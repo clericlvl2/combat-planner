@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Combat Planner">
+  <rect width="512" height="512" rx="96" fill="#18181b"/>
+  <g fill="none" stroke="#fafafa" stroke-width="28" stroke-linecap="round" stroke-linejoin="round">
+    <!-- crossed swords placeholder -->
+    <path d="M150 150 L362 362"/>
+    <path d="M362 150 L150 362"/>
+    <path d="M150 150 L150 196 L196 196"/>
+    <path d="M362 150 L362 196 L316 196"/>
+  </g>
+</svg>

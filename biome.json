@@ -1,0 +1,35 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.5.1/schema.json",
+	"vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+	"files": {
+		"ignoreUnknown": true,
+		"includes": [
+			"**",
+			"!**/node_modules",
+			"!**/.svelte-kit",
+			"!**/build",
+			"!**/dist",
+			"!src/lib/paraglide",
+			"!**/*.svelte",
+			"!package-lock.json"
+		]
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab",
+		"lineWidth": 100
+	},
+	"linter": {
+		"enabled": true,
+		"rules": { "preset": "recommended" }
+	},
+	"javascript": {
+		"formatter": { "quoteStyle": "single" }
+	},
+	"json": {
+		"formatter": { "enabled": true }
+	},
+	"css": {
+		"parser": { "tailwindDirectives": true }
+	}
+}

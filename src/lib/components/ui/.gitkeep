@@ -1,0 +1,5 @@
+# shadcn-svelte components are vendored here (ADR-008), e.g.:
+#   npx shadcn-svelte@latest add button card dialog dropdown-menu drawer sheet \
+#       sidebar select radio-group toggle-group input textarea label badge \
+#       collapsible progress popover sonner scroll-area separator alert-dialog
+# Primitive → component usage map: Component Inventory §12.

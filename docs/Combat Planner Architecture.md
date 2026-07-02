@@ -69,7 +69,7 @@ Combat Planner is a **local-only, offline-first, installable PWA** — a single-
 
 **Decision.** Model reactive combat state with `$state` / `$derived` runes, owned by a small typed store module that encapsulates the lifecycle transitions (start, advance, clear, restart, etc.) and persists to Dexie. Derived values are `$derived`, never stored.
 
-**Rationale.** Mirrors the [[Combat Planner Data Model]] split: stored fields (roster, round, override, active pointer) vs derived (`sortedCombatants`, `escalationDie`, `canAdvance`, `healthStatus`). Runes are native, minimal, and keep the Setup→Active machine readable. The store layer is the single place transitions and persistence happen, so the undo/redo history and the "interrupted write" guard live in one seam.
+**Rationale.** Mirrors the [[Combat Planner Data Model]] split: stored fields (roster, round, escalation, active pointer) vs derived (`sortedCombatants`, `escalationDie`, `canAdvance`, `healthStatus`). Runes are native, minimal, and keep the Setup→Active machine readable. The store layer is the single place transitions and persistence happen, so the undo/redo history and the "interrupted write" guard live in one seam.
 
 **Alternatives.** Classic `writable`/`derived` stores (more boilerplate, pre-runes); XState (rigorous but heavy for a 2-state lifecycle).
 

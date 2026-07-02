@@ -14,7 +14,6 @@
 	"combats.empty.cta": "Create your first combat",
 	"combat.round": "Round {n}",
 	"combat.escalation": "Escalation Die",
-	"combat.escalation.auto": "Auto",
 	"combat.undo": "Undo",
 	"combat.redo": "Redo",
 	"combat.menu.add": "Add combatant",

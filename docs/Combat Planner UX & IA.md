@@ -104,7 +104,7 @@ These three colors must meet WCAG AA contrast in both themes. **Amendment (first
 
 - **Advance:** highlights next in order; wrap → round +1 **and** escalation +1; a plain advance within the round changes neither. Only the round-99 wrap is blocked (advancing within round 99 still works).
 - **Edit round:** tap the counter → 1–99. Never touches escalation (fully decoupled — Rules §3).
-- **Set escalation:** long-press the die (mirrors the init cell's tap=roll/long-press=manual split; a plain tap is a no-op) → set 0–6 directly. No "auto" concept — future round-wraps simply continue +1 from whatever value is set.
+- **Set escalation:** tap the die → set 0–6 directly (same tap-to-edit pattern as the round counter). No "auto" concept — future round-wraps simply continue +1 from whatever value is set.
 - **Restart:** keep roster, reset init/HP/temp/conditions, round→1, escalation→0 → back to Setup. Confirmation; **undoable** via the header Undo (a roster snapshot is pushed).
 - **Clear combat:** wipe all combatants → empty Setup. Confirmation; **undoable** via the header Undo (a roster snapshot is pushed).
 - **Remove active combatant:** turn moves to next in order (or new last if it was last); no premature round increment. Removing all → reverts to Setup.
@@ -175,7 +175,7 @@ Single source of truth for **which control exists, where it lives, when it's vis
 | Back to Combats | header `←` (top-left) | always on a Combat | tap |
 | Undo ↶ / Redo ↷ | header | always; each disabled at its stack end | tap |
 | Round counter (edit) | header | **Active only** | tap |
-| Escalation die (set) | header | **Active only** | long-press (plain tap is a no-op) |
+| Escalation die (set) | header | **Active only** | tap |
 | Overflow `⋮` | header | always | tap → menu |
 | ↳ `⋮` items — **Setup** | `⋮` | roster non-empty | **Clear** |
 | ↳ `⋮` items — **Active** | `⋮` | Active | **Add combatant**, **Restart**, **Clear** |

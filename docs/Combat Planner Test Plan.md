@@ -108,7 +108,7 @@ One component, real render, stubbed store. States/variants per [[Combat Planner 
 
 Real IndexedDB; assert observable outcomes, not internal math. Viewport set: **mobile + desktop** primary; **tablet** spot-check on nav/header only (UX §7).
 
-- **F1 — Run a fight** (UX §5): Setup → add combatants → roll/long-press init (live sort) → **Start** → advance turns, numpad damage, toggle conditions → round wrap (escalation climbs) → Clear/Restart. Run mobile **and** desktop.
+- **F1 — Run a fight** (UX §5): Setup → add combatants → roll/long-press init (no live sort — add order until Start) → **Start** (snaps to sorted order) → advance turns, numpad damage, toggle conditions → round wrap (escalation +1) → Clear/Restart. Run mobile **and** desktop.
 - **F2 — Add mid-combat:** add during Active → lands `"-"` at bottom, active identity unchanged → set init → re-sort holds the active pointer (UX §5 / PRD E7).
 - **F3 — Undo a mistake:** wrong damage → header **Undo ↶** restores HP (clamped to current Max HP); accidental remove → Undo restores combatant + turn pointer; **Redo ↷** re-applies (UX §5 / PRD F3).
 - **F4 — Restart & re-run:** finish → **Restart** → roster kept, all reset to Setup → Start again (UX §5 / PRD E4).
@@ -151,10 +151,10 @@ Every PRD §6 story and every UX §5 flow maps to at least one covering test. `U
 | **E2** Start | `start` transition; F1 | U, E |
 | **E3** sort + tiebreak | sort/tiebreak (§3.2) | U |
 | **E4** Clear/Restart (confirm + undoable) | clear/restart (§3.1); Undo; F4 | U, E |
-| **E5/E6** round counter + edit | editRound + escalation recompute (§3.3) | U, C |
+| **E5/E6** round counter + edit | editRound (never touches escalation) (§3.3) | U, C |
 | **E7** whose turn (identity-bound) | F2 (re-sort keeps active) | U, E |
 | **E8** advance + r99 wrap block | advanceTurn + `canAdvance` boundary (§3.1) | U |
-| **E9** escalation track/override | escalation (§3.3) | U |
+| **E9** escalation track/set | escalation, round-wrap-only increment (§3.3) | U |
 | **E10** remove active / remove all | active-pointer move + revert-to-setup (§3.1) | U |
 | **F1 (PRD)** settings + reset-all | resetAll (keeps lang/theme, re-first-launch); DataActions | U, C |
 | **F2 (PRD)** About page | AboutPage render | C |

@@ -108,7 +108,7 @@ Fixed set of 12 (no custom conditions in v1): `charmed, confused, dazed, fear, h
 | addCombatant | currentHp = maxHp; tempHp 0; initiative "-"; no conditions; **empty hpLog**; appended; blocked if 30 exist |
 | editCombatant | update fields (incl. optional manual initiative); a **maxHp change** does not touch currentHp but is recorded as **its own discrete undoable step** (separate undo entry from the other field changes in the same save) and **appends a "Set Max HP" hpLog entry** (§9); re-sort if a tie/initiative changes |
 | rollOne(c) | initiative = d20 + bonus; re-sort (tap on init cell) |
-| setInitiative(c, v) | manual value (−99..999, sign allowed); re-sort (long-press / edit form) |
+| setInitiative(c, v) | manual value (−9..99); re-sorts only while `active` (long-press / edit form) |
 | **start** | roll all unrolled; re-sort; `state=active`; round=1; activeCombatantId = top (no confirmation). Undoable: **pushes a pre-Start snapshot** to the undo history (§8) — which combatants were unrolled (`"-"`), prior `state`, `round`, and `activeCombatantId` — so Undo restores Setup exactly. Also reversible by Restart |
 | dealDamage(n) | drain tempHp by n; remainder subtracted from currentHp; clamp at −maxHp; **appends a "Damage" hpLog entry** (§9) |
 | restoreHp(n) | currentHp = min(currentHp + n, max(maxHp, currentHp)); **appends a "Heal" hpLog entry** (§9) |

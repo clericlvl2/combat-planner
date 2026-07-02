@@ -108,8 +108,8 @@ One bar across Setup and Active; round/escalation appear **Active only** (visibi
 |---|---|---|---|---|
 | CombatHeader | Top-bar container; lays out back · undo/redo · round · escalation · `⋮` | bespoke | state ∈ {setup, active} (gates round/escalation) | default |
 | IconButton | Generic icon-only action button — back, undo, redo | **Button** (ghost, size=icon) · back/undo/redo glyphs → ADR-011 chrome | `action`; disabled (undo/redo at its stack end → Data §8) | default · disabled · focus |
-| RoundCounterControl | Show round; tap → numeric edit (1–99 → Rules §7); recompute escalation (Rules §3). **Active only** | bespoke + **Popover**/Dialog + NumberField | — | default · editing · disabled N/A |
-| EscalationDieControl | Show escalation 0–6; tap → set/reset override (Rules §3). **Active only** | bespoke + **Popover** | overridden \| auto | default · overridden · editing |
+| RoundCounterControl | Show round; tap → numeric edit (1–99 → Rules §7); never touches escalation (fully decoupled — Rules §3). **Active only** | bespoke + **Popover**/Dialog + NumberField | — | default · editing · disabled N/A |
+| EscalationDieControl | Show escalation 0–6; tap → set directly (Rules §3, no auto/override concept). **Active only** | bespoke + **Popover** | — | default · editing |
 | CombatOverflowMenu | Header `⋮`: **Setup** → {Clear}; **Active** → {Add combatant, Restart, Clear} (items/placement → UX §9) | shadcn **DropdownMenu** · overflow + add glyphs → ADR-011 | state ∈ {setup, active} (drives item set) | default |
 
 ## 7. Combat — Setup & Active bodies
@@ -118,7 +118,7 @@ The combatant list is shared by both states (sorted by initiative, Rules §2); t
 
 | Component | Purpose | Builds on · glyphs | Props / variants | States |
 |---|---|---|---|---|
-| CombatantList | Vertical, live-sorted roster; auto-scrolls active row into view (Active) | bespoke → CombatantRow | state ∈ {setup, active} | default · empty |
+| CombatantList | Vertical roster; **Active** = live-sorted by initiative; **Setup** = add order, no live sort (Rules §2); auto-scrolls active row into view (Active) | bespoke → CombatantRow | state ∈ {setup, active} | default · empty |
 | FAB | Floating bottom-right action (shared): **add** (Setup), **advance** (Active), **create** (Combats) | **Button** (rounded, size=icon) · add / advance glyphs → ADR-011 chrome | `action` ∈ {add, advance, create}; disabled (advance at r99→r100 wrap → Rules §2 / Data §3 `canAdvance`) | default · disabled |
 | StartBar | Full-width pinned bar; one-tap Start (transition → Rules §2). Hidden when roster empty (visibility → UX §9) | bespoke + **Button** | — | default · hidden (empty roster) |
 | JumpToTurnButton | On-demand float to scroll the active row back into view (appears only when it's off-screen → UX §9) | **Button** · jump glyph → ADR-011 chrome | — | default · hidden (active row visible) |

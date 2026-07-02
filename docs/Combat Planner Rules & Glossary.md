@@ -17,10 +17,10 @@ related:
 ## 1. Core terms
 
 - **Combat / encounter** — one fight. Has a lifecycle (§2), a combatant roster, a round counter, an escalation die, and an active-turn pointer.
-- **Combatant** — a participant (PC, monster/NPC, or ally). Same fields for all; the type only changes color/icon.
-- **Combatant type (PC / monster / ally)** — a flag for visual distinction (color/icon) only. Does not change fields, ordering, or behavior. One initiative list regardless of type. Optional on the add form, default **monster**.
+- **Combatant** — a participant (PC, enemy/NPC, or ally). Same fields for all; the type only changes color.
+- **Combatant type (PC / enemy / ally)** — a flag for visual distinction (color) only. Does not change fields, ordering, or behavior. One initiative list regardless of type. Optional on the add form, default **enemy**.
 - **PC** — a player character (a player has the sheet; at the table the DM just tracks its turn/HP here). Visual-only type.
-- **Ally** — a friendly NPC the DM runs at the table (DM-owned, no player sheet behind it; the DM tracks its HP). On the party's side like a PC, but DM-run. Purely a third color/icon label — same fields and behavior as any combatant; introduces no new fields or mechanics.
+- **Ally** — a friendly NPC the DM runs at the table (DM-owned, no player sheet behind it; the DM tracks its HP). On the party's side like a PC, but DM-run. Purely a third color label — same fields and behavior as any combatant; introduces no new fields or mechanics.
 - **Round** — one full cycle through all combatants. Starts at 1 on Start. Increments when the turn wraps from the last combatant back to the first. Hard-capped (range in §7).
 - **Turn** — a single combatant acting. The "active turn" highlights whose turn it is. Exists only while the combat is **Active**.
 
@@ -28,12 +28,12 @@ related:
 
 ### Lifecycle (two states: Setup → Active)
 
-- **Setup (inactive):** the default state of a new combat. The DM adds/edits/removes combatants, rolls or sets initiative, and the list auto-sorts live. There is **no active turn, no Advance control, and the round counter + escalation die are hidden.**
+- **Setup (inactive):** the default state of a new combat. The DM adds/edits/removes combatants, rolls or sets initiative. The list does **not** auto-sort while in Setup — it shows add order, so rolling/editing a value updates the number without reshuffling rows underfoot; it snaps to sorted order on Start. There is **no active turn, no Advance control, and the round counter + escalation die are hidden.**
 - **Start / Activate:** a single action that (1) auto-rolls initiative for every still-unrolled combatant (d20 + bonus), (2) re-sorts, (3) sets the combat **Active**, (4) marks the top of the order as the active turn, (5) reveals the Advance control, round counter (Round 1), and escalation die (0).
 - **Active:** turns advance; round and escalation track. Combatants can still be added/edited/removed (mid-combat add lands unrolled at the bottom).
 - **Returning to Setup / resetting** (no separate "Ended" state):
   - **Clear combat** — removes all combatants → empty Setup. Confirmation required; reversible via the combat's Undo history (a roster snapshot is kept).
-  - **Restart** — keeps the roster, resets each combatant (initiative → `"-"`, current HP → Max HP, temp HP → 0, conditions cleared), round → 1, escalation override cleared, combat back to **Setup**. For re-running the same enemies, waves, or a TPK redo.
+  - **Restart** — keeps the roster, resets each combatant (initiative → `"-"`, current HP → Max HP, temp HP → 0, conditions cleared), round → 1, escalation die reset to 0, combat back to **Setup**. For re-running the same enemies, waves, or a TPK redo.
   - If **all combatants are removed** one-by-one while Active, the combat reverts to Setup (active pointer cleared, round/escalation hidden).
 
 ### Initiative
@@ -43,23 +43,24 @@ related:
 - **Manual initiative** — DM sets a value directly (range in §7).
 - **Per-combatant initiative control (the init cell):**
   - **Tap** = roll d20 + bonus for that one combatant (re-tap re-rolls).
-  - **Long-press** = manual numeric entry with a +/− sign toggle (covers re-editing an existing value and negative values). Manual entry is also reachable from the combatant edit form as a discoverability backup.
+  - **Long-press** = manual numeric entry (covers re-editing an existing value and negative values down to −9). Manual entry is also reachable from the combatant edit form as a discoverability backup.
+  - **Active only:** the init cell is disabled (no tap-roll, no long-press) once the combat is Active — turn order is locked in for the fight. The only way to change an Active combatant's initiative is the manual-initiative field on the combatant edit form (and, for a new mid-combat add, the same field surfaced on the add form — see §7).
 - **Start auto-roll** = rolls d20 + bonus for every combatant still at `"-"`. Already-set values are untouched.
-- **Sort order** — initiative high → low. Tiebreak: (1) higher initiative bonus, (2) original add order. Combatants with `"-"` always sit at the bottom, in add order. The list re-sorts live on any initiative or bonus change (a bonus edit re-sorts only when it changes a tie).
+- **Sort order** — initiative high → low. Tiebreak: (1) higher initiative bonus, (2) original add order. Combatants with `"-"` always sit at the bottom, in add order. **While Setup, the list does not auto-sort** — it renders in add order, and an initiative/bonus edit only updates the displayed value. **Once Active, the list re-sorts live** on any initiative or bonus change (a bonus edit re-sorts only when it changes a tie).
 
 ### Turns
 
 - **Active-turn pointer** — bound to a combatant's identity, not a row position. Set to the top of the order on **Start**. A re-sort keeps it on the same combatant.
-- **Advancing the turn** — moves to the next combatant in sorted order. Past the last → wraps to first, round +1, escalation die recomputes (unless overridden). Dead combatants are **not** skipped. **At round 99 the advance is blocked** (cannot start round 100).
+- **Advancing the turn** — moves to the next combatant in sorted order. Past the last → wraps to first, round +1, escalation die +1 (see §3). A plain advance within the same round never touches the escalation die. Dead combatants are **not** skipped. **At round 99 the advance is blocked** (cannot start round 100).
 - **Removing the active combatant** — the pointer moves to the next combatant in order; if the removed one was last, it moves to the new last. This never triggers a premature round increment.
 
 ## 3. Escalation die (13th Age)
 
-- A per-combat counter, **0–6**. Visible only while the combat is Active.
-- **Auto rule:** value = `min(round − 1, 6)` → Round 1 = 0, Round 2 = 1, … Round 7+ = 6.
-- **Override:** DM may set/reset it manually (rules let it stall or reset in some fights). While overridden, it does not auto-recompute.
-- Editing the round counter recomputes the escalation die **unless** it is currently overridden.
-- The override is **cleared (back to auto)** on Clear and on Restart.
+- A per-combat counter, **0–6**, stored as a single value. Visible only while the combat is Active.
+- **Increments by 1 automatically only when Advance wraps the turn order into a new round** (last combatant → first, round +1). A plain turn advance within the same round never touches it.
+- **DM override:** the DM may set it to any value 0–6 at any time via the header control; it then continues incrementing by 1 from that value on future round-wraps.
+- **Fully decoupled from the round counter:** editing the round counter never touches escalation, and setting/advancing escalation never touches the round.
+- Reset to **0** on Clear and on Restart.
 - The app only tracks/displays it; it does not add it to any roll.
 
 ## 4. Hit points
@@ -125,7 +126,7 @@ Percentage = current HP ÷ Max HP. Temp HP is excluded. Max HP is always ≥ 1, 
 | Field | Type | Required | Placeholder | Default |
 |-------|------|----------|-------------|---------|
 | Name | text | yes (trimmed; whitespace-only blocks submit) | "Namius Name" | — |
-| Type | PC / monster / ally | no | — | monster |
+| Type | PC / enemy / ally | no | — | enemy |
 | Initiative bonus | number | no | 0 | 0 |
 | Max HP | number | yes | 10 | — |
 | AC | number | yes | 10 | — |
@@ -133,7 +134,7 @@ Percentage = current HP ÷ Max HP. Temp HP is excluded. Max HP is always ≥ 1, 
 | MD | number | yes | 10 | — |
 | Text note | text | no | "Useful notes…" | "" |
 
-> The same form (pre-filled) is reused to **edit** an existing combatant, plus a manual-initiative field as a backup entry point. Changing Max HP does not auto-change current HP.
+> The same form (pre-filled) is reused to **edit** an existing combatant, plus a manual-initiative field as a backup entry point. When adding a combatant while the combat is already **Active**, the same manual-initiative field is also surfaced on the add form so the DM can hand-enter a known value for the latecomer (default behavior unchanged — left blank, it joins unrolled ("-") at the bottom, same as §5 F2). Changing Max HP does not auto-change current HP.
 
 ### Numeric limits & validation
 
@@ -143,7 +144,7 @@ Numeric fields **clamp to their range on commit** with a brief inline hint (vali
 |-------|-----|-----|
 | Note length | — | 250 chars |
 | Initiative bonus | −99 | 99 |
-| Initiative value (manual) | −99 | 999 |
+| Initiative value (manual) | −9 | 99 |
 | AC | 0 | 99 |
 | PD | 0 | 99 |
 | MD | 0 | 99 |

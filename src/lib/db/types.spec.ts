@@ -20,6 +20,6 @@ describe('data model constants', () => {
 	it('pins the hard caps and data version (Rules §7, ADR-013)', () => {
 		expect(MAX_COMBATANTS).toBe(30);
 		expect(MAX_COMBATS).toBe(100);
-		expect(DATA_VERSION).toBe(1);
+		expect(DATA_VERSION).toBe(2);
 	});
 });

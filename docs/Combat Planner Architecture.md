@@ -131,7 +131,7 @@ Separately, the same HP transitions (including a Max-HP edit, pushed as its **ow
 
 **Decision.** Compose UI from shadcn-svelte primitives, styled with Tailwind CSS.
 
-**Rationale.** shadcn-svelte gives copy-in, ownable, accessible components (built on Bits UI) rather than a heavy locked component library — good for a small bundle and for the bespoke combatant row / numpad / drag list. Tailwind enables the dark+light theming and WCAG-AA contrast tokens (incl. the reverse/alarm HP bar and the three locked type colors: PC blue, monster red, ally green) with consistent spacing and ≥44px touch targets.
+**Rationale.** shadcn-svelte gives copy-in, ownable, accessible components (built on Bits UI) rather than a heavy locked component library — good for a small bundle and for the bespoke combatant row / numpad / drag list. Tailwind enables the dark+light theming and WCAG-AA contrast tokens (incl. the reverse/alarm HP bar, the HP-status card-background tints, and the three locked type colors: PC green, enemy red, ally blue — reassigned from an earlier PC-blue/ally-green pairing during the first-touch rework) with consistent spacing and ≥44px touch targets.
 
 **Alternatives.** A full component kit (heavier, more opinionated); plain CSS/SCSS (more hand-rolled theming).
 
@@ -162,7 +162,7 @@ Separately, the same HP transitions (including a Max-HP edit, pushed as its **ow
 **Rationale.** Lucide is **shadcn-svelte's default icon set** (ADR-008) — adopting it is zero extra decision and keeps one consistent stroke weight. ~1500 glyphs, individually importable (tree-shakeable → small bundle), MIT-licensed, bundled offline (no CDN, honors the offline/private invariant).
 
 **Mapping.**
-- **Type (firm):** PC = `user`, monster = `skull`, ally = `shield`. Color is reinforcement; the icon is the real signal (never color-alone — [[Combat Planner UX & IA]] §4c).
+- **Type (firm, map key only — first-touch rework dropped the icon from the row):** PC = `user`, enemy = `skull` (map key renamed from `monster`), ally = `shield`. The combatant row itself now signals type with color stripes, not this icon (an intentional color-alone exception, compensated by an `aria-label` — [[Combat Planner UX & IA]] §4c/§8); the map is kept in `icons.ts` for any future non-row use of the type glyphs.
 - **Chrome (firm):** back `chevron-left`, undo `undo-2`, redo `redo-2`, advance `chevron-right` (or `play`), overflow `ellipsis-vertical`, add `plus`, jump-to-turn `crosshair`, import `upload`, export/share `share-2`.
 - **12 conditions (starting map, glyphs finalized in the component pass):** charmed `heart`, confused `shuffle`, dazed `star`, fear `ghost`, helpless `bed`, hindered `link`, shocked `zap`, stuck `anchor`, stunned `tornado`, vulnerable `shield-off`, weakened `trending-down`, staggered `activity`.
 
@@ -191,3 +191,5 @@ Separately, the same HP transitions (including a Max-HP edit, pushed as its **ow
 **Alternatives.** Schema-on-read only (no Dexie upgrade — works but scatters defaulting logic; rejected for a single seam); a heavy migration framework (overkill at this scale).
 
 **Consequences.** Transforms live beside the store seam (ADR-002), unit-testable (ADR-009). `dataVersion` is the single compatibility gate for portability; the Dexie version and `dataVersion` bump together.
+
+**v2 (first-touch rework, 2026-07-02) is the first real transform**, triggered by two shape-incompatible changes together: `Combatant.type: 'monster'` → `'enemy'`, and `Combat.escalationOverride: number | 'none'` → a plain `Combat.escalation: number`. Both are folded into one migration step, applied to raw stored data (including combatants nested in the undo/redo snapshots) before read-time defaulting runs, per the "one transform, two callers" mechanism above.

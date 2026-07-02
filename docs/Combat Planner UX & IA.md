@@ -57,7 +57,7 @@ Nav destinations: Combats, Settings, About. **Non-first launch lands on Combats 
 
 ### 4a. Setup state (combat inactive)
 
-- Build the encounter: **Add combatant**, edit, remove, duplicate, set/roll initiative. List auto-sorts live by initiative.
+- Build the encounter: **Add combatant**, edit, remove, duplicate, set/roll initiative. The list does **not** auto-sort while in Setup — it renders in add order so rolling/editing a value doesn't reshuffle rows underfoot; it snaps to sorted order on Start.
 - **No** active-turn highlight, **no** Advance, **no** round counter, **no** escalation die.
 - Layout intent: **Add combatant** is a bottom-right FAB (repeated while building); **Start** is a **full-width bar pinned to the bottom edge** with the Add FAB floating just above it, **hidden while the roster is empty** (only the "Add your first combatant" hint shows). Controls / containers / visibility per state: §9.
 
@@ -71,21 +71,23 @@ One tap: auto-rolls initiative for every still-unrolled combatant (d20 + bonus) 
 
 **Combatant list:** vertical, sorted by initiative (Rules §2). Active combatant visibly highlighted. Each **Advance auto-scrolls the active combatant into view**; if the DM scrolls away so the active row is off-screen, an **on-demand floating "jump to turn" button** appears to scroll back to it.
 
-**Combatant row — compact (default):** active indicator · type color/icon · name · initiative · current/max HP · health bar · **AC/PD/MD in-row (all sizes)** · condition icons (first few + "+K" overflow). Tapping HP opens the **numpad panel**.
+**Combatant row — compact (default):** active indicator · type color stripe(s) at the leading edge · a persistent **`⋮` menu** (Edit / Duplicate / Remove — Remove destructive) · name · initiative · current/max HP · health bar · **AC/PD/MD in-row (all sizes)** · condition icons (first few + "+K" overflow). The card background itself also reflects HP status (see below). Tapping HP opens the **numpad panel**.
 
-**Combatant row — expanded (on tap):** adds temp HP · text note (inline edit, ≤250) or "add note" · condition picker (12 presets, toggle) · duplicate · remove · edit (full form).
+**Combatant row — expanded (on tap):** adds temp HP · text note (inline edit, ≤250) or "add note" · condition picker (12 presets, toggle); condition chips gain a removable **×** while expanded. The `⋮` menu (Edit / Duplicate / Remove) stays in the same place as the compact row — it does not move or duplicate into the expanded content.
 
-**Type color/icon (visual only).** Each of the three combatant types gets its own distinct color + icon so the DM can eyeball who's who at a glance; it never changes fields, ordering, or behavior:
-- **PC** — player character — **blue + person icon**.
-- **monster** — enemy (default) — **red + enemy icon**.
-- **ally** — DM-run friendly NPC (DM tracks its HP) — **green + shield icon**.
+**Type color stripes (visual only).** Each of the three combatant types gets its own distinct color stripe at the card's leading edge so the DM can eyeball who's who at a glance; it never changes fields, ordering, or behavior:
+- **PC** — player character — **green, 2 stripes**.
+- **enemy** — the default — **red, 1 stripe**.
+- **ally** — DM-run friendly NPC (DM tracks its HP) — **blue, 1 stripe**.
 
-These three colors must meet WCAG AA contrast in **both** themes and must never be conveyed by color alone — the icon is the real signal (color is reinforcement). The type carries no side/grouping semantics; it is purely this visual tag.
+These three colors must meet WCAG AA contrast in both themes. **Amendment (first-touch rework):** the type icon was dropped in favor of stripe count + color as the primary signal; this is a deliberate exception to "never color-alone" — the stripe container carries an `aria-label` naming the type as the compensating non-color signal. The type carries no side/grouping semantics; it is purely this visual tag.
+
+**Card background by HP status.** The combatant card's background tints with HP status, reusing the same tokens as the health bar (Rules §4): normal at full/wounded HP; a bloodied tint below 50% HP; at 0 HP or below, a neutral/muted tint for enemy/ally (visually "out" without an alarming color) or a distinct dead tint for a PC. The active-turn highlight ring composes on top of this background regardless of HP state.
 
 ### Initiative interactions (Setup and Active)
 
 - **Tap** the init cell → roll d20 + bonus for that one (re-tap re-rolls).
-- **Long-press** the init cell → manual numeric entry with a +/− sign toggle (re-edit existing value; negatives down to −99). Also available as a field in the edit form (discoverability backup).
+- **Long-press** the init cell → manual numeric entry (re-edit existing value; negatives down to −9). Also available as a field in the edit form (discoverability backup).
 - List re-sorts on commit.
 
 ### Numpad panel (HP)
@@ -100,16 +102,16 @@ These three colors must meet WCAG AA contrast in **both** themes and must never 
 
 ### Turn, round & escalation (Active)
 
-- **Advance:** highlights next in order; wrap → round +1, escalation recompute; only the round-99 wrap is blocked (advancing within round 99 still works).
-- **Edit round:** tap the counter → 1–99 → escalation recompute (unless overridden).
-- **Override escalation:** tap the die → set/reset 0–6 or return to auto.
-- **Restart:** keep roster, reset init/HP/temp/conditions, round→1, override cleared → back to Setup. Confirmation; **undoable** via the header Undo (a roster snapshot is pushed).
+- **Advance:** highlights next in order; wrap → round +1 **and** escalation +1; a plain advance within the round changes neither. Only the round-99 wrap is blocked (advancing within round 99 still works).
+- **Edit round:** tap the counter → 1–99. Never touches escalation (fully decoupled — Rules §3).
+- **Set escalation:** long-press the die (mirrors the init cell's tap=roll/long-press=manual split; a plain tap is a no-op) → set 0–6 directly. No "auto" concept — future round-wraps simply continue +1 from whatever value is set.
+- **Restart:** keep roster, reset init/HP/temp/conditions, round→1, escalation→0 → back to Setup. Confirmation; **undoable** via the header Undo (a roster snapshot is pushed).
 - **Clear combat:** wipe all combatants → empty Setup. Confirmation; **undoable** via the header Undo (a roster snapshot is pushed).
 - **Remove active combatant:** turn moves to next in order (or new last if it was last); no premature round increment. Removing all → reverts to Setup.
 
 ## 5. Key flows (★ = decision point / guard)
 
-**F1 — Run a fight:** open combat (Setup) → add combatants → roll some by tap / set some by long-press (live sort) → **Start** ★ (auto-rolls the rest, activates, top = active, round 1) → advance turns, deal damage via numpad, toggle conditions → wrap rounds (escalation climbs) → **Clear** or **Restart** when done.
+**F1 — Run a fight:** open combat (Setup) → add combatants → roll some by tap / set some by long-press (list stays in add order, no live sort) → **Start** ★ (auto-rolls the rest, sorts, activates, top = active, round 1) → advance turns, deal damage via numpad, toggle conditions → wrap rounds (escalation climbs) → **Clear** or **Restart** when done.
 
 **F2 — Add mid-combat:** add during Active → appears "-" at bottom, active unchanged → set its initiative → re-sort → active stays same identity.
 
@@ -151,7 +153,7 @@ These three colors must meet WCAG AA contrast in **both** themes and must never 
 - **Caps:** adding a 31st combatant or a 101st combat is blocked with a message; import refused if it would exceed 100.
 - **Import feedback:** show what's being imported; single-combat = new copy; **fail-safe** — corrupt/newer-version/over-cap refused, nothing partially applied, existing data untouched.
 - **PWA:** subtle install hint when the platform reports installability (once, dismissible, dismissal persisted); "update available" toast; offline is silent (no nag).
-- **Accessibility:** WCAG 2.1 AA basics — contrast in both themes (incl. the reverse/alarm HP bar), visible focus, semantic labels (numpad keys, condition toggles, init cell roll vs manual, turn/Start/Undo/Redo controls, row `⋮` menus), scalable text, color tags/health states not conveyed by color alone (icon/label backup).
+- **Accessibility:** WCAG 2.1 AA basics — contrast in both themes (incl. the reverse/alarm HP bar), visible focus, semantic labels (numpad keys, condition toggles, init cell roll vs manual, turn/Start/Undo/Redo controls, row `⋮` menus), scalable text, color tags/health states not conveyed by color alone (icon/label backup). **Exception:** the combatant-type stripe is color + stripe-count only (no icon); its container carries an `aria-label` naming the type as the compensating signal (§4c).
 
 ## 9. Control surface map
 
@@ -173,7 +175,7 @@ Single source of truth for **which control exists, where it lives, when it's vis
 | Back to Combats | header `←` (top-left) | always on a Combat | tap |
 | Undo ↶ / Redo ↷ | header | always; each disabled at its stack end | tap |
 | Round counter (edit) | header | **Active only** | tap |
-| Escalation die (override/reset) | header | **Active only** | tap |
+| Escalation die (set) | header | **Active only** | long-press (plain tap is a no-op) |
 | Overflow `⋮` | header | always | tap → menu |
 | ↳ `⋮` items — **Setup** | `⋮` | roster non-empty | **Clear** |
 | ↳ `⋮` items — **Active** | `⋮` | Active | **Add combatant**, **Restart**, **Clear** |
@@ -184,6 +186,7 @@ Single source of truth for **which control exists, where it lives, when it's vis
 | Add combatant | **FAB** | Setup | tap |
 | Start | **bottom bar** (FAB floats above it) | Setup, roster non-empty (hidden if empty) | tap |
 | Roll / set initiative | row init cell | always | tap / long-press |
+| Edit / Duplicate / Remove a combatant | row **`⋮`** (persistent, compact or expanded) | always | tap `⋮` → item (Remove destructive) |
 | Expand a combatant | row | always | tap row |
 | "Add your first combatant" | center hint | empty roster | tap (→ Add) |
 
@@ -194,12 +197,14 @@ Single source of truth for **which control exists, where it lives, when it's vis
 | Add combatant | header **`⋮`** (the Active FAB is Advance, not Add) | Active | tap `⋮` → Add |
 | Jump to active turn | floating button (above the Advance FAB) | Active **and** active row off-screen | tap (also auto-scroll on Advance) |
 | HP edit | row HP cell | always | tap → numpad |
+| Edit / Duplicate / Remove a combatant | row **`⋮`** (persistent, compact or expanded) | always | tap `⋮` → item (Remove destructive) |
 | Expand a combatant | row | always | tap row |
 
 ### Combatant — expanded row (both states)
 | Control | Trigger |
 |---|---|
-| Temp HP · note (≤250) · condition picker (12) · duplicate · remove · edit (full form) | tap each |
+| Temp HP · note (≤250) · condition picker (12) | tap each |
+| Remove a condition chip | tap chip's **×** (expanded only) |
 
 ### Numpad sheet (HP)
 | Control | Trigger |

@@ -1,16 +1,12 @@
 /**
- * Store seam (ADR-002) — PLACEHOLDER, implemented in M1.
+ * Store seam public API (ADR-002). Re-exports the reactive store + the pure domain (transitions,
+ * derivations, factories). Components import from `$lib/stores`; tests target `./domain/*` directly.
  *
- * This is the single owner of reactive combat state (Svelte 5 `$state` / `$derived`)
- * and the ONLY writer to Dexie (src/lib/db). It will encapsulate:
- *  - lifecycle transitions: start / advanceTurn / clearCombat / restart / editRound /
- *    setEscalation (Data Model §7) — pure functions over state, unit-testable (Test Plan §3).
- *  - HP transitions: dealDamage / restoreHp / setTempHp + Max-HP edit (Rules §4).
- *  - derived values ($derived, never stored): sortedCombatants / escalationDie /
- *    canAdvance / healthStatus (Data Model §3/§4).
- *  - per-combat 10-deep undo/redo history + hpLog append/pop kept consistent (Data Model §8/§9).
- *  - an injectable d20 RNG seam for deterministic tests (Test Plan §3 / §8 gap).
- *
- * TODO M1: implement per ADR-002 (next doc: "Store seam / ADR-002").
+ *  - reactive seam: `store` (singleton) / `CombatStore` (combat-store.svelte.ts) — owns `$state`,
+ *    the only Dexie writer, persist-on-mutation + hydrate-on-boot.
+ *  - pure domain (./domain): lifecycle/HP/roster transitions (Data §7), derived views
+ *    (sortedCombatants / escalationDie / canAdvance / healthStatus — Data §3/§4), undo/redo
+ *    (Data §8), hpLog append/pop (Data §9) — all unit-tested (Test Plan §3).
  */
-export {};
+export { CombatStore, store } from './combat-store.svelte';
+export * from './domain';

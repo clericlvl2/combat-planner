@@ -41,10 +41,10 @@
 	--sidebar-border: oklch(0.92 0.004 286.32);
 	--sidebar-ring: oklch(0.705 0.015 286.067);
 
-	/* Combatant type colors (ADR-008) — light. Icon is the real signal; color reinforces. */
-	--type-pc: #2563eb; /* PC = blue */
-	--type-monster: #dc2626; /* monster = red */
-	--type-ally: #059669; /* ally = green */
+	/* Combatant type colors (ADR-008) — light. Color-only leading-edge stripes (icon dropped). */
+	--type-pc: #059669; /* PC = green */
+	--type-enemy: #dc2626; /* enemy = red */
+	--type-ally: #2563eb; /* ally = blue */
 
 	/* Health bar bands (Rules §4) — light. `dead` = reverse/alarm fill. */
 	--health-full: #10b981;
@@ -93,9 +93,9 @@
 	--sidebar-ring: oklch(0.552 0.016 285.938);
 
 	/* Type colors — dark (≈ -400 for legibility on dark surfaces). */
-	--type-pc: #60a5fa;
-	--type-monster: #f87171;
-	--type-ally: #34d399;
+	--type-pc: #34d399;
+	--type-enemy: #f87171;
+	--type-ally: #60a5fa;
 
 	/* Health bar bands — dark. */
 	--health-full: #34d399;
@@ -149,7 +149,7 @@
 
 	/* Project tokens exposed as Tailwind color utilities (e.g. bg-type-pc, bg-health-full). */
 	--color-type-pc: var(--type-pc);
-	--color-type-monster: var(--type-monster);
+	--color-type-enemy: var(--type-enemy);
 	--color-type-ally: var(--type-ally);
 	--color-health-full: var(--health-full);
 	--color-health-wounded: var(--health-wounded);

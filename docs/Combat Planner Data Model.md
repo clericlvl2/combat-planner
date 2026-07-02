@@ -50,14 +50,14 @@ All data is local to one device. No user/account entity.
 | **state** | **setup \| active** | new combats start in `setup`; Start → `active`; Clear/Restart/remove-all → `setup` |
 | combatants | the combatant roster | see below; 0..30 |
 | round | current round counter | meaningful/visible only while `active` (range in Rules §7) |
-| escalationOverride | manual escalation value or "none" | when set, disables auto-derivation; cleared on Clear/Restart |
+| escalation | escalation die value, 0–6 | stored directly (no derivation); +1 only when Advance wraps into a new round; fully decoupled from `round` in both directions; reset to 0 on Clear/Restart |
 | activeCombatantId | identity of active turn, or "none" | bound to a Combatant id, not a position; "none" while `setup` |
 | undoStack / redoStack | bounded action history | per-combat; each holds ≤10 reversible-action entries (§8); persisted; a new action clears redoStack |
 | createdAt / updatedAt | timestamps | useful for import/debug |
 
 **Derived (not stored):**
-- **escalationDie** = if `escalationOverride` set → that value; else `min(round − 1, 6)`. Only shown while `active`.
-- **sortedCombatants** = combatants ordered per the initiative sort rule (see [[Combat Planner Rules & Glossary]] §2).
+- **escalationDie** = `clamp(escalation, 0, 6)`. Only shown while `active`.
+- **sortedCombatants** = combatants ordered per the initiative sort rule (see [[Combat Planner Rules & Glossary]] §2). **Only applied while `active`** — while `setup`, the roster is rendered in raw `combatants` (add) order; no live sort.
 - **canAdvance** = `state == active && combatants.length > 0 && !(round == 99 && active is the last combatant in sorted order)`. Only the round-99 → round-100 **wrap** is blocked; advancing *within* round 99 (combatant 1 → 2 → …) still works.
 - **showRoundAndEscalation** = `state == active`.
 
@@ -67,7 +67,7 @@ All data is local to one device. No user/account entity.
 |-------|---------|-------|
 | id | stable identifier | turn pointer & undo reference it |
 | name | display name | required; trimmed; duplicate suffixing per Rules §8 |
-| type | PC \| monster \| ally | optional input, default monster; **visual only** (color/icon) — all three share the same fields and behavior; `ally` = DM-run friendly NPC (DM tracks its HP) |
+| type | PC \| enemy \| ally | optional input, default enemy; **visual only** (color) — all three share the same fields and behavior; `ally` = DM-run friendly NPC (DM tracks its HP) |
 | addOrder | original insertion index | tiebreaker + "-" ordering |
 | initiative | number or "-" | "-" = unrolled; sits at bottom (range in Rules §7) |
 | initiativeBonus | number | default 0; used by roll (range in Rules §7) |
@@ -95,7 +95,7 @@ Fixed set of 12 (no custom conditions in v1): `charmed, confused, dazed, fear, h
   - Removing the active Combatant → move to the next in sorted order; if it was last, move to the new last; never increment the round.
   - Removing the last/only Combatant → active = "none"; if the combat was `active`, it reverts to `setup`.
 - `state` transitions: `setup → active` only via Start; `active → setup` via Clear, Restart, or removing all combatants.
-- `escalationOverride` cleared (back to auto) on Clear and Restart, or by explicit DM reset.
+- `escalation` reset to 0 on Clear and Restart.
 - Duplicating a Combatant creates a new id, appends to the list (new `addOrder`), applies the reset/copy rules (Rules §8), **starts with an empty hpLog** (its HP resets to max, so prior history is meaningless), and is blocked if it would exceed 30.
 
 ## 7. Key operations (state transitions)
@@ -114,11 +114,11 @@ Fixed set of 12 (no custom conditions in v1): `charmed, confused, dazed, fear, h
 | restoreHp(n) | currentHp = min(currentHp + n, max(maxHp, currentHp)); **appends a "Heal" hpLog entry** (§9) |
 | setTempHp(n) | tempHp = n (replace; 0 clears); **appends a "Set temp HP" hpLog entry** (§9) |
 | addCondition / removeCondition | toggle membership; no auto-expiry |
-| advanceTurn | next in sorted order; wrap → round+1, escalation recompute; **only the round-99 wrap is blocked** (advancing within round 99 still works) |
-| editRound(v) | set round (1–99); escalation recompute unless overridden |
-| setEscalation(v) / clearOverride | set/clear `escalationOverride` |
-| **restart** | keep roster; per combatant: initiative "-", currentHp=maxHp, tempHp 0, conditions cleared, **hpLog emptied**; round→1; clear override; `state=setup`; active "none"; **confirm**; pushes a roster snapshot to undo history (undoable) |
-| clearCombat | remove all combatants (**and their hpLogs**); round→1; active "none"; clear override; `state=setup`; **confirm**; pushes a roster snapshot to undo history (undoable) |
+| advanceTurn | next in sorted order; wrap → round+1 **and** escalation+1 (clamped 0–6); a plain advance within the round touches neither escalation nor round; **only the round-99 wrap is blocked** (advancing within round 99 still works) |
+| editRound(v) | set round (1–99); never touches escalation |
+| setEscalation(v) | set `escalation` directly (clamped 0–6); future round-wraps continue +1 from this value |
+| **restart** | keep roster; per combatant: initiative "-", currentHp=maxHp, tempHp 0, conditions cleared, **hpLog emptied**; round→1; escalation→0; `state=setup`; active "none"; **confirm**; pushes a roster snapshot to undo history (undoable) |
+| clearCombat | remove all combatants (**and their hpLogs**); round→1; active "none"; escalation→0; `state=setup`; **confirm**; pushes a roster snapshot to undo history (undoable) |
 | undo / redo | pop the per-combat history stack to reverse / re-apply the last action (§8); each disabled at its end. Undoing/redoing an HP action (damage/heal/set-temp/Set Max HP) also **removes / re-adds its hpLog entry** (§9) so the log mirrors current state |
 | deleteCombat | remove Combat (and its history); **confirm**, not undoable |
 | reorderCombats | update listOrder from drag |
@@ -128,7 +128,7 @@ Fixed set of 12 (no custom conditions in v1): `charmed, confused, dazed, fear, h
 
 Each Combat owns a bounded **undo history** — a stack of the **last 10 reversible actions** — plus a matching **redo** stack. Two header controls, **Undo (↶)** and **Redo (↷)**, walk the history; each is disabled at its end of the stack.
 
-- **Scope — on the stack:** HP change (damage / heal / set temp), **Max HP edit** (a discrete step, separate from other field edits in the same save — see editCombatant in §7), add / remove / duplicate combatant, condition add/remove, initiative roll/set, other combatant field edit (name/type/bonus/AC/PD/MD/note), **Start**, **Advance turn**, round edit, escalation set/clear, **Clear combat**, and **Restart**. Each entry stores what's needed to reverse the step: a **prior value** for simple edits; a **roster snapshot** for Clear/Restart; a **pre-Start snapshot** (unset initiatives + prior `state`/`round`/`activeCombatantId`) for Start; and the prior turn pointer + round + escalation for **Advance** (so an undo steps the turn — and any round/escalation wrap — back).
+- **Scope — on the stack:** HP change (damage / heal / set temp), **Max HP edit** (a discrete step, separate from other field edits in the same save — see editCombatant in §7), add / remove / duplicate combatant, condition add/remove, initiative roll/set, other combatant field edit (name/type/bonus/AC/PD/MD/note), **Start**, **Advance turn**, round edit, escalation set, **Clear combat**, and **Restart**. Each entry stores what's needed to reverse the step: a **prior value** for simple edits; a **roster snapshot** for Clear/Restart; a **pre-Start snapshot** (unset initiatives + prior `state`/`round`/`activeCombatantId`) for Start; and the prior turn pointer + round + escalation for **Advance** (so an undo steps the turn — and any round/escalation wrap — back).
 - **Off the stack (confirm-gated, not undoable):** **Delete-combat** and **Reset-all** — they live outside a single combat (Combats list / Settings), so the per-combat Undo can't reach them.
 - **HP-change reversal** (Damage / Heal / Set temp HP / **Set Max HP**) restores prior currentHp, tempHp, and (for a Max HP edit) maxHp; restored currentHp is **clamped to the current maxHp** (in case maxHp changed since). It also **pops the matching hpLog entry** (§9) — Redo re-adds it — so the read-only HP log always mirrors the combatant's real current state. Because a Max HP edit is its own undo step, undoing it pops exactly its "Set Max HP" log entry and leaves the rest of that save's field changes to their own undo entry.
 
@@ -164,7 +164,8 @@ Each Combatant owns an **`hpLog`** — an ordered, **read-only** record of its H
 
 ## 10. Persistence & portability
 
-- **Persistence:** all `AppData` (incl. combat `state`, round, override, active pointer, and each combatant's `hpLog`) saved locally; survives reload and app update; an interrupted write must not corrupt existing combats.
+- **Persistence:** all `AppData` (incl. combat `state`, round, escalation, active pointer, and each combatant's `hpLog`) saved locally; survives reload and app update; an interrupted write must not corrupt existing combats.
+- **Schema versioning:** `dataVersion` is bumped on any shape-incompatible change (ADR-013). **v2** (first-touch rework round) renamed combatant `type: 'monster'` → `'enemy'` and replaced the `escalationOverride: number | "none"` sentinel with a plain stored `escalation: number`; both are handled by a forward migration so existing local data upgrades transparently.
 - **Export all** → portable file of the full `AppData` (combats + settings + data version). Includes each combatant's `hpLog` (a full backup keeps play history).
 - **Export single combat** → portable file of one Combat (shareable). The combatant **`hpLog` IS included** (the change history travels with the shared fight). The Combat-level **undo/redo history is still NOT exported** (a fresh copy starts with an empty stack); likewise on any import. *(Deliberate split: hpLog = shareable play-history; undo stack = throwaway action-recovery.)*
 - **Import all** → **merge**: imported combats added via the import-as-new-copy rule; local Settings (language/theme) are **not** overwritten. Blocked if it would exceed the 100-combat cap.

@@ -84,7 +84,6 @@ Header chrome; round/escalation render Active-only ([[Combat Planner UX & IA]] �
 |---|---|---|
 | `combat.round` | Round {n} | `{n}` = round number |
 | `combat.escalation` | Escalation die | label |
-| `combat.escalation.auto` | Auto | reset-to-auto choice (Rules §3) |
 | `combat.undo` | Undo | |
 | `combat.redo` | Redo | |
 | `combat.menu.add` | Add combatant | header `⋮` (Active) |
@@ -95,8 +94,8 @@ Header chrome; round/escalation render Active-only ([[Combat Planner UX & IA]] �
 
 | Key | English |
 |---|---|
-| `setup.addCombatant` | Add combatant |
-| `setup.start` | Start |
+| `setup.addCombatant` | Combatant |
+| `setup.start` | Start Combat |
 | `setup.empty.title` | No combatants yet |
 | `setup.empty.cta` | Add your first combatant |
 
@@ -148,6 +147,7 @@ Display label is owned here; the **meaning** of each condition → [[Combat Plan
 | `conditions.weakened` | Weakened |
 | `conditions.staggered` | Staggered |
 | `conditions.overflow` | +{n} | `{n}` = hidden-condition count (the "+K" chip) |
+| `conditions.addShort` | Condition | short row-trigger label; dialog title keeps `conditions.add` (see note in §11) |
 
 ## 10. health.* — status labels
 
@@ -174,7 +174,7 @@ Fields, defaults, types, and the ranges behind them → [[Combat Planner Rules &
 | `forms.field.name.placeholder` | Namius Name |
 | `forms.field.type` | Type |
 | `forms.type.pc` | PC |
-| `forms.type.monster` | Monster |
+| `forms.type.enemy` | Enemy |
 | `forms.type.ally` | Ally |
 | `forms.field.initBonus` | Initiative bonus |
 | `forms.field.initValue` | Initiative |
@@ -186,6 +186,9 @@ Fields, defaults, types, and the ranges behind them → [[Combat Planner Rules &
 | `forms.field.note` | Note |
 | `forms.field.note.placeholder` | Useful notes… |
 | `forms.note.add` | Add note |
+| `forms.note.addShort` | Note |
+
+> `conditions.addShort` / `forms.note.addShort` are short row-trigger labels added alongside the M2 first-touch rework, deliberately **en.json only** — the existing full-sentence keys (`conditions.add`, `forms.note.add`) are unchanged and still back the dialog title / placeholder. New additive strings follow the established "leave other locales untranslated for now" precedent; only *renamed* keys (e.g. `forms.type.monster` → `forms.type.enemy`) require an immediate translated value in all 6 locales.
 
 ### Combat form
 

@@ -1,4 +1,5 @@
 node_modules
+dist
 
 # Output
 .output
@@ -14,6 +15,7 @@ Thumbs.db
 
 # IDE (personal)
 .idea
+.vscode
 
 # Env
 .env
@@ -30,3 +32,6 @@ playwright-report
 # Paraglide
 src/lib/paraglide
 project.inlang/cache/
+#llm
+/.claude
+/.agents

@@ -48,9 +48,9 @@ AppShell
     │   ├── CombatHeader → { IconButton×back/undo/redo, RoundCounterControl,
     │   │                    EscalationDieControl, CombatOverflowMenu }
     │   ├── CombatantList → CombatantRow
-    │   │     ├─ compact:  TypeBadge · InitCell · HpCell · HealthBar ·
-    │   │     │            DefenseStats · ConditionIconList
-    │   │     └─ expanded: + TempHpField · NoteField · ConditionPicker · RowActions
+    │   │     ├─ compact:  TypeStripe · CombatantRowMenu (persistent `⋮`) · InitCell ·
+    │   │     │            HpCell · HealthBar · DefenseStats · ConditionIconList
+    │   │     └─ expanded: + TempHpField · NoteField · ConditionPicker (chips removable)
     │   ├── StartBar (Setup) · FAB(add/advance) · JumpToTurnButton (Active)
     │   ├── EmptyState
     │   ├── NumpadSheet → { HpSummaryHeader, EntryDisplay, DigitPad,
@@ -132,27 +132,27 @@ The densest component (UX §4c). One row per combatant, toggling **compact ↔ e
 
 | Prop | Values | Drives | Source of truth |
 |---|---|---|---|
-| type | PC · monster · ally | TypeBadge color + glyph (visual only) | Rules §1, UX §4c; glyphs ADR-011, colors ADR-008/012 |
+| type | PC · enemy · ally | TypeStripe color + stripe count (visual only) | Rules §1, UX §4c; colors ADR-008/012 |
 | active | bool | active-turn highlight | Data §3 `activeCombatantId` |
-| healthState | full · wounded · bloodied · dead | HealthBar fill + alarm/reverse bar | Rules §4 (thresholds + reverse bar) |
+| healthState | full · wounded · bloodied · dead | HealthBar fill + alarm/reverse bar; also drives the card background tint (UX §4c) | Rules §4 (thresholds + reverse bar) |
 | display | compact · expanded | which children render | UX §4c |
 
 ### 8b. Sub-components
 
 | Component | Purpose | Builds on · glyphs | Props / variants | States |
 |---|---|---|---|---|
-| CombatantRow | The row container; compact↔expanded toggle; hosts all cells below | bespoke + **Collapsible** + **Card** | type · active · healthState · display (matrix above) | default · active · dead · expanded · focus |
-| TypeBadge | Type color+icon chip — the icon is the real signal, color reinforces (never color-alone → UX §4c) | bespoke + **Badge** · type glyphs → ADR-011 | type ∈ {PC, monster, ally} | default. *a11y:* label backs the color (UX §8) |
+| CombatantRow | The row container; compact↔expanded toggle; card background tints by HP status (UX §4c); hosts all cells below | bespoke + **Collapsible** + **Card** | type · active · healthState · display (matrix above) | default · active · dead · expanded · focus |
+| TypeStripe | Leading-edge color stripe(s) — count + color are the signal (deliberate color-alone exception → UX §4c/§8) | bespoke (token-driven, no primitive) | type ∈ {PC (2, green), enemy (1, red), ally (1, blue)} | default. *a11y:* `aria-label` on the stripe container names the type |
+| CombatantRowMenu | Persistent compact-row `⋮`: Edit · Duplicate · Remove (Remove destructive); visible collapsed or expanded (replaces the old expanded-only RowActions row) | shadcn **DropdownMenu** · overflow/edit/duplicate/remove glyphs — gaps §13 | — | default |
 | InitCell | Initiative value or "-"; tap = roll, long-press = manual (behavior → Rules §2) | bespoke + **Button** → InitEntry | value \| "-" (unrolled) | default · unrolled · editing. *a11y:* distinguish roll vs manual (UX §8) |
-| InitEntry | Long-press manual entry with +/− sign toggle (range → Rules §7) | shadcn **Popover** + NumberField + **Toggle** | sign ± | default · focus |
+| InitEntry | Long-press manual entry (range → Rules §7); no sign toggle — native minus-key entry | shadcn **Popover** + NumberField | — | default · focus |
 | HpCell | current/max HP display; tap opens the numpad (→ §9) | bespoke + **Button** | — | default · focus |
 | HealthBar | HP bar incl. the **reverse/alarm** dead bar (thresholds → Rules §4; alarm tokens → ADR-008) | bespoke + **Progress** (or custom fill) | healthState ∈ 4 | default · dead (reverse). *a11y:* status not color-alone, label backup (UX §8) |
 | DefenseStats | AC / PD / MD shown in-row at all sizes (read-only; values → Rules §5/§7) | bespoke | — | default |
-| ConditionIconList | Compact view: first few condition icons + a **"+K" overflow chip** (UX §4c) | bespoke + **Badge** (chip) · condition glyphs → ADR-011 | conditions set; overflow count K | default · empty (no conditions) |
+| ConditionIconList | Compact: first few condition icons + a **"+K" overflow chip**; expanded: each chip gains a removable **×** (UX §4c) | bespoke + **Badge** (chip) · condition glyphs → ADR-011; close glyph → ADR-011 chrome | conditions set; overflow count K; removable (open state) | default · empty (no conditions) |
 | ConditionPicker | Expanded: the 12 preset condition toggles (toggle membership → Data §7; set 0..12 → Data §5) | shadcn **ToggleGroup** (multi) · condition glyphs → ADR-011 | selected ⊆ 12 | default · focus |
 | TempHpField | Expanded: shows temp HP (the buffer; not on the compact row — UX §4c). Set via numpad (Rules §4) | bespoke | — | default |
 | NoteField | Expanded: inline note edit or "add note" (≤250 → Rules §7); reused in the form | shadcn **Textarea** | empty ("add note") \| filled | default · empty · error (over cap → UX §8) |
-| RowActions | Expanded: duplicate · remove · edit (full form). Remove is undoable (Data §8); edit opens CombatantFormDialog | **Button** group · duplicate/remove/edit glyphs **(gap §14)** | — | default |
 
 ## 9. Numpad sheet (HP)
 
@@ -175,8 +175,8 @@ The add/edit-combatant form (fields, defaults, limits → Rules §7). The same f
 | Component | Purpose | Builds on · glyphs | Props / variants | States |
 |---|---|---|---|---|
 | CombatantFormDialog | Add/edit a combatant; all fields + limits → Rules §7 | shadcn **Dialog** + **Form** + **Label** → NumberField, TypeSelect, NoteField, InitEntry | mode ∈ {add, edit} (edit adds manual-init field) | default · error (name required / clamp hints → UX §8) |
-| TypeSelect | PC / monster / ally selector (default monster → Rules §7) | shadcn **Select** / RadioGroup · type glyphs → ADR-011 | value ∈ {PC, monster, ally} | default · focus |
-| NumberField | Numeric input that clamps to range with inline hint (ranges → Rules §7); reused for HP/AC/PD/MD/bonus/init/round | shadcn **Input** + **Label** | `field` (sets range); sign-allowed? | default · error (clamp hint) · focus |
+| TypeSelect | PC / enemy / ally selector (default enemy → Rules §7) | shadcn **Select** / RadioGroup | value ∈ {PC, enemy, ally} | default · focus |
+| NumberField | Numeric input with native `min`/`max` attrs + clamp-on-commit + inline hint (ranges → Rules §7); reused for HP/AC/PD/MD/bonus/init/round | shadcn **Input** + **Label** | `field` (sets range) | default · error (clamp hint) · focus |
 | NoteField | Note editor ≤250 (reused in expanded row, §8) | shadcn **Textarea** | empty \| filled | default · empty · error (over cap) |
 
 ## 11. Settings & About
@@ -197,39 +197,38 @@ Which ADR-008 primitives the catalog draws on, and the components that use each.
 
 | Primitive (ADR-008) | Used by |
 |---|---|
-| Button | IconButton, FAB, StartBar, JumpToTurnButton, RowActions, DigitPad, CommitActions, DataActions, NavLink, EmptyState CTA, ImportControl |
+| Button | IconButton, FAB, StartBar, JumpToTurnButton, DigitPad, CommitActions, DataActions, NavLink, EmptyState CTA, ImportControl |
 | Dialog | CombatFormDialog, CombatantFormDialog, NumpadSheet (desktop) |
 | AlertDialog | ConfirmDialog |
 | Sidebar (app nav) | NavSidebar |
 | Sheet (side panel) | AppHeader burger |
 | Drawer (bottom sheet) | NumpadSheet (mobile) |
-| DropdownMenu | CombatRowMenu, CombatOverflowMenu |
+| DropdownMenu | CombatRowMenu, CombatOverflowMenu, CombatantRowMenu |
 | Select | TypeSelect, LanguageSwitcher |
 | RadioGroup / ToggleGroup | ColorSwatchPicker, ConditionPicker, ThemeSwitcher |
 | Input | NumberField (+ form fields) |
 | Textarea | NoteField |
 | Label / Form | CombatFormDialog, CombatantFormDialog, NumberField |
 | Card | CombatRow, CombatantRow, SettingsGroup |
-| Badge | TypeBadge, ConditionIconList (+K chip) |
+| Badge | ConditionIconList (+K chip, removable × when expanded) |
 | Collapsible | CombatantRow (compact↔expanded), HpLogSection |
 | Progress | HealthBar |
 | Popover | RoundCounterControl, EscalationDieControl, InitEntry |
-| Toggle | InitEntry (± sign) |
 | Sonner (toast) | Toaster / UpdateToast |
 | ScrollArea | HpLogSection |
 | Separator | SettingsGroup |
 | Tooltip | (a11y labels — optional reinforcement, deferred to build) |
-| bespoke (no primitive) | AppShell, ColorTagDot, HealthBar fill, DefenseStats, EntryDisplay, DigitPad grid, HpSummaryHeader, HpLogEntryRow, InstallBanner, AboutPage |
+| bespoke (no primitive) | AppShell, ColorTagDot, TypeStripe, HealthBar fill, DefenseStats, EntryDisplay, DigitPad grid, HpSummaryHeader, HpLogEntryRow, InstallBanner, AboutPage |
 
 ## 13. Glyph gaps — flagged for ADR-011
 
 ADR-011's firm **chrome** map covers: back, undo, redo, advance, overflow, add, jump-to-turn, import, export/share (plus type ×3 and the 12 conditions). The components above also need these chrome glyphs, which are **not yet in ADR-011** — flagged here, not invented (glyph names are ADR-011's to own):
 
 - **menu / burger** — AppHeader (tablet).
-- **edit** — CombatRowMenu, RowActions.
-- **delete / remove** — CombatRowMenu, RowActions.
-- **duplicate** — RowActions.
-- **close / dismiss** — InstallBanner.
+- **edit** — CombatRowMenu, CombatantRowMenu.
+- **delete / remove** — CombatRowMenu, CombatantRowMenu.
+- **duplicate** — CombatantRowMenu.
+- **close / dismiss** — InstallBanner, ConditionIconList (removable chip ×).
 - **backspace** and **clear** — DigitPad / EntryDisplay.
 - **expand / collapse chevron** — HpLogSection (History toggle), and possibly CombatantRow.
 - **drag handle** — CombatRow (reorder, ADR-006).

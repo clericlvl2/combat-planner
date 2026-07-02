@@ -50,9 +50,9 @@ Single source of truth for the choices that shaped this PRD. Mechanics detail in
 |---|------|----------|
 | 1 | Data scope | Local-only, single device. On-device storage. No backend / accounts / sync. |
 | 2 | Game system | **13th Age**, explicitly. Adds escalation die + temp HP to the sketch. |
-| 3 | Escalation die | Auto-derived from round (R1 = 0 … cap 6); DM-overridable; override clears on Clear/Restart; visible only while Active. → [[Combat Planner Rules & Glossary]] §3. |
+| 3 | Escalation die | Stored value, 0–6; +1 only when Advance wraps into a new round (fully decoupled from the round counter); DM can set it directly at any time; resets to 0 on Clear/Restart; visible only while Active. → [[Combat Planner Rules & Glossary]] §3. |
 | 4 | Temp HP | Additive buffer, set freely; damage drains temp before current; heal restores current only. → [[Combat Planner Rules & Glossary]] §4. |
-| 5 | Combatant type | Three-value visual **flag** — PC / monster / ally — color/icon only (all share fields incl. HP); `ally` = DM-run friendly NPC; optional on add form, default monster. → [[Combat Planner Rules & Glossary]] §1. |
+| 5 | Combatant type | Three-value visual **flag** — PC / enemy / ally — color only (all share fields incl. HP); `ally` = DM-run friendly NPC; optional on add form, default enemy. → [[Combat Planner Rules & Glossary]] §1. |
 | 6 | List ordering | One initiative-sorted list; type shown via color/icon, never reorders by side. |
 | 7 | Combat lifecycle | Two states **Setup → Active**. **Start** auto-rolls unrolled, activates, marks top active, reveals Advance + round + escalation; turn pointer identity-tracked (re-sort keeps the same combatant active). → [[Combat Planner Rules & Glossary]] §2. |
 | 7b | Resets | **Clear** → empty Setup; **Restart** keeps roster, resets init/HP/temp/conditions + round→1 → Setup; remove-all → Setup. → [[Combat Planner Rules & Glossary]] §2. |
@@ -126,8 +126,8 @@ Stories are grouped by epic. Each has acceptance criteria (AC). Field limits, th
 
 ### Epic D — Combatants
 
-- **D1.** As a DM I see a vertical list of combatants. Each **compact row** shows: active-turn indicator, name, type color/icon, initiative ("-" if unset), current/max HP, health bar, AC/PD/MD (in-row at all sizes), and condition icons (first few + a "+K" overflow chip). Tapping the row expands it to show temp HP, the note, the condition picker, and the duplicate/remove/edit actions. (Full field list in [[Combat Planner Data Model]].)
-- **D2.** As a DM I can add a combatant with: Name (required), Type (PC/monster/ally, optional, default monster — visual only), Initiative bonus, Max HP, AC, PD, MD, Text note. (Form spec in [[Combat Planner Rules & Glossary]].)
+- **D1.** As a DM I see a vertical list of combatants. Each **compact row** shows: active-turn indicator, type color stripe(s), a persistent `⋮` menu (Edit/Duplicate/Remove), name, initiative ("-" if unset), current/max HP, health bar, AC/PD/MD (in-row at all sizes), and condition icons (first few + a "+K" overflow chip); the card background itself also reflects HP status. Tapping the row expands it to show temp HP, the note, and the condition picker (chips become removable). (Full field list in [[Combat Planner Data Model]].)
+- **D2.** As a DM I can add a combatant with: Name (required), Type (PC/enemy/ally, optional, default enemy — visual only), Initiative bonus, Max HP, AC, PD, MD, Text note. (Form spec in [[Combat Planner Rules & Glossary]].)
   - AC: New combatant's current HP = Max HP; temp HP = 0; initiative = "-"; no conditions. Blocked at the 30-combatant cap.
 - **D3.** As a DM I can fully edit an existing combatant's fields (name, type, init bonus, Max HP, AC, PD, MD, note) via a form.
   - AC: Changing Max HP does **not** auto-change current HP.
@@ -155,24 +155,24 @@ Stories are grouped by epic. Each has acceptance criteria (AC). Field limits, th
 
 ### Epic E — Lifecycle, initiative, turns & rounds
 
-- **E0.** As a DM, a new combat starts in **Setup**: I add/edit combatants, set initiative, and the list auto-sorts live; there is no active turn, Advance, round, or escalation die yet.
-- **E1.** As a DM I can roll a single combatant's initiative by **tapping** its init cell (d20 + bonus; re-tap re-rolls), or set it manually by **long-pressing** (numeric entry with a +/− sign toggle, also reachable from the edit form).
-  - AC: List re-sorts on commit. Manual range −99..999.
+- **E0.** As a DM, a new combat starts in **Setup**: I add/edit combatants and set initiative; the list does **not** auto-sort while in Setup (it stays in add order so edits don't reshuffle rows), and snaps to sorted order on Start. There is no active turn, Advance, round, or escalation die yet.
+- **E1.** As a DM I can roll a single combatant's initiative by **tapping** its init cell (d20 + bonus; re-tap re-rolls), or set it manually by **long-pressing** (numeric entry, also reachable from the edit form).
+  - AC: While Active, the list re-sorts on commit; while Setup, the displayed value updates but the row doesn't move. Manual range −9..99.
 - **E2.** As a DM I can **Start** the combat.
   - AC: Start auto-rolls initiative (d20 + bonus) for every still-unrolled combatant, re-sorts, sets the combat **Active**, marks the top of order as the active turn, and reveals the Advance control, round counter (Round 1), and escalation die (0).
 - **E3.** As a DM the list is sorted by initiative high→low.
   - AC: Tiebreak: higher initiative bonus wins; if still tied, original add order. Combatants with "-" always sit at the bottom in add order. A bonus edit re-sorts only when it changes a tie.
-- **E4.** As a DM I can **Clear** the combat (wipe roster → empty Setup) or **Restart** it (keep roster; reset initiative/HP/temp/conditions, round→1, escalation override cleared → Setup).
+- **E4.** As a DM I can **Clear** the combat (wipe roster → empty Setup) or **Restart** it (keep roster; reset initiative/HP/temp/conditions, round→1, escalation→0 → Setup).
   - AC: Both require confirmation; both are also reversible via the combat's Undo history (a snapshot is pushed).
 - **E5.** As a DM I see a round counter and escalation die **only while the combat is Active**. Round range 1–99.
-- **E6.** As a DM I can edit the round counter by tapping (escalation recomputes unless overridden).
+- **E6.** As a DM I can edit the round counter by tapping. This never touches the escalation die (fully decoupled).
 - **E7.** As a DM I can see whose turn it is.
   - AC: Active is set to the top of order on Start. The indicator is bound to the combatant's identity, so a re-sort keeps it on the same combatant.
 - **E8.** As a DM I can advance to the next combatant's turn.
-  - AC: Advancing past the last combatant wraps to the first and increments the round (and the escalation die, unless overridden). **Only the round-99 wrap is blocked** — advancing within round 99 still works; the block fires when the last combatant of round 99 would wrap to round 100.
+  - AC: Advancing past the last combatant wraps to the first, increments the round, **and** increments the escalation die by 1 (clamped at 6). A plain advance within the same round changes neither. **Only the round-99 wrap is blocked** — advancing within round 99 still works; the block fires when the last combatant of round 99 would wrap to round 100.
   - AC: As the most-repeated live action, Advance is the **bottom-right floating button (thumb zone)** on mobile in the Active state (see [[Combat Planner UX & IA]] §4c, §9), satisfying the one-handed reach of A8/B2.
 - **E9.** As a DM I can track the escalation die.
-  - AC: Auto-derives from round (R1 = 0 … cap 6); editing the round recalculates unless overridden; I can override/reset it at any time; the override clears on Clear/Restart.
+  - AC: Stored as a single value 0–6; increments by 1 only when Advance wraps into a new round; I can set it directly at any time (future round-wraps continue +1 from that value); it resets to 0 on Clear/Restart. Editing the round counter never affects it.
 - **E10.** As a DM, removing the active combatant moves the turn to the next in order (or to the new last if it was last), without a premature round increment. Removing all combatants reverts the combat to Setup.
 
 ### Epic F — Settings & data
@@ -184,7 +184,7 @@ Stories are grouped by epic. Each has acceptance criteria (AC). Field limits, th
 ## 7. Non-functional requirements
 
 - **Offline-first:** every feature works with no network; offline is the default assumption.
-- **Persistence:** all state (combats, combatants, turn pointer, round, escalation override, settings) persists locally across reloads and updates.
+- **Persistence:** all state (combats, combatants, turn pointer, round, escalation, settings) persists locally across reloads and updates.
 - **Performance & caps:** smooth interaction (no perceptible lag on HP edits, sort, turn advance) at the hard caps of **30 combatants per combat** and **100 combats**; adding beyond is blocked.
 - **Responsive:** mobile-first; defined behavior at mobile / tablet / desktop breakpoints (see [[Combat Planner UX & IA]]).
 - **Accessibility:** practical WCAG 2.1 AA — contrast in both themes, ≥44px touch targets, visible focus, semantic labels, scalable text.

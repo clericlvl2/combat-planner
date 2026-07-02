@@ -47,9 +47,9 @@ Targets the ADR-002 store seam (transitions are pure → cheap) and ADR-013 tran
 
 ### 3.1 Lifecycle
 - **start** — Setup roster, mix of `"-"` and rolled → asserts every still-`"-"` gets `d20+bonus` (mocked RNG), re-sort, `state=active`, `round=1`, `activeCombatantId` = top of sorted order, `showRoundAndEscalation` flips true, and a **pre-Start snapshot** is pushed to undo (Data §7 `start`, §8).
-- **advanceTurn** — next in sorted order; past last → wrap, `round+1`, escalation recompute (Data §7 `advanceTurn`). Boundary: advancing **within** round 99 still works; `canAdvance` is false only at the r99→r100 wrap (Data §3 `canAdvance`, Rules §2).
-- **clearCombat** — roster emptied (+ their hpLogs), `state→setup`, override cleared, active `"none"`, roster snapshot pushed (Data §7 `clearCombat`).
-- **restart** — roster kept; per combatant reset (init `"-"`, cur=max, temp 0, conditions cleared, hpLog emptied — Rules §2 / Data §7 `restart`); `round→1`; override cleared; `state→setup`; snapshot pushed.
+- **advanceTurn** — next in sorted order; past last → wrap, `round+1` **and** escalation `+1`; a plain advance within the round changes neither (Data §7 `advanceTurn`). Boundary: advancing **within** round 99 still works; `canAdvance` is false only at the r99→r100 wrap (Data §3 `canAdvance`, Rules §2).
+- **clearCombat** — roster emptied (+ their hpLogs), `state→setup`, escalation reset to 0, active `"none"`, roster snapshot pushed (Data §7 `clearCombat`).
+- **restart** — roster kept; per combatant reset (init `"-"`, cur=max, temp 0, conditions cleared, hpLog emptied — Rules §2 / Data §7 `restart`); `round→1`; escalation reset to 0; `state→setup`; snapshot pushed.
 - **remove-all-while-active** — removing the last combatant reverts `active → setup`, active `"none"`, no premature round bump (Data §6).
 
 ### 3.2 Sort + tiebreak
@@ -57,9 +57,10 @@ Targets the ADR-002 store seam (transitions are pure → cheap) and ADR-013 tran
 - A bonus edit re-sorts **only when it changes a tie** (Rules §2 / PRD E3) — assert a non-tie bonus edit leaves order untouched.
 
 ### 3.3 Escalation
-- `escalationDie` auto = `min(round−1, 6)` incl. the 6-cap at round ≥ 7 (Rules §3).
-- `editRound` recomputes escalation **unless overridden** (Rules §3 / Data §7 `editRound`).
-- `setEscalation` stalls auto; `clearOverride` returns to auto; override is cleared by `clearCombat`/`restart` (Rules §3, Data §6).
+- `escalationDie` = `clamp(escalation, 0, 6)`; stored, not derived (Rules §3).
+- `advanceTurn` increments escalation by 1 only on the round-wrap branch; a same-round advance leaves it untouched (Rules §3 / Data §7 `advanceTurn`).
+- `editRound` never touches escalation — fully decoupled in both directions (Rules §3 / Data §7 `editRound`).
+- `setEscalation` sets the value directly (clamped 0–6); reset to 0 by `clearCombat`/`restart` (Rules §3, Data §6).
 
 ### 3.4 HP
 - **dealDamage** — drains temp first, remainder off current, clamps at the Rules §7 floor (`−maxHp`) (Rules §4).
@@ -98,7 +99,7 @@ Targets the ADR-002 store seam (transitions are pure → cheap) and ADR-013 tran
 
 One component, real render, stubbed store. States/variants per [[Combat Planner Component Inventory]]; a11y labels per [[Combat Planner UX & IA]] §8.
 
-- **CombatantRow — compact ↔ expanded** (Collapsible): tap toggles; expanded reveals TempHpField · NoteField · ConditionPicker · RowActions; compact hides temp HP (Component Inventory §8). Asserts `aria` expand/collapse label + active-highlight on `isActive`.
+- **CombatantRow — compact ↔ expanded** (Collapsible): tap toggles; expanded reveals TempHpField · NoteField · ConditionPicker (chips removable); the `⋮` menu (Edit/Duplicate/Remove) is persistent in both states, not expanded-only; compact hides temp HP (Component Inventory §8). Asserts `aria` expand/collapse label + active-highlight on `isActive`.
 - **NumpadSheet** (Component Inventory §9 / UX §4c): digit entry updates EntryDisplay; **Deal Damage / Restore HP / Set Temp HP** emit the right commit intent; **empty entry → CommitActions disabled (no-op)**; **History** toggle reveals the read-only hpLog list ("No HP changes yet" when empty), view-only (no undo control inside); dismiss (outside/Cancel) emits no commit.
 - **Forms — clamp + name-required** (Component Inventory §10 / UX §8): NumberField clamps to the Rules §7 range on commit and shows the inline hint; name field blocks submit on empty/whitespace-only (Rules §7).
 - **Condition toggle / overflow** (Component Inventory §8): ConditionPicker toggles membership (unique, up to 12); ConditionIconList shows first-few + the **"+K" overflow chip** with the plural a11y label (UX §4c, i18n `a11y.condition.overflow`).

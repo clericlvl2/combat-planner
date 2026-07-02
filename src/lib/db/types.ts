@@ -5,7 +5,7 @@
  */
 
 /** Bumped together with the Dexie DB version on a shape-incompatible change (ADR-013). */
-export const DATA_VERSION = 1;
+export const DATA_VERSION = 2;
 
 /** Hard caps (Rules §7). */
 export const MAX_COMBATANTS = 30;
@@ -15,8 +15,8 @@ export const MAX_COMBATS = 100;
 export type Locale = 'en' | 'de' | 'es' | 'fr' | 'ja' | 'ru';
 
 /** Visual-only combatant type — drives color + icon, nothing else (Rules §1). */
-export type CombatantType = 'pc' | 'monster' | 'ally';
-export const COMBATANT_TYPES = ['pc', 'monster', 'ally'] as const;
+export type CombatantType = 'pc' | 'enemy' | 'ally';
+export const COMBATANT_TYPES = ['pc', 'enemy', 'ally'] as const;
 
 /** Combat lifecycle (Data Model §3). */
 export type CombatState = 'setup' | 'active';
@@ -98,12 +98,47 @@ export interface HpLogEntry {
 }
 
 /**
- * A bounded undo/redo history entry (Data Model §8). Shape is per-action
- * (prior value | roster snapshot | pre-Start snapshot | turn pointer + round +
- * escalation). Modeled concretely in M1 alongside the store seam.
+ * The reversible per-combat actions tracked by the undo/redo history (Data Model §8).
+ * Tag carried on each UndoEntry for debugging/tests; the reversal mechanism itself is a
+ * uniform snapshot (see below), which Data §8 explicitly permits ("a roster snapshot",
+ * "a pre-Start snapshot", …).
  */
-// TODO M1: replace with the discriminated union of reversible-action entries (Data Model §8).
-export type UndoEntry = Record<string, unknown>;
+export type UndoableAction =
+	| 'damage'
+	| 'heal'
+	| 'setTemp'
+	| 'setMaxHp'
+	| 'addCombatant'
+	| 'removeCombatant'
+	| 'duplicateCombatant'
+	| 'addCondition'
+	| 'removeCondition'
+	| 'rollInitiative'
+	| 'setInitiative'
+	| 'editCombatant'
+	| 'start'
+	| 'advanceTurn'
+	| 'editRound'
+	| 'setEscalation'
+	| 'clearCombat'
+	| 'restart';
+
+/**
+ * A combat's reversible state — everything except the history stacks themselves (so snapshots
+ * never nest stacks and cannot grow unbounded).
+ */
+export type CombatSnapshot = Omit<Combat, 'undoStack' | 'redoStack'>;
+
+/**
+ * One bounded undo/redo history entry (Data Model §8). Stores a deep snapshot of the combat's
+ * reversible state taken immediately BEFORE the action; undo restores it, redo re-applies the
+ * post-action snapshot. The snapshot carries each combatant's `hpLog`, so undoing an HP action
+ * pops its log entry for free (Data §9).
+ */
+export interface UndoEntry {
+	action: UndoableAction;
+	snapshot: CombatSnapshot;
+}
 
 /** A participant (Data Model §4). All types share the same fields. */
 export interface Combatant {
@@ -137,8 +172,8 @@ export interface Combat {
 	state: CombatState;
 	combatants: Combatant[];
 	round: number;
-	/** Manual escalation value, or "none" for auto-derivation. */
-	escalationOverride: number | typeof NONE;
+	/** Escalation die (0–6). Increments by 1 only when Advance wraps into a new round. */
+	escalation: number;
 	/** Active combatant id, bound to identity, or "none" while Setup. */
 	activeCombatantId: string | typeof NONE;
 	/** Per-combat bounded history (≤10). Persisted; stripped on export (ADR-003). */

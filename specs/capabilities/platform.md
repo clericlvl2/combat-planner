@@ -50,7 +50,9 @@ The app is installable; a subtle install hint appears when eligible, shown **onc
 **dismissible** (dismissal persists via `installHintDismissed` so it never reappears); it runs
 standalone after install. When a new version is cached, an "Update available — reload" toast
 appears; reloading applies the update without data loss (data lives in IndexedDB, independent of
-the service-worker cache).
+the service-worker cache). Placement: the update toast renders bottom-center, lifted above the
+FAB/thumb zone; the install hint is a slim top banner. Neither ever overlaps the FAB or the Setup
+start bar ([[../reference/component-inventory]]).
 
 **AC:**
 - The install hint appears at most once per device unless storage is cleared; dismissing it
@@ -58,6 +60,8 @@ the service-worker cache).
 - After install, the app launches standalone (no browser chrome).
 - When an update is waiting, the reload toast appears; reloading applies it and all combats/
   settings are still present afterward.
+- The update toast renders bottom-center and the install hint renders as a top banner; neither
+  ever visually overlaps the FAB or the Setup start bar.
 
 ## PLT-5 — Accessibility (WCAG 2.1 AA)
 

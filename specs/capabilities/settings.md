@@ -23,8 +23,8 @@ in Settings. Switching applies immediately, persists, and works offline.
 - On first run with no prior choice, the UI language matches the browser locale if it's one of
   the 6, otherwise English.
 - Switching language in Settings changes all visible strings immediately, without a reload.
-- The chosen language persists across reloads and survives Reset-all is **not** the case — see
-  SET-3 (Reset-all keeps it).
+- The chosen language persists across reloads and survives Reset-all — see SET-3 (Reset-all keeps
+  language/theme).
 
 ## SET-2 — Theme
 

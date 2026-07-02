@@ -92,6 +92,12 @@ One bar across Setup and Active. `IconButton`s: back, undo, redo (undo/redo disa
 respective stack ends). `RoundCounterControl` and `EscalationDieControl` are **Active only**.
 `CombatOverflowMenu` (`⋮`): Setup → {Clear}; Active → {Add combatant, Restart, Clear}.
 
+## Global chrome placement
+
+`UpdateToast` (via `Toaster`) renders bottom-center, lifted above the FAB/thumb zone.
+`InstallBanner` renders as a slim, dismissible top banner. Neither ever overlaps the FAB or the
+Setup `StartBar` ([[platform]] PLT-4).
+
 ## Combats list row
 
 `CombatRow`: color tag (`ColorTagDot`), title, description, trailing `⋮` (`CombatRowMenu`: Edit /
@@ -121,6 +127,7 @@ Export-share / Delete). Drag handle for reorder (svelte-dnd-action).
 | Sonner (toast) | Toaster / UpdateToast |
 | ScrollArea | HpLogSection |
 | Separator | SettingsGroup |
+| Tooltip | (a11y labels — optional reinforcement, deferred to build) |
 | bespoke (no primitive) | AppShell, ColorTagDot, TypeStripe, HealthBar fill, DefenseStats, EntryDisplay, DigitPad grid, HpSummaryHeader, HpLogEntryRow, InstallBanner, AboutPage |
 
 ## Glyph gaps (not yet in ADR-011)

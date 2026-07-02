@@ -1,0 +1,60 @@
+# Reference: Condition glossary & color-tag palette
+
+Sources: `Rules & Glossary` §1 (Core terms), §6 (Conditions table) · `Architecture` ADR-012
+(color-tag palette), ADR-011 (type/condition icon mapping).
+
+## Core terms
+
+- **Combat / encounter** — one fight. Has a lifecycle ([[../capabilities/lifecycle]]), a
+  combatant roster, a round counter, an escalation die, and an active-turn pointer.
+- **Combatant** — a participant (PC, enemy, or ally). Same fields for all; type only changes
+  color ([[../capabilities/combatants]] CBT-1).
+- **PC** — a player character; the DM tracks its turn/HP here, the player has the sheet.
+- **Ally** — a friendly NPC the DM runs at the table (DM-owned, no player sheet). Same fields and
+  behavior as any combatant; a third color label only.
+- **Round** — one full cycle through all combatants ([[../capabilities/turns-rounds-escalation]]).
+- **Turn** — a single combatant acting; exists only while the combat is Active.
+
+## The 12 conditions
+
+Pure visual labels in the app ([[../capabilities/conditions]] CND-1) — no stat changes, no turn
+effects, no auto-expiry. Meaning is the DM's to apply; summarized here as domain reference only.
+
+| Condition | 13th Age reminder (DM applies, app does not enforce) |
+|-----------|------------------------------------------------------|
+| charmed | treats an enemy as ally; limited actions |
+| confused | can't use its best attacks; may act randomly |
+| dazed | −4 to attacks |
+| fear | −4 attacks & defenses; can't use some abilities |
+| helpless | unconscious/out; attackers can crit on melee |
+| hindered | can only move or act, not both |
+| shocked | situational penalty (campaign/monster-specific) |
+| stuck | can't move (no disengage/move) |
+| stunned | can't take actions; −4 to defenses |
+| vulnerable | attacks against it crit on a lower roll |
+| weakened | −4 attacks & defenses; reduced damage |
+| staggered | at or below half HP; some abilities trigger |
+
+Icon mapping (Lucide glyph per condition): charmed `heart`, confused `shuffle`, dazed `star`,
+fear `ghost`, helpless `bed`, hindered `link`, shocked `zap`, stuck `anchor`, stunned `tornado`,
+vulnerable `shield-off`, weakened `trending-down`, staggered `activity`. Glyph choices are
+non-blocking and may be tuned for recognizability during UI build (`docs/adr/ADR-011.md`).
+
+## Combat color-tag palette (8 swatches)
+
+Used by [[../capabilities/combats-list]] for a combat's `colorTag`. Each swatch is a CSS theme
+variable with a light and dark value (`docs/adr/ADR-012.md`); `colorTag` stores the swatch key,
+not a hex, so re-theming never touches stored data. Separate from the three locked
+combatant-type colors (PC green, enemy red, ally blue — [[../capabilities/combatants]] CBT-1,
+`docs/adr/ADR-008.md`), which live on combatant rows, not combat rows.
+
+| Key | Swatch |
+|-----|--------|
+| neutral | Slate (default) |
+| red | Red |
+| orange | Orange |
+| amber | Amber |
+| green | Emerald |
+| teal | Teal |
+| blue | Sky |
+| violet | Violet |

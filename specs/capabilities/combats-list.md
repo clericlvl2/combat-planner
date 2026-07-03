@@ -12,11 +12,12 @@ owns only that a combat has one.
 ## CLS-1 — List display
 
 Combats render as a vertical list; each row shows Title, Description, and a Color tag, plus a
-per-row trailing `⋮` overflow menu (Edit / Export-share / Delete).
+per-row trailing `⋮` overflow menu (Edit / Delete; the Export/share item is pending under CLS-8).
 
 **AC:**
 - Every combat row displays title, description, and its color tag.
-- The row `⋮` menu exposes exactly Edit, Export/share, and Delete.
+- The row `⋮` menu exposes Edit and Delete. (The Export/share item is added when CLS-8 lands —
+  [[import-export]].)
 
 ## CLS-2 — Create combat
 

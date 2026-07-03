@@ -8,6 +8,7 @@ per closed change unit.
 | Unit | Date | Change |
 |---|---|---|
 | 001-m2-component-tests-and-dogfood | 2026-07-03 | 7 new `vitest-browser-svelte` component test files for M2 UI components (CombatantRow, CombatantForm, HealthBar, NumpadSheet, ConditionPicker, InitCell, CombatHeader); DM dogfood attestation recorded, referencing pre-existing first-touch play sessions already folded into the M2 rework (`dfc8582` + `82da34a`); B-001/B-002 flipped to `done`. |
+| 002-combats-home | 2026-07-04 | M3 Combats home shipped (CLS-1..7): list render with color-tag rows, create with 100-cap block, edit (new `editCombat` domain fn + `CombatStore.editCombat`), confirm-gated cascade delete (no undo), tap-to-open navigation, drag reorder persisting `listOrder`, and first-launch routing branch. Row `⋮` menu ships Edit + Delete only; Export/share stays deferred to CLS-8/M5. |
 
 ## Spec era (rounds 1–13)
 

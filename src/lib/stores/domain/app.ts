@@ -3,7 +3,7 @@
  * These live outside the per-combat undo history (Data §8: delete-combat / reset-all are
  * confirm-gated, not undoable). The reactive seam wires confirmation + persistence (M2+).
  */
-import { type Combat, MAX_COMBATS, type Settings } from '../../db/types';
+import { type ColorTag, type Combat, MAX_COMBATS, type Settings } from '../../db/types';
 import { type CombatInput, createCombat } from './factories';
 import { genId as defaultGenId, type IdGen } from './id';
 
@@ -28,6 +28,29 @@ export function createCombatInList(
 /** Delete a combat (and its history). Not undoable (Data §8). */
 export function deleteCombat(combats: Combat[], id: string): Combat[] {
 	return combats.filter((c) => c.id !== id);
+}
+
+export interface EditCombatPatch {
+	title?: string;
+	description?: string;
+	colorTag?: ColorTag;
+}
+
+/** Patch title/description/colorTag on an existing combat; roster/state/history untouched (CLS-3). */
+export function editCombat(combats: Combat[], id: string, patch: EditCombatPatch): Combat[] {
+	const idx = combats.findIndex((c) => c.id === id);
+	if (idx === -1) return combats;
+	const current = combats[idx];
+	const next: Combat = {
+		...current,
+		title: patch.title !== undefined ? patch.title.trim() : current.title,
+		description: patch.description !== undefined ? patch.description.trim() : current.description,
+		colorTag: patch.colorTag ?? current.colorTag,
+		updatedAt: Date.now(),
+	};
+	const out = combats.slice();
+	out[idx] = next;
+	return out;
 }
 
 /** Re-assign listOrder from a dragged id order (Data §7 reorderCombats). */

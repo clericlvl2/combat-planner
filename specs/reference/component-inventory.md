@@ -99,7 +99,8 @@ Setup `StartBar` ([[../capabilities/platform]] PLT-4).
 ## Combats list row
 
 `CombatRow`: color tag (`ColorTagDot`), title, description, trailing `⋮` (`CombatRowMenu`: Edit /
-Export-share / Delete). Drag handle for reorder (svelte-dnd-action).
+Delete; the Export-share item is pending under [[../capabilities/combats-list]] CLS-8). Drag
+handle for reorder (svelte-dnd-action).
 
 ## shadcn-svelte primitive coverage (reverse index)
 

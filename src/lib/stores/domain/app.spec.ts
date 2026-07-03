@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import type { Combat } from '../../db/types';
-import { createCombatInList, deleteCombat, firstLaunch, reorderCombats, resetAll } from './app';
+import {
+	createCombatInList,
+	deleteCombat,
+	editCombat,
+	firstLaunch,
+	reorderCombats,
+	resetAll,
+} from './app';
 import { createCombat, createSettings } from './factories';
 
 let seq = 0;
@@ -36,6 +43,42 @@ describe('deleteCombat / reorderCombats (Data §7)', () => {
 		const out = reorderCombats([a, b], ['b', 'a']);
 		expect(out.find((c) => c.id === 'b')?.listOrder).toBe(0);
 		expect(out.find((c) => c.id === 'a')?.listOrder).toBe(1);
+	});
+});
+
+describe('editCombat (Data §7, CLS-3)', () => {
+	it('patches title/description/colorTag and bumps updatedAt, leaving roster/state untouched', () => {
+		const original = createCombat({ title: 'Old', description: 'Old desc' }, 0, () => 'a');
+		original.combatants = [{ id: 'x' } as never];
+		original.state = 'active';
+		const before = { ...original };
+		const out = editCombat([original], 'a', {
+			title: '  New Title  ',
+			description: '  New desc  ',
+			colorTag: 'red',
+		});
+		const edited = out.find((c) => c.id === 'a');
+		expect(edited?.title).toBe('New Title');
+		expect(edited?.description).toBe('New desc');
+		expect(edited?.colorTag).toBe('red');
+		expect(edited?.combatants).toBe(before.combatants);
+		expect(edited?.state).toBe(before.state);
+		expect(edited?.updatedAt).toBeGreaterThanOrEqual(before.updatedAt);
+	});
+
+	it('patches a subset, leaving unpatched fields untouched', () => {
+		const original = createCombat({ title: 'Keep', description: 'Keep desc' }, 0, () => 'a');
+		const out = editCombat([original], 'a', { colorTag: 'blue' });
+		const edited = out.find((c) => c.id === 'a');
+		expect(edited?.title).toBe('Keep');
+		expect(edited?.description).toBe('Keep desc');
+		expect(edited?.colorTag).toBe('blue');
+	});
+
+	it('is a no-op for an unknown id', () => {
+		const combats = [createCombat({}, 0, () => 'a')];
+		const out = editCombat(combats, 'missing', { title: 'x' });
+		expect(out).toBe(combats);
 	});
 });
 

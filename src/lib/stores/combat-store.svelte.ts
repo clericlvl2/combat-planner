@@ -123,6 +123,16 @@ export class CombatStore {
 		return created;
 	}
 
+	/** Patch title/description/colorTag on an existing combat (CLS-3); no-op if the id is unknown. */
+	editCombat(id: string, patch: App.EditCombatPatch): void {
+		const snapshot = $state.snapshot(this.combats) as Combat[];
+		const edited = App.editCombat(snapshot, id, patch);
+		if (edited === snapshot) return; // unknown id — no-op
+		this.combats = edited;
+		const next = edited.find((c) => c.id === id);
+		if (next) void persistCombat(this.#db, next);
+	}
+
 	/** Delete a combat (confirm-gated upstream; not undoable — Data §8). */
 	deleteCombat(id: string): void {
 		this.combats = App.deleteCombat(this.combats, id);

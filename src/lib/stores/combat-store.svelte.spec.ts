@@ -57,4 +57,29 @@ describe('CombatStore (ADR-002 seam)', () => {
 		store.dealDamage('nope', 'x', 5);
 		expect(store.combats).toHaveLength(1);
 	});
+
+	it('editCombat patches title/description/colorTag and persists (CLS-3)', async () => {
+		const db = fakeDb();
+		const store = new CombatStore(db);
+		const created = store.createCombat({ title: 'Original' }, () => 'fresh');
+		const id = (created as Combat).id;
+
+		store.editCombat(id, { title: 'Renamed', description: 'New desc', colorTag: 'blue' });
+
+		const combat = store.getCombat(id);
+		expect(combat?.title).toBe('Renamed');
+		expect(combat?.description).toBe('New desc');
+		expect(combat?.colorTag).toBe('blue');
+
+		await Promise.resolve();
+		expect(db._combats.get(id)?.title).toBe('Renamed');
+	});
+
+	it('editCombat is a safe no-op for an unknown id', () => {
+		const store = new CombatStore(fakeDb());
+		store.createCombat({ title: 'Ad hoc' }, () => 'fresh');
+		store.editCombat('nope', { title: 'x' });
+		expect(store.combats).toHaveLength(1);
+		expect(store.combats[0].title).toBe('Ad hoc');
+	});
 });

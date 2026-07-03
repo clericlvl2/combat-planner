@@ -21,8 +21,8 @@ aliases:
 
 - Spec-driven since 2026-07-03.
 - M1 done (`c7e172a`).
-- M2 code-complete (`dfc8582` + `82da34a`); component tests + dogfood pending as B-001/B-002 →
-  pilot unit 001.
+- M2 code-complete (`dfc8582` + `82da34a`); component tests + dogfood done — pilot unit
+  `001-m2-component-tests-and-dogfood` (B-001/B-002 flipped to `done`).
 - Next milestone: M3.
 
 ## Milestones
@@ -31,7 +31,7 @@ aliases:
 |---|---|---|---|
 | **M1** | Store seam (ADR-002) + Dexie persist (ADR-003) + migration transforms (ADR-013), test-first. | Core state machine + durable data; nothing real without it. | done |
 | **M2** | Combat screen vertical slice — Setup→Active, combatant row (compact/expanded), init tap/long-press, HP numpad, Advance, conditions. | The heartbeat (95% of play). End of M2 = dogfoodable: one hardcoded combat, no polish/i18n/PWA. | code-complete |
-| **★ Dogfood gate** | Run 2–3 real fights; log friction. | Riskiest-assumption test — reorder everything below by what actually hurt at the table. | pending |
+| **★ Dogfood gate** | Run 2–3 real fights; log friction. | Riskiest-assumption test — reorder everything below by what actually hurt at the table. | done |
 | **M3** | Combats home — CRUD, drag reorder, first-launch, undo/redo wired. | Multi-encounter prep. | — |
 | **M4** | PWA shell (ADR-004) — offline precache, install hint, update toast. | Delivers "installable offline"; real app on the phone, not a localhost tab. | — |
 | **M5** | Settings + About + export/import (fail-safe, shared transforms) + i18n wiring (Paraglide ADR-005; strings already cataloged). | Backup/portability (flow F5) + 6 languages. | — |
@@ -68,3 +68,4 @@ Rows added by `/spec-close`, one per closed change unit.
 
 | Unit | Date | Change |
 |---|---|---|
+| 001-m2-component-tests-and-dogfood | 2026-07-03 | 7 new `vitest-browser-svelte` component test files for M2 UI components (CombatantRow, CombatantForm, HealthBar, NumpadSheet, ConditionPicker, InitCell, CombatHeader); DM dogfood attestation recorded, referencing pre-existing first-touch play sessions already folded into the M2 rework (`dfc8582` + `82da34a`); B-001/B-002 flipped to `done`. |

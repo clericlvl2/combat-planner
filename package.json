@@ -14,7 +14,8 @@
 		"format": "biome format --write .",
 		"test:unit": "vitest",
 		"test:e2e": "playwright test",
-		"test": "npm run test:unit -- --run && npm run test:e2e"
+		"test": "npm run test:unit -- --run && npm run test:e2e",
+		"gate": "npm run lint && npm run check && npm run test:unit -- --run && npm run build"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.5.1",

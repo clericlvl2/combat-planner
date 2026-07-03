@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Test Plan §7 CI gate: lint -> types -> unit -> build -> e2e.
+      # specs/reference/acceptance-matrix.md CI gate: lint -> types -> unit -> build -> e2e.
       - name: Lint (Biome)
         run: npm run lint
 
@@ -46,3 +46,32 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
+
+  # Warn-only, per specs/README.md change-unit lifecycle: commits touching src/** should carry
+  # a "Spec: NNN-slug" trailer. Escalate to blocking once the spec-driven-development flow (see
+  # .claude/skills/spec-*) has proven itself over a few real change units.
+  spec-trailer-check:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check src/** commits carry a Spec trailer (warn-only)
+        run: |
+          base="${{ github.event.pull_request.base.sha }}"
+          head="${{ github.event.pull_request.head.sha }}"
+          missing=0
+          for sha in $(git rev-list "$base..$head"); do
+            if git diff-tree --no-commit-id --name-only -r "$sha" | grep -q '^src/'; then
+              if ! git log -1 --format=%B "$sha" | grep -qE '^Spec: [0-9]{3}-[a-z0-9-]+$'; then
+                echo "::warning::commit $sha touches src/** but has no 'Spec: NNN-slug' trailer"
+                missing=1
+              fi
+            fi
+          done
+          if [ "$missing" -eq 1 ]; then
+            echo "One or more commits are missing a Spec trailer. Warn-only for now — see specs/README.md."
+          fi
+          exit 0

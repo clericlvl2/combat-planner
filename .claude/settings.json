@@ -1,0 +1,15 @@
+{
+	"hooks": {
+		"Stop": [
+			{
+				"hooks": [
+					{
+						"type": "command",
+						"command": "cd \"$CLAUDE_PROJECT_DIR\" && { git status --porcelain -- src | grep -q . || exit 0; } && npm run lint && npm run check",
+						"timeout": 60
+					}
+				]
+			}
+		]
+	}
+}

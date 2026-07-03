@@ -1,15 +1,13 @@
 # Reference: Component inventory
 
-Sources: `Component Inventory` §1–§14 (full catalog).
-
 The reusable-UI-component catalog: hierarchy, variant/prop matrix, and the
 component → shadcn-svelte primitive → glyph mapping. Capability files point here for control
 placement/visibility and card layout; this file never restates behavior/mechanics (owned by the
-relevant capability file) or the glyph-name map (`docs/adr/ADR-011.md`).
+relevant capability file) or the glyph-name map (`specs/adr/ADR-011.md`).
 
 Global states (app-wide, not repeated per row): **loading is N/A** everywhere — all reads are
 synchronous-feeling local IndexedDB, no fetch spinner anywhere. **focus** is the global WCAG-AA
-visible-focus requirement ([[platform]] PLT-5). **error** surfaces only in forms (validation
+visible-focus requirement ([[../capabilities/platform]] PLT-5). **error** surfaces only in forms (validation
 clamp) and import (fail-safe dialog).
 
 ## Hierarchy
@@ -63,11 +61,11 @@ Shared/reused leaves: **FAB**, **IconButton**, **EmptyState**, **NumberField**, 
 (Edit/Duplicate/Remove), name, InitCell, HpCell + HealthBar, DefenseStats (AC/PD/MD, in-row at
 all sizes), ConditionIconList (first few + "+K" overflow chip).
 
-**Expanded row** additionally shows: TempHpField, NoteField, ConditionPicker (12-preset toggle,
-applied chips gain a removable ×).
+**Expanded row** additionally shows: TempHpField, NoteField, ConditionPicker (preset toggle set —
+[[../capabilities/conditions]] CND-1, applied chips gain a removable ×).
 
 TypeStripe is a deliberate color-alone exception, compensated by an `aria-label` naming the type
-([[platform]] PLT-5).
+([[../capabilities/platform]] PLT-5).
 
 ## Floating action button (FAB) — bottom-right thumb zone
 
@@ -77,7 +75,7 @@ Shared component, `action` prop switches meaning by screen/state:
 |---|---|
 | Combats home | create |
 | Combat — Setup | add (combatant) |
-| Combat — Active | advance (disabled at the round-99→100 wrap) |
+| Combat — Active | advance (disabled at the round wrap boundary — [[../capabilities/turns-rounds-escalation]] TRE-3) |
 
 ## Numpad sheet
 
@@ -96,7 +94,7 @@ respective stack ends). `RoundCounterControl` and `EscalationDieControl` are **A
 
 `UpdateToast` (via `Toaster`) renders bottom-center, lifted above the FAB/thumb zone.
 `InstallBanner` renders as a slim, dismissible top banner. Neither ever overlaps the FAB or the
-Setup `StartBar` ([[platform]] PLT-4).
+Setup `StartBar` ([[../capabilities/platform]] PLT-4).
 
 ## Combats list row
 
@@ -132,6 +130,6 @@ Export-share / Delete). Drag handle for reorder (svelte-dnd-action).
 
 ## Glyph gaps (not yet in ADR-011)
 
-Flagged, not invented — glyph names are `docs/adr/ADR-011.md`'s to own: menu/burger, edit,
+Flagged, not invented — glyph names are `specs/adr/ADR-011.md`'s to own: menu/burger, edit,
 delete/remove, duplicate, close/dismiss, backspace, clear, expand/collapse chevron, drag handle,
 settings/about nav icons, theme (system/dark/light), language/globe, reset-all.

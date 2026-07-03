@@ -5,10 +5,6 @@ prefix: CND
 
 # Conditions — the 12 preset visual labels
 
-Sources: `PRD` §4 (decision 8), §6 Epic D (D7, D8) · `Rules & Glossary` §6 (Conditions table) ·
-`Data Model` §5 (Condition enumeration), §7 (`addCondition`/`removeCondition`) · `UX & IA` §4c ·
-`Test Plan` §4 (component case), §6 (D7, D8 rows).
-
 Condition meanings (the 12-row 13th Age reminder table) live in
 [[../reference/glossary-conditions]] — this file owns only the app's behavior toward them, not
 their in-fiction meaning.

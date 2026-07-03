@@ -9,7 +9,9 @@ drives, not this skill's job).
 
 ## Steps
 
-1. Confirm the change unit is approved (ask the user if unclear — never assume).
+1. Confirm the change unit is approved: read `change.md`'s frontmatter and require
+   `status: approved`. If it's still `draft` (or anything else), stop and tell the user to
+   approve it first — do not proceed on a chat assurance alone.
 2. Read `change.md` in full: the affected capability IDs, acceptance criteria, and out-of-scope
    list.
 3. Identify the concrete files each piece of work touches. Use `Grep`/`Glob` against `src/` to
@@ -25,5 +27,6 @@ drives, not this skill's job).
 5. Write `specs/changes/NNN-slug/tasks.md` from `specs/templates/tasks.md`, one phase block per
    group, each ending with the standard `**Gate:** npm run gate must pass before this phase is
    reported done.` line.
-6. Present the phase breakdown to the user (phase names + owned files + parallel groups) and stop.
+6. Once `tasks.md` lands, flip `change.md`'s frontmatter to `status: in-progress`.
+7. Present the phase breakdown to the user (phase names + owned files + parallel groups) and stop.
    `/spec-run` executes it next, once they're happy with the split.

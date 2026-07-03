@@ -5,10 +5,6 @@ prefix: UND
 
 # Undo / Redo — per-combat action history
 
-Sources: `PRD` §4 (decision 10), §6 (D10, E4 reversibility clauses) · `Data Model` §8 (full
-model), §7 (snapshot/reversal points throughout) · `UX & IA` §4c, §5 (F3), §8 · `Test Plan`
-§3.6, §6 (D10, E4, F3 rows).
-
 A **global, per-combat** 10-deep history, exposed as header **Undo ↶ / Redo ↷** controls — not
 per-action toasts.
 

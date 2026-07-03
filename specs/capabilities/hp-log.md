@@ -5,11 +5,6 @@ prefix: LOG
 
 # HP change log — per-combatant read-only history
 
-Sources: `PRD` §4 (decision 23), §6 Epic D (D12) · `Rules & Glossary` §4 (HP change log
-subsection) · `Data Model` §9 (full model), §7 (append points), §8 (undo interaction), §10
-(persistence/export) · `UX & IA` §4c (HP change log paragraph), §8 · `Test Plan` §3.7, §6 (D12
-row).
-
 Distinct from the combat-level Undo/Redo ([[undo-redo]]): this is a **read-only**, per-combatant
 record the DM reviews, never edits or reverses directly.
 

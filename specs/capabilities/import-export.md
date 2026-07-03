@@ -5,12 +5,8 @@ prefix: IMP
 
 # Import / export — backup & portability
 
-Sources: `PRD` §4 (decision 9), §6 Epic C (C8) · `Data Model` §10 (Persistence & portability) ·
-`UX & IA` §3 (Combats home import), §5 (F5), §8 (import feedback) · `Test Plan` §5 (F5, import
-fail-safe scenarios), §6 (C8 row).
-
 Schema-version compatibility mechanics (the migration transform itself) are an implementation
-concern owned by `docs/adr/ADR-013.md` — this file owns only the import/export *behavior* that
+concern owned by `specs/adr/ADR-013.md` — this file owns only the import/export *behavior* that
 depends on it (refusal on newer version, forward migration on older).
 
 ## IMP-1 — Export all

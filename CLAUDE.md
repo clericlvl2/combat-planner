@@ -10,19 +10,19 @@ One line each; never restate rationale here — follow the pointer.
 
 | # | Decision | Pointer |
 |---|----------|---------|
-| ADR-001 | SvelteKit (Svelte 5), client-only SPA | `docs/adr/ADR-001.md` |
-| ADR-002 | Svelte 5 runes + thin store layer; derived values never stored | `docs/adr/ADR-002.md` |
-| ADR-003 | IndexedDB via Dexie; store layer is the only writer | `docs/adr/ADR-003.md` |
-| ADR-004 | @vite-pwa/sveltekit (Workbox), `registerType: prompt` | `docs/adr/ADR-004.md` |
-| ADR-005 | Paraglide (inlang) i18n, compile-time, 6 bundled locales | `docs/adr/ADR-005.md` |
-| ADR-006 | svelte-dnd-action for combats-list reorder | `docs/adr/ADR-006.md` |
-| ADR-007 | Vite + adapter-static (SPA) on Vercel | `docs/adr/ADR-007.md` |
-| ADR-008 | shadcn-svelte + Tailwind CSS | `docs/adr/ADR-008.md` |
-| ADR-009 | Biome (lint/format) + Vitest + @testing-library/svelte + Playwright | `docs/adr/ADR-009.md` |
-| ADR-010 | No telemetry/analytics — deliberate | `docs/adr/ADR-010.md` |
-| ADR-011 | Lucide icons (`lucide-svelte`) | `docs/adr/ADR-011.md` |
-| ADR-012 | 8 token-driven color-tag swatches | `docs/adr/ADR-012.md` |
-| ADR-013 | Dexie `version().upgrade()` migrations, additive-first | `docs/adr/ADR-013.md` |
+| ADR-001 | SvelteKit (Svelte 5), client-only SPA | `specs/adr/ADR-001.md` |
+| ADR-002 | Svelte 5 runes + thin store layer; derived values never stored | `specs/adr/ADR-002.md` |
+| ADR-003 | IndexedDB via Dexie; store layer is the only writer | `specs/adr/ADR-003.md` |
+| ADR-004 | @vite-pwa/sveltekit (Workbox), `registerType: prompt` | `specs/adr/ADR-004.md` |
+| ADR-005 | Paraglide (inlang) i18n, compile-time, 6 bundled locales | `specs/adr/ADR-005.md` |
+| ADR-006 | svelte-dnd-action for combats-list reorder | `specs/adr/ADR-006.md` |
+| ADR-007 | Vite + adapter-static (SPA) on Vercel | `specs/adr/ADR-007.md` |
+| ADR-008 | shadcn-svelte + Tailwind CSS | `specs/adr/ADR-008.md` |
+| ADR-009 | Biome (lint/format) + Vitest + vitest-browser-svelte + Playwright | `specs/adr/ADR-009.md` |
+| ADR-010 | No telemetry/analytics — deliberate | `specs/adr/ADR-010.md` |
+| ADR-011 | Lucide icons (`lucide-svelte`) | `specs/adr/ADR-011.md` |
+| ADR-012 | 8 token-driven color-tag swatches | `specs/adr/ADR-012.md` |
+| ADR-013 | Dexie `version().upgrade()` migrations, additive-first | `specs/adr/ADR-013.md` |
 
 ## Gate
 
@@ -66,15 +66,15 @@ One fact, one owner file; every other mention is a pointer, never a copy. Requir
 | Component catalog & control placement | `specs/reference/component-inventory.md` |
 | i18n key catalog | `specs/reference/i18n-catalog.md` |
 | Test coverage index | `specs/reference/acceptance-matrix.md` |
-| Tech/stack choices | `docs/adr/README.md` (ADR-001..013) |
-| Project status / changelog | `docs/Combat Planner Status & Roadmap.md` |
-| Task backlog / queue | `specs/backlog.md` |
+| Tech/stack choices | `specs/adr/README.md` (ADR-001..013) |
+| Changelog | `specs/CHANGELOG.md` |
+| Milestones / roadmap / task backlog | `specs/backlog.md` |
 
 ## Process
 
 All feature/fix work flows through `specs/` — see `specs/README.md` for the change-unit
-lifecycle (draft → approved → in-progress → verifying → docs-synced → archived) and which agent
-does what. Don't hand-orchestrate a task that already has a `/spec-*` skill for it.
+lifecycle and which agent does what. Don't hand-orchestrate a task that already has a `/spec-*`
+skill for it.
 
 ## Paraglide rule
 

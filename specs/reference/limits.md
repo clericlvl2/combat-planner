@@ -1,7 +1,5 @@
 # Reference: Numeric limits & form defaults
 
-Sources: `Rules & Glossary` §7 (Combatant defaults & limits).
-
 Single source of truth for every numeric range, default, and hard cap the app enforces.
 Capability files point here rather than repeating values — see [[../capabilities/combatants]],
 [[../capabilities/hp]], [[../capabilities/initiative]], [[../capabilities/turns-rounds-escalation]],

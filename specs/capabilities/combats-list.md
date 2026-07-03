@@ -5,11 +5,6 @@ prefix: CLS
 
 # Combats list — CRUD, reorder, color tags, first launch
 
-Sources: `PRD` §4 (decisions 1, 13, 17 combat-cap clause, 18), §6 Epic C (C1–C7; C8 pointer) ·
-`Data Model` §2 (`firstLaunchDone`), §3 (Combat entity: `id`, `title`, `description`,
-`colorTag`, `listOrder`), §7 (`firstLaunch`, `createCombat`, `reorderCombats`, `deleteCombat`) ·
-`UX & IA` §2 (Navigation), §3 (Combats home) · `Test Plan` §6 (C1–C7 rows).
-
 Export/import of combats (single or all) is owned by [[import-export]], not here. The 8-swatch
 color-tag palette values live in [[../reference/glossary-conditions]] (color tokens) — this file
 owns only that a combat has one.

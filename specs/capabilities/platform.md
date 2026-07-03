@@ -5,12 +5,7 @@ prefix: PLT
 
 # Platform — offline, PWA, responsive, a11y, performance NFRs
 
-Sources: `PRD` §4 (decisions 19, 20, 21), §6 Epic A (A1–A5, A8), Epic B (B1, B2), §7
-(non-functional requirements), §8 (Risks) · `Data Model` §2 (`installHintDismissed`), §10
-(persistence/interrupted write) · `UX & IA` §2 (Navigation), §7 (Responsive behavior), §8
-(toast/install/a11y) · `Test Plan` §5 (offline, PWA update E2E), §6 (A1–A5, A8, B1/B2 rows).
-
-Stack mechanism for PWA/offline/build: `docs/adr/ADR-004.md`, `ADR-007.md`, `ADR-010.md`
+Stack mechanism for PWA/offline/build: `specs/adr/ADR-004.md`, `ADR-007.md`, `ADR-010.md`
 (telemetry). This file owns the observable behavior, not the implementation choice.
 
 ## PLT-1 — Offline-first

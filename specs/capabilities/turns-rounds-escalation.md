@@ -5,11 +5,6 @@ prefix: TRE
 
 # Turns, rounds & escalation die
 
-Sources: `PRD` §4 (decision 3), §6 Epic E (E5–E9) · `Rules & Glossary` §2 (Turns), §3
-(Escalation die) · `Data Model` §3 (`round`, `escalation`, `activeCombatantId`, `canAdvance`), §7
-(`advanceTurn`, `editRound`, `setEscalation`) · `UX & IA` §4c (Turn/round/escalation) ·
-`Test Plan` §3.1 (advanceTurn), §3.3 (Escalation), §6 (E5–E9 rows).
-
 ## TRE-1 — Active-turn pointer
 
 The active-turn pointer is bound to a combatant's **identity**, not a row position. It is set to
@@ -43,7 +38,8 @@ while Active **and** the active row is off-screen) to scroll it back into view o
 ## TRE-3 — Round-99 wrap block
 
 `canAdvance = state == active && combatants.length > 0 && !(round == 99 && active is the last
-combatant in sorted order)`. Only the round-99 → round-100 **wrap** is blocked — advancing
+combatant in sorted order)`. 99 is the max round (see [[../reference/limits]]). Only the
+round-99 → round-100 **wrap** is blocked — advancing
 *within* round 99 (combatant 1 → 2 → …) still works. The Advance control is disabled exactly at
 that boundary.
 
@@ -55,7 +51,7 @@ that boundary.
 
 Removing the active combatant moves the pointer to the next combatant in order; if the removed
 one was last, it moves to the new last. This never triggers a premature round increment. Full
-removal mechanics owned by [[combatants]] CBT-8.
+removal mechanics owned by [[combatants]] CBT-6.
 
 **AC:**
 - Removing the active combatant advances the pointer without incrementing `round` or escalation.

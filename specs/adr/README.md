@@ -1,7 +1,7 @@
 # Architecture Decision Records
 
-Split from `docs/Combat Planner Architecture.md` (now archived — see `docs/archive/`) during the
-spec-driven-development migration. Each ADR: **Decision · Rationale · Alternatives ·
+Split from the original architecture doc (removed during the spec-driven-development migration —
+see git history) into per-decision files. Each ADR: **Decision · Rationale · Alternatives ·
 Consequences.** All accepted 2026-06-28 unless noted; ADR-013's v2 migration note is dated
 2026-07-02. Supersedes nothing.
 
@@ -31,7 +31,7 @@ mobile-first/one-handed/WCAG 2.1 AA with 6 bundled languages and dark+light them
 | Combat color-tag palette | 8 token-driven swatches | [ADR-012](ADR-012.md) |
 | Schema versioning / migrations | Dexie `version().upgrade()` + shared transforms | [ADR-013](ADR-013.md) |
 | Lint / format | Biome | [ADR-009](ADR-009.md) |
-| Unit tests | Vitest + @testing-library/svelte | [ADR-009](ADR-009.md) |
+| Unit tests | Vitest + vitest-browser-svelte | [ADR-009](ADR-009.md) |
 | E2E tests | Playwright | [ADR-009](ADR-009.md) |
 | Telemetry / analytics | **None — deliberately dropped** | [ADR-010](ADR-010.md) |
 

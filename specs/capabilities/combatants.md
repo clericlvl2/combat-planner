@@ -5,12 +5,6 @@ prefix: CBT
 
 # Combatants — fields, add/edit/duplicate/remove, caps
 
-Sources: `PRD` §4 (decisions 5, 15, 17 cap clause, 22), §6 Epic D (D1, D2, D3, D9, D10, D11) ·
-`Rules & Glossary` §1 (Core terms), §7 (add-combatant form, hard caps), §8 (Duplicate behavior) ·
-`Data Model` §4 (Combatant entity), §6 (relationships/integrity), §7 (`addCombatant`,
-`editCombatant`, duplicate) · `UX & IA` §4c (compact/expanded row) · `Test Plan` §3.8, §6 (D1–D3,
-D9–D11 rows).
-
 Field ranges/defaults for the add/edit form: [[../reference/limits]]. Card layout/placement
 (compact vs. expanded, cell order): [[../reference/component-inventory]].
 
@@ -86,7 +80,7 @@ Naming uses Windows-style suffixing: "Goblin" → "Goblin 1" → "Goblin 2" …,
 already taken to avoid collisions. The duplicate resets initiative to `"-"`, current HP to Max
 HP, temp HP to 0, clears conditions, starts with an **empty** HP change log ([[hp-log]] LOG-3),
 and copies all stats (type, bonus, Max HP, AC/PD/MD) and the note. Placed at the bottom of the
-list; blocked if it would exceed the 30-combatant cap.
+list; blocked if it would exceed the 30-combatant cap ([[../reference/limits]]).
 
 **AC:**
 - Duplicating "Goblin" when "Goblin" and "Goblin 1" exist produces "Goblin 2" (skips taken

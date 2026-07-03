@@ -1,9 +1,7 @@
 # Reference: i18n message catalog (English source)
 
-Sources: `i18n Message Catalog` §1–§19 (full catalog).
-
 The English source message-key namespace tree and copy. Mechanism, 6 locales, source-then-translate
-workflow: `docs/adr/ADR-005.md`. Term meanings (conditions, health statuses):
+workflow: `specs/adr/ADR-005.md`. Term meanings (conditions, health statuses):
 [[glossary-conditions]]. Numeric values behind cap/clamp copy: [[limits]] (injected as
 variables, never hardcoded here). Key form: dot-namespaced (`combats.empty.cta`); `{var}` =
 interpolation; `{n, plural, …}` = ICU plural.
@@ -164,8 +162,8 @@ Field ranges/defaults: [[limits]].
 | `forms.action.remove` | Remove |
 | `forms.action.edit` | Edit |
 
-`conditions.addShort` / `forms.note.addShort` are en.json-only additive short labels (M2
-first-touch rework); the full-sentence keys (`conditions.add`, `forms.note.add`) are unchanged.
+`conditions.addShort` / `forms.note.addShort` are en.json-only additive short labels
+(2026-07-02 first-touch rework); the full-sentence keys (`conditions.add`, `forms.note.add`) are unchanged.
 Only *renamed* keys (e.g. `forms.type.monster` → `forms.type.enemy`) require an immediate
 translated value in all 6 locales.
 

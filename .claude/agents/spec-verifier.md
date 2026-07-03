@@ -29,7 +29,14 @@ capability-spec IDs it claims to satisfy — go read those IDs' AC bullets in
 
 ## Output
 
-Write `specs/changes/NNN-slug/verification.md` (create or overwrite) with one row per AC:
+Write `specs/changes/NNN-slug/verification.md` for a code-diff pass, or
+`specs/changes/NNN-slug/doc-verification.md` if you were dispatched against a doc-syncer diff (as
+part of `/spec-close`) — you'll be told which pass this is; never overwrite one filename with the
+other. If the user later overrides a FAIL verdict, that override is recorded by editing the
+verdict cell to `PASS (user override)` plus a short reason — that's a human edit to the artifact
+you produced, not something you do yourself.
+
+Create or overwrite the file with one row per AC:
 
 ```
 # Verification: NNN-slug

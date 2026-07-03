@@ -5,10 +5,6 @@ prefix: LIF
 
 # Lifecycle — Setup / Active, Start, Clear, Restart
 
-Sources: `PRD` §4 (decisions 7, 7b), §6 Epic E (E0, E2, E4, E10) · `Rules & Glossary` §2 ·
-`Data Model` §3 (`state`, `showRoundAndEscalation`), §6, §7 (`start`, `restart`, `clearCombat`,
-remove-all) · `UX & IA` §4a, §4b, §5 (F1, F4), §6 · `Test Plan` §3.1, §6 (E0/E2/E4/E10 rows).
-
 A combat has exactly two states: **Setup** and **Active**. No separate "Ended" state — a
 finished fight returns to Setup via Clear or Restart, or automatically when the last combatant
 is removed.
@@ -45,7 +41,7 @@ Not confirmation-gated.
 - After Start: `state = active`, `round = 1`, `activeCombatantId` = top of sorted order,
   Advance/round/escalation become visible.
 - Start pushes a **pre-Start snapshot** to the combat's undo history (unset initiatives, prior
-  `state`, `round`, `activeCombatantId`) so Undo restores Setup exactly — see [[undo-redo]] UND-2.
+  `state`, `round`, `activeCombatantId`) so Undo restores Setup exactly — see [[undo-redo]] UND-3.
 
 ## LIF-4 — Active state behavior
 

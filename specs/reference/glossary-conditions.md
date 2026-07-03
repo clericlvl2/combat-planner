@@ -1,8 +1,5 @@
 # Reference: Condition glossary & color-tag palette
 
-Sources: `Rules & Glossary` §1 (Core terms), §6 (Conditions table) · `Architecture` ADR-012
-(color-tag palette), ADR-011 (type/condition icon mapping).
-
 ## Core terms
 
 - **Combat / encounter** — one fight. Has a lifecycle ([[../capabilities/lifecycle]]), a
@@ -14,6 +11,14 @@ Sources: `Rules & Glossary` §1 (Core terms), §6 (Conditions table) · `Archite
   behavior as any combatant; a third color label only.
 - **Round** — one full cycle through all combatants ([[../capabilities/turns-rounds-escalation]]).
 - **Turn** — a single combatant acting; exists only while the combat is Active.
+- **AC / PD / MD** — Armor Class, Physical Defense, Mental Defense: the three defense stats
+  tracked per combatant (mechanics: [[../capabilities/combatants]]).
+- **Escalation die** — the shared die that climbs as the fight goes on, added to PC attacks
+  (mechanics: [[../capabilities/turns-rounds-escalation]] TRE-6).
+- **Initiative** — the per-combatant turn-order value, rolled or set manually and lockable
+  (mechanics: [[../capabilities/initiative]]).
+- **Temp HP** — a damage buffer absorbed before current HP; tracked separately from max HP
+  (mechanics: [[../capabilities/hp]] HP-1).
 
 ## The 12 conditions
 
@@ -38,15 +43,15 @@ effects, no auto-expiry. Meaning is the DM's to apply; summarized here as domain
 Icon mapping (Lucide glyph per condition): charmed `heart`, confused `shuffle`, dazed `star`,
 fear `ghost`, helpless `bed`, hindered `link`, shocked `zap`, stuck `anchor`, stunned `tornado`,
 vulnerable `shield-off`, weakened `trending-down`, staggered `activity`. Glyph choices are
-non-blocking and may be tuned for recognizability during UI build (`docs/adr/ADR-011.md`).
+non-blocking and may be tuned for recognizability during UI build (`specs/adr/ADR-011.md`).
 
 ## Combat color-tag palette (8 swatches)
 
 Used by [[../capabilities/combats-list]] for a combat's `colorTag`. Each swatch is a CSS theme
-variable with a light and dark value (`docs/adr/ADR-012.md`); `colorTag` stores the swatch key,
+variable with a light and dark value (`specs/adr/ADR-012.md`); `colorTag` stores the swatch key,
 not a hex, so re-theming never touches stored data. Separate from the three locked
 combatant-type colors (PC green, enemy red, ally blue — [[../capabilities/combatants]] CBT-1,
-`docs/adr/ADR-008.md`), which live on combatant rows, not combat rows.
+`specs/adr/ADR-008.md`), which live on combatant rows, not combat rows.
 
 | Key | Swatch |
 |-----|--------|

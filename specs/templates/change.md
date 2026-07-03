@@ -1,3 +1,8 @@
+---
+status: draft
+backlog: <B-xxx or —>
+---
+
 # Change: <slug>
 
 ## Why

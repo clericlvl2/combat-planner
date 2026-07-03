@@ -17,7 +17,7 @@ now-verified `verification.md` in full before editing anything.
 
 - Edit only the capability file(s) that own the affected IDs (`specs/capabilities/*.md`), plus
   `specs/reference/*.md` if a cross-cutting fact (limits, glossary, component inventory, i18n
-  catalog, acceptance-matrix) actually changed. Never touch `docs/archive/*` (frozen) or `src/**`.
+  catalog, acceptance-matrix) actually changed. Never touch `src/**`.
 - Match the existing file's voice and structure: YAML frontmatter unchanged, requirement ID
   headings unchanged unless the change unit explicitly adds/renumbers one, AC bullets stay
   inline under their requirement.
@@ -26,8 +26,8 @@ now-verified `verification.md` in full before editing anything.
   assumed.
 - Do not restate facts that live in `specs/reference/*` inside a capability file, or vice versa —
   cross-link with `[[wikilink]]` instead, per the existing convention in these files.
-- One changelog row in `docs/Combat Planner Status & Roadmap.md`'s **Change units** table
-  (schema `| NNN-slug | YYYY-MM-DD | one-line change |`), per the doc's own "Maintaining" rule.
+- One changelog row in `specs/CHANGELOG.md`'s **Change units** table
+  (schema `| NNN-slug | YYYY-MM-DD | one-line change |`).
 
 ## Finishing
 

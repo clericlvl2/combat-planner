@@ -5,10 +5,6 @@ prefix: SET
 
 # Settings — language, theme, reset, About
 
-Sources: `PRD` §4 (decisions 11, 16), §6 Epic A (A6, A7), Epic F (F1, F2) · `Data Model` §2
-(`language`, `theme`), §7 (`resetAll`) · `UX & IA` §9 (Settings) · `Test Plan` §6 (A6, A7, F1/F2
-PRD rows).
-
 Export all / Import all controls live here in the UI but their behavior is fully owned by
 [[import-export]] (IMP-1, IMP-3). PWA install/update and offline behavior are owned by
 [[platform]], not here, even though they're both "app-wide."
@@ -16,7 +12,7 @@ Export all / Import all controls live here in the UI but their behavior is fully
 ## SET-1 — Language
 
 6 bundled languages (English, German, Spanish, French, Japanese, Russian — mechanism:
-`docs/adr/ADR-005.md`). Default = autodetected browser locale, fallback English. Manual switcher
+`specs/adr/ADR-005.md`). Default = autodetected browser locale, fallback English. Manual switcher
 in Settings. Switching applies immediately, persists, and works offline.
 
 **AC:**

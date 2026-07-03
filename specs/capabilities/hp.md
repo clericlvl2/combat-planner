@@ -5,12 +5,6 @@ prefix: HP
 
 # HP — damage, heal, temp HP, health bands, numpad
 
-Sources: `PRD` §4 (decisions 4, 7d, 14, 22), §6 Epic D (D3 partial, D4, D5, D6) ·
-`Rules & Glossary` §4 (Hit points, Heal formula, Health status & bar) · `Data Model` §4
-(`maxHp`, `currentHp`, `tempHp`, `healthPercent`, `healthStatus`), §7 (`dealDamage`, `restoreHp`,
-`setTempHp`, `editCombatant` Max HP clause) · `UX & IA` §4c (Numpad panel) · `Test Plan` §3.4,
-§3.5, §6 (D3–D6 rows).
-
 ## HP-1 — Max HP, current HP, temp HP
 
 Max HP is full health; required, must be positive (range: [[../reference/limits]]). Current HP

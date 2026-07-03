@@ -1,46 +1,15 @@
----
-aliases:
-  - Combat Planner Status
-  - Combat Planner Roadmap
-  - Combat Planner Status & Roadmap
----
+# Changelog
 
-# Combat Planner — Status & Roadmap
+Append-only changelog for Combat Planner spec-driven development. `/spec-close` adds one row
+per closed change unit.
 
-> Dashboard for Combat Planner — where the project stands and what's next. Requirements live in
-> `specs/` (`specs/README.md`); decisions live in `docs/adr/`; the task queue lives in
-> `specs/backlog.md`.
+## Change units
 
-## Maintaining
+| Unit | Date | Change |
+|---|---|---|
+| 001-m2-component-tests-and-dogfood | 2026-07-03 | 7 new `vitest-browser-svelte` component test files for M2 UI components (CombatantRow, CombatantForm, HealthBar, NumpadSheet, ConditionPicker, InitCell, CombatHeader); DM dogfood attestation recorded, referencing pre-existing first-touch play sessions already folded into the M2 rework (`dfc8582` + `82da34a`); B-001/B-002 flipped to `done`. |
 
-- **Changelog** — `/spec-close` appends one row to the Change units table per closed unit.
-- **Milestones** — updated only when a milestone changes state.
-- **Tasks** — never live here; track them in `specs/backlog.md`.
-
-## Status
-
-- Spec-driven since 2026-07-03.
-- M1 done (`c7e172a`).
-- M2 code-complete (`dfc8582` + `82da34a`); component tests + dogfood done — pilot unit
-  `001-m2-component-tests-and-dogfood` (B-001/B-002 flipped to `done`).
-- Next milestone: M3.
-
-## Milestones
-
-| Phase | Slice | Product value | Status |
-|---|---|---|---|
-| **M1** | Store seam (ADR-002) + Dexie persist (ADR-003) + migration transforms (ADR-013), test-first. | Core state machine + durable data; nothing real without it. | done |
-| **M2** | Combat screen vertical slice — Setup→Active, combatant row (compact/expanded), init tap/long-press, HP numpad, Advance, conditions. | The heartbeat (95% of play). End of M2 = dogfoodable: one hardcoded combat, no polish/i18n/PWA. | code-complete |
-| **★ Dogfood gate** | Run 2–3 real fights; log friction. | Riskiest-assumption test — reorder everything below by what actually hurt at the table. | done |
-| **M3** | Combats home — CRUD, drag reorder, first-launch, undo/redo wired. | Multi-encounter prep. | — |
-| **M4** | PWA shell (ADR-004) — offline precache, install hint, update toast. | Delivers "installable offline"; real app on the phone, not a localhost tab. | — |
-| **M5** | Settings + About + export/import (fail-safe, shared transforms) + i18n wiring (Paraglide ADR-005; strings already cataloged). | Backup/portability (flow F5) + 6 languages. | — |
-| **M6** | a11y + theming polish (WCAG-AA, dark/light, focus, ≥44px) + full Test Plan pass + CI gate. | Ship quality; one-handed / dim-room promises verified. | — |
-| **Ship v1** | Deploy static SPA on Vercel (ADR-007), PWA installable. | — | — |
-
-## Changelog
-
-### Spec era (rounds 1–13)
+## Spec era (rounds 1–13)
 
 Frozen — the spec was hardened in numbered rounds (audit / `/grill-me` passes) before the
 2026-07-03 spec-driven-development migration; kept verbatim for provenance.
@@ -61,11 +30,3 @@ Frozen — the spec was hardened in numbered rounds (audit / `/grill-me` passes)
 | 11 | 2026-06-29 | **Test Plan** doc added (ADR-009) — unit/component/E2E layer split + case inventory + requirement→test acceptance matrix (PRD epics + UX F1–F5); numbers/transitions/flows pointed to their owner docs. |
 | 12 | 2026-07-01 | **First-touch rework** — escalation override is now long-press (not tap), mirroring the init cell; the init cell locks (no tap-roll / long-press) once a combat is Active, manual edit only (add form too, for mid-combat latecomers). |
 | 13 | 2026-07-02 | **First-touch rework II** — escalation die is a stored value (round-wrap-only +1, decoupled from the round counter, no more auto/override); `monster` → `enemy` rename everywhere (`DATA_VERSION` 1→2 migration); persistent per-row `⋮` menu replaces the expanded action row; native `min`/`max` on numeric inputs; initiative range −9..99, no more ± toggle; combatant type shown as color stripes (icon dropped, `aria-label` compensates — amends the "never color-alone" invariant); card background reflects HP status; full-width Save buttons; Setup no longer auto-sorts live (sorts on Start only). |
-
-### Change units
-
-Rows added by `/spec-close`, one per closed change unit.
-
-| Unit | Date | Change |
-|---|---|---|
-| 001-m2-component-tests-and-dogfood | 2026-07-03 | 7 new `vitest-browser-svelte` component test files for M2 UI components (CombatantRow, CombatantForm, HealthBar, NumpadSheet, ConditionPicker, InitCell, CombatHeader); DM dogfood attestation recorded, referencing pre-existing first-touch play sessions already folded into the M2 rework (`dfc8582` + `82da34a`); B-001/B-002 flipped to `done`. |

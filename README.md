@@ -2,14 +2,14 @@
 
 An offline-first **13th Age** initiative tracker and combat planner. Runs entirely
 in the browser as an installable PWA — no backend, no account, no network calls at
-runtime ([ADR-007](docs/Combat%20Planner%20Architecture.md), [ADR-010](docs/Combat%20Planner%20Architecture.md)).
+runtime ([ADR-007](specs/adr/ADR-007.md), [ADR-010](specs/adr/ADR-010.md)).
 All data lives locally in IndexedDB.
 
 > **Status:** build-ready skeleton (M0). No feature logic yet — route shells, the
 > token layer, the i18n catalog, the Dexie schema, and tooling are in place; the
 > store seam and combat features land in **M1**. Source is annotated with
 > `// TODO M1` / `// TODO M-phase` markers pointing at the owning spec section.
-> See [docs/](docs/) and [Status & Roadmap](docs/Combat%20Planner%20Status%20%26%20Roadmap.md).
+> See [specs/](specs/) and [specs/CHANGELOG.md](specs/CHANGELOG.md).
 
 ## Stack
 
@@ -66,15 +66,14 @@ worker that precaches the app shell for offline use.
 
 Messages live in `messages/<locale>.json` (flat, dot-namespaced keys). `en` is the
 source of truth; `de/es/fr/ja/ru` are **stubs** (English placeholders, flagged via
-`_translation_status`) pending translation ([ADR-005](docs/Combat%20Planner%20Architecture.md)).
+`_translation_status`) pending translation ([ADR-005](specs/adr/ADR-005.md)).
 Paraglide compiles them to `src/lib/paraglide/` (gitignored). Access via
 `import { m } from '$lib/i18n'` → `m['nav.combats']()`.
 
 ## Documentation
 
-Full design specs (mirrored from the source vault, Obsidian wikilinks intact) are in
-[`docs/`](docs/) — start at [Overview](docs/Combat%20Planner%20Overview.md) and the
-[docs index](docs/README.md).
+Process and requirements: [`specs/README.md`](specs/README.md) (change-unit lifecycle,
+capability files, backlog). Stack decisions: [`specs/adr/`](specs/adr/).
 
 ## License
 

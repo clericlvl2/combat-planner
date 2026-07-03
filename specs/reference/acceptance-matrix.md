@@ -1,11 +1,7 @@
 # Reference: Acceptance matrix (capability → covering test → layer)
 
-Sources: `Test Plan` §2 (layers), §3–§5 (case inventory), §6 (requirement → test matrix),
-remapped from PRD story IDs (A1–F2, E0–E10) to capability requirement IDs.
-
-Thin index only — test tooling/rationale: `docs/adr/ADR-009.md`. Case descriptions and
-assertions: `docs/archive/Combat Planner Test Plan.md` (archived, still the authoritative case
-inventory; this table only remaps requirement IDs — see [[migration-traceability]]).
+Thin index only — test tooling/rationale: `specs/adr/ADR-009.md`. Case descriptions and
+assertions live in the actual test files: `src/**/*.spec.ts`, `src/**/*.svelte.spec.ts`, `e2e/`.
 `U`=unit, `C`=component, `E`=E2E.
 
 | Capability req(s) | Covering test | Layer |
@@ -47,7 +43,7 @@ inventory; this table only remaps requirement IDs — see [[migration-traceabili
 | [[../capabilities/settings]] SET-5 | AboutPage render | C |
 | [[../capabilities/undo-redo]] UND-1..7 | Undo/redo stack mechanics (§3.6); F3 (undo a mistake) | U, E |
 
-## Cross-cutting E2E flows (UX §5, F1–F5)
+## Cross-cutting E2E flows (F1–F5)
 
 | Flow | Exercises |
 |---|---|
@@ -63,5 +59,5 @@ Store seam (transitions + derived helpers) and ADR-013 migration transforms: nea
 coverage (pure, cheap to test). Component: every enumerated state in
 [[component-inventory]] has at least one render/interaction assertion. E2E: F1–F5 + offline +
 PWA update + import fail-safe green on mobile + desktop projects. CI gate: `npm run gate`
-(lint → check → unit/component → build; E2E run separately per `docs/adr/ADR-009.md`) — never
+(lint → check → unit/component → build; E2E run separately per `specs/adr/ADR-009.md`) — never
 weakened to unblock a merge.

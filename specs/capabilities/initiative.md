@@ -5,11 +5,6 @@ prefix: INI
 
 # Initiative — roll, manual entry, lock, sort, tiebreak
 
-Sources: `PRD` §4 (decisions 6, 7c), §6 Epic E (E1, E3) · `Rules & Glossary` §2 (Initiative) ·
-`Data Model` §3 (`sortedCombatants`), §4 (`initiative`, `initiativeBonus`, `addOrder`), §7
-(`rollOne`, `setInitiative`) · `UX & IA` §4c (Initiative interactions) · `Test Plan` §3.2, §6
-(E1, E3 rows).
-
 ## INI-1 — Initiative value & bonus
 
 Initiative value is a number or unset (`"-"`). Initiative bonus defaults to 0 and is added to a

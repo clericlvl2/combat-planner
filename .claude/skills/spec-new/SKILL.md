@@ -18,6 +18,8 @@ not create `tasks.md` — that's `/spec-tasks`, after this draft is approved.
 3. Determine the next `NNN` by listing `specs/changes/` and `specs/archive/` and taking the
    highest existing number + 1 (zero-padded to 3 digits).
 4. Create `specs/changes/NNN-slug/change.md` from `specs/templates/change.md`, filled in:
+   - **Frontmatter** — `status: draft`; `backlog:` set to the `B-xxx` row from step 1 if this
+     unit promotes one, else `—`.
    - **Why** — from step 1, in the user's own words where possible.
    - **What changes** — one row per affected ID, worded as "new requirement" or "amend: <what>".
    - **Acceptance criteria** — ask the user for these if not given; each bullet must be something
@@ -26,5 +28,7 @@ not create `tasks.md` — that's `/spec-tasks`, after this draft is approved.
    - **Out of scope** — ask explicitly: "what should this NOT touch?" Do not leave this section
      empty; if truly nothing is out of scope, say so explicitly rather than omitting the section.
 5. Do not create `tasks.md` yet.
-6. Present the filled `change.md` to the user and stop. State clearly: this is a draft, nothing
-   is approved or implemented yet, and `/spec-tasks` runs next once they approve it.
+6. Present the filled `change.md` to the user and stop. State clearly: this is a draft
+   (`status: draft`), nothing is approved or implemented yet, and once they approve it they (or
+   this skill, if they ask in the same turn) should flip frontmatter to `status: approved` —
+   `/spec-tasks` runs next and requires that flip.

@@ -33,5 +33,10 @@ playwright-report
 src/lib/paraglide
 project.inlang/cache/
 #llm
-/.claude
+/.claude/*
+!/.claude/agents
+!/.claude/agents/**
+!/.claude/skills
+!/.claude/skills/**
+!/.claude/settings.json
 /.agents

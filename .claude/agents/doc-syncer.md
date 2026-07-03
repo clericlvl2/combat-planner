@@ -26,8 +26,8 @@ now-verified `verification.md` in full before editing anything.
   assumed.
 - Do not restate facts that live in `specs/reference/*` inside a capability file, or vice versa —
   cross-link with `[[wikilink]]` instead, per the existing convention in these files.
-- One changelog row in `docs/Combat Planner Status & Roadmap.md` (its Changelog table), phrased
-  as a single line per the doc's own "Maintaining" rule.
+- One changelog row in `docs/Combat Planner Status & Roadmap.md`'s **Change units** table
+  (schema `| NNN-slug | YYYY-MM-DD | one-line change |`), per the doc's own "Maintaining" rule.
 
 ## Finishing
 

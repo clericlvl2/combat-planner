@@ -9,6 +9,8 @@ reads one file instead of fanning out across five.
 ```
 specs/
   README.md            this file
+  backlog.md            structured task queue — idea/ready/in-unit/done/v2 rows, promoted
+                        into a change unit by `/spec-new`
   capabilities/        SOURCE OF TRUTH — one file per feature, stable requirement IDs,
                         each requirement carries its own acceptance criteria
   reference/            cross-cutting tables that span capabilities (limits, glossary,
@@ -39,9 +41,10 @@ Capability files and their ID prefixes:
 
 `draft → approved (user gate) → in-progress → verifying → docs-synced → archived`
 
-1. **draft** — `/spec-new <slug>` scaffolds `specs/changes/NNN-slug/change.md` from the template
-   and interviews you for Why + What changes (by capability ID) + acceptance criteria + out of
-   scope. Stops here for your approval — nothing is implemented from a draft.
+1. **draft** — `/spec-new <slug>` checks `specs/backlog.md` for a matching row and, if promoting
+   one, links its `B-xxx` in the new unit; then scaffolds `specs/changes/NNN-slug/change.md` from
+   the template and interviews you for Why + What changes (by capability ID) + acceptance criteria
+   + out of scope. Stops here for your approval — nothing is implemented from a draft.
 2. **approved** — you approve the draft as-is (or after edits).
 3. **in-progress** — `/spec-tasks` turns the approved `change.md` into `tasks.md`: phases with
    explicit file ownership and parallel-safe groupings. `/spec-run` dispatches `implementer`

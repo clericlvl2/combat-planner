@@ -68,6 +68,7 @@ One fact, one owner file; every other mention is a pointer, never a copy. Requir
 | Test coverage index | `specs/reference/acceptance-matrix.md` |
 | Tech/stack choices | `docs/adr/README.md` (ADR-001..013) |
 | Project status / changelog | `docs/Combat Planner Status & Roadmap.md` |
+| Task backlog / queue | `specs/backlog.md` |
 
 ## Process
 

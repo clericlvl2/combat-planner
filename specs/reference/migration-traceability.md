@@ -145,7 +145,7 @@ Legend: **U** = mapped, unchanged fact. **R** = mapped, reworded/consolidated bu
 
 | Statement | New location | Status |
 |---|---|---|
-| Out-of-scope list (monster library, sync, other systems, automation, live-session sharing) | `docs/Combat Planner Status & Roadmap.md` v2 backlog (stays live, unchanged) | U |
+| Out-of-scope list (monster library, sync, other systems, automation, live-session sharing) | `specs/backlog.md` B-010/B-011 + non-goals footer | U |
 | Pointer to Status & Roadmap for open Qs/history | `docs/Combat Planner Status & Roadmap.md` (kept live; links repointed to capability IDs at flip) | U |
 
 ## Combat Planner Rules & Glossary.md

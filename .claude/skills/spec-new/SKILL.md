@@ -9,7 +9,9 @@ not create `tasks.md` — that's `/spec-tasks`, after this draft is approved.
 ## Steps
 
 1. Ask the user (if not already given): what slug (kebab-case, short), and — most importantly —
-   the Why. Do not invent the Why; if it's not clear from context, ask.
+   the Why. Do not invent the Why; if it's not clear from context, ask. Check `specs/backlog.md`
+   for a matching row; if this unit promotes one, record its `B-xxx` in `change.md`'s Why and flip
+   that backlog row to `in-unit` with the Unit column linking `specs/changes/NNN-slug/`.
 2. Read `specs/README.md` capability table to figure out which capability-spec ID prefixes this
    touches. Skim the relevant `specs/capabilities/*.md` files to check whether this is a new
    requirement or an amendment to an existing one — get this right, it drives `tasks.md` later.

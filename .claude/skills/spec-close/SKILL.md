@@ -21,5 +21,6 @@ tell the user to fix and re-verify first instead of closing on a red or missing 
 4. If that doc-verification passes: move `specs/changes/NNN-slug/` to `specs/archive/NNN-slug/`
    (`git mv`, preserve history). If it fails: report the mismatch to the user and stop — do not
    move the unit or hand-patch the docs yourself.
-5. Report to the user: capability/reference files updated, changelog row added, unit archived at
+5. If `change.md`'s Why references a `B-xxx` row, flip that row in `specs/backlog.md` to `done`.
+6. Report to the user: capability/reference files updated, changelog row added, unit archived at
    `specs/archive/NNN-slug/`.

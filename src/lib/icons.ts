@@ -3,8 +3,9 @@
  * Two groups: combatant `type` and UI `chrome` (conditions are text-only tags, no icons — see
  * ConditionPicker/ConditionIconList).
  *
- * TODO M-phase (ADR-011): the chrome glyphs flagged in Component Inventory §13 (edit/remove/
- * duplicate/close/backspace/clear/expand) are pinned here pending their formal addition to ADR-011.
+ * TODO M-phase (ADR-011): the chrome glyphs flagged in specs/reference/component-inventory.md
+ * (Glyph gaps: edit/remove/duplicate/close/backspace/clear/expand) are pinned here pending their
+ * formal addition to ADR-011.
  */
 import {
 	ChevronDown,

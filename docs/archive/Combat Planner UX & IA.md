@@ -13,6 +13,13 @@ related:
   - "[[Combat Planner Requirements Prompt]]"
 ---
 
+
+> **Archived — superseded by `specs/`.** Frozen for historical provenance; do not edit. Current
+> source of truth: `specs/capabilities/`, `specs/reference/`, and `docs/adr/`. See
+> `specs/README.md` for the process and `specs/reference/migration-traceability.md` for exactly
+> where each fact in this document moved.
+
+
 # Combat Planner — UX & Information Architecture
 
 > Page map, navigation, screen states, key flows, responsive behavior, and empty/undo/error states. **No visual design or component-library choices** — layout intent only. Pairs with [[Combat Planner PRD]] (stories), [[Combat Planner Rules & Glossary]] (rules), [[Combat Planner Data Model]] (state).

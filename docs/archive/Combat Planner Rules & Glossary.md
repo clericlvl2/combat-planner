@@ -10,6 +10,13 @@ related:
   - "[[Combat Planner Requirements Prompt]]"
 ---
 
+
+> **Archived — superseded by `specs/`.** Frozen for historical provenance; do not edit. Current
+> source of truth: `specs/capabilities/`, `specs/reference/`, and `docs/adr/`. See
+> `specs/README.md` for the process and `specs/reference/migration-traceability.md` for exactly
+> where each fact in this document moved.
+
+
 # Combat Planner — 13th Age Rules & Glossary
 
 > Domain reference for the app. Defines every game term the app touches, the exact numeric limits, and the small set of derived rules the app computes. The app does **not** automate combat — conditions and most rules are reminders the DM applies. See [[Combat Planner PRD]] for scope, [[Combat Planner Data Model]] for structure.

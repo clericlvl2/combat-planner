@@ -17,6 +17,13 @@ related:
   - "[[Combat Planner Status & Roadmap]]"
 ---
 
+
+> **Archived — superseded by `specs/`.** Frozen for historical provenance; do not edit. Current
+> source of truth: `specs/capabilities/`, `specs/reference/`, and `docs/adr/`. See
+> `specs/README.md` for the process and `specs/reference/migration-traceability.md` for exactly
+> where each fact in this document moved.
+
+
 # Combat Planner — Architecture & Tech-Stack (ADR)
 
 > **First implementation-layer doc.** Everything in [[Combat Planner PRD]], [[Combat Planner Rules & Glossary]], [[Combat Planner Data Model]], and [[Combat Planner UX & IA]] stays deliberately tech-agnostic. This note is where implementation choices are made. Each decision is recorded ADR-style: **Decision · Rationale · Alternatives · Consequences.**

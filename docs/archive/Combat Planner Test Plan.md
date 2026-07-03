@@ -15,6 +15,13 @@ related:
   - "[[Combat Planner Component Inventory]]"
 ---
 
+
+> **Archived — superseded by `specs/`.** Frozen for historical provenance; do not edit. Current
+> source of truth: `specs/capabilities/`, `specs/reference/`, and `docs/adr/`. See
+> `specs/README.md` for the process and `specs/reference/migration-traceability.md` for exactly
+> where each fact in this document moved.
+
+
 # Combat Planner — Test Plan & Acceptance Matrix
 
 > The single owner of the **test strategy, the case inventory, and the requirement → test acceptance matrix**. Realizes [[Combat Planner Architecture]] ADR-009 (Vitest + @testing-library/svelte + Playwright). It says **what is tested at which layer and which requirement each test discharges** — not the tooling rationale, not the numbers under assertion, not the flows themselves. No test code, no framework config — case descriptions + assertions-in-prose only.

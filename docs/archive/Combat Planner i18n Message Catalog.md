@@ -16,6 +16,13 @@ related:
   - "[[Combat Planner Component Inventory]]"
 ---
 
+
+> **Archived — superseded by `specs/`.** Frozen for historical provenance; do not edit. Current
+> source of truth: `specs/capabilities/`, `specs/reference/`, and `docs/adr/`. See
+> `specs/README.md` for the process and `specs/reference/migration-traceability.md` for exactly
+> where each fact in this document moved.
+
+
 # Combat Planner — i18n Message Catalog (English source)
 
 > The single owner of the **English source message catalog**: the message-key namespace tree, the English copy for every key, and the interpolation / ICU shape. English is the source language ([[Combat Planner Architecture]] ADR-005); translated locales are not kept here.

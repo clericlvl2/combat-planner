@@ -13,6 +13,13 @@ related:
   - "[[Combat Planner Requirements Prompt]]"
 ---
 
+
+> **Archived — superseded by `specs/`.** Frozen for historical provenance; do not edit. Current
+> source of truth: `specs/capabilities/`, `specs/reference/`, and `docs/adr/`. See
+> `specs/README.md` for the process and `specs/reference/migration-traceability.md` for exactly
+> where each fact in this document moved.
+
+
 # Combat Planner — Product Requirements (PRD)
 
 > Planning document. **No implementation details** (no framework, storage API, or library choices). Those are deferred to a later Architecture/ADR doc. This set: [[Combat Planner Rules & Glossary]] · [[Combat Planner Data Model]] · [[Combat Planner UX & IA]]. Source sketch: [[Combat Planner Requirements Prompt]].

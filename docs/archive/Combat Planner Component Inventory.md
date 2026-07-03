@@ -15,6 +15,13 @@ related:
   - "[[Combat Planner i18n Message Catalog]]"
 ---
 
+
+> **Archived — superseded by `specs/`.** Frozen for historical provenance; do not edit. Current
+> source of truth: `specs/capabilities/`, `specs/reference/`, and `docs/adr/`. See
+> `specs/README.md` for the process and `specs/reference/migration-traceability.md` for exactly
+> where each fact in this document moved.
+
+
 # Combat Planner — Component Inventory
 
 > The reusable-UI-component catalog: every component each screen/region needs, its hierarchy, its variant/prop matrix, and the **component → shadcn-svelte primitive → Lucide glyph** mapping. Implementation-layer (pairs with [[Combat Planner Architecture]]). **No** control placement (that's [[Combat Planner UX & IA]] §9), behavior/mechanics ([[Combat Planner Rules & Glossary]] / [[Combat Planner Data Model]]), the icon-name map ([[Combat Planner Architecture]] ADR-011), or colors/tokens (ADR-008 / ADR-012) — only pointers to them.

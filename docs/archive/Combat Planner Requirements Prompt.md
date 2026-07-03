@@ -4,6 +4,13 @@ categories:
 aliases:
   - Initiative tracker
 ---
+
+
+> **Archived — superseded by `specs/`.** Frozen for historical provenance; do not edit. Current
+> source of truth: `specs/capabilities/`, `specs/reference/`, and `docs/adr/`. See
+> `specs/README.md` for the process and `specs/reference/migration-traceability.md` for exactly
+> where each fact in this document moved.
+
 Here is prompt / requirements / claude md content for my initiative tracker app
 
 ---

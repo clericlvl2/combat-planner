@@ -16,7 +16,10 @@ related:
 
 # Combat Planner — Status & Roadmap
 
-> Dashboard for the [[Combat Planner Overview|Combat Planner]] doc set — where the project stands and what's next. Decisions live in the spec docs; this only tracks *where we are*. The spec is hardened in numbered **rounds** (audit / `/grill-me` passes).
+> Dashboard for Combat Planner — where the project stands and what's next. Decisions live in
+> `specs/` (`specs/README.md`); this only tracks *where we are*. The spec was hardened in
+> numbered **rounds** (audit / `/grill-me` passes) before the spec-driven-development migration;
+> post-migration work tracks against `specs/changes/` units instead.
 
 ## Maintaining
 
@@ -24,7 +27,7 @@ Edit only when a **round** closes (same change as the spec): add one changelog r
 
 ## Status
 
-**v1 spec set complete — 10 docs, build-ready.** Spec has 0 open questions; 1 open **product** question (distribution/audience — see below) that doesn't block the build. Doc map: [[Combat Planner Overview]].
+**v1 spec set complete, now spec-driven.** Requirements live in `specs/capabilities/` (12 files, stable IDs) + `specs/reference/`; stack decisions in `docs/adr/`; the original discipline docs are frozen in `docs/archive/` for provenance. 0 open spec questions; 1 open **product** question (distribution/audience — see below) that doesn't block the build. Doc map: `specs/README.md`.
 
 **Build: M1 shipped; M2's first-touch rework (round 13) is code-complete and gate-green, about to commit** (see Build status).
 
@@ -36,13 +39,21 @@ Tracks where the *code* stands against the Next phases (the spec above is build-
 
 **M2 — Combat screen vertical slice: round-13 rework code-complete, about to commit.**
 - Built on the `main` working tree: shadcn-svelte vendored (17 primitives + `bits-ui`, ADR-008); `src/lib/icons.ts` (ADR-011 glyph map); the combat screen at `/combats/[id]` wired to the M1 store through an id-scoped controller seam (`src/lib/components/app/controller.ts`). Components (`src/lib/components/app/`): CombatHeader (back · undo/redo · round · escalation · ⋮ menu + Clear/Restart ConfirmDialog), CombatantRow (Collapsible compact↔expanded, persistent `⋮` menu, type color stripes, HP-status card background), InitCell (tap = roll / long-press = manual, no ± toggle), HealthBar (incl. reverse/alarm dead bar), ConditionIconList (+K overflow, removable × when expanded), ConditionPicker (12 toggles), NumpadSheet (digits + Deal Damage / Restore HP / Set Temp HP + read-only History), CombatantForm (add/edit), NumberField (native min/max), ConfirmDialog. `TypeBadge` and `RowActions` were removed in round 13 — folded into inline stripes and the persistent `⋮` menu respectively. Boot hydrates the store + seeds one demo combat (`src/lib/dev-seed.ts`, TODO M3). `npm run lint` + `npm run check` + `npm run build` + full unit suite pass.
-- **Not yet done:** component tests (Test Plan §4) not written; live-browser dogfood of round 13 not yet run; no M2 commit as of this doc-sync pass (commit follows immediately after).
+- **Not yet done:** component tests (`specs/reference/acceptance-matrix.md` component-layer rows) not written; live-browser dogfood of round 13 not yet run; no M2 commit as of this doc-sync pass (commit follows immediately after).
 
 ### First-touch rework — round 13 (resolved)
 The author's first hands-on touch (round 12, 2026-07-01) surfaced that requirements needed rework before M2 could lock. A second, more detailed first-touch report followed; round 13 (2026-07-02) implements all of it: escalation die restored as a stored value (round-wrap-only increment, decoupled from the round counter), `monster` → `enemy` rename (enum, CSS vars, icon-map key, i18n, `DATA_VERSION` 1→2 migration), persistent per-row `⋮` menu, native `min`/`max` on numeric inputs, init range −9..99 (no more ± toggle), color-stripe type indicator (icon dropped, `aria-label` compensates), HP-status card backgrounds, full-width Save buttons, and no-live-autosort in Setup (sorts only on Start). Spec docs (this set) are synced to match in the same pass. Treat M2 as locked once this commits; further changes go through the normal spec-then-code flow.
 
 ### Test caveat
-The Test Plan §4 component cases are still wanted — author them now that round 13 has settled the mechanics (escalation, type enum, sort-on-Start). The M1 pure-domain unit tests (Test Plan §3) were updated in round 13 alongside the escalation/type/range changes and remain the valid baseline (`derive.spec.ts`, `transitions.spec.ts`, `clamp.spec.ts`, `migrations.spec.ts`).
+The component-layer cases (`specs/reference/acceptance-matrix.md`) are still wanted — author them now that round 13 has settled the mechanics (escalation, type enum, sort-on-Start). The M1 pure-domain unit tests were updated in round 13 alongside the escalation/type/range changes and remain the valid baseline (`derive.spec.ts`, `transitions.spec.ts`, `clamp.spec.ts`, `migrations.spec.ts`).
+
+### Open test-plan gaps (carried over from the archived Test Plan §8, unresolved)
+Flagged during the spec-driven-development migration (2026-07-03); none block the build, but none are resolved either — pick these up whenever the store-seam/CI work they touch is next in scope.
+- **No coverage number ratified.** The store-seam unit-coverage threshold is unset — pin a concrete % in `docs/adr/ADR-009.md` (currently only "near-total").
+- **Viewport matrix unspecified.** `specs/capabilities/platform.md` PLT-2/PLT-3 define mobile/tablet/desktop behavior but no doc pins the Playwright project list / exact breakpoints.
+- **Persistence round-trip ownership.** Whether "survives reload/update" ([[platform]] PLT-7) needs a dedicated interrupted-write/transaction-integrity harness test (beyond E2E) is unstated — flag for the store-seam build.
+- **a11y depth.** WCAG-AA ([[platform]] PLT-5) is checked via per-component label assertions + manual focus review; whether an automated axe-style scan is in scope isn't decided.
+- **Test-data fixtures / RNG seam.** Unit cases assume an injectable `d20` (ADR-002 store seam); the exact injection point isn't named anywhere — confirm during the store-seam build.
 
 ## Changelog
 
@@ -53,9 +64,9 @@ One line per round.
 | 1 | — | Initial spec set: PRD, Rules & Glossary, Data Model, UX & IA. |
 | 2 | 2026-06-27 | Setup→Active lifecycle; temp-HP / heal model; 30/100 caps; (then) per-action undo toasts. |
 | 3 | 2026-06-28 | `ally` type (visual-only); Overview hub created; round-99 wrap-only block + minor re-audit fixes. |
-| 4 | 2026-06-28 | Undo toasts → per-combat **Undo/Redo history** (10-deep); full **control-surface map** ([[Combat Planner UX & IA]] §9). |
+| 4 | 2026-06-28 | Undo toasts → per-combat **Undo/Redo history** (10-deep); full **control-surface map** (now `specs/reference/component-inventory.md` + `specs/capabilities/platform.md` PLT-2/PLT-3). |
 | — | 2026-06-28 | **Architecture ADR** landed — SvelteKit / Dexie / PWA / Paraglide / etc. |
-| 5 | 2026-06-29 | Per-combatant **HP change log** ([[Combat Planner Data Model]] §9); separate from undo; rides export/import. |
+| 5 | 2026-06-29 | Per-combatant **HP change log** (now `specs/capabilities/hp-log.md`); separate from undo; rides export/import. |
 | 6 | 2026-06-29 | Full audit → 8 fixes (Advance FAB, Import control, Max-HP undo step, Start snapshot + 4 minor); status split into this doc. |
 | 7 | 2026-06-29 | Open Qs resolved — ADR-011 Lucide icons, ADR-012 color-tag palette, ADR-013 schema versioning. |
 | 8 | 2026-06-29 | Consistency pass — dedup to one-fact-one-doc (limits → Rules §7, undo → Data §8, HP-log → Data §9, controls → UX §9); Overview Locked-scope cut + **Maintaining this set** added. |
@@ -67,7 +78,7 @@ One line per round.
 
 ## Next
 
-Spec is done (10 docs). Remaining work is **build → dogfood → ship → v2**. Build a vertical slice to the table fast, validate the core bet (DM runs combat one-handed, dim room, faster than pen+paper) in a real fight, then layer the platform promises. Tooling/ADRs per [[Combat Planner Architecture]]; tests per [[Combat Planner Test Plan]].
+Spec is done. Remaining work is **build → dogfood → ship → v2**. Build a vertical slice to the table fast, validate the core bet (DM runs combat one-handed, dim room, faster than pen+paper) in a real fight, then layer the platform promises. Tooling/ADRs per `docs/adr/README.md`; tests per `specs/reference/acceptance-matrix.md`.
 
 | Phase | Slice | Product value |
 |---|---|---|
@@ -84,10 +95,10 @@ Spec is done (10 docs). Remaining work is **build → dogfood → ship → v2**.
 M1 + M2 are the only phases gating first validation — prioritize ruthlessly to the dogfood gate.
 
 ### Pre-build gap
-- **No visual design.** [[Combat Planner UX & IA]] is layout-intent only; shadcn / Lucide / palette ADRs (008/011/012) exist but no screens are designed. Needs a token + screen pass before or within M2.
+- **No visual design.** The UX behavior specced in `specs/capabilities/` is layout-intent only; shadcn / Lucide / palette ADRs (008/011/012) exist but no screens are designed. Needs a token + screen pass before or within M2.
 - **Desktop layout.** Deferred at the M2 first-touch rework (2026-07-01) — mobile-first vertical slice only; revisit before M6 polish.
 
-### v2 backlog (priority — from [[Combat Planner PRD]] §9)
+### v2 backlog (priority — from `docs/archive/Combat Planner PRD.md` §9)
 1. **Monster / encounter library** (reusable stat blocks) — highest value; kills the rebuild-the-roster-every-fight friction. PRD-flagged strong v2.
 2. **Saved party template** — lighter cut: save the PC party once, reuse. Candidate v1.5.
 3. *Defer hard:* multi-device sync/cloud (breaks local-only/private invariant), rules automation (explicit non-goal), other game systems, live-session sharing.

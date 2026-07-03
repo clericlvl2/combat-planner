@@ -60,7 +60,7 @@ numpad/
   HpLogEntryRow.svelte       one log line (§9)
 forms/
   CombatantFormDialog.svelte add/edit combatant (§10)
-  TypeSelect.svelte          pc/monster/ally (§10)
+  TypeSelect.svelte          pc/enemy/ally (§10)
   NumberField.svelte         clamping numeric field (§10)
 settings/
   SettingsGroup.svelte       labeled section (§11)

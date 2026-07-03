@@ -17,6 +17,13 @@ related:
   - "[[Combat Planner Requirements Prompt]]"
 ---
 
+
+> **Archived — superseded by `specs/`.** Frozen for historical provenance; do not edit. Current
+> source of truth: `specs/capabilities/`, `specs/reference/`, and `docs/adr/`. See
+> `specs/README.md` for the process and `specs/reference/migration-traceability.md` for exactly
+> where each fact in this document moved.
+
+
 # Combat Planner — Overview (Index)
 
 > Master hub for the Combat Planner planning doc set. Start here, then dive into a sub-doc below. This note is a directory, not a copy — each fact lives in exactly one doc.

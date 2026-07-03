@@ -11,6 +11,13 @@ related:
   - "[[Combat Planner Requirements Prompt]]"
 ---
 
+
+> **Archived — superseded by `specs/`.** Frozen for historical provenance; do not edit. Current
+> source of truth: `specs/capabilities/`, `specs/reference/`, and `docs/adr/`. See
+> `specs/README.md` for the process and `specs/reference/migration-traceability.md` for exactly
+> where each fact in this document moved.
+
+
 # Combat Planner — Data Model (conceptual)
 
 > **Conceptual** model only — entities, fields, relationships, derived values, persistence semantics. No storage technology, schema syntax, or types-as-code. Limits/defaults come from [[Combat Planner Rules & Glossary]]; behavior from [[Combat Planner PRD]].

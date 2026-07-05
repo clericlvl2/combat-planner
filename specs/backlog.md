@@ -28,8 +28,8 @@ text.
 | B-005 | Decide persistence round-trip / interrupted-write harness for PLT-7 (test-plan gap) | PLT | S | idea | — |
 | B-006 | Decide automated axe-style a11y scan for PLT-5 (test-plan gap) | PLT | S | idea | — |
 | B-007 | Name the injectable d20 / RNG seam (test-plan gap) | INFRA | S | idea | — |
-| B-008 | Visual design: token + screen pass (pre-build gap) | DESIGN | M | idea | — |
-| B-009 | Desktop layout — revisit before M6 (pre-build gap) | DESIGN | M | idea | — |
+| B-008 | Visual design: screen pass — prototype app screens/states (pre-build gap) | DESIGN | M | in-unit | `specs/changes/003-ui-design-prototype/` |
+| B-009 | Desktop layout — revisit before M6 (pre-build gap) | DESIGN | M | in-unit | `specs/changes/003-ui-design-prototype/` |
 | B-010 | Monster / encounter library (v2 backlog #1) | CBT | L | v2 | — |
 | B-011 | Saved party template — candidate v1.5 (v2 backlog #2) | CBT | M | v2 | — |
 | B-012 | CombatantRow temp-HP badge always visible; `combatants.md` CBT-2 says only after expand — doc/code mismatch, fix one (found in 001 Phase 1) | CBT | S | idea | — |
@@ -37,6 +37,7 @@ text.
 | B-014 | Parallel implementer builds race on shared `.svelte-kit` output dir during `/spec-run` fan-out — self-resolves on retry but wastes agent time; consider per-phase build isolation (found in 001 Phase 6/7) | INFRA | S | idea | — |
 | B-015 | `/spec-close` has no commit step — unit 001 archived with everything left uncommitted in the working tree; add an explicit commit stage (what/when/message convention) to the close lifecycle. Resolved by the 2026-07-03 SDD restructure (spec-close commit stage). | INFRA | S | done | — |
 | B-016 | `src/**` code comments cite dead pre-migration doc sections (`UX §`, `Component Inventory §`, `Data Model §` — archive deleted 2026-07-03) — repoint to capability IDs or drop (found in SDD restructure sweep) | INFRA | S | idea | — |
+| B-017 | Visual design: design tokens — bake approved prototype look into `src/routes/layout.css` (real WCAG-AA token set, replaces STUB). Split from B-008; belongs to design-chain unit C. | DESIGN | M | in-unit | `specs/changes/005-design-tokens/` |
 
 **Fields**
 

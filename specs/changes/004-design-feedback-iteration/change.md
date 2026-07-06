@@ -1,5 +1,5 @@
 ---
-status: approved
+status: in-progress
 backlog: —
 ---
 
@@ -17,15 +17,39 @@ Unit **B** of the 5-unit design chain: A prototype → **B feedback iterate** �
 D combats-list screen → E combat screen. Depends on unit 003 (`ui-design-prototype`) and
 redeploys the **same** `specs/design/prototype.html`.
 
+**Reconciliation context.** Unit 003's prototype was built from `component-inventory.md`, but that
+doc drifted from shipped M2 code during the first-touch rework (commits dfc8582 + 82da34a, folded
+via unit 001) — a doc-sync miss. So the prototype now contradicts **CODE** on FAB button(s), the
+"+ Combatant" button, undo/redo placement, and combatant-card layout (hp / init / statuses /
+notes), among others. Root gap is doc↔code; the prototype is a downstream symptom. Precedence when
+sources disagree: **explicit prior decisions > shipped M2 code > stale docs/prototype.**
+
+## Reconciliation (do this first)
+
+Before any prototype iteration, run a **read-only 3-way diff** for every contested element:
+code ↔ `component-inventory.md` ↔ `prototype.html`. Contested set (at minimum): FAB button(s),
+"+ Combatant" button, undo/redo placement, combatant-card layout (hp / init / statuses / notes).
+
+Classify each divergence and record the decision in this unit:
+
+| Class | Meaning | Resolution |
+|-------|---------|------------|
+| (a) STALE-DOC BUG | prototype/doc wrong — disagrees with shipped M2 code | fix **both** doc + prototype to match code |
+| (b) DELIBERATE REDESIGN | intentional new target for the M-phase | user accepts/rejects; if accepted → code changes later in units **D/E**, doc updates to the new target |
+
+The doc reconciliation then gets an **independent doc-pass verify** (fresh read-only agent) — the
+same guard the first-touch rework skipped. Only after the contested set is classified does
+prototype iteration proceed.
+
 ## What changes
 
-Unlike unit 003 (artifact only), this unit **does** edit specs — reconciling them to the
-converged prototype.
+Unlike unit 003 (artifact only), this unit **does** edit specs — reconciling them to shipped M2
+code and the converged prototype.
 
 | ID | Change |
 |----|--------|
 | (artifact) `specs/design/prototype.html` | iterate to the approved converged version (v-final) across review rounds |
-| `specs/reference/component-inventory.md` | amend: reconcile hierarchy / states / control placement with what the final prototype shows |
+| `specs/reference/component-inventory.md` | amend: reconcile hierarchy / states / control placement against shipped **M2 code** (closes the first-touch doc-sync miss) **and** the final prototype |
 | `PLT-2` | amend if the design pins specifics (one-handed reach zones, ≥44px targets as realized) |
 | `PLT-3` | amend if the design pins specifics (exact breakpoints, nav placement per breakpoint) |
 | `PLT-5` | amend if the design pins specifics (focus treatment, contrast pairs, color-not-alone patterns) |
@@ -41,6 +65,12 @@ the app may shift a little or not at all.)
 - [ ] `specs/design/prototype.html` reflects every accepted feedback item from the review rounds.
 - [ ] `specs/reference/component-inventory.md` matches the final prototype — no preview↔spec
       drift in hierarchy, states, or control placement.
+- [ ] `specs/reference/component-inventory.md` is reconciled against shipped **M2 code** (closes
+      the first-touch doc-sync miss) — not only against the prototype.
+- [ ] Each contested element (FAB, "+ Combatant", undo/redo, combatant card) has a recorded
+      **bug-vs-redesign** decision.
+- [ ] The doc reconciliation passes an **independent doc-pass verify** (fresh read-only agent) —
+      the guard the first-touch rework skipped.
 - [ ] Any `PLT-2/3/5` wording that the prototype pinned down is updated to match; requirements
       the prototype did not change are left as-is.
 - [ ] `npm run gate` stays green.

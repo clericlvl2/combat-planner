@@ -24,17 +24,25 @@ AppShell
     │   ├── EmptyState
     │   └── CombatFormDialog → { NumberField·n/a, ColorSwatchPicker }   (create/edit)
     ├── Combat
-    │   ├── CombatHeader → { IconButton×back/undo/redo, RoundCounterControl,
-    │   │                    EscalationDieControl, CombatOverflowMenu }
+    │   ├── CombatHeader → { IconButton×back, RoundCounterControl, EscalationDieControl,
+    │   │                    CombatOverflowMenu → { Undo, Redo (top, disabled at stack ends),
+    │   │                    Setup: +Clear · Active: +Add combatant/Restart/Clear } }
     │   ├── CombatantList → CombatantRow
-    │   │     ├─ compact:  TypeStripe · CombatantRowMenu (persistent `⋮`) · InitCell ·
-    │   │     │            HpCell · HealthBar · DefenseStats · ConditionIconList
-    │   │     └─ expanded: + TempHpField · NoteField · ConditionPicker (chips removable)
-    │   ├── StartBar (Setup) · FAB(add/advance) · JumpToTurnButton (Active)
+    │   │     ├─ compact:  TypeStripe (leading edge) · HpCell (opens numpad) · name (toggles
+    │   │     │            expand) · HealthBar · DefenseStats · ConditionIconList (all render,
+    │   │     │            no overflow chip) · InitCell (trailing; disabled while Active) ·
+    │   │     │            persistent `⋮` menu (Edit/Duplicate/Remove, trailing-most)
+    │   │     └─ expanded: + "+ Condition" tag-trigger → ConditionPicker (chips removable ×) ·
+    │   │                  "+ Note" tag-trigger → inline note editor (hidden once note is set)
+    │   ├── Setup: persistent "Add Combatant" bar (no FAB) — Start moves into CombatHeader once
+    │   │     the roster isn't empty. Active: FAB(advance). JumpToTurnButton (Active, TRE —
+    │   │     not yet in the M2 slice, targeted by unit 007)
     │   ├── EmptyState
     │   ├── NumpadSheet → { HpSummaryHeader, EntryDisplay, DigitPad,
     │   │                   CommitActions, HpLogSection → HpLogEntryRow }
-    │   └── CombatantFormDialog → { NumberField, TypeSelect, NoteField, InitEntry }
+    │   └── CombatantForm → { NumberField (Max HP / Init Bonus / AC / PD / MD), Type
+    │         (ToggleGroup, not a Select), NoteField, Initiative (NumberField — edit mode or
+    │         mid-combat add only; no roll/lock control, rolling stays on the row's InitCell) }
     ├── Settings → { SettingsGroup, LanguageSwitcher, ThemeSwitcher, DataActions }
     └── About → AboutPage
 ```
@@ -57,24 +65,32 @@ Shared/reused leaves: **FAB**, **IconButton**, **EmptyState**, **NumberField**, 
 | healthState | full · wounded · bloodied · dead | HealthBar fill/alarm + card background tint |
 | display | compact · expanded | which children render |
 
-**Compact row** shows: active-turn indicator, TypeStripe, persistent `⋮` menu
-(Edit/Duplicate/Remove), name, InitCell, HpCell + HealthBar, DefenseStats (AC/PD/MD, in-row at
-all sizes), ConditionIconList (first few + "+K" overflow chip).
+**Compact row** shows, in order (leading → trailing): TypeStripe, HpCell (opens the numpad;
+shows a temp-HP badge inline when carried), name (toggles expand) + active-turn indicator,
+HealthBar, DefenseStats (AC/PD/MD, in-row at all sizes), ConditionIconList (**all** conditions
+render — no "+K" overflow, the row wraps instead), InitCell (disabled while the combat is
+Active), persistent `⋮` menu (Edit/Duplicate/Remove, trailing-most).
 
-**Expanded row** additionally shows: TempHpField, NoteField, ConditionPicker (preset toggle set —
-[[../capabilities/conditions]] CND-1, applied chips gain a removable ×).
+**Expanded row** additionally shows two tag-styled triggers appended to the condition row: "+
+Condition" (always, opens the ConditionPicker modal — preset toggle set,
+[[../capabilities/conditions]] CND-1, applied chips gain a removable ×) and "+ Note" (hidden
+once the note is non-empty, otherwise reveals an inline note editor). There is no separate
+temp-HP field in the expanded row — temp HP is only set via NumpadSheet's "Set Temp HP" action.
 
 TypeStripe is a deliberate color-alone exception, compensated by an `aria-label` naming the type
 ([[../capabilities/platform]] PLT-5).
 
 ## Floating action button (FAB) — bottom-right thumb zone
 
-Shared component, `action` prop switches meaning by screen/state:
+Shared component, `action` prop switches meaning by screen/state. Combat — Setup does **not**
+use the FAB at all (shipped M2 code): it shows a persistent full-width "Add Combatant" bar
+pinned at the bottom instead, and Start moves inline into `CombatHeader` once the roster isn't
+empty.
 
 | Screen / state | FAB action |
 |---|---|
 | Combats home | create |
-| Combat — Setup | add (combatant) |
+| Combat — Setup | — (no FAB; persistent "Add Combatant" bar instead, see above) |
 | Combat — Active | advance (disabled at the round wrap boundary — [[../capabilities/turns-rounds-escalation]] TRE-3) |
 
 ## Numpad sheet
@@ -86,15 +102,18 @@ Contains: `HpSummaryHeader` (cur/max + temp, shown before entry), `EntryDisplay`
 
 ## Header (Combat screen)
 
-One bar across Setup and Active. `IconButton`s: back, undo, redo (undo/redo disabled at their
-respective stack ends). `RoundCounterControl` and `EscalationDieControl` are **Active only**.
-`CombatOverflowMenu` (`⋮`): Setup → {Clear}; Active → {Add combatant, Restart, Clear}.
+One bar across Setup and Active: back (leading) · center slot · `CombatOverflowMenu` (`⋮`,
+trailing). Center slot is **Active only** (`RoundCounterControl` + `EscalationDieControl`); in
+Setup it holds nothing until the roster isn't empty, then a "Start combat" button appears there.
+Undo/Redo are **not** separate header icons — they're the top two `CombatOverflowMenu` items
+(disabled at their respective stack ends), followed by Setup → {Clear}; Active → {Add
+combatant, Restart, Clear}.
 
 ## Global chrome placement
 
 `UpdateToast` (via `Toaster`) renders bottom-center, lifted above the FAB/thumb zone.
-`InstallBanner` renders as a slim, dismissible top banner. Neither ever overlaps the FAB or the
-Setup `StartBar` ([[../capabilities/platform]] PLT-4).
+`InstallBanner` renders as a slim, dismissible top banner. Neither ever overlaps the FAB or
+Setup's persistent "Add Combatant" bar ([[../capabilities/platform]] PLT-4).
 
 ## Combats list row
 
@@ -107,22 +126,22 @@ handle for reorder (svelte-dnd-action).
 | Primitive | Used by |
 |---|---|
 | Button | IconButton, FAB, StartBar, JumpToTurnButton, DigitPad, CommitActions, DataActions, NavLink, EmptyState CTA, ImportControl |
-| Dialog | CombatFormDialog, CombatantFormDialog, NumpadSheet (desktop) |
+| Dialog | CombatFormDialog, CombatantForm, NumpadSheet (desktop) |
 | AlertDialog | ConfirmDialog |
 | Sidebar | NavSidebar |
 | Sheet | AppHeader burger |
 | Drawer | NumpadSheet (mobile) |
 | DropdownMenu | CombatRowMenu, CombatOverflowMenu, CombatantRowMenu |
-| Select | TypeSelect, LanguageSwitcher |
-| RadioGroup / ToggleGroup | ColorSwatchPicker, ConditionPicker, ThemeSwitcher |
+| Select | LanguageSwitcher |
+| RadioGroup / ToggleGroup | ColorSwatchPicker, ConditionPicker, ThemeSwitcher, Type toggle (CombatantForm) |
 | Input | NumberField (+ form fields) |
 | Textarea | NoteField |
-| Label / Form | CombatFormDialog, CombatantFormDialog, NumberField |
+| Label / Form | CombatFormDialog, CombatantForm, NumberField |
 | Card | CombatRow, CombatantRow, SettingsGroup |
-| Badge | ConditionIconList ("+K" chip, removable × when expanded) |
+| Badge | ConditionIconList (all conditions render, removable × when expanded) |
 | Collapsible | CombatantRow (compact↔expanded), HpLogSection |
 | Progress | HealthBar |
-| Popover | RoundCounterControl, EscalationDieControl, InitEntry |
+| Popover | RoundCounterControl, EscalationDieControl, InitCell (manual-entry, long-press) |
 | Sonner (toast) | Toaster / UpdateToast |
 | ScrollArea | HpLogSection |
 | Separator | SettingsGroup |

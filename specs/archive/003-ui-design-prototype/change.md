@@ -1,5 +1,5 @@
 ---
-status: approved
+status: archived
 backlog: B-008, B-009
 ---
 

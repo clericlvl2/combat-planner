@@ -28,8 +28,8 @@ text.
 | B-005 | Decide persistence round-trip / interrupted-write harness for PLT-7 (test-plan gap) | PLT | S | idea | — |
 | B-006 | Decide automated axe-style a11y scan for PLT-5 (test-plan gap) | PLT | S | idea | — |
 | B-007 | Name the injectable d20 / RNG seam (test-plan gap) | INFRA | S | idea | — |
-| B-008 | Visual design: screen pass — prototype app screens/states (pre-build gap) | DESIGN | M | in-unit | `specs/changes/003-ui-design-prototype/` |
-| B-009 | Desktop layout — revisit before M6 (pre-build gap) | DESIGN | M | in-unit | `specs/changes/003-ui-design-prototype/` |
+| B-008 | Visual design: screen pass — prototype app screens/states (pre-build gap) | DESIGN | M | done | `specs/archive/003-ui-design-prototype/` |
+| B-009 | Desktop layout — revisit before M6 (pre-build gap) | DESIGN | M | done | `specs/archive/003-ui-design-prototype/` |
 | B-010 | Monster / encounter library (v2 backlog #1) | CBT | L | v2 | — |
 | B-011 | Saved party template — candidate v1.5 (v2 backlog #2) | CBT | M | v2 | — |
 | B-012 | CombatantRow temp-HP badge always visible; `combatants.md` CBT-2 says only after expand — doc/code mismatch, fix one (found in 001 Phase 1) | CBT | S | idea | — |

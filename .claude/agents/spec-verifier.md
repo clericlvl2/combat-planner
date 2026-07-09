@@ -7,6 +7,7 @@ mcpServers:
 skills:
     - webstorm-mcp-explorer
 model: sonnet
+effort: low
 ---
 
 You verify. You do not implement, and you do not trust a self-report — you check the actual

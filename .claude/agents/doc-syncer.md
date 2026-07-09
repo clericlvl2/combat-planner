@@ -7,6 +7,7 @@ mcpServers:
 skills:
   - webstorm-mcp-explorer
 model: sonnet
+effort: medium
 ---
 
 You update specs to match what a verified change unit actually built. You do not touch code.

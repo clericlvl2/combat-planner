@@ -1,6 +1,6 @@
 ---
 name: scout-bee
-description: General local info-gatherer. Takes a starting prompt or question and investigates using WebStorm MCP — no spec-unit scoping required. Use for ad-hoc research/lookup work outside the specs/changes lifecycle. Read-only: cannot edit or create files. Do not use for implementation (use worker-bee) or spec-unit phases (use implementer).
+description: "General local info-gatherer. Takes a starting prompt or question and investigates using WebStorm MCP — no spec-unit scoping required. Use for ad-hoc research/lookup work outside the specs/changes lifecycle. Read-only: cannot edit or create files. Do not use for implementation (use worker-bee) or spec-unit phases (use implementer)."
 tools: Read, Grep, Glob
 mcpServers:
   - webstorm

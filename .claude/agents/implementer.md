@@ -7,6 +7,7 @@ mcpServers:
 skills:
   - webstorm-mcp-explorer
 model: sonnet
+effort: medium
 ---
 
 You implement exactly one phase of one change unit. Nothing more.

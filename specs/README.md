@@ -15,8 +15,9 @@ You have an idea, a bug, or a roadmap item. Here's the path from that to shipped
    frontmatter `status: draft`. Stops there — nothing is implemented from a draft.
 3. **You approve the draft.** Once you're happy with it (as written or after edits), flip
    `change.md`'s frontmatter to `status: approved`.
-4. **`/spec-tasks`** — turns the approved `change.md` into `tasks.md`: phases with explicit file
-   ownership and parallel-safe groupings. Flips `status` to `in-progress` once `tasks.md` lands.
+4. **`/spec-tasks`** — dispatches a `spec-planner` agent to turn the approved `change.md` into
+   `tasks.md`: phases with explicit file ownership and parallel-safe groupings. Flips `status` to
+   `in-progress` once `tasks.md` lands.
 5. **`/spec-run`** — dispatches `implementer` agents through `tasks.md`, one phase (or
    parallel-safe group) at a time, halting on any gate failure.
 6. **`/spec-verify`** — spawns a fresh `spec-verifier` agent against the diff and acceptance
@@ -92,11 +93,12 @@ memory.
    implemented from a draft.
 2. **approved** — you approve the draft as-is (or after edits) by flipping frontmatter to
    `status: approved`.
-3. **in-progress** — `/spec-tasks` requires `status: approved` before it will run; it turns
-   `change.md` into `tasks.md` (phases with explicit file ownership and parallel-safe groupings)
-   and flips `status` to `in-progress` once `tasks.md` lands. `/spec-run` then dispatches
-   `implementer` agents per phase (parallel when file-disjoint), collects structured reports, and
-   halts on any gate failure. `status` stays `in-progress` through this.
+3. **in-progress** — `/spec-tasks` requires `status: approved` before it will run; it dispatches
+   a `spec-planner` agent to turn `change.md` into `tasks.md` (phases with explicit file
+   ownership and parallel-safe groupings) and flips `status` to `in-progress` once `tasks.md`
+   lands. `/spec-run` then dispatches `implementer` agents per phase (parallel when
+   file-disjoint), collects structured reports, and halts on any gate failure. `status` stays
+   `in-progress` through this.
 4. **verifying** — `/spec-verify` flips `status` to `verifying` when it dispatches a fresh
    `spec-verifier` agent (no implementation context) against the diff and the change unit's
    acceptance criteria; the agent writes `verification.md` with a per-AC verdict and `file:line`
@@ -119,6 +121,9 @@ override in the verification file itself, not just in chat: change the verdict l
 
 - **You** — write Why + acceptance criteria, approve the draft, approve the verified result.
   That's the whole manual surface.
+- **spec-planner** (`.claude/agents/spec-planner.md`) — turns an approved `change.md` into
+  `tasks.md` — phases with explicit file ownership and parallel-safe groupings; independent of
+  `/spec-run`'s `implementer` agents.
 - **implementer** (`.claude/agents/implementer.md`) — executes exactly one `tasks.md` phase,
   touches only that phase's owned files, ends with the gate + a structured report.
 - **spec-verifier** (`.claude/agents/spec-verifier.md`) — read-only, fresh context, checks a

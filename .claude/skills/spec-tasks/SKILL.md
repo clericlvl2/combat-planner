@@ -12,21 +12,11 @@ drives, not this skill's job).
 1. Confirm the change unit is approved: read `change.md`'s frontmatter and require
    `status: approved`. If it's still `draft` (or anything else), stop and tell the user to
    approve it first — do not proceed on a chat assurance alone.
-2. Read `change.md` in full: the affected capability IDs, acceptance criteria, and out-of-scope
-   list.
-3. Identify the concrete files each piece of work touches. Use `Grep`/`Glob` against `src/` to
-   find the actual files backing each affected capability (store, components, routes) — don't
-   guess from the capability name alone.
-4. Group the work into phases such that:
-   - Each phase owns a disjoint file set from every other phase it's *not* marked parallel-safe
-     with. Two phases touching the same file must never be marked parallel-safe.
-   - Phases with a real ordering dependency (e.g. a store change before the component that reads
-     it) are separate, sequential phases, not merged into one.
-   - Keep phases small enough that one `implementer` agent run can finish one phase, including its
-     own gate run, without touching out-of-scope files.
-5. Write `specs/changes/NNN-slug/tasks.md` from `specs/templates/tasks.md`, one phase block per
-   group, each ending with the standard `**Gate:** npm run gate must pass before this phase is
-   reported done.` line.
-6. Once `tasks.md` lands, flip `change.md`'s frontmatter to `status: in-progress`.
-7. Present the phase breakdown to the user (phase names + owned files + parallel groups) and stop.
-   `/spec-run` executes it next, once they're happy with the split.
+2. Dispatch one `spec-planner` agent via the Agent tool, giving it the change unit path. It
+   reads `change.md` itself, finds the concrete files behind each affected capability, groups the
+   work into phases with explicit file ownership and parallel-safe groupings, and writes
+   `specs/changes/NNN-slug/tasks.md` from `specs/templates/tasks.md`.
+3. Once it reports `tasks.md written: yes`, flip `change.md`'s frontmatter to
+   `status: in-progress`.
+4. Relay the agent's phase breakdown to the user (phase names + owned files + parallel groups)
+   and stop. `/spec-run` executes it next, once they're happy with the split.

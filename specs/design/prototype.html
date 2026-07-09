@@ -145,20 +145,20 @@
     --type-ally: #2563eb;
 
     /* Semantic — health bands (matches shipped src/routes/layout.css :root) */
-    --health-full: #10b981;
-    --health-wounded: #f59e0b;
-    --health-bloodied: #f97316;
+    --health-full: #0c8d62;
+    --health-wounded: #a76b07;
+    --health-bloodied: #c75505;
     --health-dead: #b91c1c;
 
     /* Semantic — 8 combat color-tag swatches (ADR-012; matches shipped src/routes/layout.css :root) */
     --combat-neutral: #64748b;
-    --combat-red: #ef4444;
-    --combat-orange: #f97316;
-    --combat-amber: #f59e0b;
-    --combat-green: #10b981;
-    --combat-teal: #14b8a6;
-    --combat-blue: #0ea5e9;
-    --combat-violet: #8b5cf6;
+    --combat-red: #cb3a3a;
+    --combat-orange: #bb5611;
+    --combat-amber: #9d6507;
+    --combat-green: #0b8457;
+    --combat-teal: #0e8174;
+    --combat-blue: #0b7caf;
+    --combat-violet: #7d53dd;
 
     --on-semantic: #ffffff;
   }
@@ -2439,21 +2439,21 @@
         <td>Combatant type — PC / enemy / ally</td>
         <td>--type-*</td>
         <td>&ge; 6.3:1</td>
-        <td>&ge; 3.8:1</td>
+        <td>&ge; 3.7:1</td>
         <td>TypeStripe (stripe count: pc=2, enemy/ally=1) + role=img aria-label naming the type (no visible text chip)</td>
       </tr>
       <tr>
         <td>Health bands (full / wounded / bloodied / dead)</td>
         <td>--health-*</td>
         <td>&ge; 3.7:1</td>
-        <td>&ge; 3.6:1</td>
+        <td>&ge; 3.4:1</td>
         <td>cur/max text + role=img aria-label (name + band + cur/max); card background tint on bloodied/dead only (no visible band-label word)</td>
       </tr>
       <tr>
         <td>Combat color-tags (8, ADR-012)</td>
         <td>--combat-*</td>
         <td>&ge; 6.3:1</td>
-        <td>&ge; 3.2:1</td>
+        <td>&ge; 4.6:1</td>
         <td>Dot initial letter + tag name + title text</td>
       </tr>
     </tbody>

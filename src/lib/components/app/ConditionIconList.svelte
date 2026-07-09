@@ -23,16 +23,16 @@
 {#if conditions.length}
 	<div class="flex flex-wrap items-center gap-1">
 		{#each conditions as c (c)}
-			<Badge variant="outline" class={['h-4 gap-1 px-1.5 text-[10px]', conditionColor[c]]}>
+			<Badge variant="outline" class={['h-6 gap-1.5 px-2.5 text-sm font-normal', conditionColor[c]]}>
 				{conditionLabel[c]()}
 				{#if removable}
 					<button
 						type="button"
-						class="-mr-0.5 inline-flex items-center rounded-full hover:text-foreground"
+						class="-mr-1 inline-flex items-center rounded-full hover:text-foreground"
 						aria-label={m['forms.action.remove']()}
 						onclick={() => onRemove?.(c)}
 					>
-						<CloseIcon class="size-3" />
+						<CloseIcon class="size-3.5" />
 					</button>
 				{/if}
 			</Badge>

@@ -1,16 +1,21 @@
 <!--
-  CombatantRow (Component Inventory §8, UX §4c) — one roster row, compact ↔ expanded via Collapsible.
-  Leading edge: type color stripe(s) (pc=2 green, ally=1 blue, enemy=1 red — color-only, `aria-label`
-  compensates). Compact: HP cell (opens numpad) · name (toggles expand) · health bar + band ·
-  AC/PD/MD (fixed width) · condition tags (read-only, all shown, wraps). When expanded, that same
-  tag row also gets two tag-styled triggers appended: "+ Condition" (always, opens the
-  ConditionPicker modal) and "+ Note" (hidden once the note is non-empty — has a note → no button,
-  just the inline textarea; collapsing while still empty resets it back to the chip on next
-  expand), and each condition chip grows a removable `×`. Trailing: init cell (disabled while combat
-  is active — initiative then only edits via CombatantForm) · persistent `⋮` actions menu (edit /
-  duplicate / remove, visible collapsed or expanded). Card background reflects HP status (bloodied /
-  dead, type-aware); active-turn highlight when `active`. Reads the combatant; emits intent via the
-  controller + the page-owned numpad/edit dialogs (no business logic here).
+  CombatantRow (Component Inventory §8, UX §4c) — one roster card, compact ↔ expanded via
+  Collapsible. Card shape ported from `specs/design/card-prototype.html` (locked in
+  `component-inventory.md`'s "Combatant card" section): leading TypeStripe(s) (pc=2 green,
+  ally=1 blue, enemy=1 red — color-only, `aria-label` compensates) · Row 1 name + expand chevron +
+  trailing `⋮` overflow menu · Row 2 big HP (+ temp-HP badge) inside a fixed-width block, and a
+  health bar filling the remaining width · Row 3 AC/PD/MD + Init pill · Row 4 condition chips
+  (read-only, all shown, wraps) · Row 5 note. When expanded, Row 4 also gets two tag-styled
+  triggers appended: "+ Condition" (always, opens the ConditionPicker modal) and "+ Note" (hidden
+  once the note is non-empty — has a note → no button, just the inline textarea; collapsing while
+  still empty resets it back to the chip on next expand), and each condition chip grows a
+  removable `×`. A read-only note line renders under the card whenever a note is set and the row
+  is collapsed (the inline textarea already covers the expanded case). Trailing: init cell
+  (disabled while combat is active — initiative then only edits via CombatantForm) · persistent
+  `⋮` actions menu (edit / duplicate / remove, visible collapsed or expanded). Active-turn
+  highlight when `active` (health-band card-bg tint removed per the R4 restyle — the health bar's
+  fill colour change alone is the signal). Reads the combatant; emits intent via the controller +
+  the page-owned numpad/edit dialogs (no business logic here).
 -->
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
@@ -28,7 +33,6 @@
 	import { m } from '$lib/i18n';
 	import { chromeIcon } from '$lib/icons';
 	import { NOTE_MAX_LENGTH } from '$lib/stores/domain/constants';
-	import { healthStatus } from '$lib/stores/domain/derive';
 	import type { CombatController } from './controller';
 	import ConditionIconList from './ConditionIconList.svelte';
 	import ConditionPicker from './ConditionPicker.svelte';
@@ -68,19 +72,6 @@
 	const menuLabel = $derived(m['a11y.combatRowMenu']({ title: combatant.name }));
 	const showNoteEditor = $derived(combatant.note !== '' || noteEditing);
 
-	// Card bg by HP status (Rules §4): 100–50% → normal; <50% → bloodied tint; ≤0 → dead tint,
-	// split by type (enemy/ally read as a neutral "down", PC reads as the alarm dead tint).
-	const status = $derived(healthStatus(combatant));
-	const cardBgClass = $derived.by(() => {
-		if (status === 'dead') {
-			return combatant.type === 'pc'
-				? 'bg-health-dead/10'
-				: 'bg-combat-neutral/10 text-muted-foreground';
-		}
-		if (status === 'bloodied') return 'bg-health-bloodied/10';
-		return '';
-	});
-
 	// Type stripe(s) at the card's leading edge — color-only signal, aria-label compensates.
 	const stripes = $derived(Array.from({ length: typeStripeCount[combatant.type] }));
 	const stripeLabel = $derived(m['a11y.typeBadge']({ type: typeLabel[combatant.type]() }));
@@ -104,13 +95,13 @@
 	const Duplicate = chromeIcon.duplicate;
 	const Remove = chromeIcon.remove;
 
-	/** "+ Condition" / "+ Note" triggers — same h-4/px-1.5/py-0.5/text-[10px] box as the condition
-	 *  tags (Badge), just dashed to read as an affordance rather than a value (UX §4c). */
+	/** "+ Condition" / "+ Note" triggers — same chip box as the condition tags (Badge), just
+	 *  dashed to read as an affordance rather than a value (UX §4c). */
 	const tagTriggerClass =
-		'inline-flex h-4 items-center gap-1 rounded-4xl border border-dashed border-muted-foreground/50 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground hover:border-foreground hover:text-foreground';
+		'inline-flex h-6 items-center gap-1 rounded-full border border-dashed border-muted-foreground/50 px-2.5 py-0.5 text-sm font-medium text-muted-foreground hover:border-foreground hover:text-foreground';
 </script>
 
-<Card class={['overflow-hidden p-0', cardBgClass, active && 'ring-2 ring-primary']} data-active={active}>
+<Card class={['overflow-hidden p-0', active && 'ring-2 ring-primary']} data-active={active}>
 	<div class="flex items-stretch">
 		<div class="flex shrink-0" aria-label={stripeLabel}>
 			{#each stripes as _, i (i)}
@@ -118,88 +109,112 @@
 			{/each}
 		</div>
 
-		<div class="min-w-0 flex-1 p-2">
+		<div class="min-w-0 flex-1 p-3">
 			<Collapsible bind:open>
-				<div class="flex items-center gap-2">
-					<button
-						type="button"
-						class="flex w-24 shrink-0 flex-col items-center gap-0 self-start rounded-md px-2 py-1 tabular-nums hover:bg-muted"
-						aria-label={hpLabel}
-						onclick={() => onOpenNumpad(combatant.id)}
-					>
-						<span class="text-[9px] leading-none font-normal text-muted-foreground">HP</span>
-						<span class="flex items-center gap-1 text-lg leading-none font-semibold">
-							{combatant.currentHp}/{combatant.maxHp}
+				<div class="flex flex-col gap-2">
+					<!-- Row 1: name + expand chevron + overflow menu -->
+					<div class="flex items-center gap-2">
+						<CollapsibleTrigger
+							class="flex min-w-0 flex-1 items-center gap-1.5 text-left"
+							aria-label={toggleLabel}
+						>
+							<span class="truncate font-medium">{combatant.name}</span>
+							<Chevron
+								class={[
+									'size-4 shrink-0 text-muted-foreground transition-transform',
+									open && 'rotate-180',
+								]}
+							/>
+						</CollapsibleTrigger>
+
+						<DropdownMenu>
+							<DropdownMenuTrigger>
+								{#snippet child({ props })}
+									<Button {...props} variant="ghost" size="icon" aria-label={menuLabel}>
+										<Overflow class="size-4" />
+									</Button>
+								{/snippet}
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="end">
+								<DropdownMenuItem onSelect={() => onEdit(combatant.id)}>
+									<Edit class="size-4" />
+									{m['forms.action.edit']()}
+								</DropdownMenuItem>
+								<DropdownMenuItem onSelect={() => controller.duplicate(combatant.id)}>
+									<Duplicate class="size-4" />
+									{m['forms.action.duplicate']()}
+								</DropdownMenuItem>
+								<DropdownMenuSeparator />
+								<DropdownMenuItem variant="destructive" onSelect={() => controller.remove(combatant.id)}>
+									<Remove class="size-4" />
+									{m['forms.action.remove']()}
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</div>
+
+					<!-- Row 2: big HP (+ temp-HP badge), fixed-width, + health bar filling the rest -->
+					<div class="flex items-center gap-3">
+						<button
+							type="button"
+							class="relative flex w-24 shrink-0 items-center gap-1 rounded-md px-1 py-1 tabular-nums hover:bg-muted"
+							aria-label={hpLabel}
+							onclick={() => onOpenNumpad(combatant.id)}
+						>
+							<span class="text-lg leading-none font-semibold">
+								{combatant.currentHp}/{combatant.maxHp}
+							</span>
 							{#if combatant.tempHp > 0}
 								<span
-									class="inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-combat-blue text-[10px] leading-none font-medium text-white"
+									class="absolute -top-1.5 right-0 inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-combat-blue text-[10px] leading-none font-medium text-white"
 								>
 									{combatant.tempHp}
 								</span>
 							{/if}
-						</span>
-					</button>
-
-					<div class="flex min-w-0 flex-1 flex-col gap-1">
-						<CollapsibleTrigger class="flex items-center gap-1.5 text-left" aria-label={toggleLabel}>
-							<span class="truncate font-medium">{combatant.name}</span>
-							<Chevron class={['ml-auto size-4 shrink-0 text-muted-foreground transition-transform', open && 'rotate-180']} />
-						</CollapsibleTrigger>
-						<HealthBar {combatant} />
-						<div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
-							<span class="shrink-0 tabular-nums">AC {combatant.ac} · PD {combatant.pd} · MD {combatant.md}</span>
-							<div class="flex flex-wrap items-center gap-1">
-								<ConditionIconList
-									conditions={combatant.conditions}
-									removable={open}
-									onRemove={(c) => controller.removeCondition(combatant.id, c)}
-								/>
-								{#if open}
-									<button type="button" class={tagTriggerClass} onclick={() => (conditionsOpen = true)}>
-										+ {m['conditions.addShort']()}
-									</button>
-									{#if !showNoteEditor}
-										<button type="button" class={tagTriggerClass} onclick={() => (noteEditing = true)}>
-											+ {m['forms.note.addShort']()}
-										</button>
-									{/if}
-								{/if}
-							</div>
+						</button>
+						<div class="min-w-0 flex-1">
+							<HealthBar {combatant} />
 						</div>
 					</div>
 
-					<InitCell
-						{combatant}
-						onRoll={controller.roll}
-						onSetInitiative={controller.setInitiative}
-						editable={!combatActive}
-						class="text-xs text-muted-foreground"
-					/>
+					<!-- Row 3: AC/PD/MD + Init pill -->
+					<div class="flex items-center gap-3">
+						<span class="flex-1 text-xs tabular-nums text-muted-foreground">
+							AC {combatant.ac} · PD {combatant.pd} · MD {combatant.md}
+						</span>
+						<InitCell
+							{combatant}
+							onRoll={controller.roll}
+							onSetInitiative={controller.setInitiative}
+							editable={!combatActive}
+							class="text-xs text-muted-foreground"
+						/>
+					</div>
 
-					<DropdownMenu>
-						<DropdownMenuTrigger>
-							{#snippet child({ props })}
-								<Button {...props} variant="ghost" size="icon" aria-label={menuLabel}>
-									<Overflow class="size-4" />
-								</Button>
-							{/snippet}
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end">
-							<DropdownMenuItem onSelect={() => onEdit(combatant.id)}>
-								<Edit class="size-4" />
-								{m['forms.action.edit']()}
-							</DropdownMenuItem>
-							<DropdownMenuItem onSelect={() => controller.duplicate(combatant.id)}>
-								<Duplicate class="size-4" />
-								{m['forms.action.duplicate']()}
-							</DropdownMenuItem>
-							<DropdownMenuSeparator />
-							<DropdownMenuItem variant="destructive" onSelect={() => controller.remove(combatant.id)}>
-								<Remove class="size-4" />
-								{m['forms.action.remove']()}
-							</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
+					<!-- Row 4: condition chips (always) + expand-only triggers -->
+					<div class="flex flex-wrap items-center gap-1">
+						<ConditionIconList
+							conditions={combatant.conditions}
+							removable={open}
+							onRemove={(c) => controller.removeCondition(combatant.id, c)}
+						/>
+						{#if open}
+							<button type="button" class={tagTriggerClass} onclick={() => (conditionsOpen = true)}>
+								+ {m['conditions.addShort']()}
+							</button>
+							{#if !showNoteEditor}
+								<button type="button" class={tagTriggerClass} onclick={() => (noteEditing = true)}>
+									+ {m['forms.note.addShort']()}
+								</button>
+							{/if}
+						{/if}
+					</div>
+
+					<!-- Row 5: read-only note line — collapsed only (expanded keeps the inline editor below,
+					     which already renders the note's text whenever it's set). -->
+					{#if !open && combatant.note !== ''}
+						<p class="text-sm text-muted-foreground italic">{combatant.note}</p>
+					{/if}
 				</div>
 
 				<CollapsibleContent class="flex flex-col gap-2 pt-3">
@@ -213,16 +228,16 @@
 							onchange={commitNote}
 						/>
 					{/if}
-
-					<ConditionPicker
-						bind:open={conditionsOpen}
-						conditions={combatant.conditions}
-						name={combatant.name}
-						onAdd={(c) => controller.addCondition(combatant.id, c)}
-						onRemove={(c) => controller.removeCondition(combatant.id, c)}
-					/>
 				</CollapsibleContent>
 			</Collapsible>
+
+			<ConditionPicker
+				bind:open={conditionsOpen}
+				conditions={combatant.conditions}
+				name={combatant.name}
+				onAdd={(c) => controller.addCondition(combatant.id, c)}
+				onRemove={(c) => controller.removeCondition(combatant.id, c)}
+			/>
 		</div>
 	</div>
 </Card>

@@ -52,18 +52,19 @@ Percentage = current HP ÷ Max HP (temp HP excluded; Max HP ≥ 1, so never divi
 | bloodied | >0–49% | low |
 | dead | 0 or below | reverse bar, alarm color, fills opposite direction as HP goes more negative, maxing at `-maxHp`; visual label only — the combatant stays in turn order |
 
-The combatant card's background tints to match `healthStatus`, reusing the same tokens as the
-health bar: normal at full/wounded, a bloodied tint below 50%. At 0 HP or below the tint
-**differs by type**: a neutral/muted "out" tint for enemy/ally, but a distinct dead tint for a PC.
-The active-turn highlight ring composes on top of this background regardless of HP state.
+The health bar's fill color (per the table above) is the sole visual signal for `healthStatus` —
+the combatant card's background does not tint to match it. Non-color-alone signal still comes
+from the bar's band width and its `role="img"` `aria-label` ([[platform]] PLT-5,
+[[../reference/component-inventory]]). The active-turn highlight ring composes on top of the
+card regardless of HP state.
 
 **AC:**
 - `healthStatus` bands exactly per the table above; `currentHp > maxHp` reads `full`.
 - At `currentHp <= 0` the bar renders in reverse-fill alarm styling instead of the normal bar,
   scaling toward `-maxHp`.
 - "Dead" never removes the combatant from turn order or skips its turn ([[turns-rounds-escalation]] TRE-2).
-- The card background tint follows `healthStatus`; at `currentHp <= 0` a PC gets the distinct dead
-  tint while enemy/ally get the neutral/muted tint, and the active-turn ring still renders on top.
+- The health bar's fill color is the only HP-status visual signal on the card; the card
+  background does not change with `healthStatus`, and the active-turn ring still renders on top.
 
 ## HP-5 — Editing Max HP does not touch current HP
 

@@ -12,11 +12,12 @@ visible-focus requirement ([[../capabilities/platform]] PLT-5). **error** surfac
 
 **Target vs. shipped, this doc.** This file describes the design *target* locked in by the
 converged prototype (`specs/design/prototype.html`, plus `specs/design/card-prototype.html` for
-the combatant-card shape). Unit **D** (006 combats-list) has now shipped and ported its surfaces
+the combatant-card shape). Unit **D** (006 combats-list) shipped and ported its surfaces
 (AppShell/AppHeader/NavSidebar chrome, CombatList family, CombatFormDialog, ConfirmDialog,
-Settings, About); unit **E** (007 combat screen) has not — where the target still diverges from
-what shipped `src/` code renders today, that gap is flagged inline instead of silently restated
-as already-true.
+Settings, About); unit **E** (007 combat screen) has now shipped and ported the Combat-screen
+surfaces (CombatHeader, CombatantCard/CombatantRow, NumpadSheet, CombatantForm,
+JumpToTurnButton) — where the target still diverges from what shipped `src/` code renders
+today, that gap is flagged inline instead of silently restated as already-true.
 
 ## Hierarchy
 
@@ -50,8 +51,9 @@ AppShell
     │   │     hold-to-start Start FAB (right-edge, stacked above the Add FAB); desktop swaps
     │   │     both for header-add/header-start icon buttons (see CombatHeader above). Active:
     │   │     FAB(advance, chevron `›` glyph, `aria-label="Advance turn"`) (mobile) /
-    │   │     header-advance icon button (desktop). JumpToTurnButton (Active, TRE — not yet in
-    │   │     the M2 slice, targeted by unit 007). Cross-reference
+    │   │     header-advance icon button (desktop). JumpToTurnButton (Active, TRE — scrolls the
+    │   │     active-turn row into view; shipped in unit 007 as a dedicated
+    │   │     `JumpToTurnButton.svelte`). Cross-reference
     │   │     [[../capabilities/lifecycle]] for the hold-to-start gesture itself.
     │   ├── EmptyState
     │   ├── NumpadSheet → { HpSummaryHeader, EntryDisplay, CommitActions, DigitPad,
@@ -88,15 +90,15 @@ Shared/reused leaves: **FAB**, **IconButton**, **EmptyState**, **NumberField**, 
 
 Replaces the earlier dense-row description; the shape below is locked in
 `card-prototype.html` (the living sandbox spec unit E ports from) and ported into
-`prototype.html`. No matching `src/` component ships this card yet — flagged as unit **E**
-(007) work throughout.
+`prototype.html`. Ships as `CombatantRow.svelte` (unit **E**, 007).
 
 | Prop | Values | Drives |
 |---|---|---|
 | type | PC · enemy · ally | TypeStripe color + stripe count |
 | active | bool | active-turn highlight (leading dot on the current-turn card) |
-| healthState | full · wounded · bloodied · dead | HealthBar fill/alarm (health-band card-bg tint
-  removed in the R4 restyle — the fill colour change alone is the signal) |
+| healthState | full · wounded · bloodied · dead | HealthBar fill/alarm — the card background no
+  longer tints by health status (removed in the unit-007 restyle); the fill colour change, band
+  width, and the bar's `aria-label` are the signal ([[../capabilities/hp]] HP-4) |
 | open (expand state) | collapsed · expanded | which triggers/affordances render |
 
 Card layout, leading → trailing:
@@ -116,10 +118,9 @@ Card layout, leading → trailing:
   `color-mix()` recipe, which is prototype/CSS implementation detail owned by
   `card-prototype.html`.
 - **Note line** — renders read-only under the card whenever a note is set, in *both* the
-  collapsed and expanded state. **Prototype-only divergence from shipped
-  `CombatantRow.svelte`,** which currently only shows the note editor/text when the row is
-  expanded — unit E must decide whether to widen shipped behavior to match or keep the gap;
-  this file describes the *target*, not what ships today.
+  collapsed and expanded state (`CombatantRow.svelte` ships this; the collapsed state renders a
+  read-only `<p>`, the expanded state's existing inline `Textarea` continues to show/edit the
+  same note).
 
 **Collapsed vs. expanded:** AC/PD/MD, the Init pill, and the full condition-chip list stay
 visible in both states. Collapsing only hides the per-chip `×` (remove) affordance and the
@@ -209,8 +210,8 @@ title, description, trailing `⋮` (`CombatRowMenu`: Edit / Delete). Drag handle
 | bespoke (no primitive) | AppShell, ColorTagDot, TypeStripe, HealthBar fill, DefenseStats, EntryDisplay, HpSummaryHeader, HpLogEntryRow, InstallBanner, `about/+page.svelte` (inline, no AboutPage component), SearchBar |
 
 `HpCell`/`TypeStripe` (compact-row era) had no matching `src/` file (inlined in
-`CombatantRow.svelte`); the card restyle carries the same note forward for the card's HP block
-and type stripe until unit E ships dedicated components.
+`CombatantRow.svelte`); unit E's card restyle (007) shipped without extracting dedicated
+components for the card's HP block or type stripe — both stay inlined in `CombatantRow.svelte`.
 
 ## Glyph gaps (not yet in ADR-011)
 

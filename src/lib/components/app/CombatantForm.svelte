@@ -85,6 +85,10 @@
 
 	const nameValid = $derived(name.trim().length > 0);
 
+	// Prototype .field-label recipe (specs/design/prototype.html) — uppercase, muted, small caps.
+	// Mirrors NumberField.svelte's own field-label styling for a consistent look across the form.
+	const fieldLabelClass = 'text-xs font-medium uppercase tracking-wide text-muted-foreground';
+
 	function submit() {
 		touched = true;
 		if (!nameValid) return;
@@ -96,7 +100,7 @@
 <Dialog bind:open>
 	<DialogContent class="max-w-lg sm:max-w-lg">
 		<DialogHeader>
-			<DialogTitle>
+			<DialogTitle class="text-lg font-semibold">
 				{mode === 'add' ? m['forms.combatant.add.title']() : m['forms.combatant.edit.title']()}
 			</DialogTitle>
 		</DialogHeader>
@@ -110,9 +114,10 @@
 		>
 			<!-- Name (required) -->
 			<div class="flex flex-col gap-1">
-				<Label for="cf-name">{m['forms.field.name']()}</Label>
+				<Label for="cf-name" class={fieldLabelClass}>{m['forms.field.name']()}</Label>
 				<Input
 					id="cf-name"
+					class="min-h-11"
 					bind:value={name}
 					placeholder={m['forms.field.name.placeholder']()}
 					required
@@ -126,16 +131,21 @@
 
 			<!-- Type -->
 			<div class="flex flex-col gap-1">
-				<Label>{m['forms.field.type']()}</Label>
+				<Label class={fieldLabelClass}>{m['forms.field.type']()}</Label>
 				<ToggleGroup
 					type="single"
 					value={type}
 					onValueChange={(v) => v && (type = v as CombatantType)}
 					variant="outline"
-					class="justify-start"
+					class="w-full"
 				>
 					{#each COMBATANT_TYPES as t (t)}
-						<ToggleGroupItem value={t} class="px-3">{typeLabel[t]()}</ToggleGroupItem>
+						<ToggleGroupItem
+							value={t}
+							class="min-h-11 flex-1 text-muted-foreground data-[state=on]:bg-primary data-[state=on]:font-semibold data-[state=on]:text-primary-foreground"
+						>
+							{typeLabel[t]()}
+						</ToggleGroupItem>
 					{/each}
 				</ToggleGroup>
 			</div>
@@ -157,6 +167,9 @@
 					max={RANGES.initiativeBonus.max}
 					placeholder="0"
 				/>
+			</div>
+
+			<div class="grid grid-cols-3 gap-3">
 				<NumberField
 					id="cf-ac"
 					label={m['forms.field.ac']()}
@@ -181,19 +194,20 @@
 					max={RANGES.md.max}
 					placeholder="10"
 				/>
-				{#if mode === 'edit' || (mode === 'add' && combatActive)}
-					<NumberField
-						id="cf-init"
-						label={m['forms.field.initValue']()}
-						bind:value={initiative}
-						min={RANGES.initiative.min}
-						max={RANGES.initiative.max}
-					/>
-				{/if}
 			</div>
 
+			{#if mode === 'edit' || (mode === 'add' && combatActive)}
+				<NumberField
+					id="cf-init"
+					label={m['forms.field.initValue']()}
+					bind:value={initiative}
+					min={RANGES.initiative.min}
+					max={RANGES.initiative.max}
+				/>
+			{/if}
+
 			<div class="flex flex-col gap-1">
-				<Label for="cf-note">{m['forms.field.note']()}</Label>
+				<Label for="cf-note" class={fieldLabelClass}>{m['forms.field.note']()}</Label>
 				<Textarea
 					id="cf-note"
 					bind:value={note}

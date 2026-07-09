@@ -34,7 +34,7 @@
 	);
 </script>
 
-<div class="flex h-1.5 w-full overflow-hidden rounded-full bg-muted" role="img" aria-label={label}>
+<div class="flex h-2 w-full overflow-hidden rounded-full bg-muted" role="img" aria-label={label}>
 	<div
 		class={['h-full shrink-0 transition-all', healthColor[status], status === 'dead' && 'ml-auto']}
 		style="width: {fill}%"

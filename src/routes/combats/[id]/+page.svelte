@@ -1,12 +1,13 @@
 <!--
-  Combat screen (UX §4, Component Inventory §6–§10) — the M2 vertical slice. Reads the store's
-  reactive combat + the derived VIEWS (sortedCombatants / showRoundAndEscalation / canAdvance /
-  isActive), wraps them in $derived (ADR-002), and wires the thin components via an id-scoped
-  controller. Setup ⇄ Active is gated by showRoundAndEscalation. The page owns the single shared
-  NumpadSheet + add/edit forms; rows/header emit intent only.
-
-  TODO M3 (UX §3 / Component Inventory §5): the Combats home + routing/import replace the boot
-  seed; this screen stays the /combats/[id] target.
+  Combat screen (Component Inventory §Hierarchy/§FAB, PLT-2/PLT-3) — reads the store's reactive
+  combat + the derived VIEWS (sortedCombatants / showRoundAndEscalation / canAdvance / isActive),
+  wraps them in $derived (ADR-002), and wires the thin components via an id-scoped controller.
+  Setup ⇄ Active is gated by showRoundAndEscalation. The page owns the single shared NumpadSheet +
+  add/edit forms, the Setup/Active floating controls (mobile FAB stack; desktop swaps to
+  CombatHeader's header-add/header-start icon pair, the advance FAB stays on both breakpoints),
+  and the Active-only JumpToTurnButton (view-navigation only — scrolls the active-turn card into
+  view via the `data-active` marker CombatantRow's Card already carries); rows/header emit intent
+  only.
 -->
 <script lang="ts">
 	import { page } from '$app/state';
@@ -14,6 +15,7 @@
 	import CombatantRow from '$lib/components/app/CombatantRow.svelte';
 	import CombatHeader from '$lib/components/app/CombatHeader.svelte';
 	import { makeController } from '$lib/components/app/controller';
+	import JumpToTurnButton from '$lib/components/app/JumpToTurnButton.svelte';
 	import NumpadSheet from '$lib/components/app/NumpadSheet.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { m } from '$lib/i18n';
@@ -33,6 +35,13 @@
 
 	const Add = chromeIcon.add;
 	const Advance = chromeIcon.advance;
+
+	// Active-only view-navigation helper (JumpToTurnButton) — scrolls the active-turn card into
+	// view; no store/controller intent, CombatantRow already marks its Card `data-active`.
+	let mainEl = $state<HTMLElement | null>(null);
+	function jumpToActiveTurn() {
+		mainEl?.querySelector('[data-active="true"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+	}
 
 	// page-owned shared surfaces
 	let numpadId = $state<string | null>(null);
@@ -90,13 +99,13 @@
 {:else if !combat}
 	<p class="p-4 text-muted-foreground">Combat not found.</p>
 {:else}
-	<div class="mx-auto flex min-h-dvh max-w-md flex-col pb-28">
+	<div class="mx-auto flex min-h-dvh w-full max-w-md flex-col pb-28 lg:max-w-3xl">
 		<CombatHeader {combat} {controller} onAdd={() => (addOpen = true)} onStart={controller.start} />
 
-		<main class="flex flex-1 flex-col gap-2 p-2">
+		<main bind:this={mainEl} class="flex flex-1 flex-col gap-2 p-3">
 			{#if display.length === 0}
-				<div class="flex flex-1 flex-col items-center justify-center gap-3 py-16 text-center">
-					<p class="font-medium">{m['setup.empty.title']()}</p>
+				<div class="flex flex-1 flex-col items-center justify-center gap-3 py-16 text-center text-muted-foreground">
+					<p class="text-lg font-semibold text-foreground">{m['setup.empty.title']()}</p>
 				</div>
 			{:else}
 				{#each display as c (c.id)}
@@ -113,7 +122,9 @@
 		</main>
 
 		{#if active}
-			<!-- Active: Advance FAB (disabled at the r99 → r100 wrap) -->
+			<!-- Active: Advance FAB (disabled at the r99 → r100 wrap) + Jump-to-turn pill — both
+			     breakpoints, per PLT-3 (the advance-turn control stays a FAB pair on mobile and
+			     desktop, untouched by the header-icon split). -->
 			<Button
 				class="fixed right-4 bottom-4 size-14 rounded-full shadow-lg"
 				disabled={!canAdv}
@@ -122,14 +133,28 @@
 			>
 				<Advance class="size-6" />
 			</Button>
+			<JumpToTurnButton onclick={jumpToActiveTurn} />
 		{:else}
-			<!-- Setup: persistent Add Combatant bar (Start lives in the header once the roster isn't empty) -->
-			<div class="fixed inset-x-0 bottom-0 mx-auto flex max-w-md gap-2 border-t bg-background p-2">
-				<Button variant="secondary" class="h-12 flex-1 text-base" onclick={() => (addOpen = true)}>
-					<Add class="size-5" />
-					{m['setup.addCombatant']()}
+			<!-- Setup: mobile FAB stack (Add always; Start once the roster isn't empty), matching
+			     the desktop header-add/header-start pair in CombatHeader (PLT-3) — Start FAB
+			     borrows the existing chevron glyph (no dedicated play/start icon ships yet). -->
+			<Button
+				class="fixed right-4 bottom-4 size-14 rounded-full shadow-lg lg:hidden"
+				aria-label={m['setup.addCombatant']()}
+				onclick={() => (addOpen = true)}
+			>
+				<Add class="size-5" />
+			</Button>
+			{#if combat.combatants.length > 0}
+				<Button
+					variant="secondary"
+					class="fixed right-4 bottom-24 size-14 rounded-full shadow-lg lg:hidden"
+					aria-label={m['setup.start']()}
+					onclick={controller.start}
+				>
+					<Advance class="size-6" />
 				</Button>
-			</div>
+			{/if}
 		{/if}
 	</div>
 

@@ -23,13 +23,16 @@ player sheet, DM tracks its HP). Optional on the add form; default `enemy`.
 
 Compact row shows: active-turn indicator, type color stripe(s), a persistent `⋮` menu
 (Edit/Duplicate/Remove), name, initiative (`"-"` if unset), current/max HP, health bar, AC/PD/MD
-(in-row at all sizes), and condition icons (first few + overflow, [[conditions]] CND-3). The
-card background reflects HP status ([[hp]] HP-4). Tapping the row expands it to reveal temp HP,
-the note, and the condition picker.
+(in-row at all sizes), condition icons (first few + overflow, [[conditions]] CND-3), and the note
+(read-only) whenever one is set. The health bar's fill color is the sole HP-status visual signal
+— the card background no longer tints by `healthStatus` ([[hp]] HP-4). Tapping the row expands it
+to reveal temp HP, an editable note field, and the condition picker.
 
 **AC:**
 - All fields listed above are visible on the compact row without expanding.
-- Temp HP and the note are visible only after expanding the row.
+- The note renders read-only under the card in both the collapsed and expanded state whenever
+  one is set.
+- Temp HP and the condition picker are visible only after expanding the row.
 
 ## CBT-3 — Add combatant
 

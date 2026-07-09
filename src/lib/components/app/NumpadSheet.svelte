@@ -60,6 +60,14 @@
 		setMax: '',
 	};
 
+	/** Diff-value text color per entry type (HpLogEntryRow — colour-coded left column). */
+	const actionDiffClass: Record<HpLogEntry['type'], string> = {
+		damage: 'text-destructive',
+		heal: 'text-health-full',
+		setTemp: 'text-combat-blue',
+		setMax: '',
+	};
+
 	const Backspace = chromeIcon.backspace;
 	const ClearIcon = chromeIcon.close;
 
@@ -85,9 +93,9 @@
 	<DrawerContent class="mx-auto max-w-md">
 		{#if combatant}
 			<div class="flex flex-col gap-3 p-4">
-				<!-- Summary: cur/max + temp buffer (UX §4c) — cur HP is the distinctive value here -->
+				<!-- HpSummaryHeader: cur/max + temp buffer (UX §4c) — cur HP is the distinctive value here -->
 				<div class="flex items-baseline justify-between gap-2">
-					<span class="truncate text-base font-medium text-muted-foreground">{combatant.name}</span>
+					<span class="truncate font-semibold">{combatant.name}</span>
 					<span class="shrink-0 tabular-nums">
 						<span class={['text-xl font-bold', healthTextColor[status]]}>{combatant.currentHp}</span>
 						<span class="text-base text-muted-foreground">/{combatant.maxHp}</span>
@@ -99,54 +107,16 @@
 					</span>
 				</div>
 
-				<!-- Entry display -->
+				<!-- EntryDisplay -->
 				<div
-					class="flex h-12 items-center justify-end rounded-md border bg-background px-3 text-2xl tabular-nums"
+					class="flex h-10 items-center justify-end rounded-md border border-border bg-background px-3 text-lg font-semibold tabular-nums"
 					aria-live="polite"
 				>
 					{entry || '0'}
 				</div>
 
-				<!-- Digit pad -->
-				<div class="grid grid-cols-3 gap-1.5">
-					{#each ['1', '2', '3', '4', '5', '6', '7', '8', '9'] as d (d)}
-						<Button
-							variant="outline"
-							class="h-12 text-lg"
-							aria-label={m['a11y.numpad.digit']({ n: d })}
-							onclick={() => push(d)}
-						>
-							{d}
-						</Button>
-					{/each}
-					<Button
-						variant="ghost"
-						class="h-12"
-						aria-label={m['a11y.numpad.clear']()}
-						onclick={clear}
-					>
-						<ClearIcon class="size-5" />
-					</Button>
-					<Button
-						variant="outline"
-						class="h-12 text-lg"
-						aria-label={m['a11y.numpad.digit']({ n: '0' })}
-						onclick={() => push('0')}
-					>
-						0
-					</Button>
-					<Button
-						variant="ghost"
-						class="h-12"
-						aria-label={m['a11y.numpad.backspace']()}
-						onclick={backspace}
-					>
-						<Backspace class="size-5" />
-					</Button>
-				</div>
-
-				<!-- Commit actions (empty entry → disabled no-op) -->
-				<div class="grid grid-cols-3 gap-1.5">
+				<!-- CommitActions (rendered above the digit pad — Component Inventory §"Numpad sheet"; empty entry → disabled no-op) -->
+				<div class="grid grid-cols-3 gap-2">
 					<Button variant="destructive" disabled={empty} onclick={() => commit(onDamage)}>
 						{m['numpad.dealDamage']()}
 					</Button>
@@ -166,10 +136,48 @@
 					</Button>
 				</div>
 
-				<!-- History (read-only hpLog, newest first) -->
-				<Collapsible bind:open={historyOpen}>
+				<!-- DigitPad -->
+				<div class="grid grid-cols-3 gap-2">
+					{#each ['1', '2', '3', '4', '5', '6', '7', '8', '9'] as d (d)}
+						<Button
+							variant="outline"
+							class="h-11 text-lg font-semibold"
+							aria-label={m['a11y.numpad.digit']({ n: d })}
+							onclick={() => push(d)}
+						>
+							{d}
+						</Button>
+					{/each}
+					<Button
+						variant="ghost"
+						class="h-11"
+						aria-label={m['a11y.numpad.clear']()}
+						onclick={clear}
+					>
+						<ClearIcon class="size-5" />
+					</Button>
+					<Button
+						variant="outline"
+						class="h-11 text-lg font-semibold"
+						aria-label={m['a11y.numpad.digit']({ n: '0' })}
+						onclick={() => push('0')}
+					>
+						0
+					</Button>
+					<Button
+						variant="ghost"
+						class="h-11"
+						aria-label={m['a11y.numpad.backspace']()}
+						onclick={backspace}
+					>
+						<Backspace class="size-5" />
+					</Button>
+				</div>
+
+				<!-- HpLogSection (read-only, newest first) -->
+				<Collapsible bind:open={historyOpen} class="border-t border-border pt-2">
 					<CollapsibleTrigger
-						class="flex w-full items-center justify-between py-2 text-sm font-medium"
+						class="flex w-full items-center justify-between text-sm font-medium text-muted-foreground"
 					>
 						{m['numpad.history.title']()}
 						{#if history.length > 0}
@@ -181,16 +189,18 @@
 							<p class="py-2 text-sm text-muted-foreground">{m['numpad.history.empty']()}</p>
 						{:else}
 							<ScrollArea class="max-h-48">
-								<ul class="flex flex-col gap-1">
+								<ul class="flex flex-col gap-1.5 pt-2">
 									{#each history as e, i (i)}
-										<li class="flex items-center justify-between gap-2 text-sm">
-											<span class="flex items-center gap-2">
+										<li class="flex items-center justify-between gap-2 text-sm text-muted-foreground">
+											<span class="flex items-center gap-1.5">
 												<Badge variant="outline" class={actionBadgeClass[e.type]}>
 													{actionLabel[e.type]()}
 												</Badge>
-												<span class="tabular-nums">{e.delta > 0 ? `+${e.delta}` : e.delta}</span>
+												<span class={['tabular-nums', actionDiffClass[e.type]]}>
+													{e.delta > 0 ? `+${e.delta}` : e.delta}
+												</span>
 											</span>
-											<span class="tabular-nums text-muted-foreground">
+											<span class="tabular-nums">
 												{m['numpad.summary.hp']({ cur: e.currentHp, max: e.maxHp })}
 												{#if e.tempHp > 0}· {m['numpad.summary.temp']({ temp: e.tempHp })}{/if}
 												{#if e.round !== null}· {m['numpad.history.round']({ n: e.round })}{/if}

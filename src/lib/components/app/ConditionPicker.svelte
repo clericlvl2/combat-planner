@@ -50,7 +50,7 @@
 				<ToggleGroupItem
 					value={c}
 					aria-label={m['a11y.condition.toggle']({ condition: conditionLabel[c](), name })}
-					class="!rounded-full px-3 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+					class="!rounded-full min-h-11 px-3 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
 				>
 					{conditionLabel[c]()}
 				</ToggleGroupItem>

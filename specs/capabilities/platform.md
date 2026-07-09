@@ -123,3 +123,15 @@ combatants per combat and 100 combats ([[../reference/limits]]); adding beyond e
 **AC:**
 - HP edits, sorting, and turn-advance remain responsive with a combat at the full 30-combatant
   cap.
+
+## PLT-9 — Deployed & reachable
+
+The production build is served as a static SPA over HTTPS at a public URL; a push to `main`
+auto-deploys that URL. Mechanism: `@sveltejs/adapter-static` (`build/` output) hosted on Vercel
+per `ADR-007`; no server runtime, no env secrets.
+
+**AC:**
+- The production URL responds `200` over HTTPS and returns the app-shell HTML (adapter-static
+  SPA shell) — verified at `https://combat-planner-five.vercel.app/`.
+- A commit pushed to `main` produces a new production deployment at that URL (Vercel Git
+  integration, dashboard-configured).

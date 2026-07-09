@@ -37,7 +37,7 @@ text.
 | B-014 | Parallel implementer builds race on shared `.svelte-kit` output dir during `/spec-run` fan-out — self-resolves on retry but wastes agent time; consider per-phase build isolation (found in 001 Phase 6/7) | INFRA | S | idea | — |
 | B-015 | `/spec-close` has no commit step — unit 001 archived with everything left uncommitted in the working tree; add an explicit commit stage (what/when/message convention) to the close lifecycle. Resolved by the 2026-07-03 SDD restructure (spec-close commit stage). | INFRA | S | done | — |
 | B-016 | `src/**` code comments cite dead pre-migration doc sections (`UX §`, `Component Inventory §`, `Data Model §` — archive deleted 2026-07-03) — repoint to capability IDs or drop (found in SDD restructure sweep) | INFRA | S | idea | — |
-| B-017 | Visual design: design tokens — bake approved prototype look into `src/routes/layout.css` (real WCAG-AA token set, replaces STUB). Split from B-008; belongs to design-chain unit C. | DESIGN | M | in-unit | `specs/changes/005-design-tokens/` |
+| B-017 | Visual design: design tokens — bake approved prototype look into `src/routes/layout.css` (real WCAG-AA token set, replaces STUB). Split from B-008; belongs to design-chain unit C. | DESIGN | M | done | `specs/archive/005-design-tokens/` |
 | B-018 | Disable combatant toggle — disabled combatant skipped by turn advance, card renders pale (opacity ~80%) | CBT | S | idea | — |
 | B-019 | App-data export/import — all-combats + single-combat, fail-safe import, shared transforms (flow F5). Deferred past v1: unbundled from M5, descoped from the prototype + Settings Data in unit 004 (round 2); `import-export.md` / CLS-8 / CLS-1 to reconcile at close-out. | IMP | L | v2 | — |
 

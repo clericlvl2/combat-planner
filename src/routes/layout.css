@@ -7,39 +7,44 @@
  * Token layer (ADR-008 / ADR-012). Theme is fully CSS-variable driven so dark/
  * light, the combatant-type colors, the health/alarm bar, and the 8 combat
  * color-tag swatches are centralized and contrast-checked in one place.
- * Values here are a STUB — tuned for WCAG-AA during the UI build (M-phase).
+ * Source of truth: specs/design/prototype.html (:root + .theme-dark /
+ * .theme-light blocks, and its "Contrast note (WCAG-AA)" table). Values below
+ * are copied verbatim from the approved prototype — see PLT-5.
  * ------------------------------------------------------------------------- */
 
 :root {
-	--radius: 0.625rem;
+	/* Non-color scales shared by both themes (prototype :root). */
+	--radius: 10px;
 
-	/* shadcn base (zinc) — light */
-	--background: oklch(1 0 0);
-	--foreground: oklch(0.141 0.005 285.823);
-	--card: oklch(1 0 0);
-	--card-foreground: oklch(0.141 0.005 285.823);
-	--popover: oklch(1 0 0);
-	--popover-foreground: oklch(0.141 0.005 285.823);
-	--primary: oklch(0.21 0.006 285.885);
-	--primary-foreground: oklch(0.985 0 0);
-	--secondary: oklch(0.967 0.001 286.375);
-	--secondary-foreground: oklch(0.21 0.006 285.885);
-	--muted: oklch(0.967 0.001 286.375);
-	--muted-foreground: oklch(0.552 0.016 285.938);
-	--accent: oklch(0.967 0.001 286.375);
-	--accent-foreground: oklch(0.21 0.006 285.885);
-	--destructive: oklch(0.577 0.245 27.325);
-	--border: oklch(0.92 0.004 286.32);
-	--input: oklch(0.92 0.004 286.32);
-	--ring: oklch(0.705 0.015 286.067);
-	--sidebar: oklch(0.985 0 0);
-	--sidebar-foreground: oklch(0.141 0.005 285.823);
-	--sidebar-primary: oklch(0.21 0.006 285.885);
-	--sidebar-primary-foreground: oklch(0.985 0 0);
-	--sidebar-accent: oklch(0.967 0.001 286.375);
-	--sidebar-accent-foreground: oklch(0.21 0.006 285.885);
-	--sidebar-border: oklch(0.92 0.004 286.32);
-	--sidebar-ring: oklch(0.705 0.015 286.067);
+	--font-xs: 11px;
+	--font-sm: 13px;
+	--font-md: 15px;
+	--font-lg: 18px;
+	--font-xl: 22px;
+
+	--space-1: 4px;
+	--space-2: 8px;
+	--space-3: 12px;
+	--space-4: 16px;
+	--space-5: 24px;
+	--space-6: 32px;
+
+	--shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+	--shadow-md: 0 6px 16px rgba(0, 0, 0, 0.4);
+
+	/* Neutral chrome (prototype .theme-light) */
+	--bg: #f4f5f7;
+	--surface: #ffffff;
+	--surface-2: #f0f2f5;
+	--surface-3: #e6e9ee;
+	--text: #16191f;
+	--text-muted: #565f6b;
+	--text-faint: #8b94a1;
+	--border: #dde1e7;
+	--border-strong: #c4cad3;
+	--primary: #1f242c;
+	--primary-text: #f7f8fa;
+	--ring: #7c8794;
 
 	/* Combatant type colors (ADR-008) — light. Color-only leading-edge stripes (icon dropped). */
 	--type-pc: #059669; /* PC = green */
@@ -47,50 +52,64 @@
 	--type-ally: #2563eb; /* ally = blue */
 
 	/* Health bar bands (Rules §4) — light. `dead` = reverse/alarm fill. */
-	--health-full: #10b981;
-	--health-wounded: #f59e0b;
-	--health-bloodied: #f97316;
+	--health-full: #0c8d62;
+	--health-wounded: #a76b07;
+	--health-bloodied: #c75505;
 	--health-dead: #b91c1c;
 
 	/* Combat color-tag swatches (ADR-012) — 8 keys, light (≈ Tailwind -500). */
 	--combat-neutral: #64748b; /* default */
-	--combat-red: #ef4444;
-	--combat-orange: #f97316;
-	--combat-amber: #f59e0b;
-	--combat-green: #10b981;
-	--combat-teal: #14b8a6;
-	--combat-blue: #0ea5e9;
-	--combat-violet: #8b5cf6;
+	--combat-red: #cb3a3a;
+	--combat-orange: #bb5611;
+	--combat-amber: #9d6507;
+	--combat-green: #0b8457;
+	--combat-teal: #0e8174;
+	--combat-blue: #0b7caf;
+	--combat-violet: #7d53dd;
+
+	/* Foreground for text/icons placed on a solid semantic (type/health/tag) fill. */
+	--on-semantic: #ffffff;
+
+	/* shadcn base (zinc) — light, aliased onto the neutral-chrome tokens above. */
+	--background: var(--bg);
+	--foreground: var(--text);
+	--card: var(--surface);
+	--card-foreground: var(--text);
+	--popover: var(--surface);
+	--popover-foreground: var(--text);
+	--primary-foreground: var(--primary-text);
+	--secondary: var(--surface-2);
+	--secondary-foreground: var(--text);
+	--muted: var(--surface-3);
+	--muted-foreground: var(--text-muted);
+	--accent: var(--surface-2);
+	--accent-foreground: var(--text);
+	--destructive: var(--health-dead);
+	--input: var(--border);
+	--sidebar: var(--surface);
+	--sidebar-foreground: var(--text);
+	--sidebar-primary: var(--primary);
+	--sidebar-primary-foreground: var(--primary-text);
+	--sidebar-accent: var(--surface-2);
+	--sidebar-accent-foreground: var(--text);
+	--sidebar-border: var(--border);
+	--sidebar-ring: var(--ring);
 }
 
 .dark {
-	/* shadcn base (zinc) — dark */
-	--background: oklch(0.141 0.005 285.823);
-	--foreground: oklch(0.985 0 0);
-	--card: oklch(0.21 0.006 285.885);
-	--card-foreground: oklch(0.985 0 0);
-	--popover: oklch(0.21 0.006 285.885);
-	--popover-foreground: oklch(0.985 0 0);
-	--primary: oklch(0.92 0.004 286.32);
-	--primary-foreground: oklch(0.21 0.006 285.885);
-	--secondary: oklch(0.274 0.006 286.033);
-	--secondary-foreground: oklch(0.985 0 0);
-	--muted: oklch(0.274 0.006 286.033);
-	--muted-foreground: oklch(0.705 0.015 286.067);
-	--accent: oklch(0.274 0.006 286.033);
-	--accent-foreground: oklch(0.985 0 0);
-	--destructive: oklch(0.704 0.191 22.216);
-	--border: oklch(1 0 0 / 10%);
-	--input: oklch(1 0 0 / 15%);
-	--ring: oklch(0.552 0.016 285.938);
-	--sidebar: oklch(0.21 0.006 285.885);
-	--sidebar-foreground: oklch(0.985 0 0);
-	--sidebar-primary: oklch(0.488 0.243 264.376);
-	--sidebar-primary-foreground: oklch(0.985 0 0);
-	--sidebar-accent: oklch(0.274 0.006 286.033);
-	--sidebar-accent-foreground: oklch(0.985 0 0);
-	--sidebar-border: oklch(1 0 0 / 10%);
-	--sidebar-ring: oklch(0.552 0.016 285.938);
+	/* Neutral chrome (prototype .theme-dark) */
+	--bg: #101317;
+	--surface: #171b21;
+	--surface-2: #1f242c;
+	--surface-3: #272d37;
+	--text: #eef1f5;
+	--text-muted: #a3adba;
+	--text-faint: #6b7683;
+	--border: #2c333d;
+	--border-strong: #3a424e;
+	--primary: #e6e9ee;
+	--primary-text: #16191f;
+	--ring: #7c8794;
 
 	/* Type colors — dark (≈ -400 for legibility on dark surfaces). */
 	--type-pc: #34d399;
@@ -112,13 +131,41 @@
 	--combat-teal: #2dd4bf;
 	--combat-blue: #38bdf8;
 	--combat-violet: #a78bfa;
+
+	/* Foreground for text/icons placed on a solid semantic (type/health/tag) fill. */
+	--on-semantic: #0b0d10;
+
+	/* shadcn base (zinc) — dark, aliased onto the neutral-chrome tokens above. */
+	--background: var(--bg);
+	--foreground: var(--text);
+	--card: var(--surface);
+	--card-foreground: var(--text);
+	--popover: var(--surface);
+	--popover-foreground: var(--text);
+	--primary-foreground: var(--primary-text);
+	--secondary: var(--surface-2);
+	--secondary-foreground: var(--text);
+	--muted: var(--surface-3);
+	--muted-foreground: var(--text-muted);
+	--accent: var(--surface-2);
+	--accent-foreground: var(--text);
+	--destructive: var(--health-dead);
+	--input: var(--border);
+	--sidebar: var(--surface);
+	--sidebar-foreground: var(--text);
+	--sidebar-primary: var(--primary);
+	--sidebar-primary-foreground: var(--primary-text);
+	--sidebar-accent: var(--surface-2);
+	--sidebar-accent-foreground: var(--text);
+	--sidebar-border: var(--border);
+	--sidebar-ring: var(--ring);
 }
 
 @theme inline {
-	--radius-sm: calc(var(--radius) - 4px);
+	--radius-sm: 6px;
 	--radius-md: calc(var(--radius) - 2px);
-	--radius-lg: var(--radius);
-	--radius-xl: calc(var(--radius) + 4px);
+	--radius-lg: 14px;
+	--radius-xl: 18px;
 
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
@@ -163,6 +210,7 @@
 	--color-combat-teal: var(--combat-teal);
 	--color-combat-blue: var(--combat-blue);
 	--color-combat-violet: var(--combat-violet);
+	--color-on-semantic: var(--on-semantic);
 }
 
 @layer base {

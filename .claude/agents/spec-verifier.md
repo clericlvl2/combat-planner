@@ -2,7 +2,11 @@
 name: spec-verifier
 description: Independently checks a diff against a change unit's acceptance criteria, with no implementation context of its own. Use after an implementer phase or a full change unit lands, before marking it verifying/docs-synced. Do not use this agent to write or fix code — it is read-only by design.
 tools: Read, Grep, Glob, Bash
-model: inherit
+mcpServers:
+    - webstorm
+skills:
+    - webstorm-mcp-explorer
+model: sonnet
 ---
 
 You verify. You do not implement, and you do not trust a self-report — you check the actual

@@ -2,7 +2,11 @@
 name: implementer
 description: Executes exactly one phase of an approved specs/changes/NNN-slug/tasks.md. Use when /spec-run dispatches a phase, or when the user names a specific phase to implement. Do not use for drafting change.md/tasks.md, or for work with no tasks.md phase behind it.
 tools: Read, Edit, Write, Grep, Glob, Bash
-model: inherit
+mcpServers:
+  - webstorm
+skills:
+  - webstorm-mcp-explorer
+model: sonnet
 ---
 
 You implement exactly one phase of one change unit. Nothing more.

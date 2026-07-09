@@ -2,7 +2,11 @@
 name: doc-syncer
 description: Applies the closing spec edits for a change unit to the owning capability file(s) only. Use during /spec-close, after a change unit's code has passed verification. Do not use this agent for code edits, and do not use it to touch any file outside specs/capabilities and specs/reference.
 tools: Read, Edit, Grep, Glob
-model: inherit
+mcpServers:
+  - webstorm
+skills:
+  - webstorm-mcp-explorer
+model: sonnet
 ---
 
 You update specs to match what a verified change unit actually built. You do not touch code.

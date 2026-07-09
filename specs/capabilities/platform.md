@@ -24,20 +24,40 @@ Primary actions stay reachable in the mobile thumb zone via bottom-right floatin
 Touch targets ≥44px in all modes. Exact control placement per breakpoint:
 [[../reference/component-inventory]].
 
+On desktop, the Combat screen is a single centered column — extrapolated from the mobile
+layout, not a distinct desktop composition — with the same combatant-card shape carried over
+unchanged, just re-centered. The card shape itself is [[../reference/component-inventory]]'s to
+own; this requirement does not restate that detail.
+
 **AC:**
 - No feature is available on desktop but missing on mobile, or vice versa.
 - On mobile, the screen's primary action is reachable via a bottom-right floating control.
 - All interactive targets measure at least 44px on the touch axis.
+- On desktop, the Combat screen renders as a single centered column (no split-pane), reusing
+  the mobile card composition unchanged.
 
 ## PLT-3 — Navigation per breakpoint
 
 Mobile: swipe-right reveals a sidebar with nav links. Tablet: header with burger menu. Desktop:
-header with inline navigation. Destinations: Combats, Settings, About.
+header with inline icon-button navigation. Destinations: Combats, Settings, About.
+
+The create action follows the same per-breakpoint split as nav wherever a create-FAB exists: a
+header "+" icon button on desktop, a FAB on mobile — except Combat — Active's advance-turn FAB,
+which is a distinct action and stays a FAB/icon-button pair on both breakpoints, untouched by
+this split.
+
+Combat screen chrome per breakpoint: Setup header is back + title + `⋮`, with two floating Add /
+hold-to-start Start controls (FABs on mobile, icon buttons on desktop). Active header is back +
+title + `⋮`, plus a round/escalation-die sub-bar rendered below the header chrome. Exact control
+placement: [[../reference/component-inventory]].
 
 **AC:**
 - Swiping right on mobile opens a sidebar containing links to Combats, Settings, and About.
-- Tablet shows a burger-menu header; desktop shows inline nav links in the header; both expose
-  the same three destinations.
+- Tablet shows a burger-menu header; desktop shows inline icon-button nav in the header (each
+  icon carrying an `aria-label` and the current destination marked); both expose the same three
+  destinations.
+- Wherever a create-FAB exists, desktop shows an equivalent header "+" icon button instead,
+  except Combat — Active's advance-turn control, which is unchanged on both breakpoints.
 
 ## PLT-4 — Installable PWA + update toast
 
@@ -62,14 +82,17 @@ start bar ([[../reference/component-inventory]]).
 
 Practical WCAG 2.1 AA: contrast in both themes, ≥44px touch targets (PLT-2), visible focus,
 semantic labels, scalable text. Color tags and health states are never conveyed by color alone
-except the combatant-type stripe, which is a deliberate, compensated exception (color + stripe
-count, backed by an `aria-label` naming the type — see [[combatants]] CBT-1).
+except two deliberate, compensated exceptions: the combatant-type stripe (color + stripe count,
+backed by an `aria-label` naming the type — see [[combatants]] CBT-1) and the combats-list
+`ColorTagDot` (the dot's fill is the picked color with no accompanying label; the dot's letter
+is the combat title's initial — a disambiguator, not a color signifier — so the picked color
+itself carries no status information a user depends on).
 
 **AC:**
 - Every interactive control has a visible focus state and a semantic label.
 - Every status conveyed by color (health state, color tags) also has a non-color signal
-  (icon/label), except the combatant-type stripe, which instead carries a compensating
-  `aria-label`.
+  (icon/label), except the combatant-type stripe (compensating `aria-label`) and the
+  `ColorTagDot` (its color is decorative/organizational only, not itself a status).
 - Both themes meet AA contrast for text and status colors, including the reverse/alarm HP bar.
 
 ## PLT-6 — Privacy: no telemetry

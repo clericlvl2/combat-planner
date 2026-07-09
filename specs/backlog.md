@@ -12,7 +12,7 @@ changelog row + archived unit**.
 | **M2** | Combat screen vertical slice — Setup→Active, combatant row (compact/expanded), init tap/long-press, HP numpad, Advance, conditions. | The heartbeat (95% of play). End of M2 = dogfoodable: one hardcoded combat, no polish/i18n/PWA. | code-complete |
 | **M3** | Combats home — CRUD, drag reorder, first-launch, undo/redo wired. | Multi-encounter prep. | next |
 | **M4** | PWA shell (ADR-004) — offline precache, install hint, update toast. | Delivers "installable offline"; real app on the phone, not a localhost tab. | — |
-| **M5** | Settings + About + export/import (fail-safe, shared transforms) + i18n wiring (Paraglide ADR-005; strings already cataloged). | Backup/portability (flow F5) + 6 languages. | — |
+| **M5** | Settings + About + i18n wiring (Paraglide ADR-005; strings already cataloged). | Settings/About + 6 languages. | — |
 | **M6** | a11y + theming polish (WCAG-AA, dark/light, focus, ≥44px) + full Test Plan pass + CI gate. | Ship quality; one-handed / dim-room promises verified. | — |
 | **Ship v1** | Deploy static SPA on Vercel (ADR-007), PWA installable. | — | — |
 
@@ -38,6 +38,7 @@ text.
 | B-015 | `/spec-close` has no commit step — unit 001 archived with everything left uncommitted in the working tree; add an explicit commit stage (what/when/message convention) to the close lifecycle. Resolved by the 2026-07-03 SDD restructure (spec-close commit stage). | INFRA | S | done | — |
 | B-016 | `src/**` code comments cite dead pre-migration doc sections (`UX §`, `Component Inventory §`, `Data Model §` — archive deleted 2026-07-03) — repoint to capability IDs or drop (found in SDD restructure sweep) | INFRA | S | idea | — |
 | B-017 | Visual design: design tokens — bake approved prototype look into `src/routes/layout.css` (real WCAG-AA token set, replaces STUB). Split from B-008; belongs to design-chain unit C. | DESIGN | M | in-unit | `specs/changes/005-design-tokens/` |
+| B-019 | App-data export/import — all-combats + single-combat, fail-safe import, shared transforms (flow F5). Deferred past v1: unbundled from M5, descoped from the prototype + Settings Data in unit 004 (round 2); `import-export.md` / CLS-8 / CLS-1 to reconcile at close-out. | IMP | L | v2 | — |
 
 **Fields**
 

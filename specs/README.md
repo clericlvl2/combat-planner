@@ -29,6 +29,14 @@ You have an idea, a bug, or a roadmap item. Here's the path from that to shipped
 skip the full unit ceremony — edit the capability/reference file directly and mention it in the
 next changelog row. Don't use this shortcut for anything that touches `src/**`.
 
+**One-call alternative:** `/spec-orchestrate` runs steps 2–7 end-to-end in one invocation — it
+drives `/spec-new` → the approval gate → `/spec-tasks` → `/spec-run` → `/spec-verify` →
+`/spec-close` itself, only stopping at the approval gate and three critical junctures (a
+`spec-verifier` FAIL/override, an unresolved gate failure, or a scope conflict). Route work
+through it (or the manual steps above) only when it touches `src/**` or
+`specs/capabilities/**`; anything else can go straight to a `worker-bee`/`scout-bee` agent
+without a change unit at all.
+
 **Where things live:** capability truth in `specs/capabilities/`, cross-cutting tables in
 `specs/reference/`, ADRs in `specs/adr/`, active work in `specs/changes/`, closed work in
 `specs/archive/`, the task queue in `specs/backlog.md`, the append-only history in

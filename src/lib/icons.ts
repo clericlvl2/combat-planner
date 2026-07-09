@@ -4,8 +4,9 @@
  * ConditionPicker/ConditionIconList).
  *
  * TODO M-phase (ADR-011): the chrome glyphs flagged in specs/reference/component-inventory.md
- * (Glyph gaps: edit/remove/duplicate/close/backspace/clear/expand) are pinned here pending their
- * formal addition to ADR-011.
+ * (Glyph gaps: clear) are pinned here pending their formal addition to ADR-011. `menu` /
+ * `navCombats` / `navSettings` / `navAbout` (unit 006 Phase 1, AppHeader/NavSidebar) fill the
+ * "menu/burger, settings/about nav icons" gap — Combats keeps the prototype's crossed-swords glyph.
  */
 import {
 	ChevronDown,
@@ -15,13 +16,17 @@ import {
 	Crosshair,
 	Dices,
 	EllipsisVertical,
+	Info,
 	type Icon as LucideIcon,
+	Menu,
 	Pencil,
 	Plus,
 	Redo2,
+	Settings,
 	Share2,
 	Shield,
 	Skull,
+	Swords,
 	Trash2,
 	Undo2,
 	Upload,
@@ -58,4 +63,8 @@ export const chromeIcon = {
 	close: X,
 	expand: ChevronDown,
 	backspace: ChevronLeft,
+	menu: Menu,
+	navCombats: Swords,
+	navSettings: Settings,
+	navAbout: Info,
 } satisfies Record<string, IconComponent>;

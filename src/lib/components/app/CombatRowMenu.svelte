@@ -33,7 +33,13 @@
 <DropdownMenu>
 	<DropdownMenuTrigger>
 		{#snippet child({ props })}
-			<Button {...props} variant="ghost" size="icon" aria-label={menuLabel}>
+			<Button
+				{...props}
+				variant="ghost"
+				size="icon"
+				class="min-h-11 min-w-11"
+				aria-label={menuLabel}
+			>
 				<Overflow class="size-4" />
 			</Button>
 		{/snippet}

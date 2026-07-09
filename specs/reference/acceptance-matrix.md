@@ -11,8 +11,8 @@ assertions live in the actual test files: `src/**/*.spec.ts`, `src/**/*.svelte.s
 | [[../capabilities/platform]] PLT-1 | Offline guarantee (no runtime network calls) | E |
 | [[../capabilities/platform]] PLT-4 | Install-hint shown-once + dismissal persists | E |
 | [[../capabilities/platform]] PLT-4 | PWA update toast/reload | E |
-| [[../capabilities/settings]] SET-1 | LanguageSwitcher commit + persisted reload | C, E |
-| [[../capabilities/settings]] SET-2 | ThemeSwitcher + persisted reload | C, E |
+| [[../capabilities/settings]] SET-1 | language `<Select>` commit + persisted reload — **gap:** `settings/+page.svelte` shipped (unit 006) with no test file yet | — (planned C, E) |
+| [[../capabilities/settings]] SET-2 | theme `<ToggleGroup>` + persisted reload — **gap:** `settings/+page.svelte` shipped (unit 006) with no test file yet | — (planned C, E) |
 | [[../capabilities/platform]] PLT-2, PLT-5 | a11y labels + focus/target audit on F1 | C, E |
 | [[../capabilities/platform]] PLT-3, PLT-2 | Nav per viewport; FAB present mobile, header desktop | E |
 | [[../capabilities/combats-list]] CLS-1..CLS-5 | CombatFormDialog (create/edit, name-required); delete confirm; open row | C, E |
@@ -39,8 +39,8 @@ assertions live in the actual test files: `src/**/*.spec.ts`, `src/**/*.svelte.s
 | [[../capabilities/turns-rounds-escalation]] TRE-2, TRE-3 | advanceTurn + canAdvance round-99 wrap boundary | U |
 | [[../capabilities/turns-rounds-escalation]] TRE-6 | Escalation set/round-wrap-only increment | U |
 | [[../capabilities/turns-rounds-escalation]] TRE-4, [[../capabilities/lifecycle]] LIF-7 | Active-pointer move on removal + revert-to-Setup on remove-all | U |
-| [[../capabilities/settings]] SET-3 | resetAll (keeps lang/theme, re-runs first-launch); DataActions | U, C |
-| [[../capabilities/settings]] SET-5 | AboutPage render | C |
+| [[../capabilities/settings]] SET-3 | resetAll domain logic (keeps lang/theme, re-runs first-launch), tested in `app.spec.ts` — **gap:** inline Data-group UI in `settings/+page.svelte` (no dedicated DataActions component) shipped (unit 006) with no test file yet | U — (planned C, E) |
+| [[../capabilities/settings]] SET-5 | About page render — **gap:** `about/+page.svelte` (no dedicated AboutPage component) shipped (unit 006) with no test file yet | — (planned C, E) |
 | [[../capabilities/undo-redo]] UND-1..7 | Undo/redo stack mechanics (§3.6); F3 (undo a mistake) | U, E |
 
 ## Cross-cutting E2E flows (F1–F5)

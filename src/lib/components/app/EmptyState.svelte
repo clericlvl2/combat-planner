@@ -22,11 +22,11 @@
 	const Icon = $derived(icon);
 </script>
 
-<div class="flex flex-1 flex-col items-center justify-center gap-3 py-16 text-center">
+<div class="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
 	{#if Icon}
-		<Icon class="size-10 text-muted-foreground" />
+		<Icon class="size-10 text-muted-foreground opacity-50" />
 	{/if}
-	<p class="font-medium">{title}</p>
+	<p class="text-lg font-semibold">{title}</p>
 	{#if description}
 		<p class="text-sm text-muted-foreground">{description}</p>
 	{/if}

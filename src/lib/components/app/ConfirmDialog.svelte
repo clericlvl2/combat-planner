@@ -33,12 +33,18 @@
 <AlertDialog bind:open>
 	<AlertDialogContent class="data-[size=default]:sm:max-w-lg">
 		<AlertDialogHeader>
-			<AlertDialogTitle>{title}</AlertDialogTitle>
+			<AlertDialogTitle class="text-lg font-semibold">{title}</AlertDialogTitle>
 			<AlertDialogDescription>{body}</AlertDialogDescription>
 		</AlertDialogHeader>
-		<AlertDialogFooter>
-			<AlertDialogCancel>{m['dialogs.cancel']()}</AlertDialogCancel>
-			<AlertDialogAction variant="destructive" onclick={onConfirm}>{confirmLabel}</AlertDialogAction>
+		<AlertDialogFooter class="mx-0 mb-0 flex-row gap-2 rounded-b-none border-t-0 bg-transparent p-0">
+			<AlertDialogCancel class="h-11 flex-1">{m['dialogs.cancel']()}</AlertDialogCancel>
+			<AlertDialogAction
+				variant="destructive"
+				class="h-11 flex-1 bg-destructive text-white hover:bg-destructive/90 dark:bg-destructive dark:hover:bg-destructive/90"
+				onclick={onConfirm}
+			>
+				{confirmLabel}
+			</AlertDialogAction>
 		</AlertDialogFooter>
 	</AlertDialogContent>
 </AlertDialog>

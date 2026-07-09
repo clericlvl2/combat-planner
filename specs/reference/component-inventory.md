@@ -12,9 +12,11 @@ visible-focus requirement ([[../capabilities/platform]] PLT-5). **error** surfac
 
 **Target vs. shipped, this doc.** This file describes the design *target* locked in by the
 converged prototype (`specs/design/prototype.html`, plus `specs/design/card-prototype.html` for
-the combatant-card shape) — the living spec units **D** (006 combats-list) / **E** (007 combat)
-port from. Where the target still diverges from what shipped M2 `src/` code renders today, that
-gap is flagged inline instead of silently restated as already-true.
+the combatant-card shape). Unit **D** (006 combats-list) has now shipped and ported its surfaces
+(AppShell/AppHeader/NavSidebar chrome, CombatList family, CombatFormDialog, ConfirmDialog,
+Settings, About); unit **E** (007 combat screen) has not — where the target still diverges from
+what shipped `src/` code renders today, that gap is flagged inline instead of silently restated
+as already-true.
 
 ## Hierarchy
 
@@ -25,8 +27,9 @@ AppShell
 ├── ConfirmDialog                       ← global, summoned by destructive actions
 └── <route outlet>
     ├── Combats (home)
-    │   ├── SearchBar (static name+desc placeholder; first child of the populated list — no
-    │   │     matching src component yet, real filtering is unit D)
+    │   ├── SearchBar (static name+desc placeholder; first child of the populated list — still
+    │   │     no matching src component; unit D (006) shipped the CombatList/CombatRow restyle
+    │   │     without it, so real filtering remains unscheduled)
     │   ├── CombatList → CombatRow → { ColorTagDot (renders the combat title's first letter;
     │   │     dot fill is still the picked color), CombatRowMenu }
     │   ├── Create control: header "+" icon button (desktop, replaces the desktop FAB) ·
@@ -60,9 +63,13 @@ AppShell
     │         stays on the card's Init pill). Add-mode header chrome matches the Setup two-FAB /
     │         header-add+header-start pattern; edit-mode header chrome matches the Active header
     │         (header-advance/header-jump icon buttons + RoundEscBar). }
-    ├── Settings → { SettingsGroup, LanguageSwitcher, ThemeSwitcher, DataActions (Reset-all
-    │     only — export/import rows dropped, see [[../capabilities/settings]] SET-3) }
-    └── About → AboutPage
+    ├── Settings → three inline `<section>` groups (Language / Appearance / Data) plus a
+    │     headingless About link row, authored directly in `settings/+page.svelte` — no
+    │     dedicated SettingsGroup/LanguageSwitcher/ThemeSwitcher/DataActions leaf components
+    │     ship (Data group is Reset-all only — export/import rows dropped, see
+    │     [[../capabilities/settings]] SET-3)
+    └── About → a single inline block in `about/+page.svelte` (app name/version/description/
+          privacy note) — no dedicated AboutPage component ships
 ```
 
 Shared/reused leaves: **FAB**, **IconButton**, **EmptyState**, **NumberField**, **NoteField**,
@@ -186,21 +193,20 @@ title, description, trailing `⋮` (`CombatRowMenu`: Edit / Delete). Drag handle
 | Sheet | AppHeader burger |
 | Drawer | NumpadSheet (mobile) |
 | DropdownMenu | CombatRowMenu, CombatOverflowMenu, CombatantCard's per-card `⋮` menu |
-| Select | LanguageSwitcher |
-| RadioGroup / ToggleGroup | ColorSwatchPicker, ConditionPicker, ThemeSwitcher, Type toggle (CombatantForm, equal-width segments) |
+| Select | inline language `<Select>` in `settings/+page.svelte` (no dedicated LanguageSwitcher component) |
+| RadioGroup / ToggleGroup | ColorSwatchPicker, ConditionPicker, inline theme `<ToggleGroup>` in `settings/+page.svelte` (no dedicated ThemeSwitcher component), Type toggle (CombatantForm, equal-width segments) |
 | Input | NumberField (+ form fields) |
 | Textarea | NoteField |
 | Label / Form | CombatFormDialog, CombatantForm, NumberField |
-| Card | CombatRow, CombatantCard, SettingsGroup |
+| Card | CombatRow, CombatantCard |
 | Badge | condition chips (full-name, filled, colour-coded; all render, removable × when expanded) |
 | Collapsible | CombatantCard (collapsed↔expanded), HpLogSection |
 | Progress | HealthBar |
 | Popover | RoundCounterControl, EscalationDieControl, InitCell (manual-entry, long-press) |
 | Sonner (toast) | Toaster / UpdateToast |
 | ScrollArea | HpLogSection |
-| Separator | SettingsGroup |
 | Tooltip | (a11y labels — optional reinforcement, deferred to build) |
-| bespoke (no primitive) | AppShell, ColorTagDot, TypeStripe, HealthBar fill, DefenseStats, EntryDisplay, HpSummaryHeader, HpLogEntryRow, InstallBanner, AboutPage, SearchBar |
+| bespoke (no primitive) | AppShell, ColorTagDot, TypeStripe, HealthBar fill, DefenseStats, EntryDisplay, HpSummaryHeader, HpLogEntryRow, InstallBanner, `about/+page.svelte` (inline, no AboutPage component), SearchBar |
 
 `HpCell`/`TypeStripe` (compact-row era) had no matching `src/` file (inlined in
 `CombatantRow.svelte`); the card restyle carries the same note forward for the card's HP block

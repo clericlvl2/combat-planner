@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import AppShell from '$lib/components/app/AppShell.svelte';
 	import { store } from '$lib/stores';
 	import './layout.css';
 
-	// TODO M-phase: this becomes the full AppShell — mounts NavSidebar/AppHeader, Toaster,
-	// InstallBanner, ConfirmDialog singletons + the route outlet
-	// (specs/reference/component-inventory.md Hierarchy / Global chrome placement).
-	// For now it just boots the store (hydrate-on-mount, ADR-002/003).
+	// TODO M-phase: AppShell still needs the Toaster / InstallBanner / ConfirmDialog global
+	// singletons (specs/reference/component-inventory.md Hierarchy / Global chrome placement) —
+	// out of unit 006 Phase 1's scope (AppShell + per-breakpoint nav only).
 	let { children } = $props();
 
 	onMount(async () => {
@@ -14,4 +14,6 @@
 	});
 </script>
 
-{@render children()}
+<AppShell>
+	{@render children()}
+</AppShell>

@@ -1,13 +1,19 @@
 <!--
   ColorTagDot (Component Inventory §5, ADR-012) — bespoke swatch dot for a combat's `colorTag`.
   Renders one of the 8 token-driven `bg-combat-*` utilities (layout.css); status is never
-  color-alone, so it carries a role=img a11y label naming the swatch.
+  color-alone, so it carries a role=img a11y label naming the swatch. The optional `letter`
+  (the combat's title initial) is a purely visual row-disambiguator per the approved template —
+  aria-hidden, since the color name is already carried by the aria-label.
 -->
 <script lang="ts">
 	import type { ColorTag } from '$lib/db/types';
 	import { m } from '$lib/i18n';
 
-	let { colorTag, class: className }: { colorTag: ColorTag; class?: string } = $props();
+	let {
+		colorTag,
+		letter,
+		class: className,
+	}: { colorTag: ColorTag; letter?: string; class?: string } = $props();
 
 	/** ColorTag key -> `bg-combat-*` utility (tokens defined once in layout.css, ADR-012). */
 	const colorTagBg: Record<ColorTag, string> = {
@@ -35,7 +41,15 @@
 </script>
 
 <span
-	class={['inline-block size-3 shrink-0 rounded-full', colorTagBg[colorTag], className]}
+	class={[
+		'inline-flex size-6 shrink-0 items-center justify-center rounded-md text-[11px] font-bold text-on-semantic',
+		colorTagBg[colorTag],
+		className,
+	]}
 	role="img"
 	aria-label={m['a11y.colorTag']({ color: colorTagLabel[colorTag]() })}
-></span>
+>
+	{#if letter}
+		<span aria-hidden="true">{letter}</span>
+	{/if}
+</span>

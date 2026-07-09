@@ -7,24 +7,27 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import type { IconComponent } from '$lib/icons';
+	import { cn } from '$lib/utils';
 
 	let {
 		icon,
 		label,
 		onclick,
 		disabled = false,
+		class: className,
 	}: {
 		icon: IconComponent;
 		label: string;
 		onclick: () => void;
 		disabled?: boolean;
+		class?: string;
 	} = $props();
 
 	const Icon = $derived(icon);
 </script>
 
 <Button
-	class="fixed right-4 bottom-4 size-14 rounded-full shadow-lg"
+	class={cn('fixed right-4 bottom-4 size-14 rounded-full shadow-lg', className)}
 	{disabled}
 	aria-label={label}
 	{onclick}

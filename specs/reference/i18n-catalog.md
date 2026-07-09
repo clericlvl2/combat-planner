@@ -33,6 +33,8 @@ a11y.*         accessible labels for controls
 | `nav.combats` | Combats |
 | `nav.settings` | Settings |
 | `nav.about` | About |
+| `nav.open` | Open navigation |
+| `nav.primary` | Primary navigation |
 
 ## combats.* — home
 

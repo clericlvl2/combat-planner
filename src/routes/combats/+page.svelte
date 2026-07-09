@@ -10,6 +10,7 @@
 	import CombatList from '$lib/components/app/CombatList.svelte';
 	import EmptyState from '$lib/components/app/EmptyState.svelte';
 	import FAB from '$lib/components/app/FAB.svelte';
+	import { headerAction } from '$lib/components/app/header-action.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { m } from '$lib/i18n';
 	import { chromeIcon } from '$lib/icons';
@@ -35,7 +36,27 @@
 	function deleteCombat(id: string) {
 		store.deleteCombat(id);
 	}
+
+	// Desktop create control lives in AppHeader (prototype: `.icon-btn.create-desktop`), not on
+	// this page — hand it a snippet via the header-action seam while this route is mounted.
+	$effect(() => {
+		headerAction.set(createHeaderButton);
+		return () => headerAction.set(null);
+	});
 </script>
+
+{#snippet createHeaderButton()}
+	<Button
+		variant="ghost"
+		size="icon"
+		class="min-h-11 min-w-11"
+		aria-label={m['combats.create']()}
+		title={m['combats.create']()}
+		onclick={openCreate}
+	>
+		<Add class="size-5" />
+	</Button>
+{/snippet}
 
 <h1 class="sr-only">{m['combats.title']()}</h1>
 
@@ -43,13 +64,14 @@
 	<p class="p-4 text-muted-foreground">…</p>
 {:else if store.combats.length === 0}
 	<EmptyState title={m['combats.empty.title']()}>
-		<Button size="lg" class="w-full" onclick={openCreate}>
+		<Button size="lg" class="hidden w-full lg:flex" onclick={openCreate}>
 			<Add class="size-5" />
 			{m['combats.empty.cta']()}
 		</Button>
 	</EmptyState>
+	<FAB icon={Add} label={m['combats.create']()} onclick={openCreate} class="lg:hidden" />
 {:else}
-	<div class="mx-auto max-w-md p-2 pb-24">
+	<div class="p-3 pb-24">
 		<CombatList
 			combats={store.combats}
 			onOpen={openCombat}
@@ -59,7 +81,7 @@
 		/>
 	</div>
 
-	<FAB icon={Add} label={m['combats.create']()} onclick={openCreate} />
+	<FAB icon={Add} label={m['combats.create']()} onclick={openCreate} class="lg:hidden" />
 {/if}
 
 <CombatFormDialog combat={editCombat} bind:open={formOpen} {store} />

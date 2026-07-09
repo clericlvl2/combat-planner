@@ -39,6 +39,9 @@
 	let colorTag = $state<ColorTag>('neutral');
 	let capBlocked = $state(false);
 
+	// Prototype .field-label recipe (specs/design/prototype.html) — uppercase, muted, small caps.
+	const fieldLabelClass = 'text-xs font-medium uppercase tracking-wide text-muted-foreground';
+
 	// (Re)initialize the form whenever it opens (prefill on edit, blank defaults on create).
 	$effect(() => {
 		if (!open) return;
@@ -70,9 +73,9 @@
 </script>
 
 <Dialog bind:open>
-	<DialogContent class="max-w-lg sm:max-w-lg">
+	<DialogContent class="sm:max-w-md">
 		<DialogHeader>
-			<DialogTitle>
+			<DialogTitle class="text-lg font-semibold">
 				{combat ? m['forms.combat.edit.title']() : m['forms.combat.create.title']()}
 			</DialogTitle>
 		</DialogHeader>
@@ -85,17 +88,17 @@
 			}}
 		>
 			<div class="flex flex-col gap-1">
-				<Label for="cf-title">{m['forms.field.title']()}</Label>
+				<Label for="cf-title" class={fieldLabelClass}>{m['forms.field.title']()}</Label>
 				<Input id="cf-title" bind:value={title} oninput={() => (capBlocked = false)} />
 			</div>
 
 			<div class="flex flex-col gap-1">
-				<Label for="cf-description">{m['forms.field.description']()}</Label>
+				<Label for="cf-description" class={fieldLabelClass}>{m['forms.field.description']()}</Label>
 				<Textarea id="cf-description" bind:value={description} />
 			</div>
 
 			<div class="flex flex-col gap-1">
-				<Label>{m['forms.field.colorTag']()}</Label>
+				<Label class={fieldLabelClass}>{m['forms.field.colorTag']()}</Label>
 				<ColorSwatchPicker bind:value={colorTag} />
 			</div>
 
@@ -103,11 +106,17 @@
 				{m['errors.combatCap']({ max: MAX_COMBATS })}
 			</p>
 
-			<DialogFooter>
-				<Button type="button" variant="ghost" class="w-full" onclick={() => (open = false)}>
+			<DialogFooter class="mx-0 mb-0 flex-row justify-center gap-2 border-t-0 bg-transparent p-0 pt-1">
+				<Button
+					type="button"
+					variant="secondary"
+					size="lg"
+					class="h-11 w-full"
+					onclick={() => (open = false)}
+				>
 					{m['forms.action.cancel']()}
 				</Button>
-				<Button type="submit" size="lg" class="w-full">{m['forms.action.save']()}</Button>
+				<Button type="submit" size="lg" class="h-11 w-full">{m['forms.action.save']()}</Button>
 			</DialogFooter>
 		</form>
 	</DialogContent>

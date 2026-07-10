@@ -145,7 +145,7 @@
     --type-ally: #2563eb;
 
     /* Semantic — health bands (matches shipped src/routes/layout.css :root) */
-    --health-full: #0c8d62;
+    --health-full: #0b815a;
     --health-wounded: #a76b07;
     --health-bloodied: #c75505;
     --health-dead: #b91c1c;
@@ -778,9 +778,11 @@
     font-size: var(--font-sm);
   }
 
-  /* Note line (under the conditions). Collapse-gated: the shipped Collapsible
-   * only mounts note content when expanded, so collapsed hides it outright
-   * even when a note is set. */
+  /* Note line (under the conditions). Always visible when a note is set —
+   * renders in BOTH the collapsed and expanded state (a read-only <p> while
+   * collapsed, the same text via the editable Textarea while expanded).
+   * Collapsing only hides the edit-only affordances (see the "Collapsed
+   * modifier" comment below), not the note itself. */
   .cbt-note {
     font-size: var(--font-sm);
     font-style: italic;
@@ -802,10 +804,11 @@
     padding: var(--space-2);
   }
 
-  /* Collapsed modifier — hides only the note and the edit-only affordances
-   * (removable "×", "+ Condition"/"+ Note" triggers), matching the shipped
+  /* Collapsed modifier — hides only the edit-only affordances (removable
+   * "×", "+ Condition"/"+ Note" triggers), matching the shipped
    * `removable={open}` / `{#if open}` gates in CombatantRow.svelte. Defs,
-   * Init and the condition list itself stay visible either way. */
+   * Init, the condition list, and the note line itself all stay visible
+   * either way. */
   .cbt-card.is-collapsed .cond-chip__remove,
   .cbt-card.is-collapsed .tag-trigger {
     display: none;

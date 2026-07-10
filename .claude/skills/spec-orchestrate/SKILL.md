@@ -1,6 +1,7 @@
 ---
 name: spec-orchestrate
-description: Drive one change unit end-to-end — /spec-new draft, approval gate, /spec-tasks, /spec-run, /spec-verify, /spec-close — halting only for the approval gate and three critical junctures (verification FAIL/override, unresolved gate failure, scope conflict). Use when the user wants a single call to run a whole change unit instead of invoking each spec-* skill by hand. Do not use for ad-hoc work outside specs/ — dispatch worker-bee/scout-bee directly for that.
+disable-model-invocation: true
+description: Drive one change unit end-to-end — /spec-new draft, /spec-tasks, /spec-run, /spec-verify, /spec-close — halting only at genuinely critical junctures (a load-bearing unresolved draft decision, verification FAIL/override, unresolved gate failure, scope conflict), never for status bookkeeping. Use when the user wants a single call to run a whole change unit instead of invoking each spec-* skill by hand. Do not use for ad-hoc work outside specs/ — dispatch worker-bee/scout-bee directly for that.
 ---
 
 You drive a change unit through its full lifecycle by invoking the other spec-* skills yourself,
@@ -34,10 +35,20 @@ You'll be given either:
 
 ## Steps
 
-1. **draft** — if no unit exists yet, invoke `/spec-new` with the given Why/idea. It stops at
-   `status: draft` for approval — relay the drafted `change.md` to the user and STOP. Do not
-   proceed past this gate on your own judgment; wait for the user to approve (flip
-   `status: approved`, possibly after edits).
+1. **draft** — if no unit exists yet, invoke `/spec-new` with the given Why/idea; it drafts
+   `change.md` at `status: draft`. Resolving real ambiguity is legal *before* the draft exists —
+   the `/spec-new` interview may ask load-bearing scope/AC questions, and that's fine. Once the
+   draft is written, apply judgment, not ceremony:
+   - If a genuinely **load-bearing decision is still unresolved** — a real scope fork, an
+     irreversible choice, or ambiguous intent the user must own — relay the draft and STOP for
+     that decision.
+   - Otherwise (scope already settled by your reading + any interview answers), **self-approve**:
+     flip `status: approved` and continue to step 2. Still show the drafted `change.md` in your
+     reply for the record — just don't block on it.
+   - Do **not** stop merely to have the user flip `status: approved`, nor to confirm slug/ID
+     naming or ask "looks good?" — status bookkeeping and naming are not critical matters. The
+     bar for halting here is the same as every other gate: correctness or a choice only the user
+     can make.
 2. **approved → tasks** — once `status: approved`, invoke `/spec-tasks`. It turns `change.md`
    into `tasks.md` and flips `status: in-progress`.
 3. **in-progress → run** — invoke `/spec-run`. It dispatches `implementer` agents phase by
@@ -57,13 +68,19 @@ You'll be given either:
 
 ## Ask-gates (the only points you interrupt)
 
-- The draft → approved gate (step 1) — always, no exception.
+You judge critical vs non-critical at *every* gate, draft included — the same standard
+throughout: halt only for correctness or a choice only the user can make.
+
+- A load-bearing **unresolved draft decision** (step 1) — a real scope fork, irreversible
+  choice, or ambiguous intent. NOT the mere act of approving the draft, and NOT slug/ID naming
+  or "looks good?" — self-approve and continue when scope is already settled.
 - A `spec-verifier` FAIL, or a human override being needed (step 4).
 - A phase gate failure `/spec-run` reports as unresolved (step 3).
 - A scope/out-of-scope conflict flagged by an implementer or verifier.
 
-Everything else — dispatching `/spec-tasks`, `/spec-run`'s phase-by-phase agent calls, a clean
-`/spec-verify` all-PASS, `/spec-close` — proceeds without a prompt.
+Everything else — self-approving a settled draft, dispatching `/spec-tasks`, `/spec-run`'s
+phase-by-phase agent calls, a clean `/spec-verify` all-PASS, `/spec-close` — proceeds without a
+prompt.
 
 Any harness, tooling, or script a custom flow wants built is delegated (worker-bee); only its
 *execution + artifact review* is yours to do by hand.

@@ -46,7 +46,7 @@ text.
 | B-023 | Smooth animations — interactive aspects (tap, expand, damage entry, condition toggle, etc.) lack motion; add consistent transition library. | DESIGN | L | idea | — |
 | B-024 | First-launch UX — app opening experience: onboarding flow, hints, tutorial or zero-state guidance. Brainstorm before spec. | DESIGN | M | idea | — |
 | B-025 | Update credentials — About screen credits/attribution needs current team/sources. | SET | S | idea | — |
-| B-026 | Routing edge cases — fix undefined URL states, missing param guards, back-button crashes (collect examples first). | INFRA | S | idea | — |
+| B-026 | Routing edge cases — fix undefined URL states, missing param guards, back-button crashes (collect examples first). | INFRA | S | done | `specs/archive/010-route-error-boundary/` |
 
 **Fields**
 

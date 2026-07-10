@@ -143,3 +143,38 @@ per `ADR-007`; no server runtime, no env secrets.
   SPA shell) — verified at `https://combat-planner-five.vercel.app/`.
 - A commit pushed to `main` produces a new production deployment at that URL (Vercel Git
   integration, dashboard-configured).
+
+## PLT-10 — App-level error boundary
+
+A thrown error in any route load (e.g. the `/` load) or in store hydration
+(`store.hydrate()`/Dexie access) renders the app's own styled error surface — never SvelteKit's
+default error page. The boundary lives inside the app shell chrome ([[platform]] PLT-1: still
+offline-safe, no network dependency) and uses the same app tokens as every other screen. It
+offers an explicit recovery action rather than a dead end. Mechanism: a route-level
+`+error.svelte` reading the failed route's `page.error`/`page.status` from `$app/state`
+(`ADR-007`).
+
+**AC:**
+- A route-level `+error.svelte` exists in the route tree and renders using app tokens/styling
+  (not SvelteKit's default error page), reading `page.error`/`page.status` from `$app/state`.
+- A thrown error in the `/` load or in `store.hydrate()`/Dexie access surfaces this boundary; the
+  AppShell chrome remains present around it.
+- The error surface is announced to assistive tech (`role="alert"`/`aria-live`) and offers a
+  recovery action — a button with both a visible label and an `aria-label` — that either reloads
+  the app or navigates to `/combats`.
+
+## PLT-11 — Back-button dismisses transient overlays
+
+On the combat screen, pressing the browser Back button closes the top-most open transient
+overlay (Add / Edit / Numpad sheet) instead of leaving the route; only when no overlay is open
+does Back leave the combat page. Opening a sheet pushes one history entry; the browser's
+`popstate` event closes that sheet; closing a sheet normally (not via Back) consumes that history
+entry itself so it never pollutes forward-history navigation. Model boundary: sheets are not
+stacked today — at most one is open at a time, so "top-most" has at most one candidate.
+
+**AC:**
+- With an Add / Edit / Numpad sheet open on `/combats/[id]`, a browser Back gesture closes that
+  sheet and stays on the combat page.
+- With no sheet open, a browser Back gesture leaves the combat page as normal.
+- Opening a sheet pushes exactly one history entry; closing it via the sheet's own close control
+  (not Back) removes that entry rather than leaving a stray forward-history entry.

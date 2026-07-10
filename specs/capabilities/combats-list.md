@@ -52,10 +52,16 @@ Undo scope, see [[undo-redo]] UND-2). Deletes the combat and everything owned by
 
 ## CLS-5 — Open a combat
 
-Tapping a row opens that combat.
+Tapping a row opens that combat. Navigating directly to a non-existent or stale combat id (e.g.
+a deleted combat's old URL) shows a styled not-found state instead of a bare error, with a
+visible, labelled control returning to the Combats list ([[platform]] PLT-10 owns the separate,
+broader app-level error boundary for thrown errors; this is the expected not-found case for a
+missing id, not a thrown error).
 
 **AC:**
 - Tapping anywhere on a combat row (outside its `⋮` menu) navigates to that combat.
+- Navigating to `/combats/<nonexistent-id>` renders a not-found state including a visible,
+  labelled control that navigates back to `/combats`.
 
 ## CLS-6 — Manual reorder
 
@@ -68,12 +74,16 @@ Drag to reorder; the new order persists (`listOrder`).
 
 On first launch (`!firstLaunchDone`), one empty combat is auto-created and opened directly (its
 own combat page, in Setup — [[lifecycle]] LIF-1); the flag is then set. Subsequent launches land
-on the Combats home list.
+on the Combats home list. If first-launch seeding yields no combat (the seed produces an empty
+list), the app lands on `/combats` instead — a deterministic fallback, not a thrown error;
+normal first-launch behavior (one seeded combat opened directly) is unaffected.
 
 **AC:**
 - The very first time the app is opened, exactly one empty combat exists and its page is shown.
 - Any later launch lands on the Combats home list, not a combat page.
 - `resetAll` ([[settings]] SET-3) clears the flag so first-launch behavior re-runs once.
+- If first-launch seeding yields no combat, the app lands on `/combats` without throwing an
+  unhandled error.
 
 ## CLS-8 — Export / import (pointer)
 

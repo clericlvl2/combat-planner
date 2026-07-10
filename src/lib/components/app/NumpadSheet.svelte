@@ -70,6 +70,7 @@
 
 	const Backspace = chromeIcon.backspace;
 	const ClearIcon = chromeIcon.close;
+	const Expand = chromeIcon.expand;
 
 	function push(d: string) {
 		if (entry.length >= 4) return; // ≤ 9999, covers the §7 HP ranges
@@ -115,20 +116,32 @@
 					{entry || '0'}
 				</div>
 
-				<!-- CommitActions (rendered above the digit pad — Component Inventory §"Numpad sheet"; empty entry → disabled no-op) -->
+				<!-- CommitActions (rendered above the digit pad — Component Inventory §"Numpad sheet"; empty entry → disabled no-op).
+				     Tint recipe: transparent fill + a tinted border + solid-color text (no bg fill) —
+				     WCAG-AA verified against both --surface/--popover themes (see phase report); a
+				     filled color-mix background per the prototype's literal `.btn--*-tint` recipe drops
+				     below 4.5:1 for at least one of the three colors in each theme with these token
+				     hexes, so the border-only recipe is the AA-safe stand-in. -->
 				<div class="grid grid-cols-3 gap-2">
-					<Button variant="destructive" disabled={empty} onclick={() => commit(onDamage)}>
+					<Button
+						variant="outline"
+						class="border-destructive/30 bg-transparent text-destructive hover:bg-destructive/10 dark:border-destructive/30 dark:bg-transparent dark:hover:bg-destructive/10"
+						disabled={empty}
+						onclick={() => commit(onDamage)}
+					>
 						{m['numpad.dealDamage']()}
 					</Button>
 					<Button
-						class="bg-health-full/10 text-health-full hover:bg-health-full/20"
+						variant="outline"
+						class="border-health-full/30 bg-transparent text-health-full hover:bg-health-full/10 dark:border-health-full/30 dark:bg-transparent dark:hover:bg-health-full/10"
 						disabled={empty}
 						onclick={() => commit(onRestore)}
 					>
 						{m['numpad.restoreHp']()}
 					</Button>
 					<Button
-						class="bg-combat-blue/10 text-combat-blue hover:bg-combat-blue/20"
+						variant="outline"
+						class="border-combat-blue/30 bg-transparent text-combat-blue hover:bg-combat-blue/10 dark:border-combat-blue/30 dark:bg-transparent dark:hover:bg-combat-blue/10"
 						disabled={empty}
 						onclick={() => commit(onSetTempHp)}
 					>
@@ -179,10 +192,13 @@
 					<CollapsibleTrigger
 						class="flex w-full items-center justify-between text-sm font-medium text-muted-foreground"
 					>
-						{m['numpad.history.title']()}
-						{#if history.length > 0}
-							<span class="text-muted-foreground">{m['numpad.history.count']({ n: history.length })}</span>
-						{/if}
+						<span class="flex items-center gap-1.5">
+							{m['numpad.history.title']()}
+							{#if history.length > 0}
+								<span class="text-muted-foreground">{m['numpad.history.count']({ n: history.length })}</span>
+							{/if}
+						</span>
+						<Expand class={['size-4 shrink-0 transition-transform', historyOpen && 'rotate-180']} />
 					</CollapsibleTrigger>
 					<CollapsibleContent>
 						{#if history.length === 0}

@@ -6,7 +6,6 @@
   (SET-3) via the shared ConfirmDialog.
 -->
 <script lang="ts">
-	import { browser } from '$app/environment';
 	import ConfirmDialog from '$lib/components/app/ConfirmDialog.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Select, SelectContent, SelectItem, SelectTrigger } from '$lib/components/ui/select';
@@ -45,25 +44,6 @@
 		if (!next) return;
 		store.updateSettings({ theme: next as Theme });
 	}
-
-	// Apply the chosen theme to the document root so dark/light (tokens, ADR-012) is visible
-	// immediately (SET-2). "system" follows the OS/browser color-scheme preference.
-	$effect(() => {
-		if (!browser) return;
-		const theme = store.settings.theme;
-		const media = window.matchMedia('(prefers-color-scheme: dark)');
-		const apply = () => {
-			document.documentElement.classList.toggle(
-				'dark',
-				theme === 'dark' || (theme === 'system' && media.matches),
-			);
-		};
-		apply();
-		if (theme === 'system') {
-			media.addEventListener('change', apply);
-			return () => media.removeEventListener('change', apply);
-		}
-	});
 
 	let resetConfirmOpen = $state(false);
 </script>

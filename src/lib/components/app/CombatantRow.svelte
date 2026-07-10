@@ -99,11 +99,20 @@
 	 *  dashed to read as an affordance rather than a value (UX §4c). */
 	const tagTriggerClass =
 		'inline-flex h-6 items-center gap-1 rounded-full border border-dashed border-muted-foreground/50 px-2.5 py-0.5 text-sm font-medium text-muted-foreground hover:border-foreground hover:text-foreground';
+
+	/** Def-stat value styling (Row 3) — bold + full-color against the muted label text. */
+	const statClass = 'font-semibold text-foreground tabular-nums';
 </script>
 
-<Card class={['overflow-hidden p-0', active && 'ring-2 ring-primary']} data-active={active}>
+<Card
+	class={[
+		'overflow-hidden rounded-[12px] border border-border p-0 ring-0',
+		active && 'border-ring ring-2 ring-ring',
+	]}
+	data-active={active}
+>
 	<div class="flex items-stretch">
-		<div class="flex shrink-0" aria-label={stripeLabel}>
+		<div class="flex shrink-0 gap-1" aria-label={stripeLabel}>
 			{#each stripes as _, i (i)}
 				<span class={['w-1.5', typeColor[combatant.type]]}></span>
 			{/each}
@@ -112,8 +121,11 @@
 		<div class="min-w-0 flex-1 p-3">
 			<Collapsible bind:open>
 				<div class="flex flex-col gap-2">
-					<!-- Row 1: name + expand chevron + overflow menu -->
+					<!-- Row 1: active-turn dot + name + expand chevron + overflow menu -->
 					<div class="flex items-center gap-2">
+						{#if active}
+							<span class="shrink-0 text-[14px] leading-none text-ring" aria-hidden="true">▶</span>
+						{/if}
 						<CollapsibleTrigger
 							class="flex min-w-0 flex-1 items-center gap-1.5 text-left"
 							aria-label={toggleLabel}
@@ -161,16 +173,16 @@
 							aria-label={hpLabel}
 							onclick={() => onOpenNumpad(combatant.id)}
 						>
-							<span class="text-lg leading-none font-semibold">
+							<span class="relative text-lg leading-none font-semibold">
 								{combatant.currentHp}/{combatant.maxHp}
+								{#if combatant.tempHp > 0}
+									<span
+										class="absolute -top-1.5 -right-5 inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-combat-blue text-xs leading-none font-medium text-white"
+									>
+										{combatant.tempHp}
+									</span>
+								{/if}
 							</span>
-							{#if combatant.tempHp > 0}
-								<span
-									class="absolute -top-1.5 right-0 inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-combat-blue text-[10px] leading-none font-medium text-white"
-								>
-									{combatant.tempHp}
-								</span>
-							{/if}
 						</button>
 						<div class="min-w-0 flex-1">
 							<HealthBar {combatant} />
@@ -179,15 +191,16 @@
 
 					<!-- Row 3: AC/PD/MD + Init pill -->
 					<div class="flex items-center gap-3">
-						<span class="flex-1 text-xs tabular-nums text-muted-foreground">
-							AC {combatant.ac} · PD {combatant.pd} · MD {combatant.md}
+						<span class="flex-1 text-xs text-muted-foreground">
+							AC <b class={statClass}>{combatant.ac}</b> ·
+							PD <b class={statClass}>{combatant.pd}</b> ·
+							MD <b class={statClass}>{combatant.md}</b>
 						</span>
 						<InitCell
 							{combatant}
 							onRoll={controller.roll}
 							onSetInitiative={controller.setInitiative}
 							editable={!combatActive}
-							class="text-xs text-muted-foreground"
 						/>
 					</div>
 

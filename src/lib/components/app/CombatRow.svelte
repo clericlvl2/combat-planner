@@ -34,9 +34,11 @@
 	const menuLabel = $derived(m['a11y.combatRowMenu']({ title: combat.title }));
 	const deleteBody = $derived(m['dialogs.deleteCombat.body']({ title: combat.title }));
 	const titleInitial = $derived(combat.title.trim().charAt(0).toUpperCase() || '?');
+	// CLS-1 — an untitled combat renders a placeholder instead of a blank row.
+	const displayTitle = $derived(combat.title.trim() || m['combats.untitled']());
 </script>
 
-<Card class="flex-row items-center gap-3 overflow-hidden p-3">
+<Card class="flex-row items-center gap-3 overflow-hidden rounded-[var(--radius)] p-3">
 	<GripVertical class="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
 	<button
 		type="button"
@@ -45,7 +47,7 @@
 	>
 		<ColorTagDot colorTag={combat.colorTag} letter={titleInitial} />
 		<span class="flex min-w-0 flex-1 flex-col">
-			<span class="truncate font-medium">{combat.title}</span>
+			<span class="truncate font-medium">{displayTitle}</span>
 			{#if combat.description}
 				<span class="truncate text-sm text-muted-foreground">{combat.description}</span>
 			{/if}

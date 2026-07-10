@@ -13,9 +13,12 @@ owns only that a combat has one.
 
 Combats render as a vertical list; each row shows Title, Description, and a Color tag, plus a
 per-row trailing `⋮` overflow menu (Edit / Delete; the Export/share item is pending under CLS-8).
+A combat with a blank/whitespace-only title renders a placeholder title instead of a blank row.
 
 **AC:**
 - Every combat row displays title, description, and its color tag.
+- A combat whose title is empty or whitespace-only shows the localized placeholder title
+  ("Untitled combat") instead of a blank row.
 - The row `⋮` menu exposes Edit and Delete. (The Export/share item is added when CLS-8 lands —
   [[import-export]].)
 
@@ -76,3 +79,16 @@ on the Combats home list.
 
 Export/import of a single combat or all combats is fully specified in [[import-export]]
 (IMP-1..IMP-5), including the row `⋮` Export/share action and the Combats-home Import control.
+
+## CLS-9 — Search
+
+A `SearchField` above the list filters visible rows by title, in real time, case-insensitively.
+It is view-local only: the query is never persisted (no store/domain write, ADR-002) and is lost
+on navigation/reload. Shown only while the (unfiltered) list is non-empty; hidden entirely on the
+empty-state screen (CLS-7/empty combats list) since there's nothing to search.
+
+**AC:**
+- Typing in the search field filters the visible combat rows to those whose title contains the
+  query (case-insensitive); clearing the field restores the full list.
+- The search field is not rendered when the combats list is empty.
+- The typed query is never written to the store/Dexie and does not survive a reload.

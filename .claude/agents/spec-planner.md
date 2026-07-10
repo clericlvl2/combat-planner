@@ -31,6 +31,9 @@ paraphrase from the dispatcher.
     it) are separate, sequential phases, not merged into one.
   - Keep phases small enough that one `implementer` agent run can finish one phase, including its
     own gate run, without touching out-of-scope files.
+- One visual surface = one implementer: never split a single screen/component's styling across
+  parallel phases. If two phases would both touch the same screen/component's look-and-feel,
+  merge them into one sequential phase instead of marking them parallel-safe.
 - Never edit `change.md` — if it looks wrong or incomplete, report that instead of fixing it
   yourself.
 - Write `specs/changes/NNN-slug/tasks.md` from `specs/templates/tasks.md`, one phase block per

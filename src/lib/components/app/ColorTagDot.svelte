@@ -42,7 +42,7 @@
 
 <span
 	class={[
-		'inline-flex size-6 shrink-0 items-center justify-center rounded-md text-[11px] font-bold text-on-semantic',
+		'inline-flex size-6 shrink-0 items-center justify-center rounded-md text-xs font-bold text-on-semantic',
 		colorTagBg[colorTag],
 		className,
 	]}

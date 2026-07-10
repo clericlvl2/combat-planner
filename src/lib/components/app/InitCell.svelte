@@ -67,12 +67,8 @@
 <Popover bind:open>
 	<Button
 		bind:ref={anchor}
-		variant="outline"
-		size="sm"
-		class={cn(
-			'h-auto min-h-11 min-w-11 flex-row gap-1 rounded-full border-border bg-secondary px-3 font-normal text-muted-foreground tabular-nums hover:bg-secondary/80',
-			className,
-		)}
+		variant="ghost"
+		class={cn('h-auto min-h-11 min-w-11 rounded-full p-1.5', className)}
 		disabled={!editable}
 		aria-label={m['a11y.initCell.roll']({ name: combatant.name })}
 		aria-haspopup="dialog"
@@ -82,8 +78,12 @@
 		onpointercancel={cancelTimer}
 		onclick={tap}
 	>
-		<span class="text-xs leading-none">Init</span>
-		<span class="text-sm leading-none font-semibold text-foreground">{display}</span>
+		<span
+			class="inline-flex h-6 items-center gap-1 rounded-full border border-border bg-secondary px-2.5 text-sm text-muted-foreground tabular-nums"
+		>
+			Init
+			<span class="font-semibold text-foreground">{display}</span>
+		</span>
 	</Button>
 
 	<PopoverContent customAnchor={anchor} class="w-56" aria-label={m['a11y.initCell.manual']({ name: combatant.name })}>

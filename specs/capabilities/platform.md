@@ -42,22 +42,28 @@ Mobile: swipe-right reveals a sidebar with nav links. Tablet: header with burger
 header with inline icon-button navigation. Destinations: Combats, Settings, About.
 
 The create action follows the same per-breakpoint split as nav wherever a create-FAB exists: a
-header "+" icon button on desktop, a FAB on mobile — except Combat — Active's advance-turn FAB,
-which is a distinct action and stays a FAB/icon-button pair on both breakpoints, untouched by
-this split.
+header "+" icon button on desktop, a FAB on mobile. Combat — Active's advance-turn and
+jump-to-turn controls follow the same desktop swap: on desktop (≥1024px) the Active header shows
+`header-advance`/`header-jump` tonal roundel icon buttons; the Advance FAB and the Jump pill are
+hidden at that breakpoint (`lg:hidden`). Both the FAB/pill pair and the header roundels remain
+mobile-only / desktop-only respectively — never both at once.
 
 Combat screen chrome per breakpoint: Setup header is back + title + `⋮`, with two floating Add /
 hold-to-start Start controls (FABs on mobile, icon buttons on desktop). Active header is back +
-title + `⋮`, plus a round/escalation-die sub-bar rendered below the header chrome. Exact control
-placement: [[../reference/component-inventory]].
+title + `⋮`, plus a round/escalation-die sub-bar rendered below the header chrome; on desktop
+(≥1024px) the Active header also carries `header-advance`/`header-jump` roundel icon buttons,
+with the mobile Advance FAB and Jump pill hidden at that breakpoint. Exact control placement:
+[[../reference/component-inventory]].
 
 **AC:**
 - Swiping right on mobile opens a sidebar containing links to Combats, Settings, and About.
 - Tablet shows a burger-menu header; desktop shows inline icon-button nav in the header (each
   icon carrying an `aria-label` and the current destination marked); both expose the same three
   destinations.
-- Wherever a create-FAB exists, desktop shows an equivalent header "+" icon button instead,
-  except Combat — Active's advance-turn control, which is unchanged on both breakpoints.
+- Wherever a create-FAB exists, desktop shows an equivalent header "+" icon button instead.
+- On desktop (≥1024px), Combat — Active shows header Advance/Jump roundel icon buttons, and the
+  mobile Advance FAB and Jump pill are hidden (`lg:hidden`); both the FAB/pill pair and the
+  header roundels remain present on mobile.
 
 ## PLT-4 — Installable PWA + update toast
 
@@ -94,6 +100,8 @@ itself carries no status information a user depends on).
   (icon/label), except the combatant-type stripe (compensating `aria-label`) and the
   `ColorTagDot` (its color is decorative/organizational only, not itself a status).
 - Both themes meet AA contrast for text and status colors, including the reverse/alarm HP bar.
+  All three NumpadSheet commit buttons (Deal Damage, Restore HP, Set Temp HP) pass AA in both
+  themes. ([[hp]] HP-3)
 
 ## PLT-6 — Privacy: no telemetry
 

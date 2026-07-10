@@ -3,11 +3,11 @@
   combat + the derived VIEWS (sortedCombatants / showRoundAndEscalation / canAdvance / isActive),
   wraps them in $derived (ADR-002), and wires the thin components via an id-scoped controller.
   Setup ⇄ Active is gated by showRoundAndEscalation. The page owns the single shared NumpadSheet +
-  add/edit forms, the Setup/Active floating controls (mobile FAB stack; desktop swaps to
-  CombatHeader's header-add/header-start icon pair, the advance FAB stays on both breakpoints),
-  and the Active-only JumpToTurnButton (view-navigation only — scrolls the active-turn card into
-  view via the `data-active` marker CombatantRow's Card already carries); rows/header emit intent
-  only.
+  add/edit forms, the Setup/Active floating controls (mobile-only FAB stack; desktop ≥1024px
+  swaps both states' FABs for CombatHeader's icon-roundel pair — header-add/header-start in
+  Setup, header-advance/header-jump in Active, PLT-3), and the Active-only JumpToTurnButton
+  (view-navigation only, mobile-only — scrolls the active-turn card into view via the
+  `data-active` marker CombatantRow's Card already carries); rows/header emit intent only.
 -->
 <script lang="ts">
 	import { page } from '$app/state';
@@ -100,7 +100,15 @@
 	<p class="p-4 text-muted-foreground">Combat not found.</p>
 {:else}
 	<div class="mx-auto flex min-h-dvh w-full max-w-md flex-col pb-28 lg:max-w-3xl">
-		<CombatHeader {combat} {controller} onAdd={() => (addOpen = true)} onStart={controller.start} />
+		<CombatHeader
+			{combat}
+			{controller}
+			onAdd={() => (addOpen = true)}
+			onStart={controller.start}
+			onAdvance={controller.advance}
+			onJump={jumpToActiveTurn}
+			canAdvance={canAdv}
+		/>
 
 		<main bind:this={mainEl} class="flex flex-1 flex-col gap-2 p-3">
 			{#if display.length === 0}
@@ -122,11 +130,11 @@
 		</main>
 
 		{#if active}
-			<!-- Active: Advance FAB (disabled at the r99 → r100 wrap) + Jump-to-turn pill — both
-			     breakpoints, per PLT-3 (the advance-turn control stays a FAB pair on mobile and
-			     desktop, untouched by the header-icon split). -->
+			<!-- Active: Advance FAB (disabled at the r99 → r100 wrap) + Jump-to-turn pill — mobile
+			     only (PLT-3); desktop (≥1024px) swaps both for CombatHeader's header-advance/
+			     header-jump icon roundels. -->
 			<Button
-				class="fixed right-4 bottom-4 size-14 rounded-full shadow-lg"
+				class="fixed right-4 bottom-4 size-14 rounded-full shadow-lg lg:hidden"
 				disabled={!canAdv}
 				aria-label={m['active.advance']()}
 				onclick={controller.advance}
@@ -146,8 +154,10 @@
 				<Add class="size-5" />
 			</Button>
 			{#if combat.combatants.length > 0}
+				<!-- Start FAB reads as a primary action (default variant = bg-primary), matching
+				     the prototype's `.fab--start` (inherits `.fab`'s primary fill), not a pale
+				     ghost/secondary roundel. -->
 				<Button
-					variant="secondary"
 					class="fixed right-4 bottom-24 size-14 rounded-full shadow-lg lg:hidden"
 					aria-label={m['setup.start']()}
 					onclick={controller.start}

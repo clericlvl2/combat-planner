@@ -1,10 +1,11 @@
 <!--
   CombatHeader (Component Inventory "Header (Combat screen)") — the one top bar across Setup and
-  Active: back · chrome-title (combat.title) · Setup-only desktop header-add/header-start icon
-  buttons (mobile uses the FAB stack in +page.svelte instead, PLT-3) · overflow ⋮ menu (Undo ↶ /
-  Redo ↷ at top, each disabled at its stack end; Setup → Clear; Active → Add, Restart, Clear).
-  Active renders a RoundEscBar sub-bar below the header chrome (still tap-to-edit via the same
-  popovers as before the restyle). Restart / Clear route through ConfirmDialog (undoable via the
+  Active: back · chrome-title (combat.title) · desktop-only tonal roundel icon buttons (Setup:
+  header-add/header-start; Active: header-advance/header-jump) — mobile uses the FAB stack in
+  +page.svelte instead, PLT-3 · overflow ⋮ menu (Undo ↶ / Redo ↷ at top, each disabled at its
+  stack end; Setup → Clear; Active → Add, Restart, Clear). Active renders a RoundEscBar sub-bar
+  (uppercase label / tabular-value pairs) below the header chrome, still tap-to-edit via the same
+  popovers as before the restyle. Restart / Clear route through ConfirmDialog (undoable via the
   stack). Reads the combat; emits intent via the controller + the page-owned add form.
 -->
 <script lang="ts">
@@ -30,11 +31,17 @@
 		controller,
 		onAdd,
 		onStart,
+		onAdvance,
+		onJump,
+		canAdvance = false,
 	}: {
 		combat: Combat;
 		controller: CombatController;
 		onAdd: () => void;
 		onStart: () => void;
+		onAdvance?: () => void;
+		onJump?: () => void;
+		canAdvance?: boolean;
 	} = $props();
 
 	const isActive = $derived(showRoundAndEscalation(combat));
@@ -47,6 +54,8 @@
 	const Redo = chromeIcon.redo;
 	const Overflow = chromeIcon.overflow;
 	const Add = chromeIcon.add;
+	const Advance = chromeIcon.advance;
+	const Jump = chromeIcon.jump;
 
 	// round editor
 	let roundOpen = $state(false);
@@ -107,6 +116,30 @@
 				{m['setup.start']()}
 			</Button>
 		{/if}
+	{:else}
+		<!-- Active — desktop-only header-advance/header-jump tonal roundels (mirrors the Setup
+		     header-add/header-start pattern above); mobile keeps the Advance FAB + Jump pill. -->
+		<Button
+			variant="ghost"
+			size="icon"
+			class="hidden min-h-11 min-w-11 rounded-full bg-foreground/10 lg:inline-flex"
+			disabled={!canAdvance}
+			aria-label={m['active.advance']()}
+			title={m['active.advance']()}
+			onclick={onAdvance}
+		>
+			<Advance class="size-5" />
+		</Button>
+		<Button
+			variant="ghost"
+			size="icon"
+			class="hidden min-h-11 min-w-11 rounded-full bg-foreground/10 lg:inline-flex"
+			aria-label={m['active.jumpToTurn']()}
+			title={m['active.jumpToTurn']()}
+			onclick={onJump}
+		>
+			<Jump class="size-5" />
+		</Button>
 	{/if}
 
 	<!-- Overflow menu -->
@@ -152,13 +185,16 @@
 {#if isActive}
 	<!-- Round / Escalation-die sub-bar (component-inventory "Header (Combat screen)") — replaces
 	     the old header-center pills; still tap-to-edit via the same popovers. -->
-	<div class="mx-3 mt-3 flex items-center gap-5 rounded-lg border border-border bg-card px-3 py-2.5">
+	<div class="mx-3 mt-3 flex items-center gap-6 rounded-lg border border-border bg-card px-3 py-2.5">
 		<Popover bind:open={roundOpen}>
 			<PopoverTrigger
-				class="rounded-md text-base font-semibold tabular-nums hover:bg-muted"
+				class="flex items-baseline gap-1.5 rounded-md hover:bg-muted"
 				aria-label={m['a11y.editRound']()}
 			>
-				{m['combat.round']({ n: combat.round })}
+				<span class="text-xs font-normal tracking-[0.04em] text-muted-foreground uppercase">
+					{m['combat.round.label']()}
+				</span>
+				<span class="text-base font-semibold tabular-nums">{combat.round}</span>
 			</PopoverTrigger>
 			<PopoverContent class="w-48">
 				<NumberField
@@ -179,12 +215,15 @@
 			<button
 				bind:this={escAnchor}
 				type="button"
-				class="rounded-md text-base font-semibold tabular-nums hover:bg-muted"
+				class="flex items-baseline gap-1.5 rounded-md hover:bg-muted"
 				aria-label={m['a11y.escalation']({ n: esc })}
 				aria-haspopup="dialog"
 				onclick={() => (escOpen = true)}
 			>
-				{m['combat.escalation']()}&nbsp;{esc}
+				<span class="text-xs font-normal tracking-[0.04em] text-muted-foreground uppercase">
+					{m['combat.escalation']()}
+				</span>
+				<span class="text-base font-semibold tabular-nums">{esc}</span>
 			</button>
 			<PopoverContent customAnchor={escAnchor} class="w-48">
 				<NumberField

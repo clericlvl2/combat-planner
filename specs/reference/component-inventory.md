@@ -28,9 +28,8 @@ AppShell
 ├── ConfirmDialog                       ← global, summoned by destructive actions
 └── <route outlet>
     ├── Combats (home)
-    │   ├── SearchBar (static name+desc placeholder; first child of the populated list — still
-    │   │     no matching src component; unit D (006) shipped the CombatList/CombatRow restyle
-    │   │     without it, so real filtering remains unscheduled)
+    │   ├── SearchField (real-time title filter, view-local only — shipped unit F (009); first
+    │   │     child of the populated list, hidden on the empty-state screen — [[../capabilities/combats-list]] CLS-9)
     │   ├── CombatList → CombatRow → { ColorTagDot (renders the combat title's first letter;
     │   │     dot fill is still the picked color), CombatRowMenu }
     │   ├── Create control: header "+" icon button (desktop, replaces the desktop FAB) ·
@@ -149,11 +148,15 @@ itself — that capability-level behavior is LIF's job, not this file's.
 Bottom sheet (Drawer) on mobile, positioned Dialog panel on desktop. Opened from `HpCell`.
 Contains, in DOM order: `HpSummaryHeader` (cur/max + temp, shown before entry), `EntryDisplay`
 (bordered field), `CommitActions` (Deal Damage / Restore HP / Set Temp HP — rendered *above* the
-digit pad, tonal button recipe per action), `DigitPad` (0–9 bordered digit buttons + ghost
-borderless Backspace/Clear glyph buttons, ≥44px targets), `HpLogSection` — labeled "History"
-(collapsible, newest-first, "No HP changes yet" when empty) → `HpLogEntryRow` (a colour-coded
-action chip + signed diff value in the left column, the old→new value transition in the right
-column, unaccented).
+digit pad; a border+colored-text recipe per action, not the prototype's literal filled
+color-mix tint — the filled tint fails WCAG-AA with the shipped token hexes, so all three commit
+buttons use the border+colored-text recipe instead, which meets AA in both themes — see
+[[../capabilities/hp]] HP-3, [[../capabilities/platform]] PLT-5), `DigitPad` (0–9 bordered digit
+buttons + ghost borderless Backspace/Clear glyph buttons, ≥44px targets), `HpLogSection` —
+labeled "History" behind a collapsible header with a rotating chevron affordance (collapsed by
+default, newest-first when expanded, "No HP changes yet" when empty) → `HpLogEntryRow` (a
+colour-coded action chip + signed diff value in the left column, the old→new value transition in
+the right column, unaccented).
 
 ## Header (Combat screen)
 
@@ -207,7 +210,7 @@ title, description, trailing `⋮` (`CombatRowMenu`: Edit / Delete). Drag handle
 | Sonner (toast) | Toaster / UpdateToast |
 | ScrollArea | HpLogSection |
 | Tooltip | (a11y labels — optional reinforcement, deferred to build) |
-| bespoke (no primitive) | AppShell, ColorTagDot, TypeStripe, HealthBar fill, DefenseStats, EntryDisplay, HpSummaryHeader, HpLogEntryRow, InstallBanner, `about/+page.svelte` (inline, no AboutPage component), SearchBar |
+| bespoke (no primitive) | AppShell, ColorTagDot, TypeStripe, HealthBar fill, DefenseStats, EntryDisplay, HpSummaryHeader, HpLogEntryRow, InstallBanner, `about/+page.svelte` (inline, no AboutPage component), SearchField |
 
 `HpCell`/`TypeStripe` (compact-row era) had no matching `src/` file (inlined in
 `CombatantRow.svelte`); unit E's card restyle (007) shipped without extracting dedicated

@@ -11,6 +11,7 @@
 	import EmptyState from '$lib/components/app/EmptyState.svelte';
 	import FAB from '$lib/components/app/FAB.svelte';
 	import { headerAction } from '$lib/components/app/header-action.svelte';
+	import SearchField from '$lib/components/app/SearchField.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { m } from '$lib/i18n';
 	import { chromeIcon } from '$lib/icons';
@@ -21,6 +22,14 @@
 	let formOpen = $state(false);
 	let editId = $state<string | null>(null);
 	const editCombat = $derived(editId ? (store.getCombat(editId) ?? null) : null);
+
+	// CLS — real-time title filter, view-local only (never persisted, ADR-002).
+	let query = $state('');
+	const filteredCombats = $derived(
+		query.trim() === ''
+			? store.combats
+			: store.combats.filter((c) => c.title.toLowerCase().includes(query.trim().toLowerCase())),
+	);
 
 	function openCreate() {
 		editId = null;
@@ -71,9 +80,10 @@
 	</EmptyState>
 	<FAB icon={Add} label={m['combats.create']()} onclick={openCreate} class="lg:hidden" />
 {:else}
-	<div class="p-3 pb-24">
+	<div class="flex flex-col gap-3 p-3 pb-24">
+		<SearchField bind:value={query} />
 		<CombatList
-			combats={store.combats}
+			combats={filteredCombats}
 			onOpen={openCombat}
 			onEdit={openEdit}
 			onDelete={deleteCombat}

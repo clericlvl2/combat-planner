@@ -41,19 +41,22 @@ a11y.*         accessible labels for controls
 | Key | English |
 |---|---|
 | `combats.title` | Combats |
-| `combats.create` | Create combat |
+| `combats.create` | New combat |
 | `combats.import` | Import combat |
 | `combats.row.menu.edit` | Edit |
 | `combats.row.menu.export` | Export / share |
 | `combats.row.menu.delete` | Delete |
 | `combats.empty.title` | No combats yet |
 | `combats.empty.cta` | Create your first combat |
+| `combats.untitled` | Untitled combat |
+| `combats.search.placeholder` | Search combats… |
 
 ## combat.* — header (both states)
 
 | Key | English | Shape |
 |---|---|---|
-| `combat.round` | Round {n} | `{n}` = round number |
+| `combat.round` | Round {n} | `{n}` = round number; full accessible name (popover trigger `aria-label`) |
+| `combat.round.label` | Round | visual label half of the RoundEscBar label/value pair (value = `combat.round`'s `{n}` alone) |
 | `combat.escalation` | Escalation die | label |
 | `combat.undo` | Undo | |
 | `combat.redo` | Redo | |

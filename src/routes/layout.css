@@ -29,8 +29,8 @@
 	--space-5: 24px;
 	--space-6: 32px;
 
-	--shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
-	--shadow-md: 0 6px 16px rgba(0, 0, 0, 0.4);
+	--shadow-design-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+	--shadow-design-md: 0 6px 16px rgba(0, 0, 0, 0.4);
 
 	/* Neutral chrome (prototype .theme-light) */
 	--bg: #f4f5f7;
@@ -52,7 +52,7 @@
 	--type-ally: #2563eb; /* ally = blue */
 
 	/* Health bar bands (Rules §4) — light. `dead` = reverse/alarm fill. */
-	--health-full: #0c8d62;
+	--health-full: #0b815a;
 	--health-wounded: #a76b07;
 	--health-bloodied: #c75505;
 	--health-dead: #b91c1c;
@@ -166,6 +166,19 @@
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: 14px;
 	--radius-xl: 18px;
+
+	/* Typography scale (prototype --font-*) wired into Tailwind's text-* tokens so every
+	 * text-xs/sm/base/lg/xl call site renders the design scale, not stock Tailwind sizes. */
+	--text-xs: var(--font-xs);
+	--text-sm: var(--font-sm);
+	--text-base: var(--font-md);
+	--text-lg: var(--font-lg);
+	--text-xl: var(--font-xl);
+
+	/* Design shadows aliased onto Tailwind's shadow-sm/shadow-md so shadcn overlays
+	 * (popover/select/dropdown) render the design shadow instead of the Tailwind stock one. */
+	--shadow-sm: var(--shadow-design-sm);
+	--shadow-md: var(--shadow-design-md);
 
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);

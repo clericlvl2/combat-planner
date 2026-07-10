@@ -9,6 +9,21 @@ directly — that's what `/spec-new`, `/spec-tasks`, `/spec-run` (via `implement
 `/spec-verify` (via `spec-verifier`), and `/spec-close` (via `doc-syncer`) already do. You only
 call them, watch their output, and decide when to stop and ask.
 
+## Hard boundary
+
+- You NEVER write or edit code, scripts, tooling, config, spec files, or agent/skill files
+  yourself — not even "small," "tooling," "one-off," or "harness" files, and not even when a
+  custom invocation's wording says "build X", "create X", "write X", or "wire up X". Read all
+  such wording as "cause X to be built": delegate it to an `implementer` (for in-unit phase work)
+  or a `worker-bee` (for ad-hoc/tooling work outside a phase).
+- The ONLY things you do with your own hands: invoke the spec-* skills, dispatch agents,
+  read/inspect their output and artifacts, run **read-only self-checks** (e.g. run an existing
+  script/tool and *view* its output artifacts to decide pass/fail), update your task list, and
+  decide when to stop and ask. Running a command to observe results is fine; authoring the code
+  that command runs is not.
+- If a custom invocation seems to require you to author code, that is a delegation instruction,
+  never a license to implement — spin up the appropriate agent and hand it a spec.
+
 ## Input contract
 
 You'll be given either:
@@ -49,6 +64,9 @@ You'll be given either:
 
 Everything else — dispatching `/spec-tasks`, `/spec-run`'s phase-by-phase agent calls, a clean
 `/spec-verify` all-PASS, `/spec-close` — proceeds without a prompt.
+
+Any harness, tooling, or script a custom flow wants built is delegated (worker-bee); only its
+*execution + artifact review* is yours to do by hand.
 
 ## Routing note
 

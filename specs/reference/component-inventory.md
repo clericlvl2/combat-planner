@@ -15,9 +15,9 @@ converged prototype (`specs/design/prototype.html`, plus `specs/design/card-prot
 the combatant-card shape). Unit **D** (006 combats-list) shipped and ported its surfaces
 (AppShell/AppHeader/NavSidebar chrome, CombatList family, CombatFormDialog, ConfirmDialog,
 Settings, About); unit **E** (007 combat screen) has now shipped and ported the Combat-screen
-surfaces (CombatHeader, CombatantCard/CombatantRow, NumpadSheet, CombatantForm,
-JumpToTurnButton) — where the target still diverges from what shipped `src/` code renders
-today, that gap is flagged inline instead of silently restated as already-true.
+surfaces (CombatHeader, CombatantCard/CombatantRow, NumpadSheet, CombatantForm) — where the
+target still diverges from what shipped `src/` code renders today, that gap is flagged inline
+instead of silently restated as already-true.
 
 ## Hierarchy
 
@@ -41,7 +41,7 @@ AppShell
     │   ├── CombatHeader → { IconButton×back, chrome-title,
     │   │       Setup: header-add "+" icon button + header-start hold-to-start icon button
     │   │             (desktop) / two FABs — Add + Start (mobile, see "FAB" below),
-    │   │       Active: header-advance/header-jump tonal-circle icon buttons (desktop only) +
+    │   │       Active: header-advance tonal-circle icon button (desktop only) +
     │   │             RoundEscBar sub-bar rendered below the header chrome (both breakpoints),
     │   │       CombatOverflowMenu(`⋮`, trailing) → { Undo, Redo (top, disabled at stack ends),
     │   │       Setup: +Clear · Active: +Add combatant/Restart/Clear } }
@@ -50,10 +50,10 @@ AppShell
     │   │     hold-to-start Start FAB (right-edge, stacked above the Add FAB); desktop swaps
     │   │     both for header-add/header-start icon buttons (see CombatHeader above). Active:
     │   │     FAB(advance, chevron `›` glyph, `aria-label="Advance turn"`) (mobile) /
-    │   │     header-advance icon button (desktop). JumpToTurnButton (Active, TRE — scrolls the
-    │   │     active-turn row into view; shipped in unit 007 as a dedicated
-    │   │     `JumpToTurnButton.svelte`). Cross-reference
-    │   │     [[../capabilities/lifecycle]] for the hold-to-start gesture itself.
+    │   │     header-advance icon button (desktop). Advancing auto-scrolls the active-turn row
+    │   │     into view (wired into the advance flow, [[../capabilities/turns-rounds-escalation]]
+    │   │     TRE-2). Cross-reference [[../capabilities/lifecycle]] for the hold-to-start
+    │   │     gesture itself.
     │   ├── EmptyState
     │   ├── NumpadSheet → { HpSummaryHeader, EntryDisplay, CommitActions, DigitPad,
     │   │                   HpLogSection → HpLogEntryRow }
@@ -63,7 +63,7 @@ AppShell
     │         (NumberField — edit mode or mid-combat add only; no roll/lock control, rolling
     │         stays on the card's Init pill). Add-mode header chrome matches the Setup two-FAB /
     │         header-add+header-start pattern; edit-mode header chrome matches the Active header
-    │         (header-advance/header-jump icon buttons + RoundEscBar). }
+    │         (header-advance icon button + RoundEscBar). }
     ├── Settings → three inline `<section>` groups (Language / Appearance / Data) plus a
     │     headingless About link row, authored directly in `settings/+page.svelte` — no
     │     dedicated SettingsGroup/LanguageSwitcher/ThemeSwitcher/DataActions leaf components
@@ -141,7 +141,7 @@ itself — that capability-level behavior is LIF's job, not this file's.
 |---|---|---|
 | Combats home | create | header "+" icon button |
 | Combat — Setup | Add Combatant (bottom-right) + hold-to-start Start (right-edge, above Add) | header-add "+" + header-start icon buttons |
-| Combat — Active | advance (chevron `›` glyph; disabled at the round wrap boundary — [[../capabilities/turns-rounds-escalation]] TRE-3) | header-advance icon button (+ header-jump for jump-to-turn) |
+| Combat — Active | advance (chevron `›` glyph; disabled at the round wrap boundary — [[../capabilities/turns-rounds-escalation]] TRE-3) | header-advance icon button |
 
 ## Numpad sheet
 
@@ -164,10 +164,11 @@ the right column, unaccented).
 buttons (desktop) — mobile drops these two for the Setup two-FAB stack instead — ·
 `CombatOverflowMenu`(`⋮`, trailing).
 
-**Active:** back (leading) · chrome-title · `header-advance`/`header-jump` tonal-circle icon
-buttons (desktop only; mobile uses the advance FAB + a "Jump to turn" pill instead) ·
-`CombatOverflowMenu`(`⋮`, trailing). Round and escalation-die values render as a `RoundEscBar`
-sub-bar below the header chrome (both breakpoints), not inline in a header center slot.
+**Active:** back (leading) · chrome-title · `header-advance` tonal-circle icon button (desktop
+only; mobile uses the advance FAB instead) · `CombatOverflowMenu`(`⋮`, trailing). Round and
+escalation-die values render as a `RoundEscBar` sub-bar below the header chrome (both
+breakpoints), not inline in a header center slot. Advancing auto-scrolls the newly active row
+into view on both breakpoints ([[../capabilities/turns-rounds-escalation]] TRE-2).
 
 Undo/Redo are **not** separate header icons on either screen state — they're the top two
 `CombatOverflowMenu` items (disabled at their respective stack ends), followed by
@@ -190,7 +191,7 @@ title, description, trailing `⋮` (`CombatRowMenu`: Edit / Delete). Drag handle
 
 | Primitive | Used by |
 |---|---|
-| Button | IconButton, FAB, JumpToTurnButton, DigitPad, CommitActions, DataActions, NavLink, EmptyState CTA, chevron expand button, tonal-circle header icon buttons (header-add/header-start/header-advance/header-jump), ghost digit buttons (Backspace/Clear) |
+| Button | IconButton, FAB, DigitPad, CommitActions, DataActions, NavLink, EmptyState CTA, chevron expand button, tonal-circle header icon buttons (header-add/header-start/header-advance), ghost digit buttons (Backspace/Clear) |
 | Dialog | CombatFormDialog, CombatantForm, NumpadSheet (desktop) |
 | AlertDialog | ConfirmDialog |
 | Sidebar | NavSidebar |

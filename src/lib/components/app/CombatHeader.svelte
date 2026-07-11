@@ -1,7 +1,7 @@
 <!--
   CombatHeader (Component Inventory "Header (Combat screen)") — the one top bar across Setup and
   Active: back · chrome-title (combat.title) · desktop-only tonal roundel icon buttons (Setup:
-  header-add/header-start; Active: header-advance/header-jump) — mobile uses the FAB stack in
+  header-add/header-start; Active: header-advance) — mobile uses the FAB stack in
   +page.svelte instead, PLT-3 · overflow ⋮ menu (Undo ↶ / Redo ↷ at top, each disabled at its
   stack end; Setup → Clear; Active → Add, Restart, Clear). Active renders a RoundEscBar sub-bar
   (uppercase label / tabular-value pairs) below the header chrome, still tap-to-edit via the same
@@ -32,7 +32,6 @@
 		onAdd,
 		onStart,
 		onAdvance,
-		onJump,
 		canAdvance = false,
 	}: {
 		combat: Combat;
@@ -40,7 +39,6 @@
 		onAdd: () => void;
 		onStart: () => void;
 		onAdvance?: () => void;
-		onJump?: () => void;
 		canAdvance?: boolean;
 	} = $props();
 
@@ -55,7 +53,6 @@
 	const Overflow = chromeIcon.overflow;
 	const Add = chromeIcon.add;
 	const Advance = chromeIcon.advance;
-	const Jump = chromeIcon.jump;
 
 	// round editor
 	let roundOpen = $state(false);
@@ -117,8 +114,8 @@
 			</Button>
 		{/if}
 	{:else}
-		<!-- Active — desktop-only header-advance/header-jump tonal roundels (mirrors the Setup
-		     header-add/header-start pattern above); mobile keeps the Advance FAB + Jump pill. -->
+		<!-- Active — desktop-only header-advance tonal roundel (mirrors the Setup
+		     header-add/header-start pattern above); mobile keeps the Advance FAB. -->
 		<Button
 			variant="ghost"
 			size="icon"
@@ -129,16 +126,6 @@
 			onclick={onAdvance}
 		>
 			<Advance class="size-5" />
-		</Button>
-		<Button
-			variant="ghost"
-			size="icon"
-			class="hidden min-h-11 min-w-11 rounded-full bg-foreground/10 lg:inline-flex"
-			aria-label={m['active.jumpToTurn']()}
-			title={m['active.jumpToTurn']()}
-			onclick={onJump}
-		>
-			<Jump class="size-5" />
 		</Button>
 	{/if}
 

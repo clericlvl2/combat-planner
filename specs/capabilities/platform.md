@@ -42,17 +42,16 @@ Mobile: swipe-right reveals a sidebar with nav links. Tablet: header with burger
 header with inline icon-button navigation. Destinations: Combats, Settings, About.
 
 The create action follows the same per-breakpoint split as nav wherever a create-FAB exists: a
-header "+" icon button on desktop, a FAB on mobile. Combat — Active's advance-turn and
-jump-to-turn controls follow the same desktop swap: on desktop (≥1024px) the Active header shows
-`header-advance`/`header-jump` tonal roundel icon buttons; the Advance FAB and the Jump pill are
-hidden at that breakpoint (`lg:hidden`). Both the FAB/pill pair and the header roundels remain
-mobile-only / desktop-only respectively — never both at once.
+header "+" icon button on desktop, a FAB on mobile. Combat — Active's advance-turn control
+follows the same desktop swap: on desktop (≥1024px) the Active header shows a `header-advance`
+tonal roundel icon button; the Advance FAB is hidden at that breakpoint (`lg:hidden`). The FAB
+and the header roundel remain mobile-only / desktop-only respectively — never both at once.
 
 Combat screen chrome per breakpoint: Setup header is back + title + `⋮`, with two floating Add /
 hold-to-start Start controls (FABs on mobile, icon buttons on desktop). Active header is back +
 title + `⋮`, plus a round/escalation-die sub-bar rendered below the header chrome; on desktop
-(≥1024px) the Active header also carries `header-advance`/`header-jump` roundel icon buttons,
-with the mobile Advance FAB and Jump pill hidden at that breakpoint. Exact control placement:
+(≥1024px) the Active header also carries a `header-advance` roundel icon button, with the mobile
+Advance FAB hidden at that breakpoint. Exact control placement:
 [[../reference/component-inventory]].
 
 **AC:**
@@ -61,9 +60,9 @@ with the mobile Advance FAB and Jump pill hidden at that breakpoint. Exact contr
   icon carrying an `aria-label` and the current destination marked); both expose the same three
   destinations.
 - Wherever a create-FAB exists, desktop shows an equivalent header "+" icon button instead.
-- On desktop (≥1024px), Combat — Active shows header Advance/Jump roundel icon buttons, and the
-  mobile Advance FAB and Jump pill are hidden (`lg:hidden`); both the FAB/pill pair and the
-  header roundels remain present on mobile.
+- On desktop (≥1024px), Combat — Active shows a header Advance roundel icon button, and the
+  mobile Advance FAB is hidden (`lg:hidden`); both the FAB and the header roundel remain present
+  on mobile.
 
 ## PLT-4 — Installable PWA + update toast
 

@@ -22,9 +22,7 @@ increments the round by 1, **and** increments the escalation die by 1 (clamped a
 advance within the same round changes neither round nor escalation. Dead combatants (0 HP or
 below) are **not** skipped. Advance is the primary Active-state action — placed as a bottom-right
 floating button in the thumb zone on mobile (placement detail: [[../reference/component-inventory]]).
-Each Advance auto-scrolls the newly active combatant's row into view; if the DM has scrolled away
-so the active row is off-screen, an on-demand floating "jump to turn" button appears (visible only
-while Active **and** the active row is off-screen) to scroll it back into view on tap.
+Each Advance auto-scrolls the newly active combatant's row into view.
 
 **AC:**
 - Advancing to a non-last combatant changes only `activeCombatantId`.
@@ -32,8 +30,6 @@ while Active **and** the active row is off-screen) to scroll it back into view o
   escalation `+= 1` (capped at 6) in the same step.
 - A dead combatant (HP ≤ 0) still receives its turn in sorted order.
 - Advancing the turn scrolls the active combatant's row into view automatically.
-- A "jump to turn" control appears only when Active and the active row is scrolled off-screen;
-  tapping it scrolls the active row back into view; it is otherwise hidden.
 
 ## TRE-3 — Round-99 wrap block
 

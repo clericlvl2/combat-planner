@@ -42,7 +42,7 @@ text.
 | B-019 | App-data export/import — all-combats + single-combat, fail-safe import, shared transforms (flow F5). Deferred past v1: unbundled from M5, descoped from the prototype + Settings Data in unit 004 (round 2); `import-export.md` / CLS-8 / CLS-1 to reconcile at close-out. | IMP | L | v2 | — |
 | B-020 | Task spec scoping — refactoring/rn units hit 150k+ tokens; doc guidance to keep specs/changes/NNN chunks ≤120k so agents don't overflow. Affects implementer dispatch & cost. | INFRA | M | idea | — |
 | B-021 | App headers unified — Combat, Combats List, Settings screens use inconsistent header styles/spacing; standardize layout & visuals per design-system. | DESIGN | M | idea | — |
-| B-022 | Remove "Jump to Turn" button — Combat screen initiative/turn model doesn't use it; dead UI. | CBT | S | idea | — |
+| B-022 | Remove "Jump to Turn" button — Combat screen initiative/turn model doesn't use it; dead UI. | CBT | S | done | `specs/archive/011-remove-jump-to-turn/` |
 | B-023 | Smooth animations — interactive aspects (tap, expand, damage entry, condition toggle, etc.) lack motion; add consistent transition library. | DESIGN | L | idea | — |
 | B-024 | First-launch UX — app opening experience: onboarding flow, hints, tutorial or zero-state guidance. Brainstorm before spec. | DESIGN | M | idea | — |
 | B-025 | Update credentials — About screen credits/attribution needs current team/sources. | SET | S | idea | — |

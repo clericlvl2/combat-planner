@@ -36,7 +36,6 @@ combat/
   CombatantList.svelte       live-sorted roster (§7)
   FAB.svelte                 shared add/advance/create (§7)
   StartBar.svelte            pinned Start bar, Setup (§7)
-  JumpToTurnButton.svelte    scroll active row into view (§7)
 combatant/
   CombatantRow.svelte        compact ⇄ expanded (§8)
   TypeBadge.svelte           type color+icon (§8)

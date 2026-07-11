@@ -5,9 +5,9 @@
   Setup ⇄ Active is gated by showRoundAndEscalation. The page owns the single shared NumpadSheet +
   add/edit forms, the Setup/Active floating controls (mobile-only FAB stack; desktop ≥1024px
   swaps both states' FABs for CombatHeader's icon-roundel pair — header-add/header-start in
-  Setup, header-advance/header-jump in Active, PLT-3), and the Active-only JumpToTurnButton
-  (view-navigation only, mobile-only — scrolls the active-turn card into view via the
-  `data-active` marker CombatantRow's Card already carries); rows/header emit intent only.
+  Setup, header-advance in Active, PLT-3), and the auto-scroll-on-advance behavior (TRE-2) that
+  scrolls the newly active row into view via the `data-active` marker CombatantRow's Card already
+  carries; rows/header emit intent only.
 -->
 <script lang="ts">
     import {goto} from '$app/navigation';
@@ -16,7 +16,6 @@
     import CombatantRow from '$lib/components/app/CombatantRow.svelte';
     import CombatHeader from '$lib/components/app/CombatHeader.svelte';
     import {makeController} from '$lib/components/app/controller';
-    import JumpToTurnButton from '$lib/components/app/JumpToTurnButton.svelte';
     import NumpadSheet from '$lib/components/app/NumpadSheet.svelte';
     import {Button} from '$lib/components/ui/button';
     import {m} from '$lib/i18n';
@@ -37,13 +36,15 @@
     const Add = chromeIcon.add;
     const Advance = chromeIcon.advance;
 
-    // Active-only view-navigation helper (JumpToTurnButton) — scrolls the active-turn card into
-    // view; no store/controller intent, CombatantRow already marks its Card `data-active`.
+    // Auto-scroll-on-advance (TRE-2) — scrolls the newly active row into view on every advance
+    // (including the round-wrap advance); no store/controller intent, CombatantRow already marks
+    // its Card `data-active`.
     let mainEl = $state<HTMLElement | null>(null);
 
-    function jumpToActiveTurn() {
+    $effect(() => {
+        if (!combat?.activeCombatantId) return;
         mainEl?.querySelector('[data-active="true"]')?.scrollIntoView({behavior: 'smooth', block: 'center'});
-    }
+    });
 
     // page-owned shared surfaces
     let numpadId = $state<string | null>(null);
@@ -153,7 +154,6 @@
                 onAdd={() => (addOpen = true)}
                 onStart={controller.start}
                 onAdvance={controller.advance}
-                onJump={jumpToActiveTurn}
                 canAdvance={canAdv}
         />
 
@@ -177,9 +177,8 @@
         </main>
 
         {#if active}
-            <!-- Active: Advance FAB (disabled at the r99 → r100 wrap) + Jump-to-turn pill — mobile
-                 only (PLT-3); desktop (≥1024px) swaps both for CombatHeader's header-advance/
-                 header-jump icon roundels. -->
+            <!-- Active: Advance FAB (disabled at the r99 → r100 wrap) — mobile only (PLT-3);
+                 desktop (≥1024px) swaps it for CombatHeader's header-advance icon roundel. -->
             <Button
                     class="fixed right-4 bottom-4 size-14 rounded-full shadow-lg lg:hidden"
                     disabled={!canAdv}
@@ -188,7 +187,6 @@
             >
                 <Advance class="size-6"/>
             </Button>
-            <JumpToTurnButton onclick={jumpToActiveTurn}/>
         {:else}
             <!-- Setup: mobile FAB stack (Add always; Start once the roster isn't empty), matching
                  the desktop header-add/header-start pair in CombatHeader (PLT-3) — Start FAB

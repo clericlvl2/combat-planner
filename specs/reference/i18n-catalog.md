@@ -13,7 +13,7 @@ nav.*          top-level destinations
 combats.*      Combats home — list, create/import, row menu, empty
 combat.*       Combat header (both states) — back, round, escalation, undo/redo, ⋮
 setup.*        Setup body — add, start, empty
-active.*       Active body — advance, jump-to-turn
+active.*       Active body — advance
 numpad.*       HP numpad sheet — commits, pad, summary, history
 conditions.*   the 12 condition display labels + overflow chip
 health.*       the 4 health-status labels (label backup for the bar)
@@ -73,7 +73,6 @@ a11y.*         accessible labels for controls
 | `setup.empty.title` | No combatants yet |
 | `setup.empty.cta` | Add your first combatant |
 | `active.advance` | Next turn |
-| `active.jumpToTurn` | Jump to turn |
 
 ## numpad.* — HP numpad sheet
 
@@ -262,7 +261,6 @@ All numeric bounds injected from [[limits]], never written as literals here.
 | `a11y.redo` | Redo | |
 | `a11y.start` | Start combat | |
 | `a11y.advance` | Advance to next turn | |
-| `a11y.jumpToTurn` | Jump to the active turn | |
 | `a11y.editRound` | Edit round | |
 | `a11y.escalation` | Escalation die, currently {n} | `{n}` = 0–6 |
 | `a11y.initCell.roll` | Roll initiative for {name} | `{name}` |

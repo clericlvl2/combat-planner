@@ -21,11 +21,11 @@ test('add mode renders blank defaults: empty name, enemy type preselected, no nu
 	await expect
 		.element(screen.getByRole('radio', { name: m['forms.type.enemy']() }))
 		.toHaveAttribute('aria-checked', 'true');
-	await expect.element(screen.getByLabelText(m['forms.field.maxHp']())).toHaveValue(null);
-	await expect.element(screen.getByLabelText(m['forms.field.ac']())).toHaveValue(null);
-	await expect.element(screen.getByLabelText(m['forms.field.pd']())).toHaveValue(null);
-	await expect.element(screen.getByLabelText(m['forms.field.md']())).toHaveValue(null);
-	await expect.element(screen.getByLabelText(m['forms.field.initBonus']())).toHaveValue(null);
+	await expect.element(screen.getByLabelText(m['forms.field.maxHp']())).toHaveValue('');
+	await expect.element(screen.getByLabelText(m['forms.field.ac']())).toHaveValue('');
+	await expect.element(screen.getByLabelText(m['forms.field.pd']())).toHaveValue('');
+	await expect.element(screen.getByLabelText(m['forms.field.md']())).toHaveValue('');
+	await expect.element(screen.getByLabelText(m['forms.field.initBonus']())).toHaveValue('');
 	await expect.element(screen.getByLabelText(m['forms.field.note']())).toHaveValue('');
 });
 
@@ -49,7 +49,7 @@ test('numeric fields clamp to their NumberField min/max on commit', async () => 
 	// Move focus off the field to fire the blur/change commit handler.
 	await screen.getByLabelText(m['forms.field.name']()).click();
 
-	await expect.element(maxHpInput).toHaveValue(1);
+	await expect.element(maxHpInput).toHaveValue('1');
 	await expect.element(screen.getByText(m['errors.clamp']({ min: 1, max: 999 }))).toBeVisible();
 	expect(onSubmit).not.toHaveBeenCalled();
 });

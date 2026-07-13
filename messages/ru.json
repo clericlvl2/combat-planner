@@ -174,5 +174,7 @@
 	"a11y.healthStatus": "{name}: {status}, {cur} of {max} HP",
 	"a11y.colorTag": "Color tag: {color}",
 	"a11y.combatRowMenu": "Actions for {title}",
-	"a11y.reorder": "Reorder {title}"
+	"a11y.reorder": "Reorder {title}",
+	"a11y.numField.decrease": "Уменьшить",
+	"a11y.numField.increase": "Увеличить"
 }

@@ -277,6 +277,8 @@ All numeric bounds injected from [[limits]], never written as literals here.
 | `a11y.colorTag` | Color tag: {color} | tag not color-alone |
 | `a11y.combatRowMenu` | Actions for {title} | combat row `⋮` |
 | `a11y.reorder` | Reorder {title} | drag handle |
+| `a11y.numField.decrease` | Decrease | NumberField `−` stepper button |
+| `a11y.numField.increase` | Increase | NumberField `+` stepper button |
 
 ## Open gaps (flagged, not filled)
 

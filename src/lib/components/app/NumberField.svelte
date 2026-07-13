@@ -3,10 +3,12 @@
   on commit and surfaces the inline clamp hint (UX §8). Clamp uses the domain `clamp` (single source
   of truth — clamp.ts); the store re-clamps authoritatively on mutate, so this is forgiving UX only.
   Styled to the `.numfield` recipe (specs/design/prototype.html): bordered/rounded stepper shell
-  around the value input, Decrease → value → Increase order. The stepper buttons carry no
-  aria-label (no Decrease/Increase message keys exist yet — messages/*.json is out of scope for
-  this phase); their accessible name comes from their own visible +/− glyph text instead, which
-  also keeps `getByLabelText(fieldLabel)` queries resolving to the input alone, unchanged.
+  around the value input, Decrease → value → Increase order. The value input is `type="text"`
+  (not `type="number"`) so no native browser spinner arrows render, and typed entry is sanitized
+  on `oninput` to digits + a single leading `-` — this keeps a lone `-`/`1e`/`1.` from blanking the
+  field, and exposes a minus key on mobile (`inputmode="text"`) for negative-capable fields. The
+  stepper buttons carry `aria-label`s from `a11y.numField.decrease`/`a11y.numField.increase`,
+  which does not collide with `getByLabelText(fieldLabel)` resolving to the value input alone.
 -->
 <script lang="ts">
 	import { Input } from '$lib/components/ui/input';
@@ -40,18 +42,36 @@
 	const stepBtnClass =
 		'flex min-h-11 w-11 shrink-0 items-center justify-center text-lg text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:z-10 focus-visible:ring-3 focus-visible:ring-ring/50';
 
-	function capDigits(e: Event) {
+	// Allowed typed character set: digits + a single leading '-'. Keeps intermediate-invalid
+	// states (a lone '-', trailing letters) from blanking the field mid-entry.
+	function sanitize(raw: string): string {
+		const sign = raw.startsWith('-') ? '-' : '';
+		const digits = raw.replace(/-/g, '').replace(/[^0-9]/g, '');
+		return sign + digits;
+	}
+
+	// Typed entry (oninput): sanitize to the allowed set, then cap to digitCap so a keyboard can't
+	// type more digits than the range needs.
+	function onTypedInput(e: Event) {
 		const el = e.currentTarget as HTMLInputElement;
-		const digits = el.value.replace('-', '');
-		if (digits.length > digitCap) {
-			const sign = el.value.startsWith('-') ? '-' : '';
-			el.value = sign + digits.slice(0, digitCap);
-		}
+		const sanitized = sanitize(el.value);
+		const digits = sanitized.replace('-', '');
+		const sign = sanitized.startsWith('-') ? '-' : '';
+		el.value = digits.length > digitCap ? sign + digits.slice(0, digitCap) : sanitized;
+	}
+
+	// Paste / programmatic-set path (B-013): sanitize but deliberately bypass digitCap so an
+	// overflowing value survives to commit()/clamp() instead of being truncated pre-commit.
+	function onPaste(e: ClipboardEvent) {
+		e.preventDefault();
+		const el = e.currentTarget as HTMLInputElement;
+		const pasted = e.clipboardData?.getData('text') ?? '';
+		el.value = sanitize(el.value.slice(0, el.selectionStart ?? 0) + pasted + el.value.slice(el.selectionEnd ?? el.value.length));
 	}
 
 	function commit(e: Event) {
 		const raw = (e.currentTarget as HTMLInputElement).value.trim();
-		if (raw === '') {
+		if (raw === '' || raw === '-') {
 			value = null;
 			clamped = false;
 			return;
@@ -75,25 +95,38 @@
 	<div
 		class="focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50 flex items-stretch overflow-hidden rounded-md border border-border bg-secondary"
 	>
-		<button type="button" class={[stepBtnClass, 'border-r border-border']} onclick={() => step(-1)}>
+		<button
+			type="button"
+			class={[stepBtnClass, 'border-r border-border']}
+			aria-label={m['a11y.numField.decrease']()}
+			onclick={() => step(-1)}
+		>
 			−
 		</button>
 		<Input
 			{id}
-			type="number"
-			inputmode="numeric"
+			type="text"
+			inputmode="text"
+			role="spinbutton"
+			aria-valuemin={min}
+			aria-valuemax={max}
+			aria-valuenow={value ?? undefined}
 			class="min-h-11 flex-1 rounded-none border-0 bg-transparent text-center tabular-nums shadow-none focus-visible:ring-0"
 			value={value ?? ''}
-			{min}
-			{max}
 			{placeholder}
 			{required}
 			aria-invalid={clamped}
 			onchange={commit}
 			onblur={commit}
-			oninput={capDigits}
+			oninput={onTypedInput}
+			onpaste={onPaste}
 		/>
-		<button type="button" class={[stepBtnClass, 'border-l border-border']} onclick={() => step(1)}>
+		<button
+			type="button"
+			class={[stepBtnClass, 'border-l border-border']}
+			aria-label={m['a11y.numField.increase']()}
+			onclick={() => step(1)}
+		>
 			+
 		</button>
 	</div>

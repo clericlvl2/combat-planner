@@ -101,6 +101,13 @@ itself carries no status information a user depends on).
 - Both themes meet AA contrast for text and status colors, including the reverse/alarm HP bar.
   All three NumpadSheet commit buttons (Deal Damage, Restore HP, Set Temp HP) pass AA in both
   themes. ([[hp]] HP-3)
+- Known exception, tracked not silently accepted: a token-relocation-only pass (unit 014)
+  recomputed AA from actual hex and surfaced pre-existing light-theme gaps that predate this
+  requirement's prior "both themes meet AA" claim — `--text-faint` (both themes), the
+  `--health-wounded`/`--health-bloodied` bands, and the `blue`/`orange`/`green`/`neutral`/`teal`
+  combat swatches when rendered as small normal text (SearchField, NumpadSheet HP-log, condition
+  chips). No token value changed to fix these; deferred to backlog **B-028** as a dedicated
+  contrast pass.
 
 ## PLT-6 — Privacy: no telemetry
 

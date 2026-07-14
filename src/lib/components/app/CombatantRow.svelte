@@ -106,7 +106,7 @@
 
 <Card
 	class={[
-		'overflow-hidden rounded-[12px] border border-border p-0 ring-0',
+		'overflow-hidden rounded-[12px] border-[length:var(--card-border)] border-border p-0 ring-0',
 		active && 'border-ring ring-2 ring-ring',
 	]}
 	data-active={active}
@@ -118,9 +118,9 @@
 			{/each}
 		</div>
 
-		<div class="min-w-0 flex-1 p-3">
+		<div class="min-w-0 flex-1 p-[var(--card-pad)]">
 			<Collapsible bind:open>
-				<div class="flex flex-col gap-2">
+				<div class="flex flex-col gap-[var(--card-gap)]">
 					<!-- Row 1: active-turn dot + name + expand chevron + overflow menu -->
 					<div class="flex items-center gap-2">
 						{#if active}
@@ -173,11 +173,11 @@
 							aria-label={hpLabel}
 							onclick={() => onOpenNumpad(combatant.id)}
 						>
-							<span class="relative text-lg leading-none font-semibold">
+							<span class="relative text-[length:var(--hp-size)] leading-none font-semibold">
 								{combatant.currentHp}/{combatant.maxHp}
 								{#if combatant.tempHp > 0}
 									<span
-										class="absolute -top-1.5 -right-5 inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-combat-blue text-xs leading-none font-medium text-white"
+										class="absolute -top-1.5 -right-5 inline-flex h-4 w-[var(--badge-width)] shrink-0 items-center justify-center rounded-full bg-combat-blue text-xs leading-none font-medium text-white"
 									>
 										{combatant.tempHp}
 									</span>

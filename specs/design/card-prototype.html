@@ -12,6 +12,8 @@
   .cbt-card system (card-local tuning vars) and renders 16 states x 2 themes (plus a wide desktop check section).
 -->
 <style>
+  @import "tokens.css";
+
   /* ---------------------------------------------------------------------------
    * Reset / base (copied verbatim from prototype.html)
    * ------------------------------------------------------------------------- */
@@ -37,106 +39,10 @@
   }
 
   /* ---------------------------------------------------------------------------
-   * Global non-color tokens (copied verbatim from prototype.html)
+   * Shared non-color scales + theme palettes come from tokens.css (@import
+   * above), keyed by [data-theme="dark"] / [data-theme="light"].
    * ------------------------------------------------------------------------- */
-  :root {
-    --radius: 10px;
-    --radius-sm: 6px;
-    --radius-lg: 14px;
-
-    --space-1: 4px;
-    --space-2: 8px;
-    --space-3: 12px;
-    --space-4: 16px;
-    --space-5: 24px;
-    --space-6: 32px;
-
-    --font-xs: 11px;
-    --font-sm: 13px;
-    --font-md: 15px;
-    --font-lg: 18px;
-    --font-xl: 22px;
-
-    --touch-min: 44px;
-  }
-
-  /* ---------------------------------------------------------------------------
-   * Theme palettes (copied verbatim from prototype.html). Dark is primary.
-   * ------------------------------------------------------------------------- */
-  .theme-dark {
-    color-scheme: dark;
-
-    --bg: #101317;
-    --surface: #171b21;
-    --surface-2: #1f242c;
-    --surface-3: #272d37;
-    --text: #eef1f5;
-    --text-muted: #a3adba;
-    --text-faint: #6b7683;
-    --border: #2c333d;
-    --border-strong: #3a424e;
-    --primary: #e6e9ee;
-    --primary-text: #16191f;
-    --ring: #7c8794;
-
-    --type-pc: #34d399;
-    --type-enemy: #f87171;
-    --type-ally: #60a5fa;
-
-    --health-full: #34d399;
-    --health-wounded: #fbbf24;
-    --health-bloodied: #fb923c;
-    --health-dead: #ef4444;
-
-    --combat-neutral: #94a3b8;
-    --combat-red: #f87171;
-    --combat-orange: #fb923c;
-    --combat-amber: #fbbf24;
-    --combat-green: #34d399;
-    --combat-teal: #2dd4bf;
-    --combat-blue: #38bdf8;
-    --combat-violet: #a78bfa;
-
-    --on-semantic: #0b0d10;
-  }
-
-  .theme-light {
-    color-scheme: light;
-
-    --bg: #f4f5f7;
-    --surface: #ffffff;
-    --surface-2: #f0f2f5;
-    --surface-3: #e6e9ee;
-    --text: #16191f;
-    --text-muted: #565f6b;
-    --text-faint: #8b94a1;
-    --border: #dde1e7;
-    --border-strong: #c4cad3;
-    --primary: #1f242c;
-    --primary-text: #f7f8fa;
-    --ring: #7c8794;
-
-    --type-pc: #059669;
-    --type-enemy: #dc2626;
-    --type-ally: #2563eb;
-
-    --health-full: #0b815a;
-    --health-wounded: #a76b07;
-    --health-bloodied: #c75505;
-    --health-dead: #b91c1c;
-
-    --combat-neutral: #64748b;
-    --combat-red: #cb3a3a;
-    --combat-orange: #bb5611;
-    --combat-amber: #9d6507;
-    --combat-green: #0b8457;
-    --combat-teal: #0e8174;
-    --combat-blue: #0b7caf;
-    --combat-violet: #7d53dd;
-
-    --on-semantic: #ffffff;
-  }
-  .theme-light .chip.init-pill {
+  [data-theme="light"] .chip.init-pill {
     background: #ffffff;
   }
 
@@ -286,11 +192,6 @@
    * shared token (--surface, --border, --text, --font-, --space-, --radius families).
    * ------------------------------------------------------------------------- */
   .cbt-card {
-    --card-pad: 14px;
-    --card-gap: var(--space-2);
-    --card-border: 1px;
-    --hp-size: 19px;
-
     position: relative;
     display: grid;
     grid-template-columns: auto 1fr;
@@ -333,7 +234,6 @@
     font-variant-numeric: tabular-nums;
   }
   .hp-temp-badge {
-    --badge-width: 16px;
     position: absolute;
     top: -6px;
     right: calc(-1 * var(--badge-width) - 4px);
@@ -491,7 +391,7 @@
 <div class="theme-pair">
   <div class="theme-cell">
     <span class="theme-label">Dark</span>
-    <div class="theme-cell__surface theme-dark">
+    <div class="theme-cell__surface" data-theme="dark">
 
       <div class="card-slot">
         <span class="card-slot__caption">1. PC · healthy · collapsed</span>
@@ -578,7 +478,7 @@
 
   <div class="theme-cell">
     <span class="theme-label">Light</span>
-    <div class="theme-cell__surface theme-light">
+    <div class="theme-cell__surface" data-theme="light">
 
       <div class="card-slot">
         <span class="card-slot__caption">1. PC · healthy · collapsed</span>
@@ -673,7 +573,7 @@
 <div class="theme-pair">
   <div class="theme-cell">
     <span class="theme-label">Dark</span>
-    <div class="theme-cell__surface theme-dark theme-cell__surface--wide">
+    <div class="theme-cell__surface theme-cell__surface--wide" data-theme="dark">
 
       <div class="card-slot">
         <span class="card-slot__caption">2. PC · healthy · expanded</span>
@@ -695,7 +595,7 @@
 
   <div class="theme-cell">
     <span class="theme-label">Light</span>
-    <div class="theme-cell__surface theme-light theme-cell__surface--wide">
+    <div class="theme-cell__surface theme-cell__surface--wide" data-theme="light">
 
       <div class="card-slot">
         <span class="card-slot__caption">2. PC · healthy · expanded</span>
@@ -724,7 +624,7 @@
 <div class="theme-pair">
   <div class="theme-cell">
     <span class="theme-label">Dark</span>
-    <div class="theme-cell__surface theme-dark">
+    <div class="theme-cell__surface" data-theme="dark">
 
       <div class="card-slot">
         <span class="card-slot__caption">A. Collapsed, no note</span>
@@ -756,7 +656,7 @@
 
   <div class="theme-cell">
     <span class="theme-label">Light</span>
-    <div class="theme-cell__surface theme-light">
+    <div class="theme-cell__surface" data-theme="light">
 
       <div class="card-slot">
         <span class="card-slot__caption">A. Collapsed, no note</span>

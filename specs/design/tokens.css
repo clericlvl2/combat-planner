@@ -1,0 +1,127 @@
+/* ---------------------------------------------------------------------------
+ * Combat Planner — shared design tokens (single source of truth)
+ * Raw custom properties only — no @import "tailwindcss", no @theme, no shadcn
+ * aliases. Values copied verbatim from specs/design/prototype.html and
+ * specs/design/card-prototype.html. Consumed via `@import` by prototype.html,
+ * card-prototype.html, and src/routes/layout.css.
+ * ------------------------------------------------------------------------- */
+
+:root {
+	/* Radius scale */
+	--radius: 10px;
+	--radius-sm: 6px;
+	--radius-lg: 14px;
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-xl: 18px;
+
+	/* Spacing scale */
+	--space-1: 4px;
+	--space-2: 8px;
+	--space-3: 12px;
+	--space-4: 16px;
+	--space-5: 24px;
+	--space-6: 32px;
+
+	/* Type scale */
+	--font-xs: 11px;
+	--font-sm: 13px;
+	--font-md: 15px;
+	--font-lg: 18px;
+	--font-xl: 22px;
+
+	--touch-min: 44px;
+
+	/* Combatant card component dims */
+	/* Exception (change.md-documented): synced to shipped CombatantRow render, not prototype's prior 14px */
+	--card-pad: 12px;
+	--card-gap: var(--space-2);
+	--card-border: 1px;
+	/* Exception (change.md-documented): synced to shipped CombatantRow render, not prototype's prior 19px */
+	--hp-size: 18px;
+	--badge-width: 16px;
+}
+
+/* ---------------------------------------------------------------------------
+ * Theme palettes. Dark is primary. Neutral chrome + semantic-only color.
+ * ------------------------------------------------------------------------- */
+[data-theme="dark"] {
+	color-scheme: dark;
+
+	/* Neutral chrome */
+	--bg: #101317;
+	--surface: #171b21;
+	--surface-2: #1f242c;
+	--surface-3: #272d37;
+	--text: #eef1f5;
+	--text-muted: #a3adba;
+	--text-faint: #6b7683;
+	--border: #2c333d;
+	--border-strong: #3a424e;
+	--primary: #e6e9ee;
+	--primary-text: #16191f;
+	--ring: #7c8794;
+
+	/* Semantic — combatant type (dark ~ Tailwind -400) */
+	--type-pc: #34d399;
+	--type-enemy: #f87171;
+	--type-ally: #60a5fa;
+
+	/* Semantic — health bands */
+	--health-full: #34d399;
+	--health-wounded: #fbbf24;
+	--health-bloodied: #fb923c;
+	--health-dead: #ef4444;
+
+	/* Semantic — 8 combat color-tag swatches (ADR-012, dark ~ -400) */
+	--combat-neutral: #94a3b8;
+	--combat-red: #f87171;
+	--combat-orange: #fb923c;
+	--combat-amber: #fbbf24;
+	--combat-green: #34d399;
+	--combat-teal: #2dd4bf;
+	--combat-blue: #38bdf8;
+	--combat-violet: #a78bfa;
+
+	--on-semantic: #0b0d10;
+}
+
+[data-theme="light"] {
+	color-scheme: light;
+
+	/* Neutral chrome */
+	--bg: #f4f5f7;
+	--surface: #ffffff;
+	--surface-2: #f0f2f5;
+	--surface-3: #e6e9ee;
+	--text: #16191f;
+	--text-muted: #565f6b;
+	--text-faint: #8b94a1;
+	--border: #dde1e7;
+	--border-strong: #c4cad3;
+	--primary: #1f242c;
+	--primary-text: #f7f8fa;
+	--ring: #7c8794;
+
+	/* Semantic — combatant type (light ~ -500/-600) */
+	--type-pc: #059669;
+	--type-enemy: #dc2626;
+	--type-ally: #2563eb;
+
+	/* Semantic — health bands */
+	--health-full: #0b815a;
+	--health-wounded: #a76b07;
+	--health-bloodied: #c75505;
+	--health-dead: #b91c1c;
+
+	/* Semantic — 8 combat color-tag swatches (ADR-012) */
+	--combat-neutral: #64748b;
+	--combat-red: #cb3a3a;
+	--combat-orange: #bb5611;
+	--combat-amber: #9d6507;
+	--combat-green: #0b8457;
+	--combat-teal: #0e8174;
+	--combat-blue: #0b7caf;
+	--combat-violet: #7d53dd;
+
+	--on-semantic: #ffffff;
+}

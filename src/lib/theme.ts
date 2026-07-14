@@ -1,9 +1,9 @@
 /**
- * Theme resolve/apply (SET-2) — single owner of "toggle the `dark` class on
- * `document.documentElement`" and the `theme-color` meta. Called from the root
- * `+layout.svelte` on mount and reactively whenever `store.settings.theme`
- * changes, so the resolved theme is correct on every route/reload — not just
- * on the Settings page (theme-boot bug #1).
+ * Theme resolve/apply (SET-2) — single owner of setting the `data-theme`
+ * attribute on `document.documentElement` and the `theme-color` meta. Called
+ * from the root `+layout.svelte` on mount and reactively whenever
+ * `store.settings.theme` changes, so the resolved theme is correct on every
+ * route/reload — not just on the Settings page (theme-boot bug #1).
  */
 import type { Theme } from '$lib/db/types';
 
@@ -16,7 +16,7 @@ function setThemeColorMeta(isDark: boolean) {
 }
 
 function applyIsDark(isDark: boolean) {
-	document.documentElement.classList.toggle('dark', isDark);
+	document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
 	setThemeColorMeta(isDark);
 }
 

@@ -1,141 +1,27 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "../../specs/design/tokens.css";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /* ---------------------------------------------------------------------------
  * Token layer (ADR-008 / ADR-012). Theme is fully CSS-variable driven so dark/
  * light, the combatant-type colors, the health/alarm bar, and the 8 combat
  * color-tag swatches are centralized and contrast-checked in one place.
- * Source of truth: specs/design/prototype.html (:root + .theme-dark /
- * .theme-light blocks, and its "Contrast note (WCAG-AA)" table). Values below
- * are copied verbatim from the approved prototype — see PLT-5.
+ * Source of truth for every raw token (palette + scales + component dims):
+ * specs/design/tokens.css, imported above — no value is re-typed here. This
+ * file only maps those raw tokens onto the shadcn semantic aliases and the
+ * Tailwind `@theme inline` utility layer. See PLT-5 for the contrast contract.
  * ------------------------------------------------------------------------- */
 
 :root {
-	/* Non-color scales shared by both themes (prototype :root). */
-	--radius: 10px;
-
-	--font-xs: 11px;
-	--font-sm: 13px;
-	--font-md: 15px;
-	--font-lg: 18px;
-	--font-xl: 22px;
-
-	--space-1: 4px;
-	--space-2: 8px;
-	--space-3: 12px;
-	--space-4: 16px;
-	--space-5: 24px;
-	--space-6: 32px;
-
 	--shadow-design-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
 	--shadow-design-md: 0 6px 16px rgba(0, 0, 0, 0.4);
 
-	/* Neutral chrome (prototype .theme-light) */
-	--bg: #f4f5f7;
-	--surface: #ffffff;
-	--surface-2: #f0f2f5;
-	--surface-3: #e6e9ee;
-	--text: #16191f;
-	--text-muted: #565f6b;
-	--text-faint: #8b94a1;
-	--border: #dde1e7;
-	--border-strong: #c4cad3;
-	--primary: #1f242c;
-	--primary-text: #f7f8fa;
-	--ring: #7c8794;
-
-	/* Combatant type colors (ADR-008) — light. Color-only leading-edge stripes (icon dropped). */
-	--type-pc: #059669; /* PC = green */
-	--type-enemy: #dc2626; /* enemy = red */
-	--type-ally: #2563eb; /* ally = blue */
-
-	/* Health bar bands (Rules §4) — light. `dead` = reverse/alarm fill. */
-	--health-full: #0b815a;
-	--health-wounded: #a76b07;
-	--health-bloodied: #c75505;
-	--health-dead: #b91c1c;
-
-	/* Combat color-tag swatches (ADR-012) — 8 keys, light (≈ Tailwind -500). */
-	--combat-neutral: #64748b; /* default */
-	--combat-red: #cb3a3a;
-	--combat-orange: #bb5611;
-	--combat-amber: #9d6507;
-	--combat-green: #0b8457;
-	--combat-teal: #0e8174;
-	--combat-blue: #0b7caf;
-	--combat-violet: #7d53dd;
-
-	/* Foreground for text/icons placed on a solid semantic (type/health/tag) fill. */
-	--on-semantic: #ffffff;
-
-	/* shadcn base (zinc) — light, aliased onto the neutral-chrome tokens above. */
-	--background: var(--bg);
-	--foreground: var(--text);
-	--card: var(--surface);
-	--card-foreground: var(--text);
-	--popover: var(--surface);
-	--popover-foreground: var(--text);
-	--primary-foreground: var(--primary-text);
-	--secondary: var(--surface-2);
-	--secondary-foreground: var(--text);
-	--muted: var(--surface-3);
-	--muted-foreground: var(--text-muted);
-	--accent: var(--surface-2);
-	--accent-foreground: var(--text);
-	--destructive: var(--health-dead);
-	--input: var(--border);
-	--sidebar: var(--surface);
-	--sidebar-foreground: var(--text);
-	--sidebar-primary: var(--primary);
-	--sidebar-primary-foreground: var(--primary-text);
-	--sidebar-accent: var(--surface-2);
-	--sidebar-accent-foreground: var(--text);
-	--sidebar-border: var(--border);
-	--sidebar-ring: var(--ring);
-}
-
-.dark {
-	/* Neutral chrome (prototype .theme-dark) */
-	--bg: #101317;
-	--surface: #171b21;
-	--surface-2: #1f242c;
-	--surface-3: #272d37;
-	--text: #eef1f5;
-	--text-muted: #a3adba;
-	--text-faint: #6b7683;
-	--border: #2c333d;
-	--border-strong: #3a424e;
-	--primary: #e6e9ee;
-	--primary-text: #16191f;
-	--ring: #7c8794;
-
-	/* Type colors — dark (≈ -400 for legibility on dark surfaces). */
-	--type-pc: #34d399;
-	--type-enemy: #f87171;
-	--type-ally: #60a5fa;
-
-	/* Health bar bands — dark. */
-	--health-full: #34d399;
-	--health-wounded: #fbbf24;
-	--health-bloodied: #fb923c;
-	--health-dead: #ef4444;
-
-	/* Combat color-tag swatches — dark (≈ Tailwind -400). */
-	--combat-neutral: #94a3b8;
-	--combat-red: #f87171;
-	--combat-orange: #fb923c;
-	--combat-amber: #fbbf24;
-	--combat-green: #34d399;
-	--combat-teal: #2dd4bf;
-	--combat-blue: #38bdf8;
-	--combat-violet: #a78bfa;
-
-	/* Foreground for text/icons placed on a solid semantic (type/health/tag) fill. */
-	--on-semantic: #0b0d10;
-
-	/* shadcn base (zinc) — dark, aliased onto the neutral-chrome tokens above. */
+	/* shadcn base (zinc), aliased onto the neutral-chrome tokens from
+	 * tokens.css. Identical mapping for both themes — the underlying
+	 * --bg/--surface/... resolve per the active [data-theme] scope, so the
+	 * alias itself is theme-independent and lives once, here. */
 	--background: var(--bg);
 	--foreground: var(--text);
 	--card: var(--surface);
@@ -162,12 +48,20 @@
 }
 
 @theme inline {
-	--radius-sm: 6px;
-	--radius-md: calc(var(--radius) - 2px);
-	--radius-lg: 14px;
-	--radius-xl: 18px;
+	/* Radius scale — reference the tokens.css-backed raw vars (`:root` in
+	 * tokens.css) rather than redefining literals; `inline` substitutes the
+	 * var() expression directly into generated utilities. */
+	--radius-sm: var(--radius-sm);
+	--radius-md: var(--radius-md);
+	--radius-lg: var(--radius-lg);
+	--radius-xl: var(--radius-xl);
 
-	/* Typography scale (prototype --font-*) wired into Tailwind's text-* tokens so every
+	/* Spacing scale — `--spacing` is Tailwind's base unit (utilities compute
+	 * as calc(var(--spacing) * n)); aliasing it to tokens.css `--space-1`
+	 * (4px) makes p-4/gap-2/etc token-driven instead of coincidentally equal. */
+	--spacing: var(--space-1);
+
+	/* Typography scale (tokens.css --font-*) wired into Tailwind's text-* tokens so every
 	 * text-xs/sm/base/lg/xl call site renders the design scale, not stock Tailwind sizes. */
 	--text-xs: var(--font-xs);
 	--text-sm: var(--font-sm);

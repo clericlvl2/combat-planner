@@ -10,6 +10,15 @@ synchronous-feeling local IndexedDB, no fetch spinner anywhere. **focus** is the
 visible-focus requirement ([[../capabilities/platform]] PLT-5). **error** surfaces only in forms
 (validation clamp).
 
+**Token source of truth.** All raw design tokens (colors, `--space-*`, `--font-*`, radius scale,
+and the component dims `--card-pad`/`--card-gap`/`--card-border`/`--hp-size`/`--badge-width`/
+`--touch-min`) live in one place, `specs/design/tokens.css`, `@import`ed verbatim by
+`prototype.html`, `card-prototype.html`, and `src/routes/layout.css` — no value is re-typed in
+any of the three. One documented exception: `--card-pad` and `--hp-size` were synced to the
+shipped `CombatantRow` render (12px / 18px) rather than the prototype's prior 14px / 19px value;
+the prototype design source was updated to match. Theming is keyed by a `[data-theme="light"|
+"dark"]` attribute (see [[../capabilities/settings]] SET-2), not per-theme classes.
+
 **Target vs. shipped, this doc.** This file describes the design *target* locked in by the
 converged prototype (`specs/design/prototype.html`, plus `specs/design/card-prototype.html` for
 the combatant-card shape). Unit **D** (006 combats-list) shipped and ported its surfaces
@@ -89,7 +98,10 @@ Shared/reused leaves: **FAB**, **IconButton**, **EmptyState**, **NumberField**, 
 
 Replaces the earlier dense-row description; the shape below is locked in
 `card-prototype.html` (the living sandbox spec unit E ports from) and ported into
-`prototype.html`. Ships as `CombatantRow.svelte` (unit **E**, 007).
+`prototype.html`. Ships as `CombatantRow.svelte` (unit **E**, 007). Card dims (`--card-pad`,
+`--card-gap`, `--card-border`, `--hp-size`, `--badge-width`) are tokens sourced from
+`specs/design/tokens.css` (see "Token source of truth" above), referenced by `CombatantRow`
+as `var(--card-pad)` etc. rather than literal px.
 
 | Prop | Values | Drives |
 |---|---|---|

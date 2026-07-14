@@ -25,7 +25,10 @@ in Settings. Switching applies immediately, persists, and works offline.
 ## SET-2 — Theme
 
 Dark and light themes, following system preference by default; manual toggle in Settings; choice
-persists. Color tags and health states remain legible in both themes.
+persists. Color tags and health states remain legible in both themes. Applied via a
+`[data-theme="light"|"dark"]` attribute on the document root (not a `.dark` class), so additional
+themes are a token-block addition rather than a code change — no new theme is exposed in the UI
+yet.
 
 **AC:**
 - With no manual choice, the theme follows the OS/browser color-scheme preference.

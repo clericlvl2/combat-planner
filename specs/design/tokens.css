@@ -54,7 +54,7 @@
 	--surface-3: #272d37;
 	--text: #eef1f5;
 	--text-muted: #a3adba;
-	--text-faint: #6b7683;
+	--text-faint: #808b98;
 	--border: #2c333d;
 	--border-strong: #3a424e;
 	--primary: #e6e9ee;
@@ -95,7 +95,7 @@
 	--surface-3: #e6e9ee;
 	--text: #16191f;
 	--text-muted: #565f6b;
-	--text-faint: #8b94a1;
+	--text-faint: #666f7d;
 	--border: #dde1e7;
 	--border-strong: #c4cad3;
 	--primary: #1f242c;
@@ -109,18 +109,18 @@
 
 	/* Semantic — health bands */
 	--health-full: #0b815a;
-	--health-wounded: #a76b07;
-	--health-bloodied: #c75505;
+	--health-wounded: #996206;
+	--health-bloodied: #b84f05;
 	--health-dead: #b91c1c;
 
 	/* Semantic — 8 combat color-tag swatches (ADR-012) */
-	--combat-neutral: #64748b;
+	--combat-neutral: #607086;
 	--combat-red: #cb3a3a;
-	--combat-orange: #bb5611;
+	--combat-orange: #b35210;
 	--combat-amber: #9d6507;
-	--combat-green: #0b8457;
-	--combat-teal: #0e8174;
-	--combat-blue: #0b7caf;
+	--combat-green: #0b7e53;
+	--combat-teal: #0e7c70;
+	--combat-blue: #0a76a6;
 	--combat-violet: #7d53dd;
 
 	--on-semantic: #ffffff;

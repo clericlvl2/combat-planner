@@ -1,6 +1,5 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
-	"_translation_status": "source (English) — single source of truth, see Combat Planner i18n Message Catalog.",
 	"nav.combats": "Combats",
 	"nav.settings": "Settings",
 	"nav.about": "About",
@@ -181,5 +180,6 @@
 	"a11y.combatRowMenu": "Actions for {title}",
 	"a11y.reorder": "Reorder {title}",
 	"a11y.numField.decrease": "Decrease",
-	"a11y.numField.increase": "Increase"
+	"a11y.numField.increase": "Increase",
+	"a11y.close": "Close"
 }

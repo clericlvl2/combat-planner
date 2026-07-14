@@ -23,6 +23,7 @@ about.*        About page copy
 dialogs.*      destructive-action confirm dialogs
 toasts.*       SW update toast + install banner + import feedback
 errors.*       validation / clamp / cap / import-failsafe messages
+appError.*     top-level error-boundary recovery copy
 a11y.*         accessible labels for controls
 ```
 
@@ -63,6 +64,8 @@ a11y.*         accessible labels for controls
 | `combat.menu.add` | Add combatant | header `⋮` (Active) |
 | `combat.menu.restart` | Restart | |
 | `combat.menu.clear` | Clear combat | |
+| `combat.notFound.title` | Combat not found | not-found recovery view |
+| `combat.notFound.back` | Back to Combats | not-found recovery view |
 
 ## setup.* / active.*
 
@@ -93,6 +96,7 @@ a11y.*         accessible labels for controls
 | `numpad.history.action.setTemp` | Set temp HP | |
 | `numpad.history.action.setMax` | Set Max HP | |
 | `numpad.history.round` | Round {n} | `{n}`; Setup entries show "—" |
+| `numpad.history.count` | {n} records | `{n}` = HP change log entry count |
 
 ## conditions.* — 12 labels + overflow
 
@@ -234,7 +238,7 @@ Language option labels are endonyms and stay identical across all locale files.
 | `toasts.install.action` | Install | |
 | `toasts.install.dismiss` | Dismiss | |
 | `toasts.import.success` | Imported "{title}". | `{title}` |
-| `toasts.importAll.success` | {n, plural, one {# combat} other {# combats}} imported. | ICU plural |
+| `toasts.importAll.success` | {n, plural, one {{n} combat} other {{n} combats}} imported. | ICU plural |
 
 ## errors.* — validation, caps, import fail-safe
 
@@ -251,6 +255,15 @@ All numeric bounds injected from [[limits]], never written as literals here.
 | `errors.import.corrupt` | This file isn't a valid combat export. | |
 | `errors.import.newerVersion` | This file was made by a newer version of the app. Update the app to import it. | |
 | `errors.import.overCap` | Importing this would exceed the {max}-combat limit. | `{max}` |
+
+## appError.* — top-level error-boundary recovery
+
+| Key | English |
+|---|---|
+| `appError.title` | Something went wrong |
+| `appError.body` | This page hit an unexpected error. Reload the app or return to your combats. |
+| `appError.reload` | Reload |
+| `appError.goToCombats` | Go to Combats |
 
 ## a11y.* — accessible control labels
 
@@ -269,7 +282,7 @@ All numeric bounds injected from [[limits]], never written as literals here.
 | `a11y.numpad.backspace` | Backspace | |
 | `a11y.numpad.clear` | Clear entry | |
 | `a11y.condition.toggle` | Toggle {condition} on {name} | `{condition}`, `{name}` |
-| `a11y.condition.overflow` | {n, plural, one {# more condition} other {# more conditions}} | ICU plural |
+| `a11y.condition.overflow` | {n, plural, one {{n} more condition} other {{n} more conditions}} | ICU plural |
 | `a11y.rowExpand` | Expand {name} | `{name}` |
 | `a11y.rowCollapse` | Collapse {name} | `{name}` |
 | `a11y.typeBadge` | {type} | type label backs the color |
@@ -279,6 +292,7 @@ All numeric bounds injected from [[limits]], never written as literals here.
 | `a11y.reorder` | Reorder {title} | drag handle |
 | `a11y.numField.decrease` | Decrease | NumberField `−` stepper button |
 | `a11y.numField.increase` | Increase | NumberField `+` stepper button |
+| `a11y.close` | Close | sr-only label, dialog/sheet close button |
 
 ## Open gaps (flagged, not filled)
 

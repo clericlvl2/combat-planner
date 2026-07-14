@@ -32,7 +32,7 @@ text.
 | B-009 | Desktop layout — revisit before M6 (pre-build gap) | DESIGN | M | done | `specs/archive/003-ui-design-prototype/` |
 | B-010 | Monster / encounter library (v2 backlog #1) | CBT | L | v2 | — |
 | B-011 | Saved party template — candidate v1.5 (v2 backlog #2) | CBT | M | v2 | — |
-| B-012 | CombatantRow temp-HP badge always visible; `combatants.md` CBT-2 says only after expand — doc/code mismatch, fix one (found in 001 Phase 1) | CBT | S | idea | — |
+| B-012 | CombatantRow temp-HP badge always visible; `combatants.md` CBT-2 says only after expand — doc/code mismatch, fix one (found in 001 Phase 1) | CBT | S | done | `specs/archive/016-temp-hp-badge-doc-fix/` |
 | B-013 | NumberField digit-cap makes max-overflow clamp unreachable via keyboard entry — decide if intended or needs a paste/programmatic-set test path (found in 001 Phase 2) | TEST | S | done | `specs/archive/012-numberfield-input-fixes/` |
 | B-014 | Parallel implementer builds race on shared `.svelte-kit` output dir during `/spec-run` fan-out — self-resolves on retry but wastes agent time; consider per-phase build isolation (found in 001 Phase 6/7) | INFRA | S | idea | — |
 | B-015 | `/spec-close` has no commit step — unit 001 archived with everything left uncommitted in the working tree; add an explicit commit stage (what/when/message convention) to the close lifecycle. Resolved by the 2026-07-03 SDD restructure (spec-close commit stage). | INFRA | S | done | — |

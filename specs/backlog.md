@@ -24,7 +24,6 @@ text.
 | B-001 | M2 component tests — acceptance-matrix component-layer rows (Test caveat) | TEST | M | done | `specs/changes/001-m2-component-tests-and-dogfood/` |
 | B-002 | Live-browser dogfood of round 13 — 2–3 real fights, log friction (★ Dogfood gate) | TEST | M | done | `specs/changes/001-m2-component-tests-and-dogfood/` |
 | B-006 | Decide automated axe-style a11y scan for PLT-5 (test-plan gap) | PLT | S | idea | — |
-| B-007 | Name the injectable d20 / RNG seam (test-plan gap) | INFRA | S | idea | — |
 | B-008 | Visual design: screen pass — prototype app screens/states (pre-build gap) | DESIGN | M | done | `specs/archive/003-ui-design-prototype/` |
 | B-009 | Desktop layout — revisit before M6 (pre-build gap) | DESIGN | M | done | `specs/archive/003-ui-design-prototype/` |
 | B-010 | Monster / encounter library (v2 backlog #1) | CBT | L | v2 | — |

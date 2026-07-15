@@ -23,9 +23,6 @@ text.
 |----|------|------|------|--------|------|
 | B-001 | M2 component tests — acceptance-matrix component-layer rows (Test caveat) | TEST | M | done | `specs/changes/001-m2-component-tests-and-dogfood/` |
 | B-002 | Live-browser dogfood of round 13 — 2–3 real fights, log friction (★ Dogfood gate) | TEST | M | done | `specs/changes/001-m2-component-tests-and-dogfood/` |
-| B-003 | Pin store-seam unit-coverage % in ADR-009 (test-plan gap) | TEST | S | idea | — |
-| B-004 | Pin Playwright viewport matrix / breakpoints for PLT-2/PLT-3 (test-plan gap) | PLT | S | idea | — |
-| B-005 | Decide persistence round-trip / interrupted-write harness for PLT-7 (test-plan gap) | PLT | S | idea | — |
 | B-006 | Decide automated axe-style a11y scan for PLT-5 (test-plan gap) | PLT | S | idea | — |
 | B-007 | Name the injectable d20 / RNG seam (test-plan gap) | INFRA | S | idea | — |
 | B-008 | Visual design: screen pass — prototype app screens/states (pre-build gap) | DESIGN | M | done | `specs/archive/003-ui-design-prototype/` |
@@ -34,7 +31,6 @@ text.
 | B-011 | Saved party template — candidate v1.5 (v2 backlog #2) | CBT | M | v2 | — |
 | B-012 | CombatantRow temp-HP badge always visible; `combatants.md` CBT-2 says only after expand — doc/code mismatch, fix one (found in 001 Phase 1) | CBT | S | done | `specs/archive/016-temp-hp-badge-doc-fix/` |
 | B-013 | NumberField digit-cap makes max-overflow clamp unreachable via keyboard entry — decide if intended or needs a paste/programmatic-set test path (found in 001 Phase 2) | TEST | S | done | `specs/archive/012-numberfield-input-fixes/` |
-| B-014 | Parallel implementer builds race on shared `.svelte-kit` output dir during `/spec-run` fan-out — self-resolves on retry but wastes agent time; consider per-phase build isolation (found in 001 Phase 6/7) | INFRA | S | idea | — |
 | B-015 | `/spec-close` has no commit step — unit 001 archived with everything left uncommitted in the working tree; add an explicit commit stage (what/when/message convention) to the close lifecycle. Resolved by the 2026-07-03 SDD restructure (spec-close commit stage). | INFRA | S | done | — |
 | B-016 | `src/**` code comments cite dead pre-migration doc sections (`UX §`, `Component Inventory §`, `Data Model §` — archive deleted 2026-07-03) — repoint to capability IDs or drop (found in SDD restructure sweep) | INFRA | S | done | `specs/archive/017-repoint-dead-doc-citations/` |
 | B-017 | Visual design: design tokens — bake approved prototype look into `src/routes/layout.css` (real WCAG-AA token set, replaces STUB). Split from B-008; belongs to design-chain unit C. | DESIGN | M | done | `specs/archive/005-design-tokens/` |

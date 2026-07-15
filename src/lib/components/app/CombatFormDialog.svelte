@@ -39,8 +39,9 @@
 	let colorTag = $state<ColorTag>('neutral');
 	let capBlocked = $state(false);
 
-	// Prototype .field-label recipe (specs/design/prototype.html) — uppercase, muted, small caps.
-	const fieldLabelClass = 'text-xs font-medium uppercase tracking-wide text-muted-foreground';
+	// Prototype .field-label recipe (specs/design/prototype.html) — uppercase, muted, small caps,
+	// normal weight (no extra font-medium beyond the prototype's plain-weight label).
+	const fieldLabelClass = 'text-xs font-normal uppercase tracking-wide text-muted-foreground';
 
 	// (Re)initialize the form whenever it opens (prefill on edit, blank defaults on create).
 	$effect(() => {
@@ -55,6 +56,14 @@
 			description = '';
 			colorTag = 'neutral';
 		}
+	});
+
+	// Cap-error banner clears on ANY field edit, not only the title field (CLS-2).
+	$effect(() => {
+		void title;
+		void description;
+		void colorTag;
+		capBlocked = false;
 	});
 
 	function submit() {
@@ -73,7 +82,9 @@
 </script>
 
 <Dialog bind:open>
-	<DialogContent class="sm:max-w-md">
+	<DialogContent
+		class="rounded-lg border border-[var(--border-strong)] ring-0 sm:max-w-[400px]"
+	>
 		<DialogHeader>
 			<DialogTitle class="text-lg font-semibold">
 				{combat ? m['forms.combat.edit.title']() : m['forms.combat.create.title']()}
@@ -87,17 +98,27 @@
 				submit();
 			}}
 		>
-			<div class="flex flex-col gap-1">
+			<div class="flex flex-col gap-[5px]">
 				<Label for="cf-title" class={fieldLabelClass}>{m['forms.field.title']()}</Label>
-				<Input id="cf-title" bind:value={title} oninput={() => (capBlocked = false)} />
+				<Input
+					id="cf-title"
+					bind:value={title}
+					placeholder="e.g. Goblin Ambush"
+					class="h-11 rounded-sm border-[var(--border-strong)] text-[15px] md:text-[15px]"
+				/>
 			</div>
 
-			<div class="flex flex-col gap-1">
+			<div class="flex flex-col gap-[5px]">
 				<Label for="cf-description" class={fieldLabelClass}>{m['forms.field.description']()}</Label>
-				<Textarea id="cf-description" bind:value={description} />
+				<Textarea
+					id="cf-description"
+					bind:value={description}
+					placeholder="Optional notes"
+					class="rounded-sm border-[var(--border-strong)] text-[15px] md:text-[15px]"
+				/>
 			</div>
 
-			<div class="flex flex-col gap-1">
+			<div class="flex flex-col gap-[5px]">
 				<Label class={fieldLabelClass}>{m['forms.field.colorTag']()}</Label>
 				<ColorSwatchPicker bind:value={colorTag} />
 			</div>
@@ -109,14 +130,16 @@
 			<DialogFooter class="mx-0 mb-0 flex-row justify-center gap-2 border-t-0 bg-transparent p-0 pt-1">
 				<Button
 					type="button"
-					variant="secondary"
+					variant="outline"
 					size="lg"
-					class="h-11 w-full"
+					class="h-11 w-full rounded-sm border-[var(--border-strong)]"
 					onclick={() => (open = false)}
 				>
 					{m['forms.action.cancel']()}
 				</Button>
-				<Button type="submit" size="lg" class="h-11 w-full">{m['forms.action.save']()}</Button>
+				<Button type="submit" size="lg" class="h-11 w-full rounded-sm font-semibold">
+					{combat ? m['forms.action.save']() : m['forms.action.create']()}
+				</Button>
 			</DialogFooter>
 		</form>
 	</DialogContent>

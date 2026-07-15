@@ -19,6 +19,7 @@ import {
 	type Icon as LucideIcon,
 	Menu,
 	Pencil,
+	Play,
 	Plus,
 	Redo2,
 	Settings,
@@ -65,4 +66,5 @@ export const chromeIcon = {
 	navCombats: Swords,
 	navSettings: Settings,
 	navAbout: Info,
+	start: Play,
 } satisfies Record<string, IconComponent>;

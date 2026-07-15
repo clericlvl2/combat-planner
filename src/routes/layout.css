@@ -55,6 +55,7 @@
 	--radius-md: var(--radius-md);
 	--radius-lg: var(--radius-lg);
 	--radius-xl: var(--radius-xl);
+	--radius-card: var(--radius-card);
 
 	/* Spacing scale — `--spacing` is Tailwind's base unit (utilities compute
 	 * as calc(var(--spacing) * n)); aliasing it to tokens.css `--space-1`
@@ -68,6 +69,12 @@
 	--text-base: var(--font-md);
 	--text-lg: var(--font-lg);
 	--text-xl: var(--font-xl);
+
+	/* Letter-spacing (tracking) scale (tokens.css --tracking-*) aliased onto Tailwind's
+	 * tracking-wide/tracking-wider utilities so call sites use the design scale, not stock
+	 * Tailwind values. */
+	--tracking-wide: var(--tracking-wide);
+	--tracking-wider: var(--tracking-wider);
 
 	/* Design shadows aliased onto Tailwind's shadow-sm/shadow-md so shadcn overlays
 	 * (popover/select/dropdown) render the design shadow instead of the Tailwind stock one. */

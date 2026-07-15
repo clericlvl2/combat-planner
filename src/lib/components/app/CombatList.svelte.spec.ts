@@ -29,7 +29,7 @@ test('renders rows sorted by listOrder', async () => {
 	});
 
 	const list = screen.getByRole('list').element();
-	const titles = Array.from(list.querySelectorAll('.font-medium'))
+	const titles = Array.from(list.querySelectorAll('.font-semibold'))
 		.map((el) => el.textContent?.trim())
 		.filter((text): text is string => Boolean(text));
 

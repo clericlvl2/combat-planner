@@ -1,7 +1,7 @@
 <!--
   CombatantRow (component-inventory.md "Combatant card", CBT-2) — one roster card, compact ↔ expanded via
   Collapsible. Card shape ported from `specs/design/card-prototype.html` (locked in
-  `component-inventory.md`'s "Combatant card" section): leading TypeStripe(s) (pc=2 green,
+  `component-inventory.md`'s "Combatant card" section): leading TypeStripe (pc=1 green,
   ally=1 blue, enemy=1 red — color-only, `aria-label` compensates) · Row 1 name + expand chevron +
   trailing `⋮` overflow menu · Row 2 big HP (+ temp-HP badge) inside a fixed-width block, and a
   health bar filling the remaining width · Row 3 AC/PD/MD + Init pill · Row 4 condition chips
@@ -96,17 +96,19 @@
 	const Remove = chromeIcon.remove;
 
 	/** "+ Condition" / "+ Note" triggers — same chip box as the condition tags (Badge), just
-	 *  dashed to read as an affordance rather than a value. */
+	 *  dashed to read as an affordance rather than a value (prototype `.chip` + `.tag-trigger`
+	 *  recipe: chip gap, normal weight, `--border`-token border color). */
 	const tagTriggerClass =
-		'inline-flex h-6 items-center gap-1 rounded-full border border-dashed border-muted-foreground/50 px-2.5 py-0.5 text-sm font-medium text-muted-foreground hover:border-foreground hover:text-foreground';
+		'inline-flex h-6 items-center gap-[5px] rounded-full border border-dashed border-border px-2.5 py-0.5 text-sm text-muted-foreground hover:border-foreground hover:text-foreground';
 
-	/** Def-stat value styling (Row 3) — bold + full-color against the muted label text. */
-	const statClass = 'font-semibold text-foreground tabular-nums';
+	/** Def-stat value styling (Row 3) — `<b>`-default (bold) weight against the muted label text,
+	 *  matching the prototype's `.def-stats b { color: var(--text) }` (no explicit font-weight). */
+	const statClass = 'text-foreground tabular-nums';
 </script>
 
 <Card
 	class={[
-		'overflow-hidden rounded-[12px] border-[length:var(--card-border)] border-border p-0 ring-0',
+		'overflow-hidden rounded-card border-[length:var(--card-border)] border-border p-0 ring-0',
 		active && 'border-ring ring-2 ring-ring',
 	]}
 	data-active={active}
@@ -130,7 +132,7 @@
 							class="flex min-w-0 flex-1 items-center gap-1.5 text-left"
 							aria-label={toggleLabel}
 						>
-							<span class="truncate font-medium">{combatant.name}</span>
+							<span class="truncate text-base leading-[1.2] font-semibold">{combatant.name}</span>
 							<Chevron
 								class={[
 									'size-4 shrink-0 text-muted-foreground transition-transform',
@@ -177,7 +179,7 @@
 								{combatant.currentHp}/{combatant.maxHp}
 								{#if combatant.tempHp > 0}
 									<span
-										class="absolute -top-1.5 -right-5 inline-flex h-4 w-[var(--badge-width)] shrink-0 items-center justify-center rounded-full bg-combat-blue text-xs leading-none font-medium text-white"
+										class="absolute -top-1.5 -right-5 inline-flex h-4 w-[var(--badge-width)] shrink-0 items-center justify-center rounded-full bg-combat-blue text-[10px] leading-none font-semibold text-white"
 									>
 										{combatant.tempHp}
 									</span>
@@ -191,7 +193,7 @@
 
 					<!-- Row 3: AC/PD/MD + Init pill -->
 					<div class="flex items-center gap-3">
-						<span class="flex-1 text-xs text-muted-foreground">
+						<span class="flex-1 text-sm text-muted-foreground">
 							AC <b class={statClass}>{combatant.ac}</b> ·
 							PD <b class={statClass}>{combatant.pd}</b> ·
 							MD <b class={statClass}>{combatant.md}</b>
@@ -205,7 +207,7 @@
 					</div>
 
 					<!-- Row 4: condition chips (always) + expand-only triggers -->
-					<div class="flex flex-wrap items-center gap-1">
+					<div class="flex flex-wrap items-center gap-1.5">
 						<ConditionIconList
 							conditions={combatant.conditions}
 							removable={open}

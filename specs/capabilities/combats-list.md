@@ -14,6 +14,8 @@ owns only that a combat has one.
 Combats render as a vertical list; each row shows Title, Description, and a Color tag, plus a
 per-row trailing `⋮` overflow menu (Edit / Delete; the Export/share item is pending under CLS-8).
 A combat with a blank/whitespace-only title renders a placeholder title instead of a blank row.
+When there are no combats to show, an empty-state view renders in place of the list: an icon, a
+short description, and a "New combat" call-to-action that creates one (same action as CLS-2).
 
 **AC:**
 - Every combat row displays title, description, and its color tag.
@@ -21,16 +23,25 @@ A combat with a blank/whitespace-only title renders a placeholder title instead 
   ("Untitled combat") instead of a blank row.
 - The row `⋮` menu exposes Edit and Delete. (The Export/share item is added when CLS-8 lands —
   [[import-export]].)
+- When the combats list is empty, the empty-state view renders an icon, a description, and a
+  "New combat" CTA (instead of a bare list or no content).
 
 ## CLS-2 — Create combat
 
 Fields: Title, Description, Color tag (chosen from the preset swatch palette). New combat is
 added at the **top** of the list. Blocked at the 100-combat cap ([[../reference/limits]]) with a
-message.
+message. The create dialog's title reads "New combat" and its primary button reads "Create";
+the same dialog reused for editing (CLS-3) reads "Save" instead — the button label is the only
+difference between create and edit mode. A cap-error banner shown after a blocked create clears
+on any field edit (title, description, or color tag), not only when the title changes.
 
 **AC:**
 - A newly created combat appears at the top of the list, in `state: setup` ([[lifecycle]] LIF-1).
 - Creating a 101st combat is blocked with a message; nothing is created.
+- The create dialog's title reads "New combat" and its primary button reads "Create"; the same
+  dialog in edit mode (CLS-3) reads "Save".
+- Once the cap-error banner is showing, editing any field (title, description, or color tag)
+  clears it — not only editing the title.
 
 ## CLS-3 — Edit combat
 

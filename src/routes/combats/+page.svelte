@@ -19,6 +19,7 @@
 	import { store } from '$lib/stores';
 
 	const Add = chromeIcon.add;
+	const EmptyIcon = chromeIcon.navCombats;
 
 	let formOpen = $state(false);
 	let editId = $state<string | null>(null);
@@ -73,7 +74,11 @@
 {#if !store.ready}
 	<p class="p-4 text-muted-foreground">…</p>
 {:else if store.combats.length === 0}
-	<EmptyState title={m['combats.empty.title']()}>
+	<EmptyState
+		icon={EmptyIcon}
+		title={m['combats.empty.title']()}
+		description={m['combats.empty.description']()}
+	>
 		<Button size="lg" class="hidden w-full lg:flex" onclick={openCreate}>
 			<Add class="size-5" />
 			{m['combats.empty.cta']()}
@@ -81,7 +86,7 @@
 	</EmptyState>
 	<FAB icon={Add} label={m['combats.create']()} onclick={openCreate} class="lg:hidden" />
 {:else}
-	<div class="flex flex-col gap-3 p-3 pb-24">
+	<div class="flex flex-col gap-2 p-3 pb-24">
 		<SearchField bind:value={query} />
 		<CombatList
 			combats={filteredCombats}

@@ -41,6 +41,9 @@
 	const fieldLabelClass = 'text-xs font-medium uppercase tracking-wide text-muted-foreground';
 	const stepBtnClass =
 		'flex min-h-11 w-11 shrink-0 items-center justify-center text-lg text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:z-10 focus-visible:ring-3 focus-visible:ring-ring/50';
+	// Prototype .numfield recipe (specs/design/prototype.html) draws the stepper divider on
+	// --border-strong, not the default --border token.
+	const stepBorderClass = 'border-[var(--border-strong)]';
 
 	// Allowed typed character set: digits + a single leading '-'. Keeps intermediate-invalid
 	// states (a lone '-', trailing letters) from blanking the field mid-entry.
@@ -93,11 +96,14 @@
 <div class="flex flex-col gap-1">
 	<Label for={id} class={fieldLabelClass}>{label}</Label>
 	<div
-		class="focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50 flex items-stretch overflow-hidden rounded-md border border-border bg-secondary"
+		class={[
+			'focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50 flex items-stretch overflow-hidden rounded-sm border bg-secondary',
+			stepBorderClass,
+		]}
 	>
 		<button
 			type="button"
-			class={[stepBtnClass, 'border-r border-border']}
+			class={[stepBtnClass, 'border-r', stepBorderClass]}
 			aria-label={m['a11y.numField.decrease']()}
 			onclick={() => step(-1)}
 		>
@@ -111,7 +117,7 @@
 			aria-valuemin={min}
 			aria-valuemax={max}
 			aria-valuenow={value ?? undefined}
-			class="min-h-11 flex-1 rounded-none border-0 bg-transparent text-center tabular-nums shadow-none focus-visible:ring-0"
+			class="min-h-11 flex-1 rounded-none border-0 bg-transparent text-[13px] text-center tabular-nums shadow-none focus-visible:ring-0 dark:bg-transparent"
 			value={value ?? ''}
 			{placeholder}
 			{required}
@@ -123,7 +129,7 @@
 		/>
 		<button
 			type="button"
-			class={[stepBtnClass, 'border-l border-border']}
+			class={[stepBtnClass, 'border-l', stepBorderClass]}
 			aria-label={m['a11y.numField.increase']()}
 			onclick={() => step(1)}
 		>

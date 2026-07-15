@@ -125,7 +125,7 @@
 				<div class="grid grid-cols-3 gap-2">
 					<Button
 						variant="outline"
-						class="border-destructive/30 bg-transparent text-destructive hover:bg-destructive/10 dark:border-destructive/30 dark:bg-transparent dark:hover:bg-destructive/10"
+						class="h-11 text-xs font-bold border-destructive/30 bg-transparent text-destructive hover:bg-destructive/10 dark:border-destructive/30 dark:bg-transparent dark:hover:bg-destructive/10"
 						disabled={empty}
 						onclick={() => commit(onDamage)}
 					>
@@ -133,7 +133,7 @@
 					</Button>
 					<Button
 						variant="outline"
-						class="border-health-full/30 bg-transparent text-health-full hover:bg-health-full/10 dark:border-health-full/30 dark:bg-transparent dark:hover:bg-health-full/10"
+						class="h-11 text-xs font-bold border-health-full/30 bg-transparent text-health-full hover:bg-health-full/10 dark:border-health-full/30 dark:bg-transparent dark:hover:bg-health-full/10"
 						disabled={empty}
 						onclick={() => commit(onRestore)}
 					>
@@ -141,7 +141,7 @@
 					</Button>
 					<Button
 						variant="outline"
-						class="border-combat-blue/30 bg-transparent text-combat-blue hover:bg-combat-blue/10 dark:border-combat-blue/30 dark:bg-transparent dark:hover:bg-combat-blue/10"
+						class="h-11 text-xs font-bold border-combat-blue/30 bg-transparent text-combat-blue hover:bg-combat-blue/10 dark:border-combat-blue/30 dark:bg-transparent dark:hover:bg-combat-blue/10"
 						disabled={empty}
 						onclick={() => commit(onSetTempHp)}
 					>

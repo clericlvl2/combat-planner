@@ -79,10 +79,10 @@
 		onclick={tap}
 	>
 		<span
-			class="inline-flex h-6 items-center gap-1 rounded-full border border-border bg-secondary px-2.5 text-sm text-muted-foreground tabular-nums"
+			class="chip init-pill inline-flex h-6 items-center gap-[5px] rounded-full border border-border bg-secondary px-2.5 text-sm text-muted-foreground tabular-nums"
 		>
 			Init
-			<span class="font-semibold text-foreground">{display}</span>
+			<b class="text-foreground">{display}</b>
 		</span>
 	</Button>
 
@@ -97,3 +97,12 @@
 		<Button size="sm" class="mt-2 w-full" onclick={save}>{m['forms.action.save']()}</Button>
 	</PopoverContent>
 </Popover>
+
+<style>
+	/* Light-theme init-pill override (component-inventory.md INI-2 / card-prototype.html
+	 * `[data-theme="light"] .chip.init-pill { background: #fff }`) — the secondary/surface-2
+	 * token reads too close to the card surface on light, so the pill gets an explicit white. */
+	:global([data-theme='light'] .chip.init-pill) {
+		background: #fff;
+	}
+</style>

@@ -32,7 +32,9 @@ instead of silently restated as already-true.
 
 ```
 AppShell
-├── NavSidebar (mobile) / AppHeader (tablet·desktop)
+├── NavSidebar (mobile) / AppHeader (tablet·desktop) — AppShell skips its own AppHeader on the
+│     Combat route (own-header guard); CombatHeader carries an identical `.nav-desktop` icon-nav
+│     row there instead (see "Navigation placement per breakpoint" below)
 ├── Toaster · InstallBanner            ← global chrome
 ├── ConfirmDialog                       ← global, summoned by destructive actions
 └── <route outlet>
@@ -48,6 +50,8 @@ AppShell
     │   └── CombatFormDialog → { NumberField·n/a, ColorSwatchPicker }   (create/edit)
     ├── Combat
     │   ├── CombatHeader → { IconButton×back, chrome-title,
+    │   │       desktop-only `.nav-desktop` icon-nav row (Combats/Settings/About — mirrors
+    │   │             AppHeader's own; PLT-2, since AppShell skips its shared AppHeader here),
     │   │       Setup: header-add "+" icon button + header-start hold-to-start icon button
     │   │             (desktop) / two FABs — Add + Start (mobile, see "FAB" below),
     │   │       Active: header-advance tonal-circle icon button (desktop only) +
@@ -89,10 +93,12 @@ Shared/reused leaves: **FAB**, **IconButton**, **EmptyState**, **NumberField**, 
 
 - **Mobile:** `NavSidebar` — swipe-right reveals a sidebar with links (Combats/Settings/About).
 - **Tablet:** `AppHeader` in burger mode — header with a burger menu that opens a Sheet.
-- **Desktop:** `AppHeader` in icon-button mode — `.nav-desktop` renders three icon buttons (⚔
-  Combats / ⚙ Settings / ⓘ About), each carrying both `aria-label` and `title`; the current
-  destination gets `.is-current` styling. Applies globally, on every screen's header — not just
-  Combats home.
+- **Desktop:** `.nav-desktop` renders three icon buttons (⚔ Combats / ⚙ Settings / ⓘ About), each
+  carrying both `aria-label` and `title`; the current destination gets `.is-current` styling.
+  Applies globally, on every screen's header — not just Combats home. On Combats home/Settings/
+  About this row lives in the shared `AppHeader`; on the Combat screen, `AppShell` skips its own
+  AppHeader (own-header guard) and `CombatHeader` renders an identical `.nav-desktop` row itself
+  (PLT-2) so the row is still present everywhere, just sourced from two different components.
 
 ## Combatant card
 
@@ -115,7 +121,7 @@ as `var(--card-pad)` etc. rather than literal px.
 Card layout, leading → trailing:
 
 - **TypeStripe** — leading edge, color + `aria-label` naming the type (kept from the compact-row
-  era; stripe count pc=2, enemy/ally=1).
+  era; stripe count pc=enemy=ally=1, matching `labels.ts`'s `typeStripeCount`).
 - **Row 1** — name + expand chevron (`.chevron-btn`, a CSS-drawn rotating corner, not a glyph
   font character) + a trailing per-card `⋮` overflow menu (Edit/Duplicate/Remove).
 - **Row 2** — big HP (`.hp-big`, current/max, tabular figures) inside a fixed-width `.hp-block`

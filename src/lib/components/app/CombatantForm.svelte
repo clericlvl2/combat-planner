@@ -220,7 +220,9 @@
 				<Button type="button" variant="ghost" class="w-full" onclick={() => (open = false)}>
 					{m['forms.action.cancel']()}
 				</Button>
-				<Button type="submit" size="lg" class="w-full">{m['forms.action.save']()}</Button>
+				<Button type="submit" size="lg" class="w-full">
+					{mode === 'add' ? m['forms.action.add']() : m['forms.action.save']()}
+				</Button>
 			</DialogFooter>
 		</form>
 	</DialogContent>

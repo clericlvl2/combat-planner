@@ -29,12 +29,19 @@ layout, not a distinct desktop composition — with the same combatant-card shap
 unchanged, just re-centered. The card shape itself is [[../reference/component-inventory]]'s to
 own; this requirement does not restate that detail.
 
+On desktop, Settings/About/the Combats list stay reachable from an open combat screen — the
+desktop icon-nav destinations are not lost just because the Combat route renders its own header
+component instead of the shared one ([[../reference/component-inventory]] for which component
+renders the row on which screen).
+
 **AC:**
 - No feature is available on desktop but missing on mobile, or vice versa.
 - On mobile, the screen's primary action is reachable via a bottom-right floating control.
 - All interactive targets measure at least 44px on the touch axis.
 - On desktop, the Combat screen renders as a single centered column (no split-pane), reusing
   the mobile card composition unchanged.
+- On the desktop breakpoint, with a combat open, Settings/About/Combats-list remain reachable
+  from the combat screen's header.
 
 ## PLT-3 — Navigation per breakpoint
 

@@ -24,6 +24,20 @@
 		violet: m['forms.colorTag.violet'],
 	};
 
+	/** ColorTag key -> tile letter (prototype .swatch recipe) — fixed to the key, not the localized
+	 * label, so locales whose color names collide on first letter (e.g. "green"/"violet") never
+	 * render duplicate letters. The color name itself is still carried by the aria-label. */
+	const colorTagLetter: Record<ColorTag, string> = {
+		neutral: 'N',
+		red: 'R',
+		orange: 'O',
+		amber: 'A',
+		green: 'G',
+		teal: 'T',
+		blue: 'B',
+		violet: 'V',
+	};
+
 	function handle(next: string) {
 		if (next) value = next as ColorTag;
 	}
@@ -33,16 +47,16 @@
 	type="single"
 	value={value satisfies string}
 	onValueChange={handle}
-	variant="outline"
+	spacing={2}
 	class="flex-wrap justify-start"
 >
 	{#each COLOR_TAGS as tag (tag)}
 		<ToggleGroupItem
 			value={tag}
 			aria-label={colorTagLabel[tag]()}
-			class="!rounded-full px-2 data-[state=on]:bg-primary/10 data-[state=on]:ring-2 data-[state=on]:ring-primary"
+			class="size-[30px] min-w-0 rounded-md border-0 bg-transparent p-0 hover:bg-transparent data-[state=on]:bg-transparent data-[state=on]:outline data-[state=on]:outline-2 data-[state=on]:outline-offset-2 data-[state=on]:outline-foreground"
 		>
-			<ColorTagDot colorTag={tag} class="size-4" />
+			<ColorTagDot colorTag={tag} letter={colorTagLetter[tag]} class="size-full" />
 		</ToggleGroupItem>
 	{/each}
 </ToggleGroup>

@@ -35,6 +35,7 @@
 
     const Add = chromeIcon.add;
     const Advance = chromeIcon.advance;
+    const Start = chromeIcon.start;
 
     // Auto-scroll-on-advance (TRE-2) — scrolls the newly active row into view on every advance
     // (including the round-wrap advance); no store/controller intent, CombatantRow already marks
@@ -157,7 +158,7 @@
                 canAdvance={canAdv}
         />
 
-        <main bind:this={mainEl} class="flex flex-1 flex-col gap-2 p-3">
+        <main bind:this={mainEl} class="flex flex-1 flex-col gap-2 p-3 {active ? 'pt-2' : ''}">
             {#if display.length === 0}
                 <div class="flex flex-1 flex-col items-center justify-center gap-3 py-16 text-center text-muted-foreground">
                     <p class="text-lg font-semibold text-foreground">{m['setup.empty.title']()}</p>
@@ -201,13 +202,14 @@
             {#if combat.combatants.length > 0}
                 <!-- Start FAB reads as a primary action (default variant = bg-primary), matching
                      the prototype's `.fab--start` (inherits `.fab`'s primary fill), not a pale
-                     ghost/secondary roundel. -->
+                     ghost/secondary roundel. Uses the LIF-2 play glyph (mirrors the desktop
+                     header-start icon-roundel). -->
                 <Button
                         class="fixed right-4 bottom-24 size-14 rounded-full shadow-lg lg:hidden"
                         aria-label={m['setup.start']()}
                         onclick={controller.start}
                 >
-                    <Advance class="size-6"/>
+                    <Start class="size-6"/>
                 </Button>
             {/if}
         {/if}

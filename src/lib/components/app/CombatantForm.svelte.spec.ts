@@ -33,7 +33,7 @@ test('name-required validation blocks submit', async () => {
 	const onSubmit = vi.fn();
 	const screen = render(CombatantForm, { mode: 'add', open: true, onSubmit });
 
-	await screen.getByRole('button', { name: m['forms.action.save']() }).click();
+	await screen.getByRole('button', { name: m['forms.action.add']() }).click();
 
 	expect(onSubmit).not.toHaveBeenCalled();
 	await expect.element(screen.getByText(m['errors.nameRequired']())).toBeVisible();
@@ -60,7 +60,7 @@ test('onSubmit fires with the expected normalized shape', async () => {
 
 	await userEvent.fill(screen.getByLabelText(m['forms.field.name']()), 'Ogre');
 	await userEvent.fill(screen.getByLabelText(m['forms.field.maxHp']()), '40');
-	await screen.getByRole('button', { name: m['forms.action.save']() }).click();
+	await screen.getByRole('button', { name: m['forms.action.add']() }).click();
 
 	expect(onSubmit).toHaveBeenCalledTimes(1);
 	expect(onSubmit).toHaveBeenCalledWith({

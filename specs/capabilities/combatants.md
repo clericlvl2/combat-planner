@@ -21,7 +21,7 @@ player sheet, DM tracks its HP). Optional on the add form; default `enemy`.
 
 ## CBT-2 — Combatant card fields
 
-Compact row shows: active-turn indicator, type color stripe(s), a persistent `⋮` menu
+Compact row shows: active-turn indicator, type color stripe, a persistent `⋮` menu
 (Edit/Duplicate/Remove), name, initiative (`"-"` if unset), current/max HP, health bar, a
 temp-HP badge (shown whenever `tempHp > 0`, no expand needed), AC/PD/MD (in-row at all sizes),
 condition icons (first few + overflow, [[conditions]] CND-3), and the note (read-only) whenever
@@ -41,13 +41,15 @@ an editable note field and the condition picker.
 Add form fields: Name (required, trimmed; whitespace-only blocks submit), Type (optional,
 default enemy), Initiative bonus, Max HP, AC, PD, MD, Text note. Field defaults/placeholders/
 ranges: [[../reference/limits]]. Adding is blocked at the 30-combatant cap
-([[../reference/limits]]).
+([[../reference/limits]]). The form's submit button reads "Add" in add mode, distinguishing it
+from the "Save" label the same form shows in edit mode ([[combatants]] CBT-4).
 
 **AC:**
 - Submitting the add form with an empty or whitespace-only name is rejected.
 - A newly added combatant has `currentHp = maxHp`, `tempHp = 0`, `initiative = "-"`, and no
   conditions.
 - Adding a 31st combatant to a combat is blocked with a message; nothing is added.
+- The add form's submit button reads "Add"; the same form in edit mode reads "Save".
 
 ## CBT-4 — Edit combatant
 

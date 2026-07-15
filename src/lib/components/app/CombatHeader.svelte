@@ -17,6 +17,7 @@
 		DropdownMenuTrigger,
 	} from '$lib/components/ui/dropdown-menu';
 	import { Popover, PopoverContent, PopoverTrigger } from '$lib/components/ui/popover';
+	import { page } from '$app/state';
 	import type { Combat } from '$lib/db/types';
 	import { m } from '$lib/i18n';
 	import { chromeIcon } from '$lib/icons';
@@ -53,6 +54,21 @@
 	const Overflow = chromeIcon.overflow;
 	const Add = chromeIcon.add;
 	const Advance = chromeIcon.advance;
+	const Start = chromeIcon.start;
+
+	// PLT-2 — Settings/About/combats-list are reachable from an open combat screen: AppShell skips
+	// the shared AppHeader on this route (own-header guard), so CombatHeader carries its own
+	// desktop-only icon-nav row (mirrors AppHeader's `.nav-desktop`).
+	const navLinks = $derived([
+		{ href: '/combats', label: m['nav.combats'](), icon: chromeIcon.navCombats },
+		{ href: '/settings', label: m['nav.settings'](), icon: chromeIcon.navSettings },
+		{ href: '/about', label: m['nav.about'](), icon: chromeIcon.navAbout },
+	]);
+	function isCurrentNav(href: string) {
+		const path = page.url.pathname;
+		if (href === '/combats') return path === '/' || path.startsWith('/combats');
+		return path.startsWith(href);
+	}
 
 	// round editor
 	let roundOpen = $state(false);
@@ -95,6 +111,26 @@
 
 	<span class="min-w-0 flex-1 truncate text-lg font-semibold">{combat.title}</span>
 
+	<!-- PLT-2 — desktop-only icon-nav (Combats/Settings/About), reachable from the open combat
+	     screen since AppShell skips the shared AppHeader on this route. -->
+	<nav class="hidden items-center gap-1 lg:flex" aria-label={m['nav.primary']()}>
+		{#each navLinks as link (link.href)}
+			{@const current = isCurrentNav(link.href)}
+			{@const Icon = link.icon}
+			<Button
+				href={link.href}
+				variant="ghost"
+				size="icon"
+				class={['min-h-11 min-w-11', current && 'bg-secondary text-secondary-foreground']}
+				aria-label={link.label}
+				aria-current={current ? 'page' : undefined}
+				title={link.label}
+			>
+				<Icon class="size-5" />
+			</Button>
+		{/each}
+	</nav>
+
 	{#if !isActive}
 		<!-- Setup — desktop-only header pair (mobile uses the FAB stack in +page.svelte instead,
 		     PLT-3). Add is always available; Start only once the roster isn't empty. -->
@@ -109,8 +145,15 @@
 			<Add class="size-5" />
 		</Button>
 		{#if combat.combatants.length > 0}
-			<Button variant="secondary" class="hidden min-h-11 rounded-full px-5 lg:inline-flex" onclick={onStart}>
-				{m['setup.start']()}
+			<Button
+				variant="ghost"
+				size="icon"
+				class="hidden min-h-11 min-w-11 rounded-full bg-foreground/10 lg:inline-flex"
+				aria-label={m['setup.start']()}
+				title={m['setup.start']()}
+				onclick={onStart}
+			>
+				<Start class="size-5" />
 			</Button>
 		{/if}
 	{:else}
@@ -172,13 +215,15 @@
 {#if isActive}
 	<!-- Round / Escalation-die sub-bar (component-inventory "Header (Combat screen)") — replaces
 	     the old header-center pills; still tap-to-edit via the same popovers. -->
-	<div class="mx-3 mt-3 flex items-center gap-6 rounded-lg border border-border bg-card px-3 py-2.5">
+	<div
+		class="mx-3 mt-3 flex items-center gap-6 rounded-[var(--radius)] border border-border bg-card px-3 py-2.5"
+	>
 		<Popover bind:open={roundOpen}>
 			<PopoverTrigger
 				class="flex items-baseline gap-1.5 rounded-md hover:bg-muted"
 				aria-label={m['a11y.editRound']()}
 			>
-				<span class="text-xs font-normal tracking-[0.04em] text-muted-foreground uppercase">
+				<span class="text-xs font-normal tracking-wide text-muted-foreground uppercase">
 					{m['combat.round.label']()}
 				</span>
 				<span class="text-base font-semibold tabular-nums">{combat.round}</span>
@@ -207,7 +252,7 @@
 				aria-haspopup="dialog"
 				onclick={() => (escOpen = true)}
 			>
-				<span class="text-xs font-normal tracking-[0.04em] text-muted-foreground uppercase">
+				<span class="text-xs font-normal tracking-wide text-muted-foreground uppercase">
 					{m['combat.escalation']()}
 				</span>
 				<span class="text-base font-semibold tabular-nums">{esc}</span>

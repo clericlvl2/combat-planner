@@ -23,9 +23,9 @@ export const typeColor: Record<CombatantType, string> = {
 	ally: 'bg-type-ally',
 };
 
-/** Stripe count per type (pc = 2 bars, ally/enemy = 1 — the swapped pc/ally hues + firm enemy=red). */
+/** Stripe count per type — all three types render exactly one leading-edge stripe. */
 export const typeStripeCount: Record<CombatantType, number> = {
-	pc: 2,
+	pc: 1,
 	enemy: 1,
 	ally: 1,
 };

@@ -13,6 +13,7 @@
 	--radius-lg: 14px;
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-xl: 18px;
+	--radius-card: 12px;
 
 	/* Spacing scale */
 	--space-1: 4px;
@@ -28,6 +29,10 @@
 	--font-md: 15px;
 	--font-lg: 18px;
 	--font-xl: 22px;
+
+	/* Letter-spacing (tracking) scale */
+	--tracking-wide: 0.04em;
+	--tracking-wider: 0.06em;
 
 	--touch-min: 44px;
 

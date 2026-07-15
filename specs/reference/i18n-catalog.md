@@ -56,7 +56,8 @@ a11y.*         accessible labels for controls
 | `combats.row.menu.export` | Export / share |
 | `combats.row.menu.delete` | Delete |
 | `combats.empty.title` | No combats yet |
-| `combats.empty.cta` | Create your first combat |
+| `combats.empty.description` | Create your first encounter to start tracking initiative and HP. |
+| `combats.empty.cta` | New combat |
 | `combats.untitled` | Untitled combat |
 | `combats.search.placeholder` | Search combats… |
 
@@ -159,7 +160,7 @@ Field ranges/defaults: [[limits]].
 | `forms.field.note.placeholder` | Useful notes… |
 | `forms.note.add` | Add note |
 | `forms.note.addShort` | Note |
-| `forms.combat.create.title` | Create combat |
+| `forms.combat.create.title` | New combat |
 | `forms.combat.edit.title` | Edit combat |
 | `forms.field.title` | Title |
 | `forms.field.description` | Description |
@@ -173,6 +174,8 @@ Field ranges/defaults: [[limits]].
 | `forms.colorTag.blue` | Blue |
 | `forms.colorTag.violet` | Violet |
 | `forms.action.save` | Save |
+| `forms.action.create` | Create |
+| `forms.action.add` | Add |
 | `forms.action.cancel` | Cancel |
 | `forms.action.duplicate` | Duplicate |
 | `forms.action.remove` | Remove |
@@ -199,6 +202,7 @@ translated value in all 6 locales.
 | `settings.data.exportAll` | Export all |
 | `settings.data.importAll` | Import all |
 | `settings.data.resetAll` | Reset all |
+| `settings.data.resetAll.caveat` | Delete every combat (keeps language & theme) |
 | `settings.language.en` | English |
 | `settings.language.de` | Deutsch |
 | `settings.language.es` | Español |
@@ -233,7 +237,7 @@ Language option labels are endonyms and stay identical across all locale files.
 | `dialogs.restart.body` | Keeps the roster but resets initiative, HP, temp HP, conditions, and the round. You can undo it. | |
 | `dialogs.restart.confirm` | Restart | |
 | `dialogs.resetAll.title` | Reset everything? | |
-| `dialogs.resetAll.body` | This permanently deletes all combats and settings on this device. It can't be undone. | |
+| `dialogs.resetAll.body` | This permanently deletes every combat on this device. Language and theme settings are kept. | |
 | `dialogs.resetAll.confirm` | Reset all | |
 
 ## toasts.* — update, install, import

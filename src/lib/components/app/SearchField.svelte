@@ -13,7 +13,7 @@
 <div
 	class="flex h-10 flex-none items-center gap-2 rounded-sm border border-[var(--border-strong)] bg-secondary px-3 text-sm text-[var(--text-faint)]"
 >
-	<span aria-hidden="true" class="text-base leading-none">&#8981;</span>
+	<span aria-hidden="true" class="text-[16px] leading-none">&#8981;</span>
 	<input
 		type="search"
 		bind:value

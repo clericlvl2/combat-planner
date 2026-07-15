@@ -13,13 +13,13 @@
 
 <h1 class="sr-only">{m['about.title']()}</h1>
 
-<div class="mx-auto flex w-full max-w-[640px] flex-col gap-3 p-5">
+<div class="mx-auto flex w-full max-w-[640px] flex-col gap-3 p-6">
 	<h2 class="text-xl font-semibold">{m['about.appName']()}</h2>
 	<span class="text-sm tabular-nums text-muted-foreground">
 		{m['about.version']({ version: APP_VERSION })}
 	</span>
 	<p class="text-sm leading-relaxed text-muted-foreground">{m['about.description']()}</p>
-	<div class="rounded-lg border border-l-4 border-border border-l-type-pc bg-card p-3 text-sm">
+	<div class="rounded-lg border border-l-[3px] border-border border-l-type-pc bg-card p-3 text-sm">
 		{m['about.privacy']()}
 	</div>
 </div>

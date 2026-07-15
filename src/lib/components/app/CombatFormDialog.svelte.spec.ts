@@ -24,7 +24,7 @@ test('create mode calls store.createCombat with the form values', async () => {
 
 	await userEvent.fill(screen.getByLabelText(m['forms.field.title']()), 'Goblin ambush');
 	await userEvent.fill(screen.getByLabelText(m['forms.field.description']()), 'At the bridge');
-	await screen.getByRole('button', { name: m['forms.action.save']() }).click();
+	await screen.getByRole('button', { name: m['forms.action.create']() }).click();
 
 	expect(createCombatFn).toHaveBeenCalledTimes(1);
 	expect(createCombatFn).toHaveBeenCalledWith({
@@ -41,7 +41,7 @@ test('create mode surfaces errors.combatCap and creates nothing when store retur
 	const screen = render(CombatFormDialog, { open: true, store });
 
 	await userEvent.fill(screen.getByLabelText(m['forms.field.title']()), 'One too many');
-	await screen.getByRole('button', { name: m['forms.action.save']() }).click();
+	await screen.getByRole('button', { name: m['forms.action.create']() }).click();
 
 	expect(createCombatFn).toHaveBeenCalledTimes(1);
 	await expect.element(screen.getByText(m['errors.combatCap']({ max: MAX_COMBATS }))).toBeVisible();

@@ -25,6 +25,8 @@
 	"combat.menu.clear": "Очистить бой",
 	"combat.notFound.title": "Бой не найден",
 	"combat.notFound.back": "Назад к боям",
+	"route.notFound.title": "Страница не найдена",
+	"route.notFound.back": "Назад к боям",
 	"setup.addCombatant": "Участник",
 	"setup.start": "Начать бой",
 	"setup.empty.title": "Пока нет участников",

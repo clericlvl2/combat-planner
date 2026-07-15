@@ -25,6 +25,8 @@
 	"combat.menu.clear": "Kampf leeren",
 	"combat.notFound.title": "Kampf nicht gefunden",
 	"combat.notFound.back": "Zurück zu den Kämpfen",
+	"route.notFound.title": "Seite nicht gefunden",
+	"route.notFound.back": "Zurück zu den Kämpfen",
 	"setup.addCombatant": "Kämpfer",
 	"setup.start": "Kampf starten",
 	"setup.empty.title": "Noch keine Kämpfer",

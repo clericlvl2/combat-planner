@@ -25,6 +25,8 @@
 	"combat.menu.clear": "Vaciar combate",
 	"combat.notFound.title": "Combate no encontrado",
 	"combat.notFound.back": "Volver a Combates",
+	"route.notFound.title": "Página no encontrada",
+	"route.notFound.back": "Volver a Combates",
 	"setup.addCombatant": "Combatiente",
 	"setup.start": "Iniciar combate",
 	"setup.empty.title": "Aún no hay combatientes",

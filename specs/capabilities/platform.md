@@ -135,13 +135,45 @@ combatants per combat and 100 combats ([[../reference/limits]]); adding beyond e
 
 The production build is served as a static SPA over HTTPS at a public URL; a push to `main`
 auto-deploys that URL. Mechanism: `@sveltejs/adapter-static` (`build/` output) hosted on Vercel
-per `ADR-007`; no server runtime, no env secrets.
+per `ADR-007`; no server runtime, no env secrets. The static host must also serve the SPA shell
+(`index.html`) for any request with no matching static file — deep links, param routes
+(`/combats/<id>`), and unknown paths alike — via a `vercel.json` catch-all rewrite applied after
+the filesystem check, so client routing boots instead of the host returning its own 404. Without
+this, real static assets (JS/CSS/icons/manifest) still resolve directly first; only requests that
+match nothing on disk fall through to the rewrite.
 
 **AC:**
 - The production URL responds `200` over HTTPS and returns the app-shell HTML (adapter-static
   SPA shell) — verified at `https://combat-planner-five.vercel.app/`.
 - A commit pushed to `main` produces a new production deployment at that URL (Vercel Git
   integration, dashboard-configured).
+- `vercel.json` contains a catch-all rewrite sending unmatched requests to `/index.html`; a
+  deep-link or hard reload to `/combats/<id>` (or any other client-only path) returns the
+  app-shell HTML and boots client routing, not the host's own 404, while real static assets
+  under `build/` still resolve directly.
+
+## PLT-12 — Unknown-path recovery screen
+
+A client route with no route match at all (e.g. `/combat`, `/foo`) renders a styled not-found
+recovery screen with a visible, `aria-label`-labelled Back-to-Combats control — never SvelteKit's
+default 404 page and never the PLT-10 thrown-error boundary (no error is thrown; there's simply
+no matching route). Mechanism: a root `[...catchall]` route that only matches otherwise-unmatched
+paths, so it never shadows a real route (`/combats`, `/combats/[id]`, `/settings`, `/about` all
+still resolve to their own pages via SvelteKit's route-specificity rules) and never intercepts a
+genuinely thrown error. `/combats/<bad-id>` keeps rendering the existing CLS-5 not-found screen
+unchanged — the catch-all only ever sees paths with no route at all.
+
+**AC:**
+- Navigating to a path with no matching route (e.g. `/combat`, `/foo`) renders a styled
+  not-found screen using app tokens, with a control that is both visibly labelled and carries an
+  `aria-label`, and that navigates to `/combats` when activated.
+- `/combats`, `/combats/[id]`, `/settings`, and `/about` still resolve to their own pages — the
+  catch-all route never shadows a real route match.
+- `/combats/<bad-id>` still renders the existing CLS-5 not-found screen ([[combats-list]] CLS-5),
+  not the catch-all screen.
+- A genuinely thrown error (e.g. the `/` load, `store.hydrate()`/Dexie access) still surfaces the
+  PLT-10 `+error.svelte` boundary — the catch-all route contains no error-throwing logic and
+  never intercepts a thrown error.
 
 ## PLT-10 — App-level error boundary
 

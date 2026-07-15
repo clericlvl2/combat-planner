@@ -25,6 +25,8 @@
 	"combat.menu.clear": "戦闘をクリア",
 	"combat.notFound.title": "戦闘が見つかりません",
 	"combat.notFound.back": "戦闘一覧に戻る",
+	"route.notFound.title": "ページが見つかりません",
+	"route.notFound.back": "戦闘一覧に戻る",
 	"setup.addCombatant": "コンバタント",
 	"setup.start": "戦闘開始",
 	"setup.empty.title": "コンバタントがまだいません",

@@ -10,6 +10,7 @@ interpolation; `{n, plural, …}` = ICU plural.
 
 ```
 nav.*          top-level destinations
+route.*        no-route-match recovery screen (root catch-all)
 combats.*      Combats home — list, create/import, row menu, empty
 combat.*       Combat header (both states) — back, round, escalation, undo/redo, ⋮
 setup.*        Setup body — add, start, empty
@@ -36,6 +37,13 @@ a11y.*         accessible labels for controls
 | `nav.about` | About |
 | `nav.open` | Open navigation |
 | `nav.primary` | Primary navigation |
+
+## route.* — no-route-match recovery screen
+
+| Key | English | Shape |
+|---|---|---|
+| `route.notFound.title` | Page not found | root `[...catchall]` not-found view — distinct from `combat.notFound.title` |
+| `route.notFound.back` | Back to Combats | not-found recovery view |
 
 ## combats.* — home
 

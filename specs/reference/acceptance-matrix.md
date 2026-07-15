@@ -7,6 +7,7 @@ assertions live in the actual test files: `src/**/*.spec.ts`, `src/**/*.svelte.s
 | Capability req(s) | Covering test | Layer |
 |---|---|---|
 | [[../capabilities/platform]] PLT-2 | F1 on mobile+desktop; tablet nav spot-check | E |
+| [[../capabilities/platform]] PLT-12 | `catchall-page.svelte.spec.ts` — no-route-match renders not-found title + labelled Back-to-Combats button | C |
 | [[../capabilities/platform]] PLT-7 | PWA update/reload; Dexie persistence round-trip | E |
 | [[../capabilities/platform]] PLT-1 | Offline guarantee (no runtime network calls) | E |
 | [[../capabilities/platform]] PLT-4 | Install-hint shown-once + dismissal persists | E |

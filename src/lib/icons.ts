@@ -43,7 +43,7 @@ export const typeIcon: Record<CombatantType, IconComponent> = {
 	ally: Shield,
 };
 
-/** UI chrome glyphs (ADR-011 firm set + the §13-flagged gaps). */
+/** UI chrome glyphs (ADR-011 firm set + the gaps flagged in specs/reference/component-inventory.md). */
 export const chromeIcon = {
 	back: ChevronLeft,
 	undo: Undo2,
@@ -54,7 +54,7 @@ export const chromeIcon = {
 	import: Upload,
 	export: Share2,
 	roll: Dices,
-	// §13 gaps (pending ADR-011):
+	// specs/reference/component-inventory.md gaps (pending ADR-011):
 	edit: Pencil,
 	remove: Trash2,
 	duplicate: Copy,

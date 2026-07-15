@@ -1,5 +1,5 @@
 /**
- * Numeric ranges + field defaults — single source of truth mirrors Rules & Glossary §7.
+ * Numeric ranges + field defaults — single source of truth mirrors specs/reference/limits.md.
  * Used by clamps (clamp.ts) and factories (factories.ts). Tests assert against these.
  */
 
@@ -16,13 +16,13 @@ export const RANGES = {
 	escalation: { min: 0, max: 6 },
 } as const;
 
-/** Note hard cap during input (Rules §7). */
+/** Note hard cap during input (specs/reference/limits.md). */
 export const NOTE_MAX_LENGTH = 250;
 
-/** d20 roll bounds (Rules §2 — Start auto-roll / per-combatant roll). */
+/** d20 roll bounds (INI-5 — Start auto-roll / per-combatant roll). */
 export const D20 = { min: 1, max: 20 } as const;
 
-/** Add-combatant placeholders that double as defaults when a field is omitted (Rules §7). */
+/** Add-combatant placeholders that double as defaults when a field is omitted (specs/reference/limits.md). */
 export const COMBATANT_DEFAULTS = {
 	maxHp: 10,
 	ac: 10,

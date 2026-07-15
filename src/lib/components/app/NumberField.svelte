@@ -1,6 +1,6 @@
 <!--
-  NumberField (Component Inventory §10) — labeled numeric input that clamps to its Rules §7 range
-  on commit and surfaces the inline clamp hint (UX §8). Clamp uses the domain `clamp` (single source
+  NumberField (component-inventory.md) — labeled numeric input that clamps to its limits.md range
+  on commit and surfaces the inline clamp hint. Clamp uses the domain `clamp` (single source
   of truth — clamp.ts); the store re-clamps authoritatively on mutate, so this is forgiving UX only.
   Styled to the `.numfield` recipe (specs/design/prototype.html): bordered/rounded stepper shell
   around the value input, Decrease → value → Increase order. The value input is `type="text"`

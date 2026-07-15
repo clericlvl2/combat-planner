@@ -1,6 +1,6 @@
 /**
- * Numeric clamps (Rules §7). Every committed value is forced into range — validation is
- * forgiving to keep live play fast (Rules §7 "clamp to their range on commit").
+ * Numeric clamps (specs/reference/limits.md). Every committed value is forced into range —
+ * validation is forgiving to keep live play fast ("clamp to their range on commit").
  */
 import { NOTE_MAX_LENGTH, RANGES } from './constants';
 
@@ -22,7 +22,7 @@ export const clampMd = (v: number): number => clamp(v, RANGES.md.min, RANGES.md.
 
 export const clampMaxHp = (v: number): number => clamp(v, RANGES.maxHp.min, RANGES.maxHp.max);
 
-/** Current HP floored at −maxHp (Rules §4), capped at the §7 max. */
+/** Current HP floored at −maxHp (HP-1), capped at the max (specs/reference/limits.md). */
 export const clampCurrentHp = (v: number, maxHp: number): number =>
 	clamp(v, -maxHp, RANGES.currentHp.max);
 
@@ -33,6 +33,6 @@ export const clampRound = (v: number): number => clamp(v, RANGES.round.min, RANG
 export const clampEscalation = (v: number): number =>
 	clamp(v, RANGES.escalation.min, RANGES.escalation.max);
 
-/** Notes are hard-capped during input (Rules §7); no rounding, just truncate. */
+/** Notes are hard-capped during input (specs/reference/limits.md); no rounding, just truncate. */
 export const clampNote = (note: string): string =>
 	note.length > NOTE_MAX_LENGTH ? note.slice(0, NOTE_MAX_LENGTH) : note;

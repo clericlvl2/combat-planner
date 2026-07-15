@@ -1,73 +1,50 @@
 # App components (`$lib/components/app`)
 
-Bespoke + composed components, built on shadcn-svelte primitives in `../ui` (ADR-008).
-**Skeleton decision:** the folder map below is the source of truth; concrete `.svelte`
-files are created per-component during the M-phase UI build (one file per component,
-co-located with its tests). No empty stub files are committed yet — they would be
-dead, unchecked code. Full prop/variant/state matrix → **Combat Planner Component
-Inventory**; control placement → **UX & IA §9**.
+Bespoke + composed components, built on shadcn-svelte primitives in `../ui` (ADR-008). This is a
+flat directory (no nested sub-folders) — every `.svelte` component is co-located with its
+`.svelte.spec.ts` test. The map below lists only components that actually exist on disk; full
+prop/variant/state matrix and control placement live in
+[`specs/reference/component-inventory.md`](../../../../specs/reference/component-inventory.md)
+(cited per-row below by section).
 
 ```
-shell/
-  AppShell.svelte            root layout host (Inventory §3)
-  Toaster.svelte             Sonner host; UpdateToast (§3)
-  UpdateToast.svelte         SW "Update — reload" (ADR-004)
-  InstallBanner.svelte       dismissible top install hint (§3)
-  ConfirmDialog.svelte       destructive-action confirm (§3)
-nav/
-  NavSidebar.svelte          mobile swipe-in nav (§4)
-  AppHeader.svelte           tablet/desktop top bar (§4)
-  NavLink.svelte             one destination + active marker (§4)
-combats/
-  CombatList.svelte          drag-reorderable list (ADR-006, §5)
-  CombatRow.svelte           one combat row (§5)
-  ColorTagDot.svelte         token-driven swatch (ADR-012, §5)
-  CombatRowMenu.svelte       row ⋮ : edit/export/delete (§5)
-  ImportControl.svelte       single-combat import → new copy (§5)
-  EmptyState.svelte          shared empty/CTA (§5/§7)
-  CombatFormDialog.svelte    create/edit combat (§5)
-  ColorSwatchPicker.svelte   8-swatch picker (§5)
-combat/
-  CombatHeader.svelte        back/undo/redo/round/escalation/⋮ (§6)
-  IconButton.svelte          shared icon button (§6)
-  RoundCounterControl.svelte round edit, Active-only (§6)
-  EscalationDieControl.svelte escalation override, Active-only (§6)
-  CombatOverflowMenu.svelte  header ⋮ item set by state (§6)
-  CombatantList.svelte       live-sorted roster (§7)
-  FAB.svelte                 shared add/advance/create (§7)
-  StartBar.svelte            pinned Start bar, Setup (§7)
-combatant/
-  CombatantRow.svelte        compact ⇄ expanded (§8)
-  TypeBadge.svelte           type color+icon (§8)
-  InitCell.svelte            roll/manual initiative (§8)
-  InitEntry.svelte           manual ± entry popover (§8)
-  HpCell.svelte              cur/max, opens numpad (§8)
-  HealthBar.svelte           health + reverse/alarm bar (§8)
-  DefenseStats.svelte        AC/PD/MD in-row (§8)
-  ConditionIconList.svelte   first-few + "+K" overflow (§8)
-  ConditionPicker.svelte     12 condition toggles (§8)
-  TempHpField.svelte         temp HP, expanded (§8)
-  NoteField.svelte           inline note ≤250 (§8/§10)
-  RowActions.svelte          duplicate/remove/edit (§8)
-numpad/
-  NumpadSheet.svelte         HP sheet container (§9)
-  HpSummaryHeader.svelte     cur/max + temp (§9)
-  EntryDisplay.svelte        running entry readout (§9)
-  DigitPad.svelte            0–9 + backspace/clear (§9)
-  CommitActions.svelte       damage/heal/set-temp (§9)
-  HpLogSection.svelte        read-only History (Data §9, §9)
-  HpLogEntryRow.svelte       one log line (§9)
-forms/
-  CombatantFormDialog.svelte add/edit combatant (§10)
-  TypeSelect.svelte          pc/enemy/ally (§10)
-  NumberField.svelte         clamping numeric field (§10)
-settings/
-  SettingsGroup.svelte       labeled section (§11)
-  LanguageSwitcher.svelte    6 locales (ADR-005, §11)
-  ThemeSwitcher.svelte       system/dark/light (§11)
-  DataActions.svelte         export/import/reset all (§11)
-  AboutPage.svelte           static About (§11)
+AppShell.svelte            root layout host — component-inventory.md#hierarchy
+AppHeader.svelte           tablet/desktop top bar (burger + icon-button modes) —
+                            component-inventory.md#navigation-placement-per-breakpoint
+NavSidebar.svelte          mobile swipe-in nav —
+                            component-inventory.md#navigation-placement-per-breakpoint
+ConfirmDialog.svelte       destructive-action confirm — component-inventory.md#hierarchy
+CombatList.svelte          drag-reorderable combats list (ADR-006) —
+                            component-inventory.md#combats-list-row
+CombatRow.svelte           one combat row — component-inventory.md#combats-list-row
+CombatRowMenu.svelte       row ⋮ : edit/delete — component-inventory.md#combats-list-row
+CombatFormDialog.svelte    create/edit combat — capability CLS
+ColorSwatchPicker.svelte   8-swatch picker (ADR-012) — capability CLS
+ColorTagDot.svelte         token-driven swatch (ADR-012) —
+                            component-inventory.md#combats-list-row
+SearchField.svelte         real-time title filter, Combats-home only — capability CLS (CLS-9)
+CombatHeader.svelte        back/undo-redo/round/escalation/⋮ combat-screen header —
+                            component-inventory.md#header-combat-screen
+FAB.svelte                 shared add/advance/create floating action button —
+                            component-inventory.md#floating-action-button-fab-bottomright-thumb-zone
+EmptyState.svelte          shared empty-state + CTA — component-inventory.md#hierarchy
+CombatantRow.svelte        combatant card, compact ⇄ expanded —
+                            component-inventory.md#combatant-card
+CombatantForm.svelte       add/edit combatant — capability CBT
+InitCell.svelte            roll/manual initiative — capability INI
+HealthBar.svelte           health + reverse/alarm bar — capability HP
+NumberField.svelte         clamping numeric field — specs/reference/limits.md
+NumpadSheet.svelte         HP entry sheet (damage/heal/set-temp + log) —
+                            component-inventory.md#numpad-sheet
+ConditionPicker.svelte     condition toggles — capability CND
+ConditionIconList.svelte   first-few + "+K" overflow condition chips —
+                            component-inventory.md#combatant-card
+controller.ts               non-visual combat-screen controller/wiring helper
+labels.ts                   shared label/text helper
+header-action.svelte.ts     shared header-action state helper
 ```
 
-Centralize Lucide glyph names in `$lib/icons.ts` (ADR-011) so a later swap is one file;
-several chrome glyphs are still flagged open in Component Inventory §13.
+Centralize Lucide glyph names in `$lib/icons.ts` (ADR-011) so a later swap is one file; several
+chrome glyphs are still flagged open in
+[`specs/reference/component-inventory.md`](../../../../specs/reference/component-inventory.md)
+("Glyph gaps").

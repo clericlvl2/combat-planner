@@ -1,5 +1,5 @@
 /**
- * Injectable seams for the two sources of nondeterminism (Test Plan §3/§8 gap):
+ * Injectable seams for the two sources of nondeterminism:
  *  - `genId`  — stable identifier generation.
  *  - `d20`    — the initiative die.
  * Transitions take these as optional deps so unit tests can pass deterministic stubs.

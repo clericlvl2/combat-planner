@@ -1,9 +1,9 @@
 <!--
-  NumpadSheet (Component Inventory §9, UX §4c) — bottom-sheet HP editor opened from a row's HP cell.
+  NumpadSheet (component-inventory.md "Numpad sheet", HP-6) — bottom-sheet HP editor opened from a row's HP cell.
   Summary header (cur/max + temp so the buffer is visible) · entry display · digit pad · the three
   commit actions (Deal Damage / Restore HP / Set Temp HP) · a read-only History of this combatant's
   hpLog (newest first). Empty entry → commits disabled (no-op). Commit closes the sheet; the change
-  rides the combat's Undo history (no toast). History is view-only — no undo control here (Data §9).
+  rides the combat's Undo history (no toast). History is view-only — no undo control here (LOG).
   Emits commit intent only; all HP math + log append live in the store/domain.
 -->
 <script lang="ts">
@@ -35,7 +35,7 @@
 	let entry = $state('');
 	let historyOpen = $state(false);
 
-	// Fresh entry on each open (abandons any partial entry — UX §4c dismiss-with-no-op).
+	// Fresh entry on each open (abandons any partial entry — HP-6 dismiss-with-no-op).
 	$effect(() => {
 		if (open) entry = '';
 	});
@@ -73,7 +73,7 @@
 	const Expand = chromeIcon.expand;
 
 	function push(d: string) {
-		if (entry.length >= 4) return; // ≤ 9999, covers the §7 HP ranges
+		if (entry.length >= 4) return; // ≤ 9999, covers the HP ranges in specs/reference/limits.md
 		entry += d;
 	}
 	function backspace() {
@@ -94,7 +94,7 @@
 	<DrawerContent class="mx-auto max-w-md">
 		{#if combatant}
 			<div class="flex flex-col gap-3 p-4">
-				<!-- HpSummaryHeader: cur/max + temp buffer (UX §4c) — cur HP is the distinctive value here -->
+				<!-- HpSummaryHeader: cur/max + temp buffer (HP-1) — cur HP is the distinctive value here -->
 				<div class="flex items-baseline justify-between gap-2">
 					<span class="truncate font-semibold">{combatant.name}</span>
 					<span class="shrink-0 tabular-nums">
@@ -116,7 +116,7 @@
 					{entry || '0'}
 				</div>
 
-				<!-- CommitActions (rendered above the digit pad — Component Inventory §"Numpad sheet"; empty entry → disabled no-op).
+				<!-- CommitActions (rendered above the digit pad — component-inventory.md "Numpad sheet"; empty entry → disabled no-op).
 				     Tint recipe: transparent fill + a tinted border + solid-color text (no bg fill) —
 				     WCAG-AA verified against both --surface/--popover themes (see phase report); a
 				     filled color-mix background per the prototype's literal `.btn--*-tint` recipe drops

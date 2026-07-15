@@ -1,5 +1,5 @@
 <!--
-  ConditionIconList (Component Inventory §8b) — compact-row condition tag chips (text only, no
+  ConditionIconList (component-inventory.md, CND-3) — compact-row condition tag chips (text only, no
   icons). All conditions render (no overflow chip — max is 12, the row wraps). Empty → nothing.
   When `removable` (row expanded only — gated by the caller), each chip gets a trailing `×` to
   drop that condition directly from the tag row.

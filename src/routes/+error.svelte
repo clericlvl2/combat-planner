@@ -3,7 +3,7 @@
   `/` root load) or from `store.hydrate()`/Dexie access during `+layout.svelte`'s `onMount`.
   Renders inside `+layout.svelte`'s AppShell, so the chrome (header/nav) stays present; this
   file only supplies the outlet content, matching the EmptyState pattern already used on
-  Combats home / the Combat screen (Component Inventory §Hierarchy).
+  Combats home / the Combat screen (specs/reference/component-inventory.md Hierarchy section).
 -->
 <script lang="ts">
 	import { goto } from '$app/navigation';

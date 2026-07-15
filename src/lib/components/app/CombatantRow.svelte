@@ -1,5 +1,5 @@
 <!--
-  CombatantRow (Component Inventory §8, UX §4c) — one roster card, compact ↔ expanded via
+  CombatantRow (component-inventory.md "Combatant card", CBT-2) — one roster card, compact ↔ expanded via
   Collapsible. Card shape ported from `specs/design/card-prototype.html` (locked in
   `component-inventory.md`'s "Combatant card" section): leading TypeStripe(s) (pc=2 green,
   ally=1 blue, enemy=1 red — color-only, `aria-label` compensates) · Row 1 name + expand chevron +
@@ -96,7 +96,7 @@
 	const Remove = chromeIcon.remove;
 
 	/** "+ Condition" / "+ Note" triggers — same chip box as the condition tags (Badge), just
-	 *  dashed to read as an affordance rather than a value (UX §4c). */
+	 *  dashed to read as an affordance rather than a value. */
 	const tagTriggerClass =
 		'inline-flex h-6 items-center gap-1 rounded-full border border-dashed border-muted-foreground/50 px-2.5 py-0.5 text-sm font-medium text-muted-foreground hover:border-foreground hover:text-foreground';
 

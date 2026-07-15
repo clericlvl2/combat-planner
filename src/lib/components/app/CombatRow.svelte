@@ -1,5 +1,5 @@
 <!--
-  CombatRow (Component Inventory §Combats list row, CLS-1/CLS-5/CLS-6) — one Combats-home list
+  CombatRow (component-inventory.md, CLS-1/CLS-5/CLS-6) — one Combats-home list
   row: a leading drag-handle affordance (decorative only — `svelte-dnd-action`'s zone on
   `CombatList` is what actually makes the whole row draggable, unchanged here), `ColorTagDot`
   (with the title initial, a row disambiguator) + title + description, trailing `⋮`

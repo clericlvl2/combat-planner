@@ -1,6 +1,7 @@
 /**
- * Derived values (Data Model §3/§4) — never stored, always computed. Pure functions over state.
- * The reactive seam wraps these in `$derived` (ADR-002); tests assert them directly (Test Plan §3).
+ * Derived values (see TRE-5, HP-4) — never stored, always computed. Pure functions over state.
+ * The reactive seam wraps these in `$derived` (ADR-002); tests assert them directly (see
+ * specs/reference/acceptance-matrix.md).
  */
 import { type Combat, type Combatant, UNROLLED } from '../../db/types';
 import { clampEscalation } from './clamp';
@@ -10,7 +11,7 @@ export type HealthStatus = 'full' | 'wounded' | 'bloodied' | 'dead';
 /** currentHp / maxHp (temp excluded; maxHp ≥ 1 so never divides by zero). May exceed 1. */
 export const healthPercent = (c: Combatant): number => c.currentHp / c.maxHp;
 
-/** Health band (Rules §4). cur ≤ 0 → dead; cur > maxHp (>100%) reads full. */
+/** Health band (HP-4). cur ≤ 0 → dead; cur > maxHp (>100%) reads full. */
 export function healthStatus(c: Combatant): HealthStatus {
 	if (c.currentHp <= 0) return 'dead';
 	const pct = healthPercent(c);
@@ -19,19 +20,19 @@ export function healthStatus(c: Combatant): HealthStatus {
 	return 'bloodied';
 }
 
-/** Stored escalation value (Rules §3), clamped 0..6. Fully decoupled from round. */
+/** Stored escalation value (TRE-6), clamped 0..6. Fully decoupled from round. */
 export function escalationDie(combat: Combat): number {
 	return clampEscalation(combat.escalation);
 }
 
-/** Round + escalation are visible only while Active (Data §3). */
+/** Round + escalation are visible only while Active (TRE-5). */
 export const showRoundAndEscalation = (combat: Combat): boolean => combat.state === 'active';
 
 export const isActive = (combat: Combat, c: Combatant): boolean =>
 	combat.activeCombatantId === c.id;
 
 /**
- * Initiative order (Rules §2): rolled high→low, tiebreak (1) higher bonus (2) addOrder;
+ * Initiative order (INI-4): rolled high→low, tiebreak (1) higher bonus (2) addOrder;
  * unrolled ("-") always at the bottom in addOrder. Pure, stable.
  */
 export function sortedCombatants(combat: Combat): Combatant[] {
@@ -50,7 +51,7 @@ export function sortedCombatants(combat: Combat): Combatant[] {
 }
 
 /**
- * canAdvance (Data §3): Active, non-empty, and NOT the round-99 → round-100 wrap. Advancing
+ * canAdvance (TRE-3): Active, non-empty, and NOT the round-99 → round-100 wrap. Advancing
  * within round 99 (not yet on the last combatant) still works.
  */
 export function canAdvance(combat: Combat): boolean {

@@ -11,7 +11,7 @@ import {
 } from './persistence';
 import { type Combat, SETTINGS_ID, type Settings } from './types';
 
-/** In-memory PersistenceDb fake (real IndexedDB round-trip is E2E — Test Plan §2). */
+/** In-memory PersistenceDb fake (real IndexedDB round-trip is E2E — see specs/reference/acceptance-matrix.md). */
 function fakeDb(): PersistenceDb {
 	const combats = new Map<string, Combat>();
 	const settings = new Map<string, Settings>();
@@ -83,7 +83,7 @@ describe('persistence round-trip (ADR-003)', () => {
 	});
 });
 
-describe('stripHistory (Data §10 — export keeps hpLog, drops undo/redo)', () => {
+describe('stripHistory (IMP-2 — export keeps hpLog, drops undo/redo)', () => {
 	it('clears the stacks but leaves everything else intact', () => {
 		const c: Combat = {
 			...createCombat({ title: 'Keep' }, 0, () => 'c'),

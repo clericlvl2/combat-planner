@@ -2,7 +2,8 @@
  * Combat controller — the intent seam between the prop-driven UI leaves and the M1 store
  * (ADR-002). Every method is already bound to one `combatId`, so components emit pure intent
  * (`roll(id)`, `damage(id, n)`, …) and stay free of the store import — which is what lets the
- * Test Plan §4 component tests drive them with a plain spy object instead of a live Dexie store.
+ * component tests (see acceptance-matrix.md) drive them with a plain spy object instead of a
+ * live Dexie store.
  *
  * No business logic lives here: each call forwards straight to a store mutation (which snapshots
  * `$state` and persists — see the store seam). The store owns the rules; this only narrows + binds.

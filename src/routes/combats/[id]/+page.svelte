@@ -1,5 +1,5 @@
 <!--
-  Combat screen (Component Inventory §Hierarchy/§FAB, PLT-2/PLT-3) — reads the store's reactive
+  Combat screen (specs/reference/component-inventory.md Hierarchy/FAB sections, PLT-2/PLT-3) — reads the store's reactive
   combat + the derived VIEWS (sortedCombatants / showRoundAndEscalation / canAdvance / isActive),
   wraps them in $derived (ADR-002), and wires the thin components via an id-scoped controller.
   Setup ⇄ Active is gated by showRoundAndEscalation. The page owns the single shared NumpadSheet +

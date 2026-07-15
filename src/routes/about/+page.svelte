@@ -1,5 +1,5 @@
 <!--
-  About (Component Inventory §Hierarchy AboutPage, specs/capabilities/settings.md SET-5) — static
+  About (specs/reference/component-inventory.md Hierarchy AboutPage, specs/capabilities/settings.md SET-5) — static
   page: app name + version, purpose, and the local-only privacy note, per the approved
   `specs/design/prototype.html` "SCREEN — About" `.about` block.
 -->

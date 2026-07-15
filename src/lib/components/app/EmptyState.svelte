@@ -1,5 +1,5 @@
 <!--
-  EmptyState (Component Inventory §5/§7) — shared empty-state leaf: optional icon, title,
+  EmptyState (component-inventory.md) — shared empty-state leaf: optional icon, title,
   optional description, and a CTA slot (e.g. Combats home's "Create your first combat" Button).
   Reused for the "No combats yet" (combats.empty.*) and the Combat-screen empty roster cases.
 -->

@@ -1,5 +1,5 @@
 /**
- * Conceptual data model as TypeScript types (Data Model §2–§5, §9).
+ * Conceptual data model as TypeScript types.
  * Types + shapes only — no behavior. All transitions/derivations live in the
  * store seam (ADR-002, src/lib/stores), wired in M1.
  */
@@ -7,18 +7,18 @@
 /** Bumped together with the Dexie DB version on a shape-incompatible change (ADR-013). */
 export const DATA_VERSION = 2;
 
-/** Hard caps (Rules §7). */
+/** Hard caps (see specs/reference/limits.md). */
 export const MAX_COMBATANTS = 30;
 export const MAX_COMBATS = 100;
 
 /** Bundled UI locales (ADR-005). English is the source language. */
 export type Locale = 'en' | 'de' | 'es' | 'fr' | 'ja' | 'ru';
 
-/** Visual-only combatant type — drives color + icon, nothing else (Rules §1). */
+/** Visual-only combatant type — drives color + icon, nothing else (CBT-1). */
 export type CombatantType = 'pc' | 'enemy' | 'ally';
 export const COMBATANT_TYPES = ['pc', 'enemy', 'ally'] as const;
 
-/** Combat lifecycle (Data Model §3). */
+/** Combat lifecycle (LIF-1). */
 export type CombatState = 'setup' | 'active';
 
 /** The 8 preset color-tag swatch keys (ADR-012). Stored as the key, never a hex. */
@@ -42,7 +42,7 @@ export const COLOR_TAGS = [
 	'violet',
 ] as const;
 
-/** The fixed set of 12 conditions — membership only, no duration/stacks (Data Model §5). */
+/** The fixed set of 12 conditions — membership only, no duration/stacks (CND-1). */
 export type Condition =
 	| 'charmed'
 	| 'confused'
@@ -71,17 +71,17 @@ export const CONDITIONS = [
 	'staggered',
 ] as const;
 
-/** Theme preference (Data Model §2). */
+/** Theme preference (SET-2). */
 export type Theme = 'system' | 'dark' | 'light';
 
-/** Unrolled initiative sentinel (Data Model §4). */
+/** Unrolled initiative sentinel (INI-2). */
 export const UNROLLED = '-' as const;
 export type Initiative = number | typeof UNROLLED;
 
-/** "none" sentinels (Data Model §3). */
+/** "none" sentinels (LIF-1). */
 export const NONE = 'none' as const;
 
-/** One read-only HP-change log line (Data Model §9). Captured at write time. */
+/** One read-only HP-change log line (LOG-1). Captured at write time. */
 export interface HpLogEntry {
 	/** Maps to i18n numpad.history.action.* labels. */
 	type: 'damage' | 'heal' | 'setTemp' | 'setMax';
@@ -98,9 +98,9 @@ export interface HpLogEntry {
 }
 
 /**
- * The reversible per-combat actions tracked by the undo/redo history (Data Model §8).
+ * The reversible per-combat actions tracked by the undo/redo history (UND-1).
  * Tag carried on each UndoEntry for debugging/tests; the reversal mechanism itself is a
- * uniform snapshot (see below), which Data §8 explicitly permits ("a roster snapshot",
+ * uniform snapshot (see below), which UND-3 explicitly permits ("a roster snapshot",
  * "a pre-Start snapshot", …).
  */
 export type UndoableAction =
@@ -130,17 +130,17 @@ export type UndoableAction =
 export type CombatSnapshot = Omit<Combat, 'undoStack' | 'redoStack'>;
 
 /**
- * One bounded undo/redo history entry (Data Model §8). Stores a deep snapshot of the combat's
+ * One bounded undo/redo history entry (UND-6). Stores a deep snapshot of the combat's
  * reversible state taken immediately BEFORE the action; undo restores it, redo re-applies the
  * post-action snapshot. The snapshot carries each combatant's `hpLog`, so undoing an HP action
- * pops its log entry for free (Data §9).
+ * pops its log entry for free (LOG-4).
  */
 export interface UndoEntry {
 	action: UndoableAction;
 	snapshot: CombatSnapshot;
 }
 
-/** A participant (Data Model §4). All types share the same fields. */
+/** A participant (CBT-2). All types share the same fields. */
 export interface Combatant {
 	id: string;
 	name: string;
@@ -161,7 +161,7 @@ export interface Combatant {
 	hpLog: HpLogEntry[];
 }
 
-/** One fight (Data Model §3). One Dexie row per combat. */
+/** One fight (LIF-1). One Dexie row per combat. */
 export interface Combat {
 	id: string;
 	title: string;
@@ -183,7 +183,7 @@ export interface Combat {
 	updatedAt: number;
 }
 
-/** Singleton settings record (Data Model §2). */
+/** Singleton settings record (SET-1). */
 export interface Settings {
 	/** Fixed primary key for the singleton row. */
 	id: typeof SETTINGS_ID;
@@ -198,7 +198,7 @@ export interface Settings {
 /** The one fixed key under which the singleton Settings row is stored. */
 export const SETTINGS_ID = 'settings' as const;
 
-/** Full export/import payload (Data Model §10). */
+/** Full export/import payload (IMP-1). */
 export interface AppData {
 	dataVersion: number;
 	settings: Settings;

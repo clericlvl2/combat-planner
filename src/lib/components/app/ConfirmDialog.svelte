@@ -1,5 +1,5 @@
 <!--
-  ConfirmDialog (Component Inventory §3) — AlertDialog wrapper for the destructive confirms
+  ConfirmDialog (component-inventory.md) — AlertDialog wrapper for the destructive confirms
   (clear / restart here; delete / reset-all are M3/M5). Open is controlled by the parent.
 -->
 <script lang="ts">

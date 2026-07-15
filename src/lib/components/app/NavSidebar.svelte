@@ -1,5 +1,5 @@
 <!--
-  NavSidebar (Component Inventory §Hierarchy / §Navigation placement per breakpoint, PLT-3) — the
+  NavSidebar (component-inventory.md "Hierarchy" / "Navigation placement per breakpoint", PLT-3) — the
   mobile/tablet nav overlay: links to Combats / Settings / About. Opened either by AppHeader's
   burger button (bound `open`, tablet's mode) or by swiping right from the left screen edge on
   touch devices (mobile's mode, PLT-3 AC "swiping right on mobile opens a sidebar containing

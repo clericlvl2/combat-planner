@@ -1,10 +1,10 @@
 /**
- * Per-combat undo/redo history (Data Model §8): a bounded (10-deep) two-way stack.
+ * Per-combat undo/redo history (UND-6): a bounded (10-deep) two-way stack.
  *
  * Mechanism: a uniform deep **snapshot** of the combat's reversible state (everything except the
- * two stacks) taken before each reversible action. Data §8 permits snapshots ("a roster snapshot",
+ * two stacks) taken before each reversible action. UND-3 permits snapshots ("a roster snapshot",
  * "a pre-Start snapshot", …); a single snapshot scheme reverses every action correctly — including
- * popping an hpLog entry on undo of an HP action (Data §9), since the snapshot carries the log.
+ * popping an hpLog entry on undo of an HP action (LOG-4), since the snapshot carries the log.
  */
 import type { Combat, CombatSnapshot, UndoableAction, UndoEntry } from '../../db/types';
 
@@ -15,13 +15,13 @@ function snapshot(c: Combat): CombatSnapshot {
 	return structuredClone(rest);
 }
 
-/** Cap to the last UNDO_LIMIT entries (oldest dropped past the cap — Data §8). */
+/** Cap to the last UNDO_LIMIT entries (oldest dropped past the cap — UND-6). */
 function capped(stack: UndoEntry[]): UndoEntry[] {
 	return stack.length > UNDO_LIMIT ? stack.slice(stack.length - UNDO_LIMIT) : stack;
 }
 
 /**
- * Push a pre-action snapshot and clear the redo branch (a new action invalidates redo — Data §8).
+ * Push a pre-action snapshot and clear the redo branch (a new action invalidates redo — UND-6).
  * Call BEFORE applying the mutation.
  */
 export function pushUndo(c: Combat, action: UndoableAction): Combat {

@@ -1,5 +1,6 @@
 <!--
-  Combats home (UX §3, Component Inventory §5) — the M3 real home: CombatList (Phase 5) + create
+  Combats home (specs/capabilities/combats-list.md CLS, specs/reference/component-inventory.md
+  "Combats list row" section) — the M3 real home: CombatList (Phase 5) + create
   FAB + EmptyState ("No combats yet") + CombatFormDialog (Phase 3) shared by create/edit. Row
   callbacks from CombatList (onOpen/onEdit/onDelete) drive navigation + this page's own dialog
   state; delete is confirm-gated inside CombatRowMenu (Phase 4), not here.

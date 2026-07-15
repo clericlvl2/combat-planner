@@ -1,5 +1,5 @@
 /**
- * Per-combat state transitions (Data Model §7) — pure functions `(Combat, …) => Combat`.
+ * Per-combat state transitions (see CBT, LIF) — pure functions `(Combat, …) => Combat`.
  * Every reversible action pushes an undo snapshot first (undo.ts); HP actions append an hpLog
  * entry (hp.ts). Blocked/no-op actions return the combat unchanged (no undo pushed) so the
  * caller can surface a message (caps/clamps live in clamp.ts; messages are a UI concern — M2+).
@@ -54,9 +54,9 @@ function nextAddOrder(combat: Combat): number {
 const liveRound = (combat: Combat): number | null =>
 	combat.state === 'active' ? combat.round : null;
 
-// ── HP transitions (Rules §4, Data §9) ──────────────────────────────────────
+// ── HP transitions (HP-1, LOG-1) ─────────────────────────────────────────────
 
-/** Empty/non-positive entry → no-op (no state change, no log — Rules §4 / Test Plan §3.4). */
+/** Empty/non-positive entry → no-op (no state change, no log — HP-1). */
 export function dealDamage(combat: Combat, id: string, n: number): Combat {
 	if (!(n > 0) || !find(combat, id)) return combat;
 	const round = liveRound(combat);
@@ -75,7 +75,7 @@ export function setTempHp(combat: Combat, id: string, n: number): Combat {
 	return mapCombatant(pushUndo(combat, 'setTemp'), id, (c) => applySetTemp(c, n, round));
 }
 
-/** Discrete Max-HP step (its own undo entry + "Set Max HP" hpLog entry — Data §7/§8). */
+/** Discrete Max-HP step (its own undo entry + "Set Max HP" hpLog entry — HP-5). */
 export function setMaxHp(combat: Combat, id: string, n: number): Combat {
 	const target = find(combat, id);
 	if (!target || clampMaxHp(n) === target.maxHp) return combat;
@@ -83,7 +83,7 @@ export function setMaxHp(combat: Combat, id: string, n: number): Combat {
 	return mapCombatant(pushUndo(combat, 'setMaxHp'), id, (c) => applySetMax(c, n, round));
 }
 
-// ── combatant roster (Data §6/§7, Rules §8) ─────────────────────────────────
+// ── combatant roster (CBT-3, CBT-6, CBT-7) ──────────────────────────────────
 
 export function addCombatant(
 	combat: Combat,
@@ -93,7 +93,7 @@ export function addCombatant(
 ): Combat {
 	if (combat.combatants.length >= MAX_COMBATANTS) return combat;
 	let combatant = createCombatant(input, nextAddOrder(combat), genId);
-	// Mid-combat add (Data §7): no manual value given → auto-roll like everyone else got at Start.
+	// Mid-combat add (CBT-3): no manual value given → auto-roll like everyone else got at Start.
 	if (combat.state === 'active' && combatant.initiative === UNROLLED) {
 		combatant = { ...combatant, initiative: clampInitiative(roll() + combatant.initiativeBonus) };
 	}
@@ -103,7 +103,7 @@ export function addCombatant(
 
 /**
  * Remove a combatant. If it was active, move the pointer to the next in sorted order (or the new
- * last); removing the last/only one clears the pointer and reverts Active → Setup (Data §6).
+ * last); removing the last/only one clears the pointer and reverts Active → Setup (TRE-4, LIF-7).
  */
 export function removeCombatant(combat: Combat, id: string): Combat {
 	if (!find(combat, id)) return combat;
@@ -130,7 +130,7 @@ export function removeCombatant(combat: Combat, id: string): Combat {
 	return { ...pushed, combatants, activeCombatantId, updatedAt: now() };
 }
 
-/** Windows-style suffix: strip a trailing " N", then find the lowest free "base K" (Rules §8). */
+/** Windows-style suffix: strip a trailing " N", then find the lowest free "base K" (CBT-7). */
 function duplicateName(name: string, taken: Set<string>): string {
 	const base = name.replace(/\s+\d+$/, '').trimEnd() || name;
 	let k = 1;
@@ -138,7 +138,7 @@ function duplicateName(name: string, taken: Set<string>): string {
 	return `${base} ${k}`;
 }
 
-/** Duplicate: copy stats+note, reset init/cur/temp/conditions/hpLog, append at bottom (Rules §8). */
+/** Duplicate: copy stats+note, reset init/cur/temp/conditions/hpLog, append at bottom (CBT-7). */
 export function duplicateCombatant(
 	combat: Combat,
 	id: string,
@@ -162,7 +162,7 @@ export function duplicateCombatant(
 	return { ...pushed, combatants: [...pushed.combatants, copy], updatedAt: now() };
 }
 
-// ── combatant fields (Data §7) ──────────────────────────────────────────────
+// ── combatant fields (CBT-4) ─────────────────────────────────────────────────
 
 export function addCondition(combat: Combat, id: string, condition: Condition): Combat {
 	const c = find(combat, id);
@@ -227,7 +227,7 @@ function applyFieldPatch(c: Combatant, patch: CombatantFieldPatch): Combatant {
 
 /**
  * Edit a combatant from the form save. A Max-HP change is recorded as its OWN discrete undo step,
- * separate from the other field edits in the same save (Data §7 editCombatant / §8): the field
+ * separate from the other field edits in the same save (CBT-4 editCombatant / UND-4): the field
  * edits push one entry, the Max-HP edit a second (with its "Set Max HP" hpLog entry).
  */
 export function editCombatant(
@@ -251,9 +251,9 @@ export function editCombatant(
 	return next;
 }
 
-// ── lifecycle (Data §7, Rules §2) ───────────────────────────────────────────
+// ── lifecycle (LIF-3, INI-5) ──────────────────────────────────────────────────
 
-/** Start: roll all "-", re-sort, Active, round 1, pointer = top of order (Data §7 start). */
+/** Start: roll all "-", re-sort, Active, round 1, pointer = top of order (LIF-3 start). */
 export function start(combat: Combat, roll: D20Roll = defaultD20): Combat {
 	if (combat.state !== 'setup') return combat;
 	const pushed = pushUndo(combat, 'start');
@@ -300,13 +300,13 @@ export function editRound(combat: Combat, value: number): Combat {
 	return { ...pushed, round: clampRound(value), updatedAt: now() };
 }
 
-/** Set the escalation die absolutely (Rules §3); future round-wraps continue +1 from here. */
+/** Set the escalation die absolutely (TRE-6); future round-wraps continue +1 from here. */
 export function setEscalation(combat: Combat, value: number): Combat {
 	const pushed = pushUndo(combat, 'setEscalation');
 	return { ...pushed, escalation: clampEscalation(value), updatedAt: now() };
 }
 
-/** Clear: remove all combatants (+ their hpLogs), back to empty Setup (Data §7 clearCombat). */
+/** Clear: remove all combatants (+ their hpLogs), back to empty Setup (LIF-5 clearCombat). */
 export function clearCombat(combat: Combat): Combat {
 	const pushed = pushUndo(combat, 'clearCombat');
 	return {
@@ -320,7 +320,7 @@ export function clearCombat(combat: Combat): Combat {
 	};
 }
 
-/** Restart: keep roster, reset each combatant, back to Setup (Data §7 restart). */
+/** Restart: keep roster, reset each combatant, back to Setup (LIF-6 restart). */
 export function restart(combat: Combat): Combat {
 	const pushed = pushUndo(combat, 'restart');
 	const combatants = pushed.combatants.map((c) => ({

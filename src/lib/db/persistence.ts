@@ -1,7 +1,8 @@
 /**
  * Dexie persistence operations (ADR-003) behind the store seam. The reactive store is the ONLY
  * caller; it passes the Dexie instance, so these functions take an injectable `PersistenceDb` and
- * unit tests can supply an in-memory fake (real IndexedDB round-trip is E2E — Test Plan §2).
+ * unit tests can supply an in-memory fake (real IndexedDB round-trip is E2E — see
+ * specs/reference/acceptance-matrix.md).
  *
  * Combats persist one row each (inline JSON for combatants/conditions/hpLog/undoStack — ADR-013);
  * settings is the singleton row. Hydrate-on-boot reads all rows + normalizes/migrates (migrations.ts).
@@ -10,7 +11,7 @@
 import { normalizeAppData } from './migrations';
 import { type AppData, type Combat, SETTINGS_ID, type Settings } from './types';
 
-/** The minimal surface this module needs from Dexie — keeps the seam mockable (Test Plan §3). */
+/** The minimal surface this module needs from Dexie — keeps the seam mockable. */
 export interface PersistenceDb {
 	combats: {
 		toArray(): Promise<Combat[]>;
@@ -25,7 +26,7 @@ export interface PersistenceDb {
 	};
 }
 
-/** Hydrate full AppData on boot: read all rows, normalize + forward-migrate (ADR-013, Data §10). */
+/** Hydrate full AppData on boot: read all rows, normalize + forward-migrate (ADR-013, IMP-3). */
 export async function loadAppData(db: PersistenceDb): Promise<AppData> {
 	const [settings, combats] = await Promise.all([
 		db.settings.get(SETTINGS_ID),
@@ -61,7 +62,7 @@ export async function clearCombats(db: PersistenceDb): Promise<void> {
 }
 
 /**
- * Strip the throwaway undo/redo history from a combat (Data §10): export keeps the hpLog but NOT
+ * Strip the throwaway undo/redo history from a combat (IMP-2): export keeps the hpLog but NOT
  * the action-recovery stacks. Reused by the M5 export path; defined here beside the store seam.
  */
 export function stripHistory(combat: Combat): Combat {

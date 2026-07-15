@@ -1,5 +1,5 @@
 <!--
-  Settings (Component Inventory §Hierarchy, specs/capabilities/settings.md SET-1..5) — three
+  Settings (specs/reference/component-inventory.md Hierarchy section, specs/capabilities/settings.md SET-1..5) — three
   SettingsGroups (Language, Appearance, Data) + a headingless About link row, per the approved
   `specs/design/prototype.html` "SCREEN — Settings". Export/import rows are dropped from this
   screen (see component-inventory: "DataActions (Reset-all only)"). Reset-all is confirm-gated

@@ -1,5 +1,5 @@
 <!--
-  AppHeader (Component Inventory §Hierarchy / §Navigation placement per breakpoint, PLT-3) — the
+  AppHeader (component-inventory.md "Hierarchy" / "Navigation placement per breakpoint", PLT-3) — the
   app-wide chrome bar mounted by AppShell above every non-Combat route outlet (the Combat screen
   ships its own CombatHeader — back/title/overflow — and AppShell skips this bar there, see
   AppShell's routeHasOwnHeader guard). Below the desktop breakpoint it renders a burger button

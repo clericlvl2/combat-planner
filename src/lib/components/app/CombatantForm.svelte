@@ -1,8 +1,8 @@
 <!--
-  CombatantForm (Component Inventory §10, Rules §7) — add/edit a combatant in a Dialog. Name is
+  CombatantForm (component-inventory.md, limits.md) — add/edit a combatant in a Dialog. Name is
   required (whitespace-only blocks submit); numeric fields clamp via NumberField and default to the
-  Rules §7 placeholders when left blank (the factory/store fills them). Edit mode prefills and adds
-  the manual-initiative field (Data §7 editCombatant). Emits a normalized values object; the parent
+  limits.md placeholders when left blank (the factory/store fills them). Edit mode prefills and adds
+  the manual-initiative field (CBT-4 editCombatant). Emits a normalized values object; the parent
   routes it to addCombatant or editCombatant. Max-HP change ⇏ current HP (handled in the store).
 -->
 <script lang="ts">
@@ -39,7 +39,7 @@
 	}: {
 		mode: 'add' | 'edit';
 		combatant?: Combatant | null;
-		/** Active combats surface a manual-initiative field on add too (Data §7 mid-combat add). */
+		/** Active combats surface a manual-initiative field on add too (INI-3 mid-combat add). */
 		combatActive?: boolean;
 		open?: boolean;
 		onSubmit: (values: CombatantFormValues) => void;

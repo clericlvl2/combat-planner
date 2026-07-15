@@ -1,5 +1,5 @@
 <!--
-  CombatList (Component Inventory §Combats home, CLS-6) — vertical list of `CombatRow`, sorted by
+  CombatList (component-inventory.md, CLS-6) — vertical list of `CombatRow`, sorted by
   `listOrder`, wrapped with `svelte-dnd-action` (ADR-006) for manual touch/pointer/keyboard drag
   reorder. On drop (finalize) the new order is handed to `reorderCombats` so it persists via the
   store → Dexie ("drag to reorder; order survives reload"). Row callbacks are passed straight

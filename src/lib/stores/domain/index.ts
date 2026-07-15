@@ -1,6 +1,6 @@
 /**
  * Pure domain barrel (ADR-002). Transitions/derivations/factories/migration-safe helpers — no
- * runes, no Dexie, no DOM. Fully unit-testable (Test Plan §3). The reactive seam
+ * runes, no Dexie, no DOM. Fully unit-testable. The reactive seam
  * (combat-store.svelte.ts) and persistence (db/) compose these.
  */
 

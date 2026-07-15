@@ -1,5 +1,5 @@
 <!--
-  CombatFormDialog (Component Inventory §5, CLS-2/CLS-3) — Title/Description/Color-tag form for a
+  CombatFormDialog (component-inventory.md, CLS-2/CLS-3) — Title/Description/Color-tag form for a
   combat, shared by create and edit. Mode is inferred from the optional `combat` prop (present =
   edit, absent = create), same convention as CombatantForm's explicit mode but collapsed to one
   signal since combats-list has no third state. Calls the store directly (createCombat / editCombat)

@@ -4,7 +4,7 @@ import { expect, test } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import EmptyState from './EmptyState.svelte';
 
-// Component Inventory §5/§7: shared "No combats yet" (combats.empty.*) / empty-roster leaf —
+// component-inventory.md: shared "No combats yet" (combats.empty.*) / empty-roster leaf —
 // optional icon, title, optional description, and a CTA slot rendered as-is (no CTA logic here).
 
 test('renders title and, when given, description', async () => {

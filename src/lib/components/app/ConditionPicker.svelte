@@ -1,7 +1,7 @@
 <!--
-  ConditionPicker (Component Inventory §8b) — the 12 preset condition toggles, in a modal (Dialog)
+  ConditionPicker (component-inventory.md, CND-3) — the 12 preset condition toggles, in a modal (Dialog)
   opened from the row's "Add condition" button. Text-only pills (no icons): unselected = outline,
-  selected = filled primary. Membership only, unique, up to 12 (Data §5/§7). One click = one toggle;
+  selected = filled primary. Membership only, unique, up to 12 (CND-2). One click = one toggle;
   the diff against the current set yields exactly one change, forwarded as add/remove intent (no
   business logic here).
 -->

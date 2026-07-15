@@ -1,8 +1,8 @@
 <!--
-  HealthBar (Component Inventory §8b) — HP bar with the four Rules §4 bands and the reverse/alarm
+  HealthBar (component-inventory.md, HP-4) — HP bar with the four HP-4 bands and the reverse/alarm
   `dead` bar (fills the opposite way as HP goes deeper negative, maxing at −maxHp). A second segment
   (`bg-combat-blue`) tails past the current-HP fill to show temp HP as a buffer. Status is never
-  color-alone: a role=img a11y label carries name + band + cur/max (UX §8).
+  color-alone: a role=img a11y label carries name + band + cur/max.
 -->
 <script lang="ts">
 	import type { Combatant } from '$lib/db/types';

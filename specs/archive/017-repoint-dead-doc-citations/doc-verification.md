@@ -1,0 +1,15 @@
+# Doc verification: 017-repoint-dead-doc-citations
+
+| Check | Verdict | Evidence |
+|----|---------|----------|
+| Exactly one new row added to CHANGELOG.md Change-units table, dated 2026-07-15, for unit `017-repoint-dead-doc-citations` | PASS | `git diff -- specs/CHANGELOG.md` shows a single `+` line inserted after the `016-temp-hp-badge-doc-fix` row: `| 017-repoint-dead-doc-citations | 2026-07-15 | ... |`. No other lines in the file changed. |
+| Row summary accurately describes what verification.md confirmed shipped — no overclaim, no false capability/reference-wording-change claim | PASS | Row text: "Repointed all dead pre-migration `§` doc-section citations ... in `src/**` comments/JSDoc/test-`describe` labels to live capability IDs or `specs/reference/*.md` filenames, dropping where no clean target existed; also fixed `NumpadSheet.svelte`'s `§7` comment (→ `limits.md`) and reconciled `src/lib/components/app/README.md`'s stale component map (dropped ~15 never-built phantom rows, repointed all bare `§N`/`UX & IA §` to `component-inventory.md`/capability IDs); no capability/reference wording change needed — comment/doc-pointer-only, zero runtime behavior change; promotes B-016." This matches verification.md's findings: AC1 (zero dead `§`) PASS, NumpadSheet AC PASS, README phantom-row removal PASS, scope-check PASS (no `specs/capabilities/**`/`specs/reference/**` edits), and explicitly does not claim a capability/reference wording change (correctly, since none occurred). It does not paper over the one open item verification.md flagged (AC2's six bare-namespace README citations, given "PASS (user override)") — the row's phrasing ("repointed... to live capability IDs or reference filenames... dropping where no clean target existed") is a fair, non-overclaiming summary of a 57-file sweep with one accepted user-override nuance; it does not assert 100% literal-regex conformance. No contradiction found. |
+| No capability file (`specs/capabilities/**`), reference file (`specs/reference/**`), or other unexpected file edited by the doc-sync step; unit correctly warrants changelog-row-only | PASS | `git status --porcelain specs/` shows only `M specs/CHANGELOG.md`, `M specs/backlog.md` (untracked `specs/changes/` is the change-unit's own directory, expected). `specs/backlog.md` diff is a 1-line B-016 status flip (`idea` → `in-unit`) with a pointer to this unit's directory — pre-existing lifecycle bookkeeping already reviewed and accepted in verification.md's scope check, not part of the doc-sync step and not a capability/reference edit. No file under `specs/capabilities/**`, `specs/reference/**`, or `specs/adr/**` was touched by the doc-sync step. |
+
+## Scope check
+
+Doc-sync edit scope respected: exactly one CHANGELOG.md row added, nothing else touched by the doc-sync step itself.
+
+## Other findings
+
+None. The CHANGELOG row appropriately omits any capability/reference-wording-change claim, consistent with change.md's explicit statement that no capability-spec IDs are added or amended by this unit.

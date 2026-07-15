@@ -1,5 +1,5 @@
 <!--
-  FAB (Component Inventory §7/§5) — shared bottom-right thumb-zone floating action button. The
+  FAB (component-inventory.md "Floating action button (FAB)") — shared bottom-right thumb-zone floating action button. The
   `action` prop's meaning (create / add / advance) is decided by the screen that wires it in
   (Combats home = create; Combat Setup = add; Combat Active = advance) — this component only
   renders the fixed-position circular Button + icon + a11y label, it carries no screen logic.

@@ -1,7 +1,7 @@
 <!--
-  AppShell (Component Inventory §Hierarchy) — composes NavSidebar/AppHeader by breakpoint around
+  AppShell (component-inventory.md "Hierarchy") — composes NavSidebar/AppHeader by breakpoint around
   the route outlet. Mounted once by the root +layout.svelte. The Combat screen (`/combats/[id]`)
-  ships its own full CombatHeader (back/title/overflow — Component Inventory §Header) as page
+  ships its own full CombatHeader (back/title/overflow — component-inventory.md "Header") as page
   content, so this shell skips the generic AppHeader there to avoid stacking two header bars;
   NavSidebar (and its swipe-right gesture) stays mounted on every route.
 -->

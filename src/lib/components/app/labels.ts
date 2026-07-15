@@ -30,7 +30,7 @@ export const typeStripeCount: Record<CombatantType, number> = {
 	ally: 1,
 };
 
-/** Condition tag color (grouped semantically; UX §4c request for at-a-glance distinction). */
+/** Condition tag color (grouped semantically for at-a-glance distinction; CND-3). */
 export const conditionColor: Record<Condition, string> = {
 	charmed: 'border-combat-violet/30 bg-combat-violet/10 text-combat-violet',
 	confused: 'border-combat-amber/30 bg-combat-amber/10 text-combat-amber',
@@ -68,7 +68,7 @@ export const healthLabel: Record<HealthStatus, () => string> = {
 	dead: m['health.dead'],
 };
 
-/** Health band → bar fill color utility (Rules §4; `dead` = reverse/alarm). */
+/** Health band → bar fill color utility (HP-4; `dead` = reverse/alarm). */
 export const healthColor: Record<HealthStatus, string> = {
 	full: 'bg-health-full',
 	wounded: 'bg-health-wounded',

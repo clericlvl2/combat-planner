@@ -4,7 +4,7 @@ import type { Combat, Settings } from '../db/types';
 import { CombatStore } from './combat-store.svelte';
 
 // Light integration smoke for the reactive seam (ADR-002): state + persist-on-mutation wiring.
-// The transition math itself is pinned by the pure domain specs (Test Plan §3 / §2 layering).
+// The transition math itself is pinned by the pure domain specs (see `specs/reference/acceptance-matrix.md`).
 function fakeDb(): PersistenceDb & { _combats: Map<string, Combat> } {
 	const combats = new Map<string, Combat>();
 	const settings = new Map<string, Settings>();

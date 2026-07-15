@@ -1,5 +1,5 @@
 <!--
-  InitCell (Component Inventory §8b, Rules §2) — initiative value or "-". Tap = roll d20+bonus;
+  InitCell (component-inventory.md, INI-2) — initiative value or "-". Tap = roll d20+bonus;
   long-press = manual entry (Popover). Re-sort is the parent's job via sortedCombatants. Emits
   roll / setInitiative intent only.
 -->

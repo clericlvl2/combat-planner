@@ -13,7 +13,7 @@ import { createCombat, createSettings } from './factories';
 let seq = 0;
 const id = () => `k${seq++}`;
 
-describe('createCombatInList (Data §7, Rules §7)', () => {
+describe('createCombatInList (CLS-2, specs/reference/limits.md)', () => {
 	it('inserts at the TOP with the lowest listOrder', () => {
 		const existing = createCombat({}, 0, () => 'a');
 		const { combats, created } = createCombatInList([existing], { title: 'New' }, id);
@@ -30,7 +30,7 @@ describe('createCombatInList (Data §7, Rules §7)', () => {
 	});
 });
 
-describe('deleteCombat / reorderCombats (Data §7)', () => {
+describe('deleteCombat / reorderCombats (CLS-4, CLS-6)', () => {
 	it('removes by id', () => {
 		const a = createCombat({}, 0, () => 'a');
 		const b = createCombat({}, 1, () => 'b');
@@ -46,7 +46,7 @@ describe('deleteCombat / reorderCombats (Data §7)', () => {
 	});
 });
 
-describe('editCombat (Data §7, CLS-3)', () => {
+describe('editCombat (CLS-3)', () => {
 	it('patches title/description/colorTag and bumps updatedAt, leaving roster/state untouched', () => {
 		const original = createCombat({ title: 'Old', description: 'Old desc' }, 0, () => 'a');
 		original.combatants = [{ id: 'x' } as never];
@@ -82,7 +82,7 @@ describe('editCombat (Data §7, CLS-3)', () => {
 	});
 });
 
-describe('resetAll / firstLaunch (Data §7)', () => {
+describe('resetAll / firstLaunch (SET-3, CLS-7)', () => {
 	it('resetAll clears combats, keeps language/theme, re-arms first-launch', () => {
 		const settings = createSettings({ language: 'de', theme: 'dark', firstLaunchDone: true });
 		const { combats, settings: next } = resetAll(settings);

@@ -16,12 +16,14 @@ player sheet, DM tracks its HP). Optional on the add form; default `enemy`.
 
 **AC:**
 - Changing a combatant's type never changes its fields, sort position, or any computed value —
-  only its display color/stripe.
+  only its display color (a leading color dot on the combatant card, or the Type pill's tint in
+  the add/edit form — [[../reference/component-inventory]]).
 - A combatant added without specifying type defaults to `enemy`.
 
 ## CBT-2 — Combatant card fields
 
-Compact row shows: active-turn indicator, type color stripe, name, initiative (`"-"` if unset),
+Compact row shows: active-turn indicator, a leading type-color dot (decorative, immediately
+before the name), name, initiative (`"-"` if unset),
 current/max HP, health bar, a temp-HP badge (shown whenever `tempHp > 0`, no expand needed),
 AC/PD/MD (in-row at all sizes), condition icons (first few + overflow, [[conditions]] CND-3),
 and the note (read-only) whenever one is set. The health bar's fill color is the sole HP-status
@@ -57,17 +59,23 @@ becomes the combatant's **real stored name** — an empty name is never rejected
 Initiative bonus, AC, PD, and MD are pre-filled with real, editable default values (Max HP 10,
 Init 0, AC/PD/MD 10) — not placeholder-styled hints; the DM can accept or overwrite them.
 
-The modal caps its dialog height and scrolls only its field region: the dialog frame is a column
-flex box with a `max-h-[calc(100dvh-2rem)]` cap, so the title stays pinned above and the footer
-stays pinned below regardless of viewport height; only the field region between them carries
-`overflow-y-auto`. Name, Type, and Note render as stacked fields — an uppercase label above its
-control, not a label-left row. Max HP, AC, PD, MD (and, where shown, Init Bonus/Initiative)
-render as 2-across `NumberField` pairs (`[Max HP | AC]`, `[PD | MD]`, and a final Init-Bonus row
-— field order: [[combatants]] CBT-4) rather than steppers spanning the full control width or a
-3-across squeeze. The footer matches the `CombatFormDialog` styling — Cancel is
-`variant="outline"`, both buttons are equal-width and full-height (`h-11 flex-1`) — and still
-renders inside the dialog panel's footer, outside the scrolling field region but inside the
-form. Name/note placeholders resolve from paraglide i18n keys.
+The dialog is a centered `Dialog` on desktop (≥1024px) and a bottom `Drawer` on mobile — both
+share one form body via a `MediaQuery` split ([[../reference/component-inventory]]). On desktop,
+the dialog frame is a column flex box with a `max-h-[calc(100dvh-2rem)]` cap, so the title stays
+pinned above and the footer stays pinned below regardless of viewport height; only the field
+region between them carries `overflow-y-auto`. Name, Type, and Note render as stacked fields —
+an uppercase label above its control, not a label-left row — and Note is the **last** field,
+after the Init Bonus/Initiative pair (field order: [[combatants]] CBT-4). Max HP, AC, PD, MD,
+Init Bonus, and the manual Initiative field render as 2-across `NumberField` pairs (`[Max HP |
+AC]`, `[PD | MD]`, `[Init Bonus | Initiative]`) rather than steppers spanning the full control
+width or a 3-across squeeze. The Type selector renders as per-type-colored pills — each option
+shows a leading color dot in that type's color, and the selected pill is tinted/ringed in the
+same color — rather than a neutral segmented fill. An out-of-range `NumberField` value shows
+only a destructive ring on the field shell (plus `aria-invalid`) — no inline clamp-hint text
+renders. The footer matches the `CombatFormDialog` styling — Cancel is `variant="outline"`, both
+buttons are equal-width and full-height (`h-11 flex-1`) — and still renders inside the dialog
+panel's footer, outside the scrolling field region but inside the form. Name/note placeholders
+resolve from paraglide i18n keys.
 
 **AC:**
 - Submitting the add form with an empty or whitespace-only name is **accepted**; the combatant's
@@ -79,10 +87,16 @@ form. Name/note placeholders resolve from paraglide i18n keys.
 - The add form's submit button reads "Add"; the same form in edit mode reads "Save".
 - On open with no data, Max HP/Init/AC/PD/MD read 10/0/10/10/10 as real editable values, not
   placeholder text.
-- The dialog frame caps its height and lays out as a column flex box so only the field region
-  scrolls (`overflow-y-auto`) while the title and footer stay pinned; Name/Type/Note render as
-  stacked fields (label above control), and Max HP/AC/PD/MD render as 2-across `NumberField`
-  pairs, not an inline label-left grid or a 3-across squeeze.
+- The form renders as a centered `Dialog` at ≥1024px and a bottom `Drawer` below it (shared form
+  body via `MediaQuery`); the desktop dialog frame caps its height and lays out as a column flex
+  box so only the field region scrolls (`overflow-y-auto`) while the title and footer stay
+  pinned. Name/Type/Note render as stacked fields (label above control), Note is the last field,
+  and Max HP/AC/PD/MD/Init Bonus/Initiative render as 2-across `NumberField` pairs, not an inline
+  label-left grid or a 3-across squeeze.
+- The Type selector renders as per-type-colored pills (a leading color dot plus a same-color
+  tint/ring on the selected pill), not a neutral segmented control.
+- An out-of-range `NumberField` shows only a destructive ring on the field shell plus
+  `aria-invalid` — no inline clamp-hint text is shown.
 - The footer matches `CombatFormDialog` styling — Cancel is `variant="outline"`, both buttons
   are `h-11 flex-1` — and still renders inside the dialog panel's footer, not outside the modal
   frame.
@@ -92,23 +106,24 @@ form. Name/note placeholders resolve from paraglide i18n keys.
 ## CBT-4 — Edit combatant
 
 The same form, pre-filled, edits an existing combatant's name/type/init-bonus/Max HP/AC/PD/MD/
-note, plus a manual-initiative field ([[initiative]] INI-2/INI-3). Changing Max HP does not
-auto-change current HP — full nuance (discrete undo step, HP-log entry) owned by [[hp]] HP-5.
+note, plus a manual-initiative field ([[initiative]] INI-2/INI-3, amended). Changing Max HP does
+not auto-change current HP — full nuance (discrete undo step, HP-log entry) owned by [[hp]]
+HP-5.
 
-Field order top-to-bottom is: Name, Type, `[Max HP | AC]`, `[PD | MD]`, Note, then a final
-`[Init Bonus | Initiative]` row — Init Bonus is the last stat field. The manual Initiative field
-is super-last and conditional: in add mode while the combat is still in Setup, that final row
-shows Init Bonus only; in edit mode, and in add mode once the combat is Active, the manual
-Initiative field appears alongside Init Bonus in that same row.
+Field order top-to-bottom is: Name, Type, `[Max HP | AC]`, `[PD | MD]`, `[Init Bonus |
+Initiative]`, Note — Note is the **last** field. The manual Initiative field renders
+unconditionally in both add and edit mode, alongside Init Bonus in that pair — an amendment
+against the prior Setup-gated behavior: the manual field used to appear only in edit mode, or in
+add mode once the combat was Active; it's now always present, including add-while-Setup
+([[initiative]] INI-3).
 
 **AC:**
 - Every field on the add form is also editable via the edit form on an existing combatant.
 - Saving an edit that changes Max HP leaves `currentHp` numerically unchanged.
-- Field order is Name, Type, `[Max HP | AC]`, `[PD | MD]`, Note, `[Init Bonus | Initiative]` —
-  Init Bonus is the last stat field.
-- In add mode with the combat still in Setup, the final row shows Init Bonus only; in edit mode,
-  and in add mode with the combat Active, the manual Initiative field appears next to Init Bonus
-  as the super-last field.
+- Field order is Name, Type, `[Max HP | AC]`, `[PD | MD]`, `[Init Bonus | Initiative]`, Note —
+  Note is the last field.
+- The manual Initiative field renders unconditionally in both add and edit mode, regardless of
+  combat state (Setup or Active).
 
 ## CBT-5 — Note
 

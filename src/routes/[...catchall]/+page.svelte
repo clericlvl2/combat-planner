@@ -10,7 +10,7 @@
     import {m} from '$lib/i18n';
 </script>
 
-<div class="flex min-h-dvh flex-col items-center justify-center gap-3 p-4 text-center text-muted-foreground">
+<div class="flex min-h-dvh flex-col items-center justify-center gap-3 py-4 text-center text-muted-foreground">
     <p class="text-lg font-semibold text-foreground">{m['route.notFound.title']()}</p>
     <Button aria-label={m['route.notFound.back']()} onclick={() => goto('/combats')}>
         {m['route.notFound.back']()}

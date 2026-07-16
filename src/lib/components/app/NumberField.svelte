@@ -44,7 +44,7 @@
 	// Prototype .field-label recipe (specs/design/prototype.html) — uppercase, muted, small caps.
 	const fieldLabelClass = 'text-xs font-medium uppercase tracking-wide text-muted-foreground';
 	const stepBtnClass =
-		'flex min-h-11 w-11 shrink-0 items-center justify-center text-lg text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:z-10 focus-visible:ring-3 focus-visible:ring-ring/50';
+		'flex min-h-10 w-10 shrink-0 items-center justify-center text-lg text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:z-10 lg:focus-visible:ring-3 lg:focus-visible:ring-ring/50 active:bg-muted active:text-foreground transition-colors';
 	// Prototype .numfield recipe (specs/design/prototype.html) draws the stepper divider on
 	// --border-strong, not the default --border token.
 	const stepBorderClass = 'border-[var(--border-strong)]';
@@ -101,8 +101,9 @@
 	<Label for={id} class={fieldLabelClass}>{label}</Label>
 	<div
 		class={[
-			'focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50 flex w-full items-stretch overflow-hidden rounded-sm border bg-secondary',
+			'lg:focus-within:border-ring lg:focus-within:ring-3 lg:focus-within:ring-ring/50 flex w-full items-stretch overflow-hidden rounded-sm border bg-secondary',
 			stepBorderClass,
+			clamped && 'border-destructive ring-3 ring-destructive/50',
 		]}
 	>
 		<button
@@ -121,7 +122,7 @@
 			aria-valuemin={min}
 			aria-valuemax={max}
 			aria-valuenow={value ?? undefined}
-			class="min-h-11 flex-1 rounded-none border-0 bg-transparent text-[13px] text-center tabular-nums shadow-none focus-visible:ring-0 dark:bg-transparent"
+			class="min-h-10 flex-1 rounded-none border-0 bg-transparent text-[13px] text-center tabular-nums shadow-none focus-visible:ring-0 dark:bg-transparent"
 			value={value ?? ''}
 			{placeholder}
 			{required}
@@ -140,13 +141,4 @@
 			+
 		</button>
 	</div>
-	<p
-		class={[
-			'min-h-4 text-xs text-muted-foreground',
-			!clamped && 'invisible',
-			inline && 'col-span-2',
-		]}
-	>
-		{m['errors.clamp']({ min, max })}
-	</p>
 </div>

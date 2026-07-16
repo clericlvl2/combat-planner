@@ -145,7 +145,7 @@
 	width: 100%;
 	margin-inline: auto;
 	max-width: var(--content-max);
-	padding-inline: var(--space-4);
+	padding-inline: var(--space-3);
 }
 
 /* Wide sibling of `.content-container` (PLT-2) — caps the Combat header chrome at
@@ -155,7 +155,7 @@
 	width: 100%;
 	margin-inline: auto;
 	max-width: var(--content-max-wide);
-	padding-inline: var(--space-4);
+	padding-inline: var(--space-3);
 }
 
 @layer base {

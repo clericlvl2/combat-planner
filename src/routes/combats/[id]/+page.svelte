@@ -184,7 +184,7 @@
             <!-- Active: Advance FAB (disabled at the r99 → r100 wrap) — mobile only (PLT-3);
                  desktop (≥1024px) swaps it for CombatHeader's header-advance icon roundel. -->
             <Button
-                    class="fixed right-4 bottom-4 size-14 rounded-full shadow-lg lg:hidden"
+                    class="fixed right-4 bottom-4 size-14 rounded-full shadow-lg lg:hidden max-lg:focus-visible:ring-0 max-lg:focus-visible:border-transparent"
                     disabled={!canAdv}
                     aria-label={m['active.advance']()}
                     onclick={controller.advance}
@@ -196,7 +196,7 @@
                  the desktop header-add/header-start pair in CombatHeader (PLT-3) — Start FAB
                  borrows the existing chevron glyph (no dedicated play/start icon ships yet). -->
             <Button
-                    class="fixed right-4 bottom-4 size-14 rounded-full shadow-lg lg:hidden"
+                    class="fixed right-4 bottom-4 size-14 rounded-full shadow-lg lg:hidden max-lg:focus-visible:ring-0 max-lg:focus-visible:border-transparent"
                     aria-label={m['setup.addCombatant']()}
                     onclick={() => (addOpen = true)}
             >
@@ -208,7 +208,7 @@
                      ghost/secondary roundel. Uses the LIF-2 play glyph (mirrors the desktop
                      header-start icon-roundel). -->
                 <Button
-                        class="fixed right-4 bottom-24 size-14 rounded-full shadow-lg lg:hidden"
+                        class="fixed right-4 bottom-24 size-14 rounded-full shadow-lg lg:hidden max-lg:focus-visible:ring-0 max-lg:focus-visible:border-transparent"
                         aria-label={m['setup.start']()}
                         onclick={controller.start}
                 >
@@ -225,6 +225,6 @@
             onRestore={controller.restore}
             onSetTempHp={controller.setTempHp}
     />
-    <CombatantForm mode="add" combatActive={active} bind:open={addOpen} onSubmit={submitAdd}/>
+    <CombatantForm mode="add" bind:open={addOpen} onSubmit={submitAdd}/>
     <CombatantForm mode="edit" combatant={editCombatant} bind:open={editOpen} onSubmit={submitEdit}/>
 {/if}

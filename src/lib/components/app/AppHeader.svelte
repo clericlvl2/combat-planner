@@ -36,12 +36,12 @@
 	const Menu = chromeIcon.menu;
 </script>
 
-<header class="flex h-13 shrink-0 items-center border-b border-border bg-card px-3">
-	<div class="content-container flex w-full items-center gap-2">
+<header class="flex h-13 shrink-0 items-center border-b border-border bg-card">
+	<div class="content-container-wide flex w-full items-center gap-2">
 		<Button
 			variant="ghost"
 			size="icon"
-			class="min-h-11 min-w-11 lg:hidden"
+			class="-ml-3 min-h-11 min-w-11 lg:hidden"
 			aria-label={m['nav.open']()}
 			onclick={onOpenNav}
 		>

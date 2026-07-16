@@ -86,17 +86,19 @@
 	let restartOpen = $state(false);
 </script>
 
-<header class="flex h-13 shrink-0 items-center border-b border-border bg-card px-3">
+<header class="flex h-13 shrink-0 items-center border-b border-border bg-card">
 	<div class="content-container-wide flex w-full items-center gap-2">
 		<Button
 			href="/combats"
 			variant="ghost"
 			aria-label={m['a11y.back']()}
-			class="-ml-2 flex min-h-11 min-w-0 flex-1 items-center justify-start gap-1 px-2 text-lg font-semibold"
+			class="-ml-2 flex min-h-11 min-w-0 max-w-full items-center justify-start gap-1 px-2 text-lg font-semibold"
 		>
 			<Back class="size-5 shrink-0" />
 			<span class="min-w-0 truncate">{combat.title}</span>
 		</Button>
+
+		<div class="min-w-0 flex-1"></div>
 
 		{#if !isActive}
 			<!-- Setup — desktop-only header pair (mobile uses the FAB stack in +page.svelte instead,
@@ -193,7 +195,7 @@
 		>
 			<Popover bind:open={roundOpen}>
 				<PopoverTrigger
-					class="flex items-baseline gap-1.5 rounded-md hover:bg-muted"
+					class="flex cursor-pointer items-baseline gap-1.5 rounded-md hover:bg-muted"
 					aria-label={m['a11y.editRound']()}
 				>
 					<span class="text-xs font-normal tracking-wide text-muted-foreground uppercase">
@@ -220,7 +222,7 @@
 				<button
 					bind:this={escAnchor}
 					type="button"
-					class="flex items-baseline gap-1.5 rounded-md hover:bg-muted"
+					class="flex cursor-pointer items-baseline gap-1.5 rounded-md hover:bg-muted"
 					aria-label={m['a11y.escalation']({ n: esc })}
 					aria-haspopup="dialog"
 					onclick={() => (escOpen = true)}

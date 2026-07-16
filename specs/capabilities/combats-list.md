@@ -17,7 +17,8 @@ A combat with a blank/whitespace-only title renders a placeholder title instead 
 When there are no combats to show, an empty-state view renders in place of the list: an icon, a
 short description, and a "New combat" call-to-action that creates one (same action as CLS-2). On
 desktop, hovering anywhere over a combat row applies a whole-card hover highlight (see CLS-5 for
-the matching whole-card click behavior and CLS-6 for the drag-handle carve-out).
+the matching whole-card click behavior and CLS-6 for the drag-handle carve-out). The row card's
+corner radius matches the combatant card's radius ([[../reference/component-inventory]]).
 
 **AC:**
 - Every combat row displays title, description, and its color tag.
@@ -31,29 +32,33 @@ the matching whole-card click behavior and CLS-6 for the drag-handle carve-out).
 
 ## CLS-2 — Create combat
 
-Fields: Title, Description, Color tag (chosen from the preset swatch palette). New combat is
-added at the **top** of the list. Blocked at the 100-combat cap ([[../reference/limits]]) with a
-message. The create dialog's title reads "New combat" and its primary button reads "Create";
-the same dialog reused for editing (CLS-3) reads "Save" instead — the button label is the only
-difference between create and edit mode. A cap-error banner shown after a blocked create clears
-on any field edit (title, description, or color tag), not only when the title changes. The
-dialog's Cancel button renders inside the dialog panel's footer, alongside the primary button.
-Title/description placeholders resolve from paraglide i18n keys. Color-tag swatch tiles are
-buttons that keep a normal hover affordance; the currently-selected tile additionally carries a
-clear, persistent selected indicator (a visible ring/outline) distinct from hover, since the
-color tag is a form field whose current choice must stay visible.
+Fields: Title, Description, Color tag (chosen from the preset swatch palette, rendered as a
+single full-width stretched row of equal-width swatches — not a fixed-square wrapping grid). New
+combat is added at the **top** of the list. Creating past the 100-combat cap
+([[../reference/limits]]) is blocked **silently**: nothing is created, the dialog stays open, and
+no inline cap-error message is shown — amended: the prior cap-error banner and its
+field-edit-clears-it behavior are both gone. The dialog is a centered `Dialog` on desktop
+(≥1024px) and a bottom `Drawer` on mobile, sharing one form body
+([[../reference/component-inventory]]). The create dialog's title reads "New combat" and its
+primary button reads "Create"; the same dialog reused for editing (CLS-3) reads "Save" instead —
+the button label is the only difference between create and edit mode. The dialog's Cancel button
+renders inside the dialog panel's footer, alongside the primary button. Title/description
+placeholders resolve from paraglide i18n keys. Color-tag swatch tiles are buttons that keep a
+normal hover affordance; the currently-selected tile additionally carries a clear, persistent
+selected indicator (a visible ring/outline) distinct from hover, since the color tag is a form
+field whose current choice must stay visible.
 
 **AC:**
 - A newly created combat appears at the top of the list, in `state: setup` ([[lifecycle]] LIF-1).
-- Creating a 101st combat is blocked with a message; nothing is created.
+- Creating a 101st combat is blocked silently: nothing is created, the dialog stays open, and no
+  error message is shown.
+- The form renders as a centered `Dialog` at ≥1024px and a bottom `Drawer` below it.
 - The create dialog's title reads "New combat" and its primary button reads "Create"; the same
   dialog in edit mode (CLS-3) reads "Save".
-- Once the cap-error banner is showing, editing any field (title, description, or color tag)
-  clears it — not only editing the title.
 - The Cancel button renders inside the dialog panel's footer, not outside the modal frame.
-- Color-tag swatch tiles show a normal hover affordance, and the selected tile carries a
-  persistent visible selected indicator distinct from hover; clicking a tile sets the color tag
-  and moves the indicator.
+- Color-tag swatch tiles render as a single full-width stretched row of equal-width tiles, each
+  keeping a normal hover affordance; the selected tile carries a persistent visible selected
+  indicator distinct from hover; clicking a tile sets the color tag and moves the indicator.
 - The title and description placeholders resolve from paraglide message keys, not hardcoded
   string literals.
 

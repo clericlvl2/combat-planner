@@ -48,13 +48,13 @@
 	value={value satisfies string}
 	onValueChange={handle}
 	spacing={2}
-	class="flex-wrap justify-start"
+	class="w-full"
 >
 	{#each COLOR_TAGS as tag (tag)}
 		<ToggleGroupItem
 			value={tag}
 			aria-label={colorTagLabel[tag]()}
-			class="size-[30px] min-w-0 cursor-pointer rounded-md border-0 bg-transparent p-0 transition-opacity hover:bg-transparent hover:opacity-80 data-[state=on]:bg-transparent data-[state=on]:opacity-100 data-[state=on]:ring-2 data-[state=on]:ring-offset-2 data-[state=on]:ring-offset-background data-[state=on]:ring-foreground"
+			class="h-9 flex-1 min-w-0 cursor-pointer rounded-md border-0 bg-transparent p-0 transition-opacity hover:bg-transparent hover:opacity-80 data-[state=on]:bg-transparent data-[state=on]:opacity-100 data-[state=on]:ring-2 data-[state=on]:ring-offset-2 data-[state=on]:ring-offset-background data-[state=on]:ring-foreground"
 		>
 			<ColorTagDot colorTag={tag} letter={colorTagLetter[tag]} class="size-full" />
 		</ToggleGroupItem>

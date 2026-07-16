@@ -1,9 +1,8 @@
 <!--
   CombatantRow (component-inventory.md "Combatant card", CBT-2) — one roster card, compact ↔ expanded via
   Collapsible. Card shape ported from `specs/design/card-prototype.html` (locked in
-  `component-inventory.md`'s "Combatant card" section): leading TypeStripe (pc=1 green,
-  ally=1 blue, enemy=1 red — color-only, `aria-label` compensates) · Row 1 name + expand chevron +
-  trailing `⋮` overflow menu · Row 2 big HP (+ temp-HP badge) inside a fixed-width block, and a
+  `component-inventory.md`'s "Combatant card" section) · Row 1 type-color dot + name + expand
+  chevron + trailing `⋮` overflow menu · Row 2 big HP (+ temp-HP badge) inside a fixed-width block, and a
   health bar filling the remaining width · Row 3 AC/PD/MD + Init pill · Row 4 condition chips
   (read-only, all shown, wraps) · Row 5 note. When expanded, Row 4 also gets two tag-styled
   triggers appended: "+ Condition" (always, opens the ConditionPicker modal) and "+ Note" (hidden
@@ -38,7 +37,7 @@
 	import ConditionPicker from './ConditionPicker.svelte';
 	import HealthBar from './HealthBar.svelte';
 	import InitCell from './InitCell.svelte';
-	import { typeColor, typeLabel, typeStripeCount } from './labels';
+	import { typeColor } from './labels';
 
 	let {
 		combatant,
@@ -71,10 +70,6 @@
 	);
 	const menuLabel = $derived(m['a11y.combatRowMenu']({ title: combatant.name }));
 	const showNoteEditor = $derived(combatant.note !== '' || noteEditing);
-
-	// Type stripe(s) at the card's leading edge — color-only signal, aria-label compensates.
-	const stripes = $derived(Array.from({ length: typeStripeCount[combatant.type] }));
-	const stripeLabel = $derived(m['a11y.typeBadge']({ type: typeLabel[combatant.type]() }));
 
 	$effect(() => {
 		if (noteEditing) noteEl?.focus();
@@ -114,12 +109,6 @@
 	data-active={active}
 >
 	<div class="flex items-stretch">
-		<div class="flex shrink-0 gap-1" aria-label={stripeLabel}>
-			{#each stripes as _, i (i)}
-				<span class={['w-1.5', typeColor[combatant.type]]}></span>
-			{/each}
-		</div>
-
 		<div class="min-w-0 flex-1 p-[var(--card-pad)]">
 			<Collapsible bind:open>
 				<div class="flex flex-col">
@@ -128,6 +117,10 @@
 						{#if active}
 							<span class="shrink-0 text-[14px] leading-none text-ring" aria-hidden="true">▶</span>
 						{/if}
+						<span
+							class={['size-2 shrink-0 rounded-full', typeColor[combatant.type]]}
+							aria-hidden="true"
+						></span>
 						<span class="min-w-0 flex-1 truncate text-base leading-[1.2] font-semibold">
 							{combatant.name}
 						</span>

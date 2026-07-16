@@ -32,14 +32,23 @@ own; this requirement does not restate that detail.
 App-wide, desktop content is capped at a **768px content max-width** (`--content-max` design
 token), centered with horizontal gutter padding on the shared container so header and body
 content never touch the viewport's left/right edges at cap width — header and card columns no
-longer span the full viewport on a wide monitor. The combat screen's header is the one
+longer span the full viewport on a wide monitor. The shared container gutter is 12px (the
+`--space-3` token — [[../reference/component-inventory]]). The combat screen's header is the one
 exception: its background renders as a **full-bleed bar** spanning the full viewport width, with
 its content centered/capped inside; the shared container's gutter does not inset that header, so
 no page background leaks in a gutter beside it. Within that full-bleed bar, the combat header's
 own chrome (back link, title, `⋮` menu, Setup/Active header controls) caps at a wider
 **1024px** (`--content-max-wide` token, `.content-container-wide` utility) rather than 768 —
 the Round/Escalation sub-bar rendered below the header, the combatant cards, and every other
-body/screen container still cap at 768 ([[../reference/component-inventory]]).
+body/screen container still cap at 768 ([[../reference/component-inventory]]). Within that
+capped chrome, the back-link's leading chevron sits flush to the content edge, separated from
+the trailing controls by a spacer, rather than the link itself stretching to fill the row.
+
+On mobile, FAB buttons suppress their `focus-visible` ring below the 1024px breakpoint (the
+desktop focus ring is unaffected); mobile bottom-drawers (used by the `CombatantForm`/
+`CombatFormDialog`/`ConditionPicker` mobile split — [[../reference/component-inventory]]) render
+a working swipe-to-close drag handle; and interactive buttons show a pointer cursor on hover
+app-wide.
 
 On mobile, the combat screen's bottom padding exceeds 2× the FAB height plus the inter-FAB gaps,
 so content is never hidden behind the stacked FABs; the combat-screen header's overflow (`⋮`)
@@ -67,6 +76,12 @@ renders the row on which screen).
   gaps, and the header's overflow/icon controls are ≥44px touch targets.
 - On the desktop breakpoint, with a combat open, Settings/About/Combats-list remain reachable
   from the combat screen's header.
+- The shared desktop container gutter is 12px, and the combat header's back-link chevron sits
+  flush to the content edge.
+- Below 1024px, FAB buttons show no visible focus ring on activation; at ≥1024px the focus ring
+  is unaffected.
+- Mobile bottom-drawers include a working swipe-to-close handle, and buttons show a pointer
+  cursor on hover.
 
 ## PLT-3 — Navigation per breakpoint
 
@@ -130,17 +145,21 @@ start bar ([[../reference/component-inventory]]).
 
 Practical WCAG 2.1 AA: contrast in both themes, ≥44px touch targets (PLT-2), visible focus,
 semantic labels, scalable text. Color tags and health states are never conveyed by color alone
-except two deliberate, compensated exceptions: the combatant-type stripe (color + stripe count,
-backed by an `aria-label` naming the type — see [[combatants]] CBT-1) and the combats-list
-`ColorTagDot` (the dot's fill is the picked color with no accompanying label; the dot's letter
-is the combat title's initial — a disambiguator, not a color signifier — so the picked color
-itself carries no status information a user depends on).
+except one deliberate exception: the combats-list `ColorTagDot` (the dot's fill is the picked
+color with no accompanying label; the dot's letter is the combat title's initial — a
+disambiguator, not a color signifier — so the picked color itself carries no status information
+a user depends on). The combatant card's type indicator is now a decorative, `aria-hidden` color
+dot with no compensating label (amended — the prior type-stripe + `aria-label` compensation was
+replaced without a text alternative); since combatant type is a purely cosmetic flag with no
+mechanical meaning ([[combatants]] CBT-1), this is not treated as a status-conveyed-by-color
+violation.
 
 **AC:**
 - Every interactive control has a visible focus state and a semantic label.
 - Every status conveyed by color (health state, color tags) also has a non-color signal
-  (icon/label), except the combatant-type stripe (compensating `aria-label`) and the
-  `ColorTagDot` (its color is decorative/organizational only, not itself a status).
+  (icon/label), except the `ColorTagDot` (its color is decorative/organizational only, not
+  itself a status) and the combatant-card type dot (decorative only, backing no status — type is
+  a cosmetic flag, not a status, per [[combatants]] CBT-1).
 - Both themes meet AA contrast for text and status colors, including the reverse/alarm HP bar.
   All three NumpadSheet commit buttons (Deal Damage, Restore HP, Set Temp HP) pass AA in both
   themes. ([[hp]] HP-3)

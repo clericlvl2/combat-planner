@@ -52,11 +52,13 @@ test('numeric fields clamp to their NumberField min/max on commit', async () => 
 	const maxHpInput = screen.getByLabelText(m['forms.field.maxHp']());
 	// Below RANGES.maxHp.min (1) but within the field's digit cap, so it isn't truncated pre-commit.
 	await userEvent.fill(maxHpInput, '0');
-	// Move focus off the field to fire the blur/change commit handler.
-	await screen.getByLabelText(m['forms.field.name']()).click();
+	// Fire the commit handler directly (a single 'change') so the clamp/aria-invalid assertion below
+	// observes the initial over-range commit, not a later no-op re-commit of the already-clamped
+	// value that a subsequent native blur would otherwise trigger.
+	maxHpInput.element().dispatchEvent(new Event('change', { bubbles: true }));
 
 	await expect.element(maxHpInput).toHaveValue('1');
-	await expect.element(screen.getByText(m['errors.clamp']({ min: 1, max: 999 }))).toBeVisible();
+	await expect.element(maxHpInput).toHaveAttribute('aria-invalid', 'true');
 	expect(onSubmit).not.toHaveBeenCalled();
 });
 

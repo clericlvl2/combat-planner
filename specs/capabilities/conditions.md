@@ -34,7 +34,8 @@ once. Toggling membership adds or removes it.
 
 On the compact combatant row, the first few condition icons show, plus a "+K" overflow chip for
 the rest. On the expanded row, the full set is shown via a 12-preset toggle picker, and each
-applied condition's chip gains a removable **×**.
+applied condition's chip gains a removable **×**. The picker renders as a centered `Dialog` on
+desktop (≥1024px) and a bottom `Drawer` on mobile ([[../reference/component-inventory]]).
 
 **AC:**
 - The compact row never shows more than a fixed number of condition icons before collapsing the

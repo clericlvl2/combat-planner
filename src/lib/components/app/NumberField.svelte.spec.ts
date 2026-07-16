@@ -1,6 +1,5 @@
 import { afterEach, expect, test } from 'vitest';
 import { cleanup, render } from 'vitest-browser-svelte';
-import { m } from '$lib/i18n';
 import NumberField from './NumberField.svelte';
 
 // Component test for the B-013 fix: the digit-cap applied to typed entry must not make an
@@ -35,7 +34,7 @@ test('paste bypasses the digit cap so an over-cap value still reaches clamp on c
 	input.dispatchEvent(new Event('change', { bubbles: true }));
 
 	await expect.element(input).toHaveValue('99');
-	await expect.element(screen.getByText(m['errors.clamp']({ min: -9, max: 99 }))).toBeVisible();
+	await expect.element(input).toHaveAttribute('aria-invalid', 'true');
 });
 
 test('getByLabelText(fieldLabel) resolves to the value input alone, not the stepper buttons', async () => {

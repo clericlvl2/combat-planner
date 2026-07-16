@@ -27,7 +27,8 @@ wider viewports — `AppShell.svelte`'s `<main>` wrapper, `AppHeader.svelte`, an
 Escalation sub-bar in `CombatHeader.svelte` all apply it, so card columns and sub-bar content
 stop spanning the full viewport past 768px. The `content-container` utility also carries
 horizontal `padding-inline` gutter so header/body content never touches the viewport's
-left/right edges at cap width. `prototype.html`'s `--desktop-w: 768px` frame canvas dimension is
+left/right edges at cap width — that gutter is `--space-3` (12px), narrowed from the initial
+16px this unit (021). `prototype.html`'s `--desktop-w: 768px` frame canvas dimension is
 the design-canvas analogue of this same width.
 
 Unit 021 (dogfooding follow-up) added a second, wider token: `--content-max-wide: 1024px`, caps a
@@ -70,7 +71,11 @@ AppShell
     │   │     FAB(create) (mobile)
     │   ├── EmptyState (desktop keeps the centered "+ New Combat" button; mobile drops it —
     │   │     FAB alone)
-    │   └── CombatFormDialog → { NumberField·n/a, ColorSwatchPicker }   (create/edit)
+    │   └── CombatFormDialog → { NumberField·n/a, ColorSwatchPicker (single full-width
+    │         stretched row of equal-width swatches, `h-9 flex-1` each — unit 021, was a
+    │         fixed-square wrapping grid) } — renders as a centered Dialog at ≥1024px / bottom
+    │         Drawer below it (unit 021, `MediaQuery` split — [[../capabilities/combats-list]]
+    │         CLS-2)   (create/edit)
     ├── Combat
     │   ├── CombatHeader → { IconButton×back, chrome-title,
     │   │       desktop-only `.nav-desktop` icon-nav row (Combats/Settings/About — mirrors
@@ -93,17 +98,21 @@ AppShell
     │   ├── EmptyState
     │   ├── NumpadSheet → { HpSummaryHeader, EntryDisplay, CommitActions, DigitPad,
     │   │                   HpLogSection → HpLogEntryRow }
-    │   └── CombatantForm → { NumberField (Max HP / Init Bonus / AC / PD / MD — every instance
-    │         follows Decrease → value → Increase button order, incl. AC/PD/MD), Type
-    │         (ToggleGroup, equal-width segments, not a Select), NoteField, Initiative
-    │         (NumberField — edit mode or mid-combat add only; no roll/lock control, rolling
-    │         stays on the card's Init pill). Add-mode header chrome matches the Setup two-FAB /
-    │         header-add+header-start pattern; edit-mode header chrome matches the Active header
-    │         (header-advance icon button + RoundEscBar). Dialog layout (unit 021): Name/Type/Note
-    │         stack (label above control); Max HP/AC/PD/MD/Init Bonus/Initiative render as
-    │         2-across `NumberField` pairs, no `inline` prop, no label-left grid
-    │         ([[../capabilities/combatants]] CBT-3/CBT-4). The `DialogContent` caps height
-    │         (`max-h-[calc(100dvh-2rem)]`, column flex) so only the field region scrolls
+    │   └── CombatantForm → { NumberField (Max HP / AC / PD / MD / Init Bonus / Initiative —
+    │         every instance follows Decrease → value → Increase button order, incl. AC/PD/MD;
+    │         the Initiative field now renders unconditionally in both add and edit mode, unit
+    │         021 — no more `combatActive` gating), Type (ToggleGroup, equal-width per-type-
+    │         colored pills — each item shows a leading `size-2 rounded-full` color dot and a
+    │         same-color tint/ring when selected, unit 021; not a neutral segmented fill, not a
+    │         Select), NoteField (renders last, after the Init Bonus/Initiative pair, unit 021) }.
+    │         Add-mode header chrome matches the Setup two-FAB / header-add+header-start pattern;
+    │         edit-mode header chrome matches the Active header (header-advance icon button +
+    │         RoundEscBar). The form renders as a centered Dialog at ≥1024px and a bottom Drawer
+    │         below it (unit 021, `MediaQuery`, sharing one form-body snippet —
+    │         [[../capabilities/combatants]] CBT-3/CBT-4). Dialog layout: Name/Type stack (label
+    │         above control); Max HP/AC/PD/MD/Init Bonus/Initiative render as 2-across
+    │         `NumberField` pairs; Note is the last field. The desktop `DialogContent` caps
+    │         height (`max-h-[calc(100dvh-2rem)]`, column flex) so only the field region scrolls
     │         (`overflow-y-auto`); the footer matches `CombatFormDialog` styling (Cancel
     │         `variant="outline"`, buttons `h-11 flex-1`) and stays outside the scroll region but
     │         inside the form. }
@@ -149,7 +158,8 @@ as `var(--card-pad)` etc. rather than literal px.
 
 | Prop | Values | Drives |
 |---|---|---|
-| type | PC · enemy · ally | TypeStripe color + stripe count |
+| type | PC · enemy · ally | leading color dot (`aria-hidden`, decorative) before the name —
+  unit 021, replaces the earlier type-color stripe |
 | active | bool | active-turn highlight (leading dot on the current-turn card) |
 | healthState | full · wounded · bloodied · dead | HealthBar fill/alarm — the card background no
   longer tints by health status (removed in the unit-007 restyle); the fill colour change, band
@@ -158,9 +168,11 @@ as `var(--card-pad)` etc. rather than literal px.
 
 Card layout, leading → trailing:
 
-- **TypeStripe** — leading edge, color + `aria-label` naming the type (kept from the compact-row
-  era; stripe count pc=enemy=ally=1, matching `labels.ts`'s `typeStripeCount`).
-- **Row 1** — name (grows, `flex:1 1 auto`) + a trailing controls cluster holding the expand
+- **Type dot** — a `size-2 rounded-full` color dot (`aria-hidden`, purely decorative) immediately
+  before the name, using the same `typeColor` map as before (unit 021 — replaces the earlier
+  type-color stripe block and the now-deleted `typeStripeCount` export;
+  [[../capabilities/platform]] PLT-5).
+- **Row 1** — the type dot, then name (grows, `flex:1 1 auto`) + a trailing controls cluster holding the expand
   chevron (`.chevron-btn`, a CSS-drawn rotating corner, not a glyph font character) immediately
   next to the per-card `⋮` overflow menu (Edit/Duplicate/Remove) — the chevron is **not** adjacent
   to the name; it sits in that trailing cluster (CBT-2).
@@ -192,9 +204,10 @@ Card layout, leading → trailing:
 visible in both states. Collapsing only hides the per-chip `×` (remove) affordance and the
 "+ Condition" / "+ Note" triggers.
 
-TypeStripe (and the Combats-home `ColorTagDot`'s colour fill) are the deliberate color-alone
-exceptions, each compensated by a non-color signal — see
-[[../capabilities/platform]] PLT-5.
+The type dot (decorative, no label) and the Combats-home `ColorTagDot`'s colour fill are the
+color-alone cases flagged by [[../capabilities/platform]] PLT-5 (unit 021 — the type dot carries
+no compensating label since type is a cosmetic flag only, CBT-1; the `ColorTagDot` pairs its
+color with the title-initial letter).
 
 ## Floating action button (FAB) — bottom-right thumb zone
 
@@ -226,6 +239,16 @@ default, newest-first when expanded, "No HP changes yet" when empty) → `HpLogE
 colour-coded action chip + signed diff value in the left column, the old→new value transition in
 the right column, unaccented).
 
+## Mobile form Drawer/Dialog split (unit 021)
+
+`CombatantForm`, `CombatFormDialog`, and `ConditionPicker` each construct their own
+`new MediaQuery('(min-width: 1024px)')` and render a centered Dialog at ≥1024px or a bottom
+Drawer below it, sharing one `{#snippet}` body — the same pattern the Numpad sheet already used
+(HP-6). `drawer-content.svelte` renders the real `DrawerPrimitive.Handle` (not a decorative
+`<div>` grabber), so every mobile Drawer — Numpad, CombatantForm, CombatFormDialog,
+ConditionPicker — gets a working swipe-to-close gesture. The shared `Button` primitive's base
+class carries `cursor-pointer` app-wide (unit 021).
+
 ## Header (Combat screen)
 
 **Setup:** back (leading) · chrome-title · `header-add`("+")/`header-start`(hold-to-start) icon
@@ -237,6 +260,13 @@ only; mobile uses the advance FAB instead) · `CombatOverflowMenu`(`⋮`, traili
 escalation-die values render as a `RoundEscBar` sub-bar below the header chrome (both
 breakpoints), not inline in a header center slot. Advancing auto-scrolls the newly active row
 into view on both breakpoints ([[../capabilities/turns-rounds-escalation]] TRE-2).
+
+The back link's leading chevron sits flush to the content edge (unit 021) — its wrapper carries
+`max-w-full` (not `flex-1`), and a `<div class="min-w-0 flex-1">` spacer separates it from the
+trailing controls, rather than the link itself stretching to fill the row. Below 1024px, all
+three mobile FABs (Advance/Add/Start) suppress their `focus-visible` ring
+(`max-lg:focus-visible:ring-0 max-lg:focus-visible:border-transparent`, unit 021); the desktop
+focus ring is unaffected.
 
 Undo/Redo are **not** separate header icons on either screen state — they're the top two
 `CombatOverflowMenu` items (disabled at their respective stack ends), followed by
@@ -251,8 +281,9 @@ PLT-4).
 
 ## Combats list row
 
-`CombatRow`: leading drag handle (`GripVertical`, reorder via svelte-dnd-action, wired as the
-drag-handle so drag can **only** start there — CLS-6), color tag (`ColorTagDot`, renders the
+`CombatRow`: card corner radius is `rounded-card`, matching the combatant card (unit 021 — was
+`rounded-[var(--radius)]`). Leading drag handle (`GripVertical`, reorder via svelte-dnd-action,
+wired as the drag-handle so drag can **only** start there — CLS-6), color tag (`ColorTagDot`, renders the
 title's first letter; fill = picked color), title, description, trailing `⋮` (`CombatRowMenu`:
 Edit / Delete). The whole `Card` is both the whole-card hover surface (CLS-1) and the
 click-to-open target (CLS-5); the drag handle and the `⋮` menu are excluded from the open-click
@@ -266,14 +297,14 @@ single column, not a grid.
 | Primitive | Used by |
 |---|---|
 | Button | IconButton, FAB, DigitPad, CommitActions, DataActions, NavLink, EmptyState CTA, chevron expand button, tonal-circle header icon buttons (header-add/header-start/header-advance), ghost digit buttons (Backspace/Clear) |
-| Dialog | CombatFormDialog, CombatantForm, NumpadSheet (desktop) |
+| Dialog | CombatFormDialog (desktop), CombatantForm (desktop), NumpadSheet (desktop), ConditionPicker (desktop, unit 021) |
 | AlertDialog | ConfirmDialog |
 | Sidebar | NavSidebar |
 | Sheet | AppHeader burger |
-| Drawer | NumpadSheet (mobile) |
+| Drawer | NumpadSheet (mobile), CombatantForm (mobile, unit 021), CombatFormDialog (mobile, unit 021), ConditionPicker (mobile, unit 021) |
 | DropdownMenu | CombatRowMenu, CombatOverflowMenu, CombatantCard's per-card `⋮` menu |
 | Select | inline language `<Select>` in `settings/+page.svelte` (no dedicated LanguageSwitcher component) |
-| RadioGroup / ToggleGroup | ColorSwatchPicker, ConditionPicker, inline theme `<ToggleGroup>` in `settings/+page.svelte` (no dedicated ThemeSwitcher component), Type toggle (CombatantForm, equal-width segments) |
+| RadioGroup / ToggleGroup | ColorSwatchPicker, ConditionPicker, inline theme `<ToggleGroup>` in `settings/+page.svelte` (no dedicated ThemeSwitcher component), Type toggle (CombatantForm, equal-width per-type-colored pills, unit 021) |
 | Input | NumberField (+ form fields) |
 | Textarea | NoteField |
 | Label / Form | CombatFormDialog, CombatantForm, NumberField |
@@ -285,11 +316,13 @@ single column, not a grid.
 | Sonner (toast) | Toaster / UpdateToast |
 | ScrollArea | HpLogSection |
 | Tooltip | (a11y labels — optional reinforcement, deferred to build) |
-| bespoke (no primitive) | AppShell, ColorTagDot, TypeStripe, HealthBar fill, DefenseStats, EntryDisplay, HpSummaryHeader, HpLogEntryRow, InstallBanner, `about/+page.svelte` (inline, no AboutPage component), SearchField |
+| bespoke (no primitive) | AppShell, ColorTagDot, HealthBar fill, DefenseStats, EntryDisplay, HpSummaryHeader, HpLogEntryRow, InstallBanner, `about/+page.svelte` (inline, no AboutPage component), SearchField |
 
 `HpCell`/`TypeStripe` (compact-row era) had no matching `src/` file (inlined in
 `CombatantRow.svelte`); unit E's card restyle (007) shipped without extracting dedicated
-components for the card's HP block or type stripe — both stay inlined in `CombatantRow.svelte`.
+components for the card's HP block or type stripe — both stayed inlined in `CombatantRow.svelte`
+until unit 021 removed the stripe block entirely, replacing it with a decorative type-color dot
+(also inlined, no dedicated component).
 
 ## Glyph gaps (not yet in ADR-011)
 

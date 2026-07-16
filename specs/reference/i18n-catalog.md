@@ -270,14 +270,16 @@ All numeric bounds injected from [[limits]], never written as literals here.
 | Key | English | Shape |
 |---|---|---|
 | `errors.nameRequired` | Name is required. | |
-| `errors.clamp` | Clamped to {min}–{max}. | `{min}`,`{max}` |
 | `errors.noteTooLong` | Notes are capped at {max} characters. | `{max}` |
 | `errors.combatantCap` | This combat is full ({max} combatants max). | `{max}` |
-| `errors.combatCap` | You've reached the limit of {max} combats. | `{max}` |
 | `errors.roundCap` | Round {max} is the last round. | `{max}` |
 | `errors.import.corrupt` | This file isn't a valid combat export. | |
 | `errors.import.newerVersion` | This file was made by a newer version of the app. Update the app to import it. | |
 | `errors.import.overCap` | Importing this would exceed the {max}-combat limit. | `{max}` |
+
+`errors.clamp` and `errors.combatCap` were removed in unit 021 — `NumberField` clamp is now a
+red-ring/`aria-invalid`-only visual with no inline hint text, and the combat-cap block is now
+silent ([[../capabilities/combatants]] CBT-3, [[../capabilities/combats-list]] CLS-2).
 
 ## appError.* — top-level error-boundary recovery
 
@@ -308,7 +310,6 @@ All numeric bounds injected from [[limits]], never written as literals here.
 | `a11y.condition.overflow` | {n, plural, one {{n} more condition} other {{n} more conditions}} | ICU plural |
 | `a11y.rowExpand` | Expand {name} | `{name}` |
 | `a11y.rowCollapse` | Collapse {name} | `{name}` |
-| `a11y.typeBadge` | {type} | type label backs the color |
 | `a11y.healthStatus` | {name}: {status}, {cur} of {max} HP | label backup for the bar |
 | `a11y.colorTag` | Color tag: {color} | tag not color-alone |
 | `a11y.combatRowMenu` | Actions for {title} | combat row `⋮` |
@@ -316,6 +317,9 @@ All numeric bounds injected from [[limits]], never written as literals here.
 | `a11y.numField.decrease` | Decrease | NumberField `−` stepper button |
 | `a11y.numField.increase` | Increase | NumberField `+` stepper button |
 | `a11y.close` | Close | sr-only label, dialog/sheet close button |
+
+`a11y.typeBadge` was removed in unit 021 — the combatant-card type indicator is now a decorative
+`aria-hidden` dot with no backing label ([[../capabilities/platform]] PLT-5).
 
 ## Open gaps (flagged, not filled)
 

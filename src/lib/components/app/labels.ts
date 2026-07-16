@@ -23,13 +23,6 @@ export const typeColor: Record<CombatantType, string> = {
 	ally: 'bg-type-ally',
 };
 
-/** Stripe count per type — all three types render exactly one leading-edge stripe. */
-export const typeStripeCount: Record<CombatantType, number> = {
-	pc: 1,
-	enemy: 1,
-	ally: 1,
-};
-
 /** Condition tag color (grouped semantically for at-a-glance distinction; CND-3). */
 export const conditionColor: Record<Condition, string> = {
 	charmed: 'border-combat-violet/30 bg-combat-violet/10 text-combat-violet',

@@ -1,7 +1,6 @@
 import { afterEach, expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { cleanup, render } from 'vitest-browser-svelte';
-import { MAX_COMBATS } from '$lib/db/types';
 import { m } from '$lib/i18n';
 import { createCombat } from '$lib/stores/domain/factories';
 import CombatFormDialog from './CombatFormDialog.svelte';
@@ -35,7 +34,7 @@ test('create mode calls store.createCombat with the form values', async () => {
 	expect(editCombatFn).not.toHaveBeenCalled();
 });
 
-test('create mode surfaces errors.combatCap and creates nothing when store returns null', async () => {
+test('create mode blocks silently and keeps the dialog open when store returns null (cap hit)', async () => {
 	const createCombatFn = vi.fn(() => null);
 	const store = { createCombat: createCombatFn, editCombat: vi.fn() };
 	const screen = render(CombatFormDialog, { open: true, store });
@@ -43,8 +42,11 @@ test('create mode surfaces errors.combatCap and creates nothing when store retur
 	await userEvent.fill(screen.getByLabelText(m['forms.field.title']()), 'One too many');
 	await screen.getByRole('button', { name: m['forms.action.create']() }).click();
 
+	// Cap enforcement is silent: no new combat, and the dialog stays open (no error text shown).
 	expect(createCombatFn).toHaveBeenCalledTimes(1);
-	await expect.element(screen.getByText(m['errors.combatCap']({ max: MAX_COMBATS }))).toBeVisible();
+	await expect
+		.element(screen.getByRole('dialog', { name: m['forms.combat.create.title']() }))
+		.toBeVisible();
 });
 
 test('edit mode pre-fills from the existing combat', async () => {

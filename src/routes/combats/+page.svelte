@@ -88,7 +88,7 @@
 	</EmptyState>
 	<FAB icon={Add} label={m['combats.create']()} onclick={openCreate} class="lg:hidden" />
 {:else}
-	<div class="flex flex-col gap-2 p-3 pb-24">
+	<div class="flex flex-col gap-2 pt-3 pb-24">
 		<SearchField bind:value={query} />
 		<CombatList
 			combats={filteredCombats}

@@ -36,14 +36,18 @@ hover box. The cell has a **fixed width** so 1-digit and 2-digit values render t
 
 Once `state == active`, the init cell is disabled — no tap-roll, no long-press; turn order is
 locked in for the fight. The only way to change an Active combatant's initiative is the
-manual-initiative field on the edit form. When adding a combatant while Active, the same
-manual-initiative field is surfaced on the add form so the DM can hand-enter a value for a
-latecomer; left blank, it joins unrolled at the bottom (see [[lifecycle]] LIF-4).
+manual-initiative field on the edit form. The same manual-initiative field is always present on
+the add form too, regardless of whether the combat is Setup or Active — amended: it used to be
+gated to add-while-Active only, so the DM could hand-enter a value for a latecomer; it now also
+appears when adding during Setup. Left blank, it joins unrolled at the bottom (see [[lifecycle]]
+LIF-4).
 
 **AC:**
 - While Active, tapping or long-pressing the init cell has no effect.
 - While Active, the edit form's manual-initiative field is the only control that changes a
   combatant's initiative.
+- The add form's manual-initiative field is present regardless of combat state (Setup or
+  Active).
 
 ## INI-4 — Sort order & tiebreak
 

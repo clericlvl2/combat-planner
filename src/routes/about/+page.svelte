@@ -13,7 +13,7 @@
 
 <h1 class="sr-only">{m['about.title']()}</h1>
 
-<div class="mx-auto flex w-full max-w-[640px] flex-col gap-3 p-6">
+<div class="mx-auto flex w-full max-w-[640px] flex-col gap-3 py-6">
 	<h2 class="text-xl font-semibold">{m['about.appName']()}</h2>
 	<span class="text-sm tabular-nums text-muted-foreground">
 		{m['about.version']({ version: APP_VERSION })}

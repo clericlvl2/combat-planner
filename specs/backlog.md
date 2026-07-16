@@ -44,6 +44,8 @@ text.
 | B-026 | Routing edge cases — fix undefined URL states, missing param guards, back-button crashes (collect examples first). | INFRA | S | done | `specs/archive/010-route-error-boundary/` |
 | B-027 | Unified design tokens — one shared `specs/design/tokens.css` (SSOT) `@import`ed by both prototypes + `layout.css`; kill spacing/component-dim drift; move theming to `[data-theme]` attribute to enable N themes. | DESIGN | M | done | `specs/archive/014-unified-design-tokens/` |
 | B-028 | Light-theme WCAG-AA contrast pass — fix pre-existing sub-4.5:1 normal-text pairs surfaced by unit 014: `--text-faint` (both themes), `--health-wounded`/`--health-bloodied`, and combat swatches `blue`/`orange`/`green`/`neutral`/`teal` (light). Rendered as small text in SearchField, NumpadSheet HP-log badges/diffs/buttons, and condition chips. Adjust prototype design-source hexes + re-verify AA per value. | DESIGN | M | done | `specs/archive/015-light-theme-aa-contrast/` |
+| B-029 | Combatant card type is visual-only after unit 021 — the type-color dot is `aria-hidden` and the old stripe's `aria-label` (deleted `a11y.typeBadge` key) is gone, so screen readers no longer announce PC/Enemy/Ally on the card. PLT-5 documents this honestly; decide sr-only label on the dot vs. accept. | PLT | S | idea | — |
+| B-030 | NumberField `onchange`+`onblur` both call `commit()` — a blur after a change re-clamps the already-valid DOM value and clears `clamped`, so the red destructive invalid ring (unit 021 red-ring-only validation) can flicker off on blur in production. Latent wiring quirk; decide fix (dedupe the commit / keep clamped sticky). | CBT | S | idea | — |
 
 **Fields**
 

@@ -61,6 +61,10 @@
 	 * `.content-container` utility below (and any other consumer) can reference it via the
 	 * Tailwind theme layer, not just the raw custom property. */
 	--content-max: var(--content-max);
+	/* Wide desktop content max-width (tokens.css --content-max-wide) — exposed for the
+	 * `.content-container-wide` utility below (Combat header chrome only; body/cards stay at
+	 * --content-max). */
+	--content-max-wide: var(--content-max-wide);
 
 	/* Spacing scale — `--spacing` is Tailwind's base unit (utilities compute
 	 * as calc(var(--spacing) * n)); aliasing it to tokens.css `--space-1`
@@ -141,6 +145,16 @@
 	width: 100%;
 	margin-inline: auto;
 	max-width: var(--content-max);
+	padding-inline: var(--space-4);
+}
+
+/* Wide sibling of `.content-container` (PLT-2) — caps the Combat header chrome at
+ * --content-max-wide (1024px) instead of --content-max (768px). Body content, the
+ * Round/Escalation sub-bar, and the cards stay at --content-max via `.content-container`. */
+@utility content-container-wide {
+	width: 100%;
+	margin-inline: auto;
+	max-width: var(--content-max-wide);
 	padding-inline: var(--space-4);
 }
 

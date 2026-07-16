@@ -106,7 +106,9 @@
 </script>
 
 <Dialog bind:open>
-	<DialogContent class="max-w-lg sm:max-w-lg">
+	<DialogContent
+		class="flex max-h-[calc(100dvh-2rem)] flex-col rounded-lg border border-[var(--border-strong)] ring-0 sm:max-w-[400px]"
+	>
 		<DialogHeader>
 			<DialogTitle class="text-lg font-semibold">
 				{mode === 'add' ? m['forms.combatant.add.title']() : m['forms.combatant.edit.title']()}
@@ -114,115 +116,114 @@
 		</DialogHeader>
 
 		<form
-			class="flex flex-col gap-3"
+			class="flex min-h-0 flex-1 flex-col gap-4"
 			onsubmit={(e) => {
 				e.preventDefault();
 				submit();
 			}}
 		>
-			<!-- Name (optional — empty on save falls back to the type-specific placeholder as the real name) -->
-			<div class="grid grid-cols-[6rem_1fr] items-center gap-x-3">
-				<Label for="cf-name" class={fieldLabelClass}>{m['forms.field.name']()}</Label>
-				<Input id="cf-name" class="min-h-11" bind:value={name} placeholder={namePlaceholder} />
+			<div class="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
+				<!-- Name (optional — empty on save falls back to the type-specific placeholder as the real name) -->
+				<div class="flex flex-col gap-[5px]">
+					<Label for="cf-name" class={fieldLabelClass}>{m['forms.field.name']()}</Label>
+					<Input id="cf-name" class="min-h-11" bind:value={name} placeholder={namePlaceholder} />
+				</div>
+
+				<!-- Type -->
+				<div class="flex flex-col gap-[5px]">
+					<Label class={fieldLabelClass}>{m['forms.field.type']()}</Label>
+					<ToggleGroup
+						type="single"
+						value={type}
+						onValueChange={(v) => v && (type = v as CombatantType)}
+						variant="outline"
+						class="w-full"
+					>
+						{#each COMBATANT_TYPES as t (t)}
+							<ToggleGroupItem
+								value={t}
+								class="min-h-11 flex-1 text-muted-foreground data-[state=on]:bg-primary data-[state=on]:font-semibold data-[state=on]:text-primary-foreground"
+							>
+								{typeLabel[t]()}
+							</ToggleGroupItem>
+						{/each}
+					</ToggleGroup>
+				</div>
+
+				<div class="grid grid-cols-2 gap-3">
+					<NumberField
+						id="cf-maxhp"
+						label={m['forms.field.maxHp']()}
+						bind:value={maxHp}
+						min={RANGES.maxHp.min}
+						max={RANGES.maxHp.max}
+					/>
+					<NumberField
+						id="cf-ac"
+						label={m['forms.field.ac']()}
+						bind:value={ac}
+						min={RANGES.ac.min}
+						max={RANGES.ac.max}
+					/>
+				</div>
+
+				<div class="grid grid-cols-2 gap-3">
+					<NumberField
+						id="cf-pd"
+						label={m['forms.field.pd']()}
+						bind:value={pd}
+						min={RANGES.pd.min}
+						max={RANGES.pd.max}
+					/>
+					<NumberField
+						id="cf-md"
+						label={m['forms.field.md']()}
+						bind:value={md}
+						min={RANGES.md.min}
+						max={RANGES.md.max}
+					/>
+				</div>
+
+				<div class="flex flex-col gap-[5px]">
+					<Label for="cf-note" class={fieldLabelClass}>{m['forms.field.note']()}</Label>
+					<Textarea
+						id="cf-note"
+						bind:value={note}
+						maxlength={NOTE_MAX_LENGTH}
+						placeholder={m['forms.field.note.placeholder']()}
+					/>
+				</div>
+
+				<div class="grid grid-cols-2 gap-3">
+					<NumberField
+						id="cf-initbonus"
+						label={m['forms.field.initBonus']()}
+						bind:value={initiativeBonus}
+						min={RANGES.initiativeBonus.min}
+						max={RANGES.initiativeBonus.max}
+					/>
+					{#if mode === 'edit' || (mode === 'add' && combatActive)}
+						<NumberField
+							id="cf-init"
+							label={m['forms.field.initValue']()}
+							bind:value={initiative}
+							min={RANGES.initiative.min}
+							max={RANGES.initiative.max}
+						/>
+					{/if}
+				</div>
 			</div>
 
-			<!-- Type -->
-			<div class="grid grid-cols-[6rem_1fr] items-center gap-x-3">
-				<Label class={fieldLabelClass}>{m['forms.field.type']()}</Label>
-				<ToggleGroup
-					type="single"
-					value={type}
-					onValueChange={(v) => v && (type = v as CombatantType)}
-					variant="outline"
-					class="w-full"
-				>
-					{#each COMBATANT_TYPES as t (t)}
-						<ToggleGroupItem
-							value={t}
-							class="min-h-11 flex-1 text-muted-foreground data-[state=on]:bg-primary data-[state=on]:font-semibold data-[state=on]:text-primary-foreground"
-						>
-							{typeLabel[t]()}
-						</ToggleGroupItem>
-					{/each}
-				</ToggleGroup>
-			</div>
-
-			<NumberField
-				inline
-				id="cf-maxhp"
-				label={m['forms.field.maxHp']()}
-				bind:value={maxHp}
-				min={RANGES.maxHp.min}
-				max={RANGES.maxHp.max}
-			/>
-			<NumberField
-				inline
-				id="cf-initbonus"
-				label={m['forms.field.initBonus']()}
-				bind:value={initiativeBonus}
-				min={RANGES.initiativeBonus.min}
-				max={RANGES.initiativeBonus.max}
-			/>
-			<NumberField
-				inline
-				id="cf-ac"
-				label={m['forms.field.ac']()}
-				bind:value={ac}
-				min={RANGES.ac.min}
-				max={RANGES.ac.max}
-			/>
-			<NumberField
-				inline
-				id="cf-pd"
-				label={m['forms.field.pd']()}
-				bind:value={pd}
-				min={RANGES.pd.min}
-				max={RANGES.pd.max}
-			/>
-			<NumberField
-				inline
-				id="cf-md"
-				label={m['forms.field.md']()}
-				bind:value={md}
-				min={RANGES.md.min}
-				max={RANGES.md.max}
-			/>
-
-			{#if mode === 'edit' || (mode === 'add' && combatActive)}
-				<NumberField
-					inline
-					id="cf-init"
-					label={m['forms.field.initValue']()}
-					bind:value={initiative}
-					min={RANGES.initiative.min}
-					max={RANGES.initiative.max}
-				/>
-			{/if}
-
-			<div class="grid grid-cols-[6rem_1fr] items-center gap-x-3">
-				<Label for="cf-note" class={fieldLabelClass}>{m['forms.field.note']()}</Label>
-				<Textarea
-					id="cf-note"
-					bind:value={note}
-					maxlength={NOTE_MAX_LENGTH}
-					placeholder={m['forms.field.note.placeholder']()}
-				/>
-			</div>
-
-			<DialogFooter>
+			<DialogFooter class="mx-0 mb-0 flex-row justify-center gap-2 border-t-0 bg-transparent p-0 pt-1">
 				<Button
 					type="button"
-					variant="ghost"
-					class="w-full min-w-0 sm:w-auto sm:flex-1 sm:shrink sm:basis-0"
+					variant="outline"
+					class="h-11 min-w-0 flex-1 shrink basis-0 rounded-sm border-[var(--border-strong)]"
 					onclick={() => (open = false)}
 				>
 					{m['forms.action.cancel']()}
 				</Button>
-				<Button
-					type="submit"
-					size="lg"
-					class="w-full min-w-0 sm:w-auto sm:flex-1 sm:shrink sm:basis-0"
-				>
+				<Button type="submit" size="lg" class="h-11 min-w-0 flex-1 shrink basis-0 rounded-sm">
 					{mode === 'add' ? m['forms.action.add']() : m['forms.action.save']()}
 				</Button>
 			</DialogFooter>

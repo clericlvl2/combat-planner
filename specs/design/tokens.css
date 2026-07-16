@@ -38,6 +38,7 @@
 
 	/* Layout container dims */
 	--content-max: 768px;
+	--content-max-wide: 1024px;
 
 	/* Combatant card component dims */
 	/* Exception (change.md-documented): synced to shipped CombatantRow render, not prototype's prior 14px */

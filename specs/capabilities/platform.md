@@ -35,7 +35,11 @@ content never touch the viewport's left/right edges at cap width — header and 
 longer span the full viewport on a wide monitor. The combat screen's header is the one
 exception: its background renders as a **full-bleed bar** spanning the full viewport width, with
 its content centered/capped inside; the shared container's gutter does not inset that header, so
-no page background leaks in a gutter beside it.
+no page background leaks in a gutter beside it. Within that full-bleed bar, the combat header's
+own chrome (back link, title, `⋮` menu, Setup/Active header controls) caps at a wider
+**1024px** (`--content-max-wide` token, `.content-container-wide` utility) rather than 768 —
+the Round/Escalation sub-bar rendered below the header, the combatant cards, and every other
+body/screen container still cap at 768 ([[../reference/component-inventory]]).
 
 On mobile, the combat screen's bottom padding exceeds 2× the FAB height plus the inter-FAB gaps,
 so content is never hidden behind the stacked FABs; the combat-screen header's overflow (`⋮`)
@@ -56,6 +60,9 @@ renders the row on which screen).
   padding so content never touches the viewport edges at cap width.
 - The combat-screen header renders as a full-bleed bar (background spans the full viewport,
   content centered/capped inside) and is never clipped or gutter-inset like ordinary body content.
+- The combat header's own chrome (back link/title/`⋮`/Setup-Active controls) caps at 1024px, wider
+  than the 768px cap used by the Round/Escalation sub-bar, the combatant cards, and every other
+  screen's body content.
 - On mobile, the combat screen's bottom padding is greater than 2× the FAB height plus inter-FAB
   gaps, and the header's overflow/icon controls are ≥44px touch targets.
 - On the desktop breakpoint, with a combat open, Settings/About/Combats-list remain reachable

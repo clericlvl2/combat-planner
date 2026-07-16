@@ -23,12 +23,19 @@ the prototype design source was updated to match. Theming is keyed by a `[data-t
 (narrowed from an initial 1024px after unit-020 dogfooding) caps a shared `.content-container`
 utility (`src/routes/layout.css`'s `@utility content-container`, consuming the token via `@theme`)
 that every routed screen's body and header inner-content sit inside, centered with gutters on
-wider viewports — `AppShell.svelte`'s `<main>` wrapper, `AppHeader.svelte`, and
-`CombatHeader.svelte` all apply it, so card columns and header content stop spanning the full
-viewport past 768px (including the Combat screen, which used to clip on its sides). The
-`content-container` utility also carries horizontal `padding-inline` gutter so header/body content
-never touches the viewport's left/right edges at cap width. `prototype.html`'s
-`--desktop-w: 768px` frame canvas dimension is the design-canvas analogue of this same width.
+wider viewports — `AppShell.svelte`'s `<main>` wrapper, `AppHeader.svelte`, and the Round/
+Escalation sub-bar in `CombatHeader.svelte` all apply it, so card columns and sub-bar content
+stop spanning the full viewport past 768px. The `content-container` utility also carries
+horizontal `padding-inline` gutter so header/body content never touches the viewport's
+left/right edges at cap width. `prototype.html`'s `--desktop-w: 768px` frame canvas dimension is
+the design-canvas analogue of this same width.
+
+Unit 021 (dogfooding follow-up) added a second, wider token: `--content-max-wide: 1024px`, caps a
+`.content-container-wide` utility (`layout.css`'s `@utility content-container-wide`), consumed
+only by `CombatHeader.svelte`'s own chrome wrapper (back link, title, `⋮` menu, Setup/Active
+header controls) — the one container in the app that caps at 1024 instead of 768. Everything
+else (body content, cards, the Round/Escalation sub-bar, every other screen's header) keeps the
+768 `.content-container` cap.
 
 **Target vs. shipped, this doc.** This file describes the design *target* locked in by the
 converged prototype (`specs/design/prototype.html`, plus `specs/design/card-prototype.html` for
@@ -92,7 +99,14 @@ AppShell
     │         (NumberField — edit mode or mid-combat add only; no roll/lock control, rolling
     │         stays on the card's Init pill). Add-mode header chrome matches the Setup two-FAB /
     │         header-add+header-start pattern; edit-mode header chrome matches the Active header
-    │         (header-advance icon button + RoundEscBar). }
+    │         (header-advance icon button + RoundEscBar). Dialog layout (unit 021): Name/Type/Note
+    │         stack (label above control); Max HP/AC/PD/MD/Init Bonus/Initiative render as
+    │         2-across `NumberField` pairs, no `inline` prop, no label-left grid
+    │         ([[../capabilities/combatants]] CBT-3/CBT-4). The `DialogContent` caps height
+    │         (`max-h-[calc(100dvh-2rem)]`, column flex) so only the field region scrolls
+    │         (`overflow-y-auto`); the footer matches `CombatFormDialog` styling (Cancel
+    │         `variant="outline"`, buttons `h-11 flex-1`) and stays outside the scroll region but
+    │         inside the form. }
     ├── Settings → three inline `<section>` groups (Language / Appearance / Data) plus a
     │     headingless About link row, authored directly in `settings/+page.svelte` — no
     │     dedicated SettingsGroup/LanguageSwitcher/ThemeSwitcher/DataActions leaf components

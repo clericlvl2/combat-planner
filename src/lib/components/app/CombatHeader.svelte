@@ -87,18 +87,16 @@
 </script>
 
 <header class="flex h-13 shrink-0 items-center border-b border-border bg-card px-3">
-	<div class="content-container flex w-full items-center gap-2">
+	<div class="content-container-wide flex w-full items-center gap-2">
 		<Button
 			href="/combats"
 			variant="ghost"
-			size="icon"
-			class="size-11 shrink-0 lg:size-8"
 			aria-label={m['a11y.back']()}
+			class="-ml-2 flex min-h-11 min-w-0 flex-1 items-center justify-start gap-1 px-2 text-lg font-semibold"
 		>
-			<Back class="size-5" />
+			<Back class="size-5 shrink-0" />
+			<span class="min-w-0 truncate">{combat.title}</span>
 		</Button>
-
-		<span class="min-w-0 flex-1 truncate text-lg font-semibold">{combat.title}</span>
 
 		{#if !isActive}
 			<!-- Setup — desktop-only header pair (mobile uses the FAB stack in +page.svelte instead,

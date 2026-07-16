@@ -1,0 +1,40 @@
+# Doc-verification: 020-ux-interaction-overhaul
+
+Pass type: doc-sync (capabilities/reference/CHANGELOG diff vs. shipped code recorded in
+`verification.md`).
+
+| Doc area | Verdict | Evidence |
+|----|---------|----------|
+| SET-1: first-run default = always English, no autodetect | PASS | `specs/capabilities/settings.md`: "Default = **always English** on first run — browser-locale autodetect is not used"; AC "regardless of browser locale" — matches shipped `vite.config.ts` strategy change in `verification.md:8` |
+| SET-1: instant apply | PASS | `settings.md` AC "Switching language in Settings changes all visible strings immediately, without a reload" — matches `verification.md:7` |
+| PLT-2: 768px content-max + gutter | PASS | `platform.md`: "768px content max-width (`--content-max` design token)...horizontal gutter padding" + AC bullets — matches `verification.md:9,11` |
+| PLT-2/3: full-bleed combat header | PASS | `platform.md`: "combat screen's header is the one exception: its background renders as a full-bleed bar...shared container's gutter does not inset that header" — matches `verification.md:40` |
+| PLT-3: shared DesktopNav + control-then-nav sectioning | PASS | `platform.md` PLT-3: "rendered by a single shared `DesktopNav` component consumed by every header...page-control buttons...render before the nav icon-button group...visually distinct section"; `component-inventory.md` "Control-then-nav sectioning" block added — matches `verification.md:12-14` |
+| PLT (mobile): bottom safe-area, 44px targets | PASS | `platform.md`: "bottom padding exceeds 2× the FAB height plus the inter-FAB gaps" / "overflow (⋮) and icon controls are ≥44px" — matches `verification.md:38-39` |
+| CLS-1/5/6: whole-card hover/click, grip+⋮ excluded, drag-from-handle | PASS | `combats-list.md` CLS-1 "whole-card hover highlight"; CLS-5 "except the drag handle...and the ⋮ menu"; CLS-6 "Drag is initiated only from the lucide grip-vertical handle" — matches `verification.md:15-17` |
+| CLS-9: title+description search + square-corner highlight | PASS | `combats-list.md` CLS-9: "filters visible rows by title or description...highlight (`<mark>`) has square corners" — matches `verification.md:18-19` |
+| CLS-2: Cancel-in-footer, swatch selected indicator, i18n placeholders | PASS | `combats-list.md` CLS-2: "Cancel button renders inside the dialog panel's footer"; "selected tile additionally carries a clear, persistent selected indicator"; "Title/description placeholders resolve from paraglide i18n keys" — matches `verification.md:20-22` |
+| CBT-2: chevron placement/size, gap removal, 44px ⋮ | PASS | `combatants.md` CBT-2: "trailing controls cluster holds the expand/collapse chevron immediately next to the persistent ⋮ menu...the two render at the same size"; "carries no internal gap rule"; "≥44px touch target" — matches `verification.md:23,27-29` |
+| CBT-3: empty-name-falls-back wording (old "rejected" text gone) | PASS | `combatants.md` CBT-3: "an empty name is never rejected"; AC rewritten to "Submitting the add form with an empty or whitespace-only name is **accepted**; the combatant's stored name becomes the type-specific placeholder" — directly resolves the contradiction flagged in `verification.md`'s "Other findings" section; no residual "required"/"rejected" language found (grep across `specs/capabilities/*.md` and `specs/reference/*.md` returns only the new "never rejected" phrasing) |
+| CBT-3: pre-filled numeric defaults | PASS | `combatants.md` CBT-3: "Max HP, Initiative bonus, AC, PD, and MD are pre-filled with real, editable default values...not placeholder-styled hints"; matching AC bullet "10/0/10/10/10 as real editable values" — matches `verification.md:31` |
+| CBT-3: inline label-left grid, no multi-column grid, no mobile-stacking rule | PASS | `combatants.md` CBT-3: "inline label-left grid: every field...is one row with an uppercase label in a fixed ~6rem left column...There is no separate multi-column AC/PD/MD grid and no distinct mobile-stacking rule" — matches `verification.md:33` and change.md's CBT-3(mobile) supersession note |
+| HP-4/HP-6: unified HP+bar target, desktop modal / mobile drawer | PASS | `hp.md` HP-4: "single unified interactive target...one rounded hover/press area with a pointer cursor on desktop"; HP-6: "On desktop the numpad renders as a centered modal dialog; on mobile it renders as a bottom drawer" — matches `verification.md:24-25` |
+| INI-2: hover scoped, fixed width, pointer, no min-height | PASS | `initiative.md` INI-2: "hover affordance is scoped to the inner control only...fixed width so 1-digit and 2-digit values render the same width, a pointer cursor, and no `min-height`" — matches `verification.md:26` |
+| limits.md: name-optional/placeholder facts | PASS | `limits.md` Name row: "no (trimmed; empty/whitespace-only falls back to the type placeholder as the real stored name)"; placeholder column lists "Hero Name"/"Enemy"/"Ally"; numeric defaults row states pre-filled real values — consistent with `combatants.md` and shipped code |
+| i18n-catalog.md: new keys + dead-key flags | PASS | `i18n-catalog.md` adds `forms.field.name.placeholder.{pc,enemy,ally}`, `forms.field.title.placeholder`, `forms.field.description.placeholder`; new "Dead keys" section correctly flags `forms.field.name.placeholder` and `errors.nameRequired` as unreferenced — confirmed by grep: neither string appears in `src/**` (`grep -rn "errors.nameRequired\|nameRequired" src/` = no hits outside i18n-catalog.md/messages/en.json) |
+| acceptance-matrix.md: CBT-3 matrix wording | PASS | Row changed from "form clamp/name-required" to "form clamp/empty-name-falls-back-to-type-placeholder" — matches shipped behavior |
+| CHANGELOG.md: one well-formed row for unit 020 | PASS | `specs/CHANGELOG.md` Change-units table gains exactly one new row, `020-ux-interaction-overhaul | 2026-07-16 | ...`, correctly summarizing SET-1/PLT-2/PLT-3/CLS-1/2/5/6/9/CBT-2/3/HP-4/6/INI-2 and explicitly noting the CBT-3 AC correction and new/dead i18n keys |
+
+## Scope check
+
+In-scope only. Diff confined to `specs/capabilities/{settings,platform,combats-list,combatants,hp,initiative}.md`, `specs/reference/{limits,i18n-catalog,acceptance-matrix,component-inventory}.md`, and `specs/CHANGELOG.md` — exactly the doc-owner files named in change.md's "What changes" table plus the mandated CHANGELOG row. `specs/design/{prototype,card-prototype}.html` and `specs/design/tokens.css` also carry diffs in this working tree, but those are declared design-source edits from the code pass (already covered by `verification.md`'s design-source AC rows), not doc-syncer overreach — no capability/reference file outside the declared set was touched, and no capability file states a claim beyond what `verification.md` confirms shipped.
+
+## Other findings
+
+- The contradiction flagged by the code-pass `verification.md` ("Other findings" section — `combatants.md` CBT-3 stale "empty name rejected" text) is now fully resolved: `combatants.md` was rewritten in this doc pass to state the opposite (accepted, falls back to placeholder), matching shipped `CombatantForm.svelte` behavior and the corresponding spec test. No other stale "name required"/"rejected" language was found anywhere in `specs/capabilities/*.md` or `specs/reference/*.md` (verified by regex grep across both directories).
+- `errors.nameRequired` and `forms.field.name.placeholder` are correctly documented as dead keys rather than silently deleted, consistent with change.md's i18n scope note ("never hand-edit `src/lib/paraglide/*`" / key-parity-only guarantee) — no code deletion of the dead keys was expected or found.
+- No doc edit makes an unshipped claim: every capability/reference bullet checked above has a corresponding PASS row with concrete file:line evidence in the code-pass `verification.md`.
+
+## Summary
+
+19 doc areas checked: 19 PASS, 0 FAIL. Scope respected — no capability/reference file outside the declared set was edited, and the CBT-3 contradiction flagged in the prior code-pass verification has been fully resolved.

@@ -29,6 +29,18 @@ layout, not a distinct desktop composition — with the same combatant-card shap
 unchanged, just re-centered. The card shape itself is [[../reference/component-inventory]]'s to
 own; this requirement does not restate that detail.
 
+App-wide, desktop content is capped at a **768px content max-width** (`--content-max` design
+token), centered with horizontal gutter padding on the shared container so header and body
+content never touch the viewport's left/right edges at cap width — header and card columns no
+longer span the full viewport on a wide monitor. The combat screen's header is the one
+exception: its background renders as a **full-bleed bar** spanning the full viewport width, with
+its content centered/capped inside; the shared container's gutter does not inset that header, so
+no page background leaks in a gutter beside it.
+
+On mobile, the combat screen's bottom padding exceeds 2× the FAB height plus the inter-FAB gaps,
+so content is never hidden behind the stacked FABs; the combat-screen header's overflow (`⋮`)
+and icon controls are ≥44px touch targets.
+
 On desktop, Settings/About/the Combats list stay reachable from an open combat screen — the
 desktop icon-nav destinations are not lost just because the Combat route renders its own header
 component instead of the shared one ([[../reference/component-inventory]] for which component
@@ -40,13 +52,25 @@ renders the row on which screen).
 - All interactive targets measure at least 44px on the touch axis.
 - On desktop, the Combat screen renders as a single centered column (no split-pane), reusing
   the mobile card composition unchanged.
+- A shared desktop container caps content width at 768px and centers it, with horizontal gutter
+  padding so content never touches the viewport edges at cap width.
+- The combat-screen header renders as a full-bleed bar (background spans the full viewport,
+  content centered/capped inside) and is never clipped or gutter-inset like ordinary body content.
+- On mobile, the combat screen's bottom padding is greater than 2× the FAB height plus inter-FAB
+  gaps, and the header's overflow/icon controls are ≥44px touch targets.
 - On the desktop breakpoint, with a combat open, Settings/About/Combats-list remain reachable
   from the combat screen's header.
 
 ## PLT-3 — Navigation per breakpoint
 
 Mobile: swipe-right reveals a sidebar with nav links. Tablet: header with burger menu. Desktop:
-header with inline icon-button navigation. Destinations: Combats, Settings, About.
+header with inline icon-button navigation, rendered by a single shared `DesktopNav` component
+consumed by every header (no per-header duplicate nav markup). Destinations: Combats, Settings,
+About.
+
+Across every screen's header, page-control buttons (e.g. New combat, combat controls) render
+**before** the nav icon-button group in DOM/visual order, and the nav group is a visually
+distinct section (e.g. its own divider/grouping), not interleaved with the controls.
 
 The create action follows the same per-breakpoint split as nav wherever a create-FAB exists: a
 header "+" icon button on desktop, a FAB on mobile. Combat — Active's advance-turn control
@@ -66,6 +90,11 @@ Advance FAB hidden at that breakpoint. Exact control placement:
 - Tablet shows a burger-menu header; desktop shows inline icon-button nav in the header (each
   icon carrying an `aria-label` and the current destination marked); both expose the same three
   destinations.
+- The desktop nav icon row is rendered by a single shared component consumed by every header
+  that shows it (no duplicated nav markup across components).
+- Across every app screen header, page-control buttons render before the nav icon-button group,
+  and the nav group is visually separated as its own section. On the combats-list header
+  specifically, the New combat control renders before the nav icon group.
 - Wherever a create-FAB exists, desktop shows an equivalent header "+" icon button instead.
 - On desktop (≥1024px), Combat — Active shows a header Advance roundel icon button, and the
   mobile Advance FAB is hidden (`lg:hidden`); both the FAB and the header roundel remain present

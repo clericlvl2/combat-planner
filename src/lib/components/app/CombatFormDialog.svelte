@@ -103,7 +103,7 @@
 				<Input
 					id="cf-title"
 					bind:value={title}
-					placeholder="e.g. Goblin Ambush"
+					placeholder={m['forms.field.title.placeholder']()}
 					class="h-11 rounded-sm border-[var(--border-strong)] text-[15px] md:text-[15px]"
 				/>
 			</div>
@@ -113,7 +113,7 @@
 				<Textarea
 					id="cf-description"
 					bind:value={description}
-					placeholder="Optional notes"
+					placeholder={m['forms.field.description.placeholder']()}
 					class="rounded-sm border-[var(--border-strong)] text-[15px] md:text-[15px]"
 				/>
 			</div>
@@ -132,12 +132,16 @@
 					type="button"
 					variant="outline"
 					size="lg"
-					class="h-11 w-full rounded-sm border-[var(--border-strong)]"
+					class="h-11 min-w-0 flex-1 shrink basis-0 rounded-sm border-[var(--border-strong)]"
 					onclick={() => (open = false)}
 				>
 					{m['forms.action.cancel']()}
 				</Button>
-				<Button type="submit" size="lg" class="h-11 w-full rounded-sm font-semibold">
+				<Button
+					type="submit"
+					size="lg"
+					class="h-11 min-w-0 flex-1 shrink basis-0 rounded-sm font-semibold"
+				>
 					{combat ? m['forms.action.save']() : m['forms.action.create']()}
 				</Button>
 			</DialogFooter>

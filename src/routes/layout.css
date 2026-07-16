@@ -57,6 +57,11 @@
 	--radius-xl: var(--radius-xl);
 	--radius-card: var(--radius-card);
 
+	/* Desktop content max-width (tokens.css --content-max) — exposed so the shared
+	 * `.content-container` utility below (and any other consumer) can reference it via the
+	 * Tailwind theme layer, not just the raw custom property. */
+	--content-max: var(--content-max);
+
 	/* Spacing scale — `--spacing` is Tailwind's base unit (utilities compute
 	 * as calc(var(--spacing) * n)); aliasing it to tokens.css `--space-1`
 	 * (4px) makes p-4/gap-2/etc token-driven instead of coincidentally equal. */
@@ -125,6 +130,18 @@
 	--color-combat-blue: var(--combat-blue);
 	--color-combat-violet: var(--combat-violet);
 	--color-on-semantic: var(--on-semantic);
+}
+
+/* Shared desktop content container (PLT-2) — caps routed body content at --content-max
+ * (768px) and centers it with gutters on wider screens. Horizontal gutter padding ensures
+ * header/body content never touches the viewport left/right edges at cap width (fixes the
+ * combat-screen header being flush-clipped). Nested screens (Settings, About) keep their own
+ * narrower inner columns nested inside this outer container. */
+@utility content-container {
+	width: 100%;
+	margin-inline: auto;
+	max-width: var(--content-max);
+	padding-inline: var(--space-4);
 }
 
 @layer base {

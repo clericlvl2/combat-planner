@@ -144,7 +144,9 @@ Field ranges/defaults: [[limits]].
 | `forms.combatant.add.title` | Add combatant |
 | `forms.combatant.edit.title` | Edit combatant |
 | `forms.field.name` | Name |
-| `forms.field.name.placeholder` | Namius Name |
+| `forms.field.name.placeholder.pc` | Hero Name | type-specific Name placeholder; falls back to the combatant's real stored name when submitted empty ([[../capabilities/combatants]] CBT-3) |
+| `forms.field.name.placeholder.enemy` | Enemy | see above |
+| `forms.field.name.placeholder.ally` | Ally | see above |
 | `forms.field.type` | Type |
 | `forms.type.pc` | PC |
 | `forms.type.enemy` | Enemy |
@@ -163,7 +165,9 @@ Field ranges/defaults: [[limits]].
 | `forms.combat.create.title` | New combat |
 | `forms.combat.edit.title` | Edit combat |
 | `forms.field.title` | Title |
+| `forms.field.title.placeholder` | e.g. Goblin Ambush | |
 | `forms.field.description` | Description |
+| `forms.field.description.placeholder` | Optional notes | |
 | `forms.field.colorTag` | Color tag |
 | `forms.colorTag.neutral` | Neutral |
 | `forms.colorTag.red` | Red |
@@ -185,6 +189,13 @@ Field ranges/defaults: [[limits]].
 (2026-07-02 first-touch rework); the full-sentence keys (`conditions.add`, `forms.note.add`) are unchanged.
 Only *renamed* keys (e.g. `forms.type.monster` → `forms.type.enemy`) require an immediate
 translated value in all 6 locales.
+
+**Dead keys (present in all 6 locale files, no longer referenced by any component):**
+- `forms.field.name.placeholder` ("Namius Name") — superseded by the three type-specific keys
+  above ([[../capabilities/combatants]] CBT-3); left in place, not deleted, per this unit's scope.
+- `errors.nameRequired` ("Name is required.") — the add/edit-combatant name field is no longer
+  required (CBT-3); an empty/whitespace name now falls back to the type placeholder instead of
+  being rejected, so this validation message is never shown.
 
 ## settings.*
 
@@ -308,9 +319,6 @@ All numeric bounds injected from [[limits]], never written as literals here.
 
 ## Open gaps (flagged, not filled)
 
-- **Combat-form placeholders.** [[limits]] gives combatant-form placeholders but the combat
-  create/edit form (Title/Description) has none specified. Add `forms.field.title.placeholder` /
-  `forms.field.description.placeholder` once decided.
 - **About copy.** `about.description` / `about.privacy` are first-draft English, review-pending.
 - **Import-progress copy.** If a per-item import label beyond `toasts.import.success` is needed,
   it lands in `toasts.import.*` once specced.

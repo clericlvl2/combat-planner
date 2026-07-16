@@ -24,6 +24,7 @@
 		max,
 		placeholder,
 		required = false,
+		inline = false,
 	}: {
 		id: string;
 		label: string;
@@ -32,6 +33,9 @@
 		max: number;
 		placeholder?: string;
 		required?: boolean;
+		/** Opt-in label-left inline row (CBT-3f); default false keeps the stacked label-above look
+		    that the combat-header round/escalation popovers rely on. */
+		inline?: boolean;
 	} = $props();
 
 	let clamped = $state(false);
@@ -93,11 +97,11 @@
 	}
 </script>
 
-<div class="flex flex-col gap-1">
+<div class={inline ? 'grid grid-cols-[6rem_1fr] items-center gap-x-3' : 'flex flex-col gap-1'}>
 	<Label for={id} class={fieldLabelClass}>{label}</Label>
 	<div
 		class={[
-			'focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50 flex items-stretch overflow-hidden rounded-sm border bg-secondary',
+			'focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50 flex w-full items-stretch overflow-hidden rounded-sm border bg-secondary',
 			stepBorderClass,
 		]}
 	>
@@ -136,7 +140,13 @@
 			+
 		</button>
 	</div>
-	<p class={['min-h-4 text-xs text-muted-foreground', !clamped && 'invisible']}>
+	<p
+		class={[
+			'min-h-4 text-xs text-muted-foreground',
+			!clamped && 'invisible',
+			inline && 'col-span-2',
+		]}
+	>
 		{m['errors.clamp']({ min, max })}
 	</p>
 </div>

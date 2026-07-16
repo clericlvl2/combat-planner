@@ -25,13 +25,15 @@
 	let editId = $state<string | null>(null);
 	const editCombat = $derived(editId ? (store.getCombat(editId) ?? null) : null);
 
-	// CLS — real-time title filter, view-local only (never persisted, ADR-002).
+	// CLS-9 — real-time title-or-description filter, view-local only (never persisted, ADR-002).
 	let query = $state('');
-	const filteredCombats = $derived(
-		query.trim() === ''
-			? store.combats
-			: store.combats.filter((c) => c.title.toLowerCase().includes(query.trim().toLowerCase())),
-	);
+	const filteredCombats = $derived.by(() => {
+		const q = query.trim().toLowerCase();
+		if (q === '') return store.combats;
+		return store.combats.filter(
+			(c) => c.title.toLowerCase().includes(q) || c.description.toLowerCase().includes(q),
+		);
+	});
 
 	function openCreate() {
 		editId = null;
@@ -90,6 +92,7 @@
 		<SearchField bind:value={query} />
 		<CombatList
 			combats={filteredCombats}
+			{query}
 			onOpen={openCombat}
 			onEdit={openEdit}
 			onDelete={deleteCombat}

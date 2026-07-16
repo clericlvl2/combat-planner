@@ -122,59 +122,63 @@
 
 		<div class="min-w-0 flex-1 p-[var(--card-pad)]">
 			<Collapsible bind:open>
-				<div class="flex flex-col gap-[var(--card-gap)]">
-					<!-- Row 1: active-turn dot + name + expand chevron + overflow menu -->
+				<div class="flex flex-col">
+					<!-- Row 1: active-turn dot + name + trailing controls cluster (expand chevron, overflow menu) -->
 					<div class="flex items-center gap-2">
 						{#if active}
 							<span class="shrink-0 text-[14px] leading-none text-ring" aria-hidden="true">▶</span>
 						{/if}
-						<CollapsibleTrigger
-							class="flex min-w-0 flex-1 items-center gap-1.5 text-left"
-							aria-label={toggleLabel}
-						>
-							<span class="truncate text-base leading-[1.2] font-semibold">{combatant.name}</span>
-							<Chevron
-								class={[
-									'size-4 shrink-0 text-muted-foreground transition-transform',
-									open && 'rotate-180',
-								]}
-							/>
-						</CollapsibleTrigger>
+						<span class="min-w-0 flex-1 truncate text-base leading-[1.2] font-semibold">
+							{combatant.name}
+						</span>
 
-						<DropdownMenu>
-							<DropdownMenuTrigger>
+						<div class="flex shrink-0 items-center gap-0.5">
+							<CollapsibleTrigger>
 								{#snippet child({ props })}
-									<Button {...props} variant="ghost" size="icon" aria-label={menuLabel}>
-										<Overflow class="size-4" />
+									<Button {...props} variant="ghost" size="icon" class="size-11 lg:size-8" aria-label={toggleLabel}>
+										<Chevron
+											class={['size-4 text-muted-foreground transition-transform', open && 'rotate-180']}
+										/>
 									</Button>
 								{/snippet}
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end">
-								<DropdownMenuItem onSelect={() => onEdit(combatant.id)}>
-									<Edit class="size-4" />
-									{m['forms.action.edit']()}
-								</DropdownMenuItem>
-								<DropdownMenuItem onSelect={() => controller.duplicate(combatant.id)}>
-									<Duplicate class="size-4" />
-									{m['forms.action.duplicate']()}
-								</DropdownMenuItem>
-								<DropdownMenuSeparator />
-								<DropdownMenuItem variant="destructive" onSelect={() => controller.remove(combatant.id)}>
-									<Remove class="size-4" />
-									{m['forms.action.remove']()}
-								</DropdownMenuItem>
-							</DropdownMenuContent>
-						</DropdownMenu>
+							</CollapsibleTrigger>
+
+							<DropdownMenu>
+								<DropdownMenuTrigger>
+									{#snippet child({ props })}
+										<Button {...props} variant="ghost" size="icon" class="size-11 lg:size-8" aria-label={menuLabel}>
+											<Overflow class="size-4" />
+										</Button>
+									{/snippet}
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align="end">
+									<DropdownMenuItem onSelect={() => onEdit(combatant.id)}>
+										<Edit class="size-4" />
+										{m['forms.action.edit']()}
+									</DropdownMenuItem>
+									<DropdownMenuItem onSelect={() => controller.duplicate(combatant.id)}>
+										<Duplicate class="size-4" />
+										{m['forms.action.duplicate']()}
+									</DropdownMenuItem>
+									<DropdownMenuSeparator />
+									<DropdownMenuItem variant="destructive" onSelect={() => controller.remove(combatant.id)}>
+										<Remove class="size-4" />
+										{m['forms.action.remove']()}
+									</DropdownMenuItem>
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</div>
 					</div>
 
-					<!-- Row 2: big HP (+ temp-HP badge), fixed-width, + health bar filling the rest -->
-					<div class="flex items-center gap-3">
-						<button
-							type="button"
-							class="relative flex w-24 shrink-0 items-center gap-1 rounded-md px-1 py-1 tabular-nums hover:bg-muted"
-							aria-label={hpLabel}
-							onclick={() => onOpenNumpad(combatant.id)}
-						>
+					<!-- Row 2: unified HP tap target — big HP (+ temp-HP badge) fixed-width block, and the
+					     health bar filling the rest, both inside one rounded hover/press area (HP-4). -->
+					<button
+						type="button"
+						class="flex min-h-11 w-full cursor-pointer items-center gap-3 rounded-md px-1 py-1 hover:bg-muted"
+						aria-label={hpLabel}
+						onclick={() => onOpenNumpad(combatant.id)}
+					>
+						<span class="relative flex w-24 shrink-0 items-center gap-1 tabular-nums">
 							<span class="relative text-[length:var(--hp-size)] leading-none font-semibold">
 								{combatant.currentHp}/{combatant.maxHp}
 								{#if combatant.tempHp > 0}
@@ -185,11 +189,11 @@
 									</span>
 								{/if}
 							</span>
-						</button>
-						<div class="min-w-0 flex-1">
+						</span>
+						<span class="min-w-0 flex-1">
 							<HealthBar {combatant} />
-						</div>
-					</div>
+						</span>
+					</button>
 
 					<!-- Row 3: AC/PD/MD + Init pill -->
 					<div class="flex items-center gap-3">

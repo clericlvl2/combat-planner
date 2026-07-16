@@ -1,8 +1,10 @@
 <!--
   CombatantForm (component-inventory.md, limits.md) — add/edit a combatant in a Dialog. Name is
-  required (whitespace-only blocks submit); numeric fields clamp via NumberField and default to the
-  limits.md placeholders when left blank (the factory/store fills them). Edit mode prefills and adds
-  the manual-initiative field (CBT-4 editCombatant). Emits a normalized values object; the parent
+  optional: on add-with-no-data the numeric fields (Max HP/Init/AC/PD/MD) pre-fill as real editable
+  values (10/0/10/10/10 — CBT-3b), and the Name field shows a type-specific placeholder ("Hero
+  Name"/"Enemy"/"Ally" — CBT-3c) that becomes the combatant's real stored name if left empty on
+  save. Numeric fields still clamp via NumberField. Edit mode prefills and adds the
+  manual-initiative field (CBT-4 editCombatant). Emits a normalized values object; the parent
   routes it to addCombatant or editCombatant. Max-HP change ⇏ current HP (handled in the store).
 -->
 <script lang="ts">
@@ -54,12 +56,11 @@
 	let md = $state<number | null>(null);
 	let note = $state('');
 	let initiative = $state<number | null>(null);
-	let touched = $state(false);
 
-	// (Re)initialize the form whenever it opens (prefill on edit, blank defaults on add).
+	// (Re)initialize the form whenever it opens (prefill on edit, real pre-filled defaults on add —
+	// CBT-3b: 10 / 0 / 10 / 10 / 10, not placeholder-only hints).
 	$effect(() => {
 		if (!open) return;
-		touched = false;
 		if (mode === 'edit' && combatant) {
 			name = combatant.name;
 			type = combatant.type;
@@ -73,26 +74,33 @@
 		} else {
 			name = '';
 			type = 'enemy';
-			initiativeBonus = null;
-			maxHp = null;
-			ac = null;
-			pd = null;
-			md = null;
+			initiativeBonus = 0;
+			maxHp = 10;
+			ac = 10;
+			pd = 10;
+			md = 10;
 			note = '';
 			initiative = null;
 		}
 	});
 
-	const nameValid = $derived(name.trim().length > 0);
+	// CBT-3c: type-specific name placeholder; also substituted as the real stored name when the
+	// name is left empty on save (see submit()).
+	const namePlaceholder = $derived(
+		type === 'pc'
+			? m['forms.field.name.placeholder.pc']()
+			: type === 'ally'
+				? m['forms.field.name.placeholder.ally']()
+				: m['forms.field.name.placeholder.enemy'](),
+	);
 
 	// Prototype .field-label recipe (specs/design/prototype.html) — uppercase, muted, small caps.
 	// Mirrors NumberField.svelte's own field-label styling for a consistent look across the form.
 	const fieldLabelClass = 'text-xs font-medium uppercase tracking-wide text-muted-foreground';
 
 	function submit() {
-		touched = true;
-		if (!nameValid) return;
-		onSubmit({ name, type, initiativeBonus, maxHp, ac, pd, md, note, initiative });
+		const resolvedName = name.trim().length > 0 ? name : namePlaceholder;
+		onSubmit({ name: resolvedName, type, initiativeBonus, maxHp, ac, pd, md, note, initiative });
 		open = false;
 	}
 </script>
@@ -112,25 +120,14 @@
 				submit();
 			}}
 		>
-			<!-- Name (required) -->
-			<div class="flex flex-col gap-1">
+			<!-- Name (optional — empty on save falls back to the type-specific placeholder as the real name) -->
+			<div class="grid grid-cols-[6rem_1fr] items-center gap-x-3">
 				<Label for="cf-name" class={fieldLabelClass}>{m['forms.field.name']()}</Label>
-				<Input
-					id="cf-name"
-					class="min-h-11"
-					bind:value={name}
-					placeholder={m['forms.field.name.placeholder']()}
-					required
-					aria-invalid={touched && !nameValid}
-					oninput={() => (touched = true)}
-				/>
-				<p class={['min-h-4 text-xs text-destructive', !(touched && !nameValid) && 'invisible']}>
-					{m['errors.nameRequired']()}
-				</p>
+				<Input id="cf-name" class="min-h-11" bind:value={name} placeholder={namePlaceholder} />
 			</div>
 
 			<!-- Type -->
-			<div class="flex flex-col gap-1">
+			<div class="grid grid-cols-[6rem_1fr] items-center gap-x-3">
 				<Label class={fieldLabelClass}>{m['forms.field.type']()}</Label>
 				<ToggleGroup
 					type="single"
@@ -150,54 +147,50 @@
 				</ToggleGroup>
 			</div>
 
-			<div class="grid grid-cols-2 gap-3">
-				<NumberField
-					id="cf-maxhp"
-					label={m['forms.field.maxHp']()}
-					bind:value={maxHp}
-					min={RANGES.maxHp.min}
-					max={RANGES.maxHp.max}
-					placeholder="10"
-				/>
-				<NumberField
-					id="cf-initbonus"
-					label={m['forms.field.initBonus']()}
-					bind:value={initiativeBonus}
-					min={RANGES.initiativeBonus.min}
-					max={RANGES.initiativeBonus.max}
-					placeholder="0"
-				/>
-			</div>
-
-			<div class="grid grid-cols-3 gap-3">
-				<NumberField
-					id="cf-ac"
-					label={m['forms.field.ac']()}
-					bind:value={ac}
-					min={RANGES.ac.min}
-					max={RANGES.ac.max}
-					placeholder="10"
-				/>
-				<NumberField
-					id="cf-pd"
-					label={m['forms.field.pd']()}
-					bind:value={pd}
-					min={RANGES.pd.min}
-					max={RANGES.pd.max}
-					placeholder="10"
-				/>
-				<NumberField
-					id="cf-md"
-					label={m['forms.field.md']()}
-					bind:value={md}
-					min={RANGES.md.min}
-					max={RANGES.md.max}
-					placeholder="10"
-				/>
-			</div>
+			<NumberField
+				inline
+				id="cf-maxhp"
+				label={m['forms.field.maxHp']()}
+				bind:value={maxHp}
+				min={RANGES.maxHp.min}
+				max={RANGES.maxHp.max}
+			/>
+			<NumberField
+				inline
+				id="cf-initbonus"
+				label={m['forms.field.initBonus']()}
+				bind:value={initiativeBonus}
+				min={RANGES.initiativeBonus.min}
+				max={RANGES.initiativeBonus.max}
+			/>
+			<NumberField
+				inline
+				id="cf-ac"
+				label={m['forms.field.ac']()}
+				bind:value={ac}
+				min={RANGES.ac.min}
+				max={RANGES.ac.max}
+			/>
+			<NumberField
+				inline
+				id="cf-pd"
+				label={m['forms.field.pd']()}
+				bind:value={pd}
+				min={RANGES.pd.min}
+				max={RANGES.pd.max}
+			/>
+			<NumberField
+				inline
+				id="cf-md"
+				label={m['forms.field.md']()}
+				bind:value={md}
+				min={RANGES.md.min}
+				max={RANGES.md.max}
+			/>
 
 			{#if mode === 'edit' || (mode === 'add' && combatActive)}
 				<NumberField
+					inline
 					id="cf-init"
 					label={m['forms.field.initValue']()}
 					bind:value={initiative}
@@ -206,7 +199,7 @@
 				/>
 			{/if}
 
-			<div class="flex flex-col gap-1">
+			<div class="grid grid-cols-[6rem_1fr] items-center gap-x-3">
 				<Label for="cf-note" class={fieldLabelClass}>{m['forms.field.note']()}</Label>
 				<Textarea
 					id="cf-note"
@@ -217,10 +210,19 @@
 			</div>
 
 			<DialogFooter>
-				<Button type="button" variant="ghost" class="w-full" onclick={() => (open = false)}>
+				<Button
+					type="button"
+					variant="ghost"
+					class="w-full min-w-0 sm:w-auto sm:flex-1 sm:shrink sm:basis-0"
+					onclick={() => (open = false)}
+				>
 					{m['forms.action.cancel']()}
 				</Button>
-				<Button type="submit" size="lg" class="w-full">
+				<Button
+					type="submit"
+					size="lg"
+					class="w-full min-w-0 sm:w-auto sm:flex-1 sm:shrink sm:basis-0"
+				>
 					{mode === 'add' ? m['forms.action.add']() : m['forms.action.save']()}
 				</Button>
 			</DialogFooter>

@@ -21,13 +21,17 @@ player sheet, DM tracks its HP). Optional on the add form; default `enemy`.
 
 ## CBT-2 — Combatant card fields
 
-Compact row shows: active-turn indicator, type color stripe, a persistent `⋮` menu
-(Edit/Duplicate/Remove), name, initiative (`"-"` if unset), current/max HP, health bar, a
-temp-HP badge (shown whenever `tempHp > 0`, no expand needed), AC/PD/MD (in-row at all sizes),
-condition icons (first few + overflow, [[conditions]] CND-3), and the note (read-only) whenever
-one is set. The health bar's fill color is the sole HP-status visual signal — the card
-background no longer tints by `healthStatus` ([[hp]] HP-4). Tapping the row expands it to reveal
-an editable note field and the condition picker.
+Compact row shows: active-turn indicator, type color stripe, name, initiative (`"-"` if unset),
+current/max HP, health bar, a temp-HP badge (shown whenever `tempHp > 0`, no expand needed),
+AC/PD/MD (in-row at all sizes), condition icons (first few + overflow, [[conditions]] CND-3),
+and the note (read-only) whenever one is set. The health bar's fill color is the sole HP-status
+visual signal — the card background no longer tints by `healthStatus` ([[hp]] HP-4). Tapping the
+row expands it to reveal an editable note field and the condition picker.
+
+The trailing controls cluster holds the expand/collapse chevron immediately next to the
+persistent `⋮` menu (Edit/Duplicate/Remove) — not beside the name/title — and the two render at
+the same size. The card container carries no internal gap rule between its rows. On mobile, the
+card's `⋮` overflow trigger is a ≥44px touch target.
 
 **AC:**
 - All fields listed above are visible on the compact row without expanding.
@@ -35,21 +39,47 @@ an editable note field and the condition picker.
   one is set.
 - The condition picker is visible only after expanding the row.
 - The temp-HP badge is visible on the compact row without expanding whenever `tempHp > 0`.
+- The expand/collapse chevron sits in the trailing controls cluster next to the `⋮` menu, and
+  the two render at the same size.
+- On mobile, the card's `⋮` overflow trigger is a ≥44px touch target.
 
 ## CBT-3 — Add combatant
 
-Add form fields: Name (required, trimmed; whitespace-only blocks submit), Type (optional,
-default enemy), Initiative bonus, Max HP, AC, PD, MD, Text note. Field defaults/placeholders/
-ranges: [[../reference/limits]]. Adding is blocked at the 30-combatant cap
-([[../reference/limits]]). The form's submit button reads "Add" in add mode, distinguishing it
-from the "Save" label the same form shows in edit mode ([[combatants]] CBT-4).
+Add form fields: Name (**optional**, trimmed), Type (optional, default enemy), Initiative bonus,
+Max HP, AC, PD, MD, Text note. Field defaults/placeholders/ranges: [[../reference/limits]].
+Adding is blocked at the 30-combatant cap ([[../reference/limits]]). The form's submit button
+reads "Add" in add mode, distinguishing it from the "Save" label the same form shows in edit
+mode ([[combatants]] CBT-4).
+
+The Name field's placeholder is type-specific — "Hero Name" for PC, "Enemy" for Enemy, "Ally"
+for Ally. If the name is left empty (or whitespace-only) on submit, that type placeholder
+becomes the combatant's **real stored name** — an empty name is never rejected. Max HP,
+Initiative bonus, AC, PD, and MD are pre-filled with real, editable default values (Max HP 10,
+Init 0, AC/PD/MD 10) — not placeholder-styled hints; the DM can accept or overwrite them.
+
+The modal is laid out as an inline label-left grid: every field (Name, Type, Max HP, Init, AC,
+PD, MD, Note) is one row with an uppercase label in a fixed ~6rem left column and its control
+filling the remaining width; numeric steppers span the full control width. There is no separate
+multi-column AC/PD/MD grid and no distinct mobile-stacking rule — the same label-left grid
+applies at every breakpoint. The Cancel button renders inside the dialog panel's footer.
+Name/note placeholders resolve from paraglide i18n keys.
 
 **AC:**
-- Submitting the add form with an empty or whitespace-only name is rejected.
+- Submitting the add form with an empty or whitespace-only name is **accepted**; the combatant's
+  stored name becomes the type-specific placeholder ("Hero Name" for PC, "Enemy" for Enemy,
+  "Ally" for Ally).
 - A newly added combatant has `currentHp = maxHp`, `tempHp = 0`, `initiative = "-"`, and no
   conditions.
 - Adding a 31st combatant to a combat is blocked with a message; nothing is added.
 - The add form's submit button reads "Add"; the same form in edit mode reads "Save".
+- On open with no data, Max HP/Init/AC/PD/MD read 10/0/10/10/10 as real editable values, not
+  placeholder text.
+- The modal renders as an inline label-left grid (uppercase label in a fixed ~6rem left column,
+  control filling the rest; numeric steppers full-width) at every breakpoint — no multi-column
+  AC/PD/MD grid.
+- The Cancel button renders inside the dialog panel's footer, not outside the modal frame.
+- The name/note/other free-text placeholders resolve from paraglide message keys, not hardcoded
+  literals.
 
 ## CBT-4 — Edit combatant
 

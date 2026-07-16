@@ -54,7 +54,7 @@
 		<ToggleGroupItem
 			value={tag}
 			aria-label={colorTagLabel[tag]()}
-			class="size-[30px] min-w-0 rounded-md border-0 bg-transparent p-0 hover:bg-transparent data-[state=on]:bg-transparent data-[state=on]:outline data-[state=on]:outline-2 data-[state=on]:outline-offset-2 data-[state=on]:outline-foreground"
+			class="size-[30px] min-w-0 cursor-pointer rounded-md border-0 bg-transparent p-0 transition-opacity hover:bg-transparent hover:opacity-80 data-[state=on]:bg-transparent data-[state=on]:opacity-100 data-[state=on]:ring-2 data-[state=on]:ring-offset-2 data-[state=on]:ring-offset-background data-[state=on]:ring-foreground"
 		>
 			<ColorTagDot colorTag={tag} letter={colorTagLetter[tag]} class="size-full" />
 		</ToggleGroupItem>

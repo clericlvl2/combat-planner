@@ -12,12 +12,12 @@ Export all / Import all controls live here in the UI but their behavior is fully
 ## SET-1 — Language
 
 6 bundled languages (English, German, Spanish, French, Japanese, Russian — mechanism:
-`specs/adr/ADR-005.md`). Default = autodetected browser locale, fallback English. Manual switcher
-in Settings. Switching applies immediately, persists, and works offline.
+`specs/adr/ADR-005.md`). Default = **always English** on first run — browser-locale autodetect
+is not used. Manual switcher in Settings. Switching applies immediately, persists, and works
+offline.
 
 **AC:**
-- On first run with no prior choice, the UI language matches the browser locale if it's one of
-  the 6, otherwise English.
+- On first run with no prior choice, the UI language is English, regardless of browser locale.
 - Switching language in Settings changes all visible strings immediately, without a reload.
 - The chosen language persists across reloads and survives Reset-all — see SET-3 (Reset-all keeps
   language/theme).

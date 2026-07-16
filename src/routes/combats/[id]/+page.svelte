@@ -148,7 +148,7 @@
         </Button>
     </div>
 {:else}
-    <div class="mx-auto flex min-h-dvh w-full max-w-md flex-col pb-28 lg:max-w-3xl">
+    <div class="mx-auto flex min-h-dvh w-full flex-col pb-56 lg:pb-8">
         <CombatHeader
                 {combat}
                 {controller}
@@ -158,7 +158,10 @@
                 canAdvance={canAdv}
         />
 
-        <main bind:this={mainEl} class="flex flex-1 flex-col gap-2 p-3 {active ? 'pt-2' : ''}">
+        <main
+                bind:this={mainEl}
+                class="content-container flex w-full flex-1 flex-col gap-2 p-3 {active ? 'pt-2' : ''}"
+        >
             {#if display.length === 0}
                 <div class="flex flex-1 flex-col items-center justify-center gap-3 py-16 text-center text-muted-foreground">
                     <p class="text-lg font-semibold text-foreground">{m['setup.empty.title']()}</p>

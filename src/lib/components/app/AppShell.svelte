@@ -26,6 +26,12 @@
 	{/if}
 	<NavSidebar bind:open={navOpen} />
 	<main class="flex flex-1 flex-col">
-		{@render children()}
+		{#if routeHasOwnHeader}
+			{@render children()}
+		{:else}
+			<div class="content-container flex w-full flex-1 flex-col">
+				{@render children()}
+			</div>
+		{/if}
 	</main>
 </div>

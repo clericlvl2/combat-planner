@@ -20,11 +20,17 @@ Initiative value is a number or unset (`"-"`). Initiative bonus defaults to 0 an
 opens manual numeric entry (also reachable from the combatant edit form as a discoverability
 backup). Manual range: see [[../reference/limits]].
 
+The init cell's hover affordance is scoped to the inner control only — no oversized surrounding
+hover box. The cell has a **fixed width** so 1-digit and 2-digit values render the same width, a
+**pointer cursor**, and **no `min-height`**.
+
 **AC:**
 - Tapping an init cell rolls and displays a new `d20 + bonus` value; tapping again re-rolls.
 - Long-pressing an init cell opens a numeric entry field pre-filled with the current value;
   committing sets it directly.
 - The manual-entry field is also present on the combatant edit form.
+- The init cell's hover highlight is confined to the inner control; the cell has a fixed width
+  (1- and 2-digit values render identically wide), a pointer cursor, and no `min-height`.
 
 ## INI-3 — Active-only lock
 

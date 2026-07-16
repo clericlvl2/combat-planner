@@ -58,6 +58,10 @@ from the bar's band width and its `role="img"` `aria-label` ([[platform]] PLT-5,
 [[../reference/component-inventory]]). The active-turn highlight ring composes on top of the
 card regardless of HP state.
 
+The current-HP number and the health bar form a **single unified interactive target** — no gap
+between them — that opens the HP numpad (HP-6): one rounded hover/press area with a pointer
+cursor on desktop, rather than two separate tap targets.
+
 **AC:**
 - `healthStatus` bands exactly per the table above; `currentHp > maxHp` reads `full`.
 - At `currentHp <= 0` the bar renders in reverse-fill alarm styling instead of the normal bar,
@@ -65,6 +69,9 @@ card regardless of HP state.
 - "Dead" never removes the combatant from turn order or skips its turn ([[turns-rounds-escalation]] TRE-2).
 - The health bar's fill color is the only HP-status visual signal on the card; the card
   background does not change with `healthStatus`, and the active-turn ring still renders on top.
+- The current-HP number and the health bar are a single unified interactive target (no gap
+  between them) that opens the HP numpad, with one rounded hover/press area and a pointer cursor
+  on desktop.
 
 ## HP-5 — Editing Max HP does not touch current HP
 
@@ -81,10 +88,14 @@ the same form submit, and appends a "Set Max HP" entry to the combatant's HP log
 
 ## HP-6 — Numpad panel behavior
 
-Opens by tapping a combatant's HP. Shows current HP / Max HP and temp HP at the top before any
-entry, so the DM sees the buffer being drained. Dismissing without committing (tap outside, or
-Cancel) closes with no change and no toast, abandoning any partial entry.
+Opens by tapping the unified HP number/health-bar target (HP-4). Shows current HP / Max HP and
+temp HP at the top before any entry, so the DM sees the buffer being drained. Dismissing without
+committing (tap outside, or Cancel) closes with no change and no toast, abandoning any partial
+entry. On desktop the numpad renders as a **centered modal dialog**; on mobile it renders as a
+bottom drawer.
 
 **AC:**
 - The panel displays cur/max HP and temp HP before any digit is entered.
 - Dismissing without pressing a commit action makes no state change.
+- On desktop (≥1024px) the HP numpad renders as a centered modal dialog; on mobile it renders as
+  the bottom drawer.

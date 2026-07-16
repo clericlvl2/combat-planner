@@ -21,7 +21,7 @@ assertions live in the actual test files: `src/**/*.spec.ts`, `src/**/*.svelte.s
 | [[../capabilities/combats-list]] CLS-7 | firstLaunch transition; lands on combat page | U, E |
 | [[../capabilities/import-export]] IMP-1..5, [[../capabilities/combats-list]] CLS-8 | ADR-013 migration transform; import fail-safe; F5 (prep tablet → run phone) | U, E |
 | [[../capabilities/combatants]] CBT-2 | CombatantRow compact↔expanded toggle | C |
-| [[../capabilities/combatants]] CBT-3 | addCombatant (defaults, 30-cap); form clamp/name-required | U, C |
+| [[../capabilities/combatants]] CBT-3 | addCombatant (defaults, 30-cap); form clamp/empty-name-falls-back-to-type-placeholder | U, C |
 | [[../capabilities/combatants]] CBT-4, [[../capabilities/hp]] HP-5 | editCombatant (Max-HP discrete undo step) | U |
 | [[../capabilities/hp]] HP-3 | dealDamage/restoreHp/setTempHp/empty-entry no-op; NumpadSheet | U, C |
 | [[../capabilities/hp]] HP-1, HP-4 | HP clamp at −maxHp; healthStatus banding + reverse/alarm bar | U, C |

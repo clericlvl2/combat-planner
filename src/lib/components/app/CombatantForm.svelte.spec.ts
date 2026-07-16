@@ -10,33 +10,39 @@ afterEach(() => {
 	cleanup();
 });
 
-test('add mode renders blank defaults: empty name, enemy type preselected, no numeric prefill', async () => {
+test('add mode renders real pre-filled defaults: empty name (placeholder shown), enemy type preselected, numeric fields pre-filled (CBT-3b)', async () => {
 	const onSubmit = vi.fn();
 	const screen = render(CombatantForm, { mode: 'add', open: true, onSubmit });
 
 	await expect
 		.element(screen.getByRole('dialog', { name: m['forms.combatant.add.title']() }))
 		.toBeVisible();
-	await expect.element(screen.getByLabelText(m['forms.field.name']())).toHaveValue('');
+	const nameInput = screen.getByLabelText(m['forms.field.name']());
+	await expect.element(nameInput).toHaveValue('');
+	await expect
+		.element(nameInput)
+		.toHaveAttribute('placeholder', m['forms.field.name.placeholder.enemy']());
 	await expect
 		.element(screen.getByRole('radio', { name: m['forms.type.enemy']() }))
 		.toHaveAttribute('aria-checked', 'true');
-	await expect.element(screen.getByLabelText(m['forms.field.maxHp']())).toHaveValue('');
-	await expect.element(screen.getByLabelText(m['forms.field.ac']())).toHaveValue('');
-	await expect.element(screen.getByLabelText(m['forms.field.pd']())).toHaveValue('');
-	await expect.element(screen.getByLabelText(m['forms.field.md']())).toHaveValue('');
-	await expect.element(screen.getByLabelText(m['forms.field.initBonus']())).toHaveValue('');
+	await expect.element(screen.getByLabelText(m['forms.field.maxHp']())).toHaveValue('10');
+	await expect.element(screen.getByLabelText(m['forms.field.ac']())).toHaveValue('10');
+	await expect.element(screen.getByLabelText(m['forms.field.pd']())).toHaveValue('10');
+	await expect.element(screen.getByLabelText(m['forms.field.md']())).toHaveValue('10');
+	await expect.element(screen.getByLabelText(m['forms.field.initBonus']())).toHaveValue('0');
 	await expect.element(screen.getByLabelText(m['forms.field.note']())).toHaveValue('');
 });
 
-test('name-required validation blocks submit', async () => {
+test('empty name does not block submit: type placeholder becomes the stored name (CBT-3c)', async () => {
 	const onSubmit = vi.fn();
 	const screen = render(CombatantForm, { mode: 'add', open: true, onSubmit });
 
 	await screen.getByRole('button', { name: m['forms.action.add']() }).click();
 
-	expect(onSubmit).not.toHaveBeenCalled();
-	await expect.element(screen.getByText(m['errors.nameRequired']())).toBeVisible();
+	expect(onSubmit).toHaveBeenCalledTimes(1);
+	expect(onSubmit).toHaveBeenCalledWith(
+		expect.objectContaining({ name: m['forms.field.name.placeholder.enemy']() }),
+	);
 });
 
 test('numeric fields clamp to their NumberField min/max on commit', async () => {
@@ -66,11 +72,11 @@ test('onSubmit fires with the expected normalized shape', async () => {
 	expect(onSubmit).toHaveBeenCalledWith({
 		name: 'Ogre',
 		type: 'enemy',
-		initiativeBonus: null,
+		initiativeBonus: 0,
 		maxHp: 40,
-		ac: null,
-		pd: null,
-		md: null,
+		ac: 10,
+		pd: 10,
+		md: 10,
 		note: '',
 		initiative: null,
 	});

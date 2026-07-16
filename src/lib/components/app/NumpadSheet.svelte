@@ -1,5 +1,7 @@
 <!--
-  NumpadSheet (component-inventory.md "Numpad sheet", HP-6) — bottom-sheet HP editor opened from a row's HP cell.
+  NumpadSheet (component-inventory.md "Numpad sheet", HP-6) — HP editor opened from a row's HP cell.
+  Renders as a bottom Drawer on mobile and a centered modal Dialog on desktop (≥1024px), switched
+  via the `svelte/reactivity` MediaQuery — component-inventory.md already states desktop = modal.
   Summary header (cur/max + temp so the buffer is visible) · entry display · digit pad · the three
   commit actions (Deal Damage / Restore HP / Set Temp HP) · a read-only History of this combatant's
   hpLog (newest first). Empty entry → commits disabled (no-op). Commit closes the sheet; the change
@@ -7,9 +9,11 @@
   Emits commit intent only; all HP math + log append live in the store/domain.
 -->
 <script lang="ts">
+	import { MediaQuery } from 'svelte/reactivity';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
 	import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '$lib/components/ui/collapsible';
+	import { Dialog, DialogContent } from '$lib/components/ui/dialog';
 	import { Drawer, DrawerContent } from '$lib/components/ui/drawer';
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
 	import type { Combatant, HpLogEntry } from '$lib/db/types';
@@ -34,6 +38,7 @@
 
 	let entry = $state('');
 	let historyOpen = $state(false);
+	const isDesktop = new MediaQuery('(min-width: 1024px)');
 
 	// Fresh entry on each open (abandons any partial entry — HP-6 dismiss-with-no-op).
 	$effect(() => {
@@ -90,145 +95,154 @@
 	}
 </script>
 
-<Drawer bind:open>
-	<DrawerContent class="mx-auto max-w-md">
-		{#if combatant}
-			<div class="flex flex-col gap-3 p-4">
-				<!-- HpSummaryHeader: cur/max + temp buffer (HP-1) — cur HP is the distinctive value here -->
-				<div class="flex items-baseline justify-between gap-2">
-					<span class="truncate font-semibold">{combatant.name}</span>
-					<span class="shrink-0 tabular-nums">
-						<span class={['text-xl font-bold', healthTextColor[status]]}>{combatant.currentHp}</span>
-						<span class="text-base text-muted-foreground">/{combatant.maxHp}</span>
-						{#if combatant.tempHp > 0}
-							<span class="ml-1 text-muted-foreground">
-								{m['numpad.summary.temp']({ temp: combatant.tempHp })}
-							</span>
-						{/if}
+{#snippet body(c: Combatant)}
+	<div class="flex flex-col gap-3 p-4">
+		<!-- HpSummaryHeader: cur/max + temp buffer (HP-1) — cur HP is the distinctive value here -->
+		<div class="flex items-baseline justify-between gap-2">
+			<span class="truncate font-semibold">{c.name}</span>
+			<span class="shrink-0 tabular-nums">
+				<span class={['text-xl font-bold', healthTextColor[status]]}>{c.currentHp}</span>
+				<span class="text-base text-muted-foreground">/{c.maxHp}</span>
+				{#if c.tempHp > 0}
+					<span class="ml-1 text-muted-foreground">
+						{m['numpad.summary.temp']({ temp: c.tempHp })}
 					</span>
-				</div>
+				{/if}
+			</span>
+		</div>
 
-				<!-- EntryDisplay -->
-				<div
-					class="flex h-10 items-center justify-end rounded-md border border-border bg-background px-3 text-lg font-semibold tabular-nums"
-					aria-live="polite"
+		<!-- EntryDisplay -->
+		<div
+			class="flex h-10 items-center justify-end rounded-md border border-border bg-background px-3 text-lg font-semibold tabular-nums"
+			aria-live="polite"
+		>
+			{entry || '0'}
+		</div>
+
+		<!-- CommitActions (rendered above the digit pad — component-inventory.md "Numpad sheet"; empty entry → disabled no-op).
+		     Tint recipe: transparent fill + a tinted border + solid-color text (no bg fill) —
+		     WCAG-AA verified against both --surface/--popover themes (see phase report); a
+		     filled color-mix background per the prototype's literal `.btn--*-tint` recipe drops
+		     below 4.5:1 for at least one of the three colors in each theme with these token
+		     hexes, so the border-only recipe is the AA-safe stand-in. -->
+		<div class="grid grid-cols-3 gap-2">
+			<Button
+				variant="outline"
+				class="h-11 text-xs font-bold border-destructive/30 bg-transparent text-destructive hover:bg-destructive/10 dark:border-destructive/30 dark:bg-transparent dark:hover:bg-destructive/10"
+				disabled={empty}
+				onclick={() => commit(onDamage)}
+			>
+				{m['numpad.dealDamage']()}
+			</Button>
+			<Button
+				variant="outline"
+				class="h-11 text-xs font-bold border-health-full/30 bg-transparent text-health-full hover:bg-health-full/10 dark:border-health-full/30 dark:bg-transparent dark:hover:bg-health-full/10"
+				disabled={empty}
+				onclick={() => commit(onRestore)}
+			>
+				{m['numpad.restoreHp']()}
+			</Button>
+			<Button
+				variant="outline"
+				class="h-11 text-xs font-bold border-combat-blue/30 bg-transparent text-combat-blue hover:bg-combat-blue/10 dark:border-combat-blue/30 dark:bg-transparent dark:hover:bg-combat-blue/10"
+				disabled={empty}
+				onclick={() => commit(onSetTempHp)}
+			>
+				{m['numpad.setTempHp']()}
+			</Button>
+		</div>
+
+		<!-- DigitPad -->
+		<div class="grid grid-cols-3 gap-2">
+			{#each ['1', '2', '3', '4', '5', '6', '7', '8', '9'] as d (d)}
+				<Button
+					variant="outline"
+					class="h-11 text-lg font-semibold"
+					aria-label={m['a11y.numpad.digit']({ n: d })}
+					onclick={() => push(d)}
 				>
-					{entry || '0'}
-				</div>
+					{d}
+				</Button>
+			{/each}
+			<Button variant="ghost" class="h-11" aria-label={m['a11y.numpad.clear']()} onclick={clear}>
+				<ClearIcon class="size-5" />
+			</Button>
+			<Button
+				variant="outline"
+				class="h-11 text-lg font-semibold"
+				aria-label={m['a11y.numpad.digit']({ n: '0' })}
+				onclick={() => push('0')}
+			>
+				0
+			</Button>
+			<Button
+				variant="ghost"
+				class="h-11"
+				aria-label={m['a11y.numpad.backspace']()}
+				onclick={backspace}
+			>
+				<Backspace class="size-5" />
+			</Button>
+		</div>
 
-				<!-- CommitActions (rendered above the digit pad — component-inventory.md "Numpad sheet"; empty entry → disabled no-op).
-				     Tint recipe: transparent fill + a tinted border + solid-color text (no bg fill) —
-				     WCAG-AA verified against both --surface/--popover themes (see phase report); a
-				     filled color-mix background per the prototype's literal `.btn--*-tint` recipe drops
-				     below 4.5:1 for at least one of the three colors in each theme with these token
-				     hexes, so the border-only recipe is the AA-safe stand-in. -->
-				<div class="grid grid-cols-3 gap-2">
-					<Button
-						variant="outline"
-						class="h-11 text-xs font-bold border-destructive/30 bg-transparent text-destructive hover:bg-destructive/10 dark:border-destructive/30 dark:bg-transparent dark:hover:bg-destructive/10"
-						disabled={empty}
-						onclick={() => commit(onDamage)}
-					>
-						{m['numpad.dealDamage']()}
-					</Button>
-					<Button
-						variant="outline"
-						class="h-11 text-xs font-bold border-health-full/30 bg-transparent text-health-full hover:bg-health-full/10 dark:border-health-full/30 dark:bg-transparent dark:hover:bg-health-full/10"
-						disabled={empty}
-						onclick={() => commit(onRestore)}
-					>
-						{m['numpad.restoreHp']()}
-					</Button>
-					<Button
-						variant="outline"
-						class="h-11 text-xs font-bold border-combat-blue/30 bg-transparent text-combat-blue hover:bg-combat-blue/10 dark:border-combat-blue/30 dark:bg-transparent dark:hover:bg-combat-blue/10"
-						disabled={empty}
-						onclick={() => commit(onSetTempHp)}
-					>
-						{m['numpad.setTempHp']()}
-					</Button>
-				</div>
+		<!-- HpLogSection (read-only, newest first) -->
+		<Collapsible bind:open={historyOpen} class="border-t border-border pt-2">
+			<CollapsibleTrigger
+				class="flex w-full items-center justify-between text-sm font-medium text-muted-foreground"
+			>
+				<span class="flex items-center gap-1.5">
+					{m['numpad.history.title']()}
+					{#if history.length > 0}
+						<span class="text-muted-foreground">{m['numpad.history.count']({ n: history.length })}</span>
+					{/if}
+				</span>
+				<Expand class={['size-4 shrink-0 transition-transform', historyOpen && 'rotate-180']} />
+			</CollapsibleTrigger>
+			<CollapsibleContent>
+				{#if history.length === 0}
+					<p class="py-2 text-sm text-muted-foreground">{m['numpad.history.empty']()}</p>
+				{:else}
+					<ScrollArea class="max-h-48">
+						<ul class="flex flex-col gap-1.5 pt-2">
+							{#each history as e, i (i)}
+								<li class="flex items-center justify-between gap-2 text-sm text-muted-foreground">
+									<span class="flex items-center gap-1.5">
+										<Badge variant="outline" class={actionBadgeClass[e.type]}>
+											{actionLabel[e.type]()}
+										</Badge>
+										<span class={['tabular-nums', actionDiffClass[e.type]]}>
+											{e.delta > 0 ? `+${e.delta}` : e.delta}
+										</span>
+									</span>
+									<span class="tabular-nums">
+										{m['numpad.summary.hp']({ cur: e.currentHp, max: e.maxHp })}
+										{#if e.tempHp > 0}· {m['numpad.summary.temp']({ temp: e.tempHp })}{/if}
+										{#if e.round !== null}· {m['numpad.history.round']({ n: e.round })}{/if}
+									</span>
+								</li>
+							{/each}
+						</ul>
+					</ScrollArea>
+				{/if}
+			</CollapsibleContent>
+		</Collapsible>
+	</div>
+{/snippet}
 
-				<!-- DigitPad -->
-				<div class="grid grid-cols-3 gap-2">
-					{#each ['1', '2', '3', '4', '5', '6', '7', '8', '9'] as d (d)}
-						<Button
-							variant="outline"
-							class="h-11 text-lg font-semibold"
-							aria-label={m['a11y.numpad.digit']({ n: d })}
-							onclick={() => push(d)}
-						>
-							{d}
-						</Button>
-					{/each}
-					<Button
-						variant="ghost"
-						class="h-11"
-						aria-label={m['a11y.numpad.clear']()}
-						onclick={clear}
-					>
-						<ClearIcon class="size-5" />
-					</Button>
-					<Button
-						variant="outline"
-						class="h-11 text-lg font-semibold"
-						aria-label={m['a11y.numpad.digit']({ n: '0' })}
-						onclick={() => push('0')}
-					>
-						0
-					</Button>
-					<Button
-						variant="ghost"
-						class="h-11"
-						aria-label={m['a11y.numpad.backspace']()}
-						onclick={backspace}
-					>
-						<Backspace class="size-5" />
-					</Button>
-				</div>
-
-				<!-- HpLogSection (read-only, newest first) -->
-				<Collapsible bind:open={historyOpen} class="border-t border-border pt-2">
-					<CollapsibleTrigger
-						class="flex w-full items-center justify-between text-sm font-medium text-muted-foreground"
-					>
-						<span class="flex items-center gap-1.5">
-							{m['numpad.history.title']()}
-							{#if history.length > 0}
-								<span class="text-muted-foreground">{m['numpad.history.count']({ n: history.length })}</span>
-							{/if}
-						</span>
-						<Expand class={['size-4 shrink-0 transition-transform', historyOpen && 'rotate-180']} />
-					</CollapsibleTrigger>
-					<CollapsibleContent>
-						{#if history.length === 0}
-							<p class="py-2 text-sm text-muted-foreground">{m['numpad.history.empty']()}</p>
-						{:else}
-							<ScrollArea class="max-h-48">
-								<ul class="flex flex-col gap-1.5 pt-2">
-									{#each history as e, i (i)}
-										<li class="flex items-center justify-between gap-2 text-sm text-muted-foreground">
-											<span class="flex items-center gap-1.5">
-												<Badge variant="outline" class={actionBadgeClass[e.type]}>
-													{actionLabel[e.type]()}
-												</Badge>
-												<span class={['tabular-nums', actionDiffClass[e.type]]}>
-													{e.delta > 0 ? `+${e.delta}` : e.delta}
-												</span>
-											</span>
-											<span class="tabular-nums">
-												{m['numpad.summary.hp']({ cur: e.currentHp, max: e.maxHp })}
-												{#if e.tempHp > 0}· {m['numpad.summary.temp']({ temp: e.tempHp })}{/if}
-												{#if e.round !== null}· {m['numpad.history.round']({ n: e.round })}{/if}
-											</span>
-										</li>
-									{/each}
-								</ul>
-							</ScrollArea>
-						{/if}
-					</CollapsibleContent>
-				</Collapsible>
-			</div>
-		{/if}
-	</DrawerContent>
-</Drawer>
+{#if isDesktop.current}
+	<Dialog bind:open>
+		<DialogContent class="sm:max-w-md">
+			{#if combatant}
+				{@render body(combatant)}
+			{/if}
+		</DialogContent>
+	</Dialog>
+{:else}
+	<Drawer bind:open>
+		<DrawerContent class="mx-auto max-w-md">
+			{#if combatant}
+				{@render body(combatant)}
+			{/if}
+		</DrawerContent>
+	</Drawer>
+{/if}

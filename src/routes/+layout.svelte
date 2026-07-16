@@ -22,6 +22,14 @@
 	});
 </script>
 
-<AppShell>
-	{@render children()}
-</AppShell>
+<!--
+  SET-1: keying the subtree on the active locale forces every `m[...]()` call-site to re-render
+  when the language changes (Settings calls `setLocale(..., { reload: false })`), without a full
+  page reload — Paraglide's `getLocale()`/`m[...]()` aren't themselves reactive to Svelte, so this
+  keyed block is the reactive seam that makes the switch apply instantly.
+-->
+{#key store.settings.language}
+	<AppShell>
+		{@render children()}
+	</AppShell>
+{/key}

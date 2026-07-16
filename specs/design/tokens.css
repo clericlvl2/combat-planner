@@ -36,6 +36,9 @@
 
 	--touch-min: 44px;
 
+	/* Layout container dims */
+	--content-max: 768px;
+
 	/* Combatant card component dims */
 	/* Exception (change.md-documented): synced to shipped CombatantRow render, not prototype's prior 14px */
 	--card-pad: 12px;

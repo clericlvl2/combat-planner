@@ -19,7 +19,7 @@
 		{m['about.version']({ version: APP_VERSION })}
 	</span>
 	<p class="text-sm leading-relaxed text-muted-foreground">{m['about.description']()}</p>
-	<div class="rounded-lg border border-l-[3px] border-border border-l-type-pc bg-card p-3 text-sm">
+	<div class="rounded-lg border border-border bg-card p-3 text-sm">
 		{m['about.privacy']()}
 	</div>
 </div>

@@ -60,7 +60,7 @@
     /* Frame dimensions (design canvas, not device-accurate). */
     --mobile-w: 390px;
     --mobile-h: 800px;
-    --desktop-w: 1024px;
+    --desktop-w: 768px;
     --desktop-h: 720px;
   }
 
@@ -192,7 +192,12 @@
     white-space: nowrap;
   }
 
-  /* Mobile: NavSidebar burger. Desktop: AppHeader icon-button nav (Combats / Settings / About). */
+  /* Mobile: NavSidebar burger. Desktop: shared DesktopNav icon-button row
+   * (Combats / Settings / About), rendered by BOTH AppHeader and CombatHeader
+   * (single shared component, PLT-3) — always the LAST section in the
+   * header, after any page-control buttons (create-desktop / header-add /
+   * header-start / header-advance), and visually distinct via its own
+   * border-left divider (never interleaved with the controls). */
   .frame--mobile .nav-mobile {
     display: inline-flex;
   }
@@ -205,7 +210,9 @@
   .frame--desktop .nav-desktop {
     display: inline-flex;
     gap: var(--space-1);
-    margin-right: var(--space-1);
+    margin-left: var(--space-1);
+    padding-left: var(--space-2);
+    border-left: 1px solid var(--border);
   }
   .frame--desktop .nav-desktop .icon-btn.is-current {
     background: var(--surface-2);
@@ -616,6 +623,20 @@
     color: var(--text-faint);
   }
 
+  /* Init pill (INI-2) — fixed width so a 1-digit and a 2-digit value render
+   * identically wide (no reflow of the trailing Row 3 stats when the value
+   * changes width); pointer cursor since the whole pill/chip is the tap
+   * target (roll on tap, long-press for manual entry); no min-height — the
+   * chip's own 24px `.chip` height is the full control height, unlike the
+   * 44px-min header/chrome touch targets (the wrapping shipped `Button` still
+   * meets the ≥44px hit-area requirement even though the visible pill inside
+   * it is smaller — see the "Row 3" note below). */
+  .chip.init-pill {
+    width: 72px;
+    justify-content: center;
+    cursor: pointer;
+  }
+
   /* Row 1 — active marker (active only) · name (grows) · expand chevron ·
    * overflow. Chevron icon is drawn with ::after (rotating corner), no glyph;
    * icon buttons inside the card are 32px (vs the 44px header/chrome default —
@@ -645,11 +666,19 @@
   }
 
   /* Row 2 — large cur/max HP (+ optional temp-HP badge) + HealthBar filling
-   * the remaining width. Always visible, collapsed or expanded. */
+   * the remaining width. Always visible, collapsed or expanded. The current-HP
+   * number and the health bar are a SINGLE unified interactive target (HP-4) —
+   * one rounded hover/press area (no separate button per element) that opens
+   * the HP numpad, with a pointer cursor on desktop. */
   .cbt-card__hp {
     display: flex;
     align-items: center;
     gap: var(--space-3);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+  }
+  .cbt-card__hp:hover {
+    background: var(--surface-3);
   }
   .hp-block {
     flex: 0 0 96px;
@@ -726,11 +755,11 @@
     transform: none;
   }
 
-  /* Primary actions (Add / Start) get a circular tonal treatment even as
-     header icon buttons, so they read as the primary call-to-action next to
-     the plain Advance/Jump/More icons — icon + circle share --text (dark-on-
-     white in light theme, light-on-dark in dark theme), the roundel itself
-     contrasts against the header bar, not against its own icon. */
+  /* Primary actions (Add / Start / Advance) get a circular tonal treatment
+     even as header icon buttons, so they read as the primary call-to-action
+     next to the plain back/overflow icons — icon + circle share --text
+     (dark-on-white in light theme, light-on-dark in dark theme), the roundel
+     itself contrasts against the header bar, not against its own icon. */
   .header-add,
   .header-start,
   .header-advance,
@@ -745,8 +774,7 @@
      .header-advance below), same convention as the Combats-home
      create-desktop / mobile-fab split. */
   .frame--desktop .fab[aria-label="New combatant"],
-  .frame--desktop .fab--start,
-  .frame--desktop .jump-turn {
+  .frame--desktop .fab--start {
     display: none;
   }
 
@@ -787,22 +815,6 @@
     font-size: var(--font-md);
     font-weight: 600;
     font-variant-numeric: tabular-nums;
-  }
-
-  /* Jump-to-turn button (Active) */
-  .jump-turn {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: var(--space-4);
-    padding: 7px 14px;
-    border-radius: 999px;
-    background: var(--surface-2);
-    border: 1px solid var(--border-strong);
-    color: var(--text);
-    font-size: var(--font-sm);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    cursor: default;
   }
 
   /* ---------------------------------------------------------------------------
@@ -1058,10 +1070,12 @@
     line-height: 1.6;
     margin: 0;
   }
+  /* No colored left-accent border (SET-5) — matches shipped about/+page.svelte's plain
+   * border-border privacy note; the earlier border-l-[3px] border-l-type-pc accent was removed
+   * from the app in unit 020 Phase 9. */
   .about__privacy {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-left: 3px solid var(--type-pc);
     border-radius: var(--radius);
     padding: var(--space-3);
     font-size: var(--font-sm);
@@ -1267,7 +1281,7 @@
     frame, each in dark and light.
   </p>
   <div class="proto-legend">
-    <span>Frames: mobile 390&times;800 · desktop 1024&times;720 (design canvas, not device-accurate)</span>
+    <span>Frames: mobile 390&times;800 · desktop 768&times;720 (design canvas, not device-accurate)</span>
     <span>Themes: dark (primary) · light</span>
     <span>Color signifiers are always paired with a label / letter / icon (PLT-5)</span>
   </div>
@@ -1289,8 +1303,8 @@
         <div class="frame__chrome">
           <button type="button" class="icon-btn nav-mobile" aria-label="Open navigation">&#9776;</button>
           <span class="chrome-title">Combats</span>
-          <nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn is-current" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav>
           <button type="button" class="icon-btn create-desktop" aria-label="New combat" title="New combat">+</button>
+          <nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn is-current" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav>
         </div>
         <div class="frame__body">
           <div class="screen">
@@ -1315,8 +1329,8 @@
         <div class="frame__chrome">
           <button type="button" class="icon-btn nav-mobile" aria-label="Open navigation">&#9776;</button>
           <span class="chrome-title">Combats</span>
-          <nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn is-current" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav>
           <button type="button" class="icon-btn create-desktop" aria-label="New combat" title="New combat">+</button>
+          <nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn is-current" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav>
         </div>
         <div class="frame__body">
           <div class="screen">
@@ -1343,8 +1357,8 @@
         <div class="frame__chrome">
           <button type="button" class="icon-btn nav-mobile" aria-label="Open navigation">&#9776;</button>
           <span class="chrome-title">Combats</span>
-          <nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn is-current" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav>
           <button type="button" class="icon-btn create-desktop" aria-label="New combat" title="New combat">+</button>
+          <nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn is-current" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav>
         </div>
         <div class="frame__body">
           <div class="screen">
@@ -1371,8 +1385,8 @@
         <div class="frame__chrome">
           <button type="button" class="icon-btn nav-mobile" aria-label="Open navigation">&#9776;</button>
           <span class="chrome-title">Combats</span>
-          <nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn is-current" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav>
           <button type="button" class="icon-btn create-desktop" aria-label="New combat" title="New combat">+</button>
+          <nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn is-current" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav>
         </div>
         <div class="frame__body">
           <div class="screen">
@@ -1404,7 +1418,7 @@
     <div class="theme-cell">
       <span class="theme-label">Mobile · Dark</span>
       <div class="frame frame--mobile" data-theme="dark">
-        <div class="frame__chrome"><button type="button" class="icon-btn nav-mobile" aria-label="Open navigation">&#9776;</button><span class="chrome-title">Combats</span><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn is-current" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav><button type="button" class="icon-btn create-desktop" aria-label="New combat" title="New combat">+</button></div>
+        <div class="frame__chrome"><button type="button" class="icon-btn nav-mobile" aria-label="Open navigation">&#9776;</button><span class="chrome-title">Combats</span><button type="button" class="icon-btn create-desktop" aria-label="New combat" title="New combat">+</button><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn is-current" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav></div>
         <div class="frame__body">
           <div class="empty-state"><div class="empty-state__icon" aria-hidden="true">&#9876;</div><div class="empty-state__title">No combats yet</div><div>Create your first encounter to start tracking initiative and HP.</div><button type="button" class="btn btn--primary empty-cta">+ New combat</button></div>
           <button type="button" class="fab" aria-label="New combat">+</button>
@@ -1414,7 +1428,7 @@
     <div class="theme-cell">
       <span class="theme-label">Mobile · Light</span>
       <div class="frame frame--mobile" data-theme="light">
-        <div class="frame__chrome"><button type="button" class="icon-btn nav-mobile" aria-label="Open navigation">&#9776;</button><span class="chrome-title">Combats</span><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn is-current" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav><button type="button" class="icon-btn create-desktop" aria-label="New combat" title="New combat">+</button></div>
+        <div class="frame__chrome"><button type="button" class="icon-btn nav-mobile" aria-label="Open navigation">&#9776;</button><span class="chrome-title">Combats</span><button type="button" class="icon-btn create-desktop" aria-label="New combat" title="New combat">+</button><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn is-current" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav></div>
         <div class="frame__body">
           <div class="empty-state"><div class="empty-state__icon" aria-hidden="true">&#9876;</div><div class="empty-state__title">No combats yet</div><div>Create your first encounter to start tracking initiative and HP.</div><button type="button" class="btn btn--primary empty-cta">+ New combat</button></div>
           <button type="button" class="fab" aria-label="New combat">+</button>
@@ -1427,7 +1441,7 @@
     <div class="theme-cell">
       <span class="theme-label">Desktop · Dark</span>
       <div class="frame frame--desktop" data-theme="dark">
-        <div class="frame__chrome"><button type="button" class="icon-btn nav-mobile" aria-label="Open navigation">&#9776;</button><span class="chrome-title">Combats</span><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn is-current" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav><button type="button" class="icon-btn create-desktop" aria-label="New combat" title="New combat">+</button></div>
+        <div class="frame__chrome"><button type="button" class="icon-btn nav-mobile" aria-label="Open navigation">&#9776;</button><span class="chrome-title">Combats</span><button type="button" class="icon-btn create-desktop" aria-label="New combat" title="New combat">+</button><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn is-current" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav></div>
         <div class="frame__body">
           <div class="empty-state"><div class="empty-state__icon" aria-hidden="true">&#9876;</div><div class="empty-state__title">No combats yet</div><div>Create your first encounter to start tracking initiative and HP.</div><button type="button" class="btn btn--primary empty-cta">+ New combat</button></div>
           <button type="button" class="fab" aria-label="New combat">+</button>
@@ -1440,7 +1454,7 @@
     <div class="theme-cell">
       <span class="theme-label">Desktop · Light</span>
       <div class="frame frame--desktop" data-theme="light">
-        <div class="frame__chrome"><button type="button" class="icon-btn nav-mobile" aria-label="Open navigation">&#9776;</button><span class="chrome-title">Combats</span><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn is-current" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav><button type="button" class="icon-btn create-desktop" aria-label="New combat" title="New combat">+</button></div>
+        <div class="frame__chrome"><button type="button" class="icon-btn nav-mobile" aria-label="Open navigation">&#9776;</button><span class="chrome-title">Combats</span><button type="button" class="icon-btn create-desktop" aria-label="New combat" title="New combat">+</button><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn is-current" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav></div>
         <div class="frame__body">
           <div class="empty-state"><div class="empty-state__icon" aria-hidden="true">&#9876;</div><div class="empty-state__title">No combats yet</div><div>Create your first encounter to start tracking initiative and HP.</div><button type="button" class="btn btn--primary empty-cta">+ New combat</button></div>
           <button type="button" class="fab" aria-label="New combat">+</button>
@@ -1467,7 +1481,7 @@
     <div class="theme-cell">
       <span class="theme-label">Mobile · Dark</span>
       <div class="frame frame--mobile" data-theme="dark">
-        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-add" aria-label="New combatant" title="New combatant">+</button><button type="button" class="icon-btn header-start" aria-label="Start combat" title="Start combat"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button><button type="button" class="icon-btn" aria-label="More">&#8942;</button></div>
+        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-add" aria-label="New combatant" title="New combatant">+</button><button type="button" class="icon-btn header-start" aria-label="Start combat" title="Start combat"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button><button type="button" class="icon-btn" aria-label="More">&#8942;</button><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav></div>
         <div class="frame__body">
           <div class="screen">
             <div class="cbt-card is-collapsed"><div class="type-stripes" role="img" aria-label="PC"><div class="type-stripe type--pc"></div></div><div class="cbt-card__body"><div class="cbt-card__head"><span class="cbt-name">Valen Ashford</span><button type="button" class="icon-btn chevron-btn" aria-label="Expand"></button><button type="button" class="icon-btn" aria-label="Combatant menu">&#8942;</button></div><div class="cbt-card__hp"><div class="hp-block"><span class="hp-big">42 / 42</span></div><div class="healthbar" role="img" aria-label="Full"><div class="healthbar__track"><div class="healthbar__fill fill--full" style="width:100%"></div></div></div></div><div class="cbt-card__stats"><div class="def-stats"><span>AC <b>18</b> &middot; PD <b>14</b> &middot; MD <b>12</b></span></div><span class="chip init-pill">Init <b>&ndash;</b></span></div></div></div>
@@ -1482,7 +1496,7 @@
     <div class="theme-cell">
       <span class="theme-label">Mobile · Light</span>
       <div class="frame frame--mobile" data-theme="light">
-        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-add" aria-label="New combatant" title="New combatant">+</button><button type="button" class="icon-btn header-start" aria-label="Start combat" title="Start combat"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button><button type="button" class="icon-btn" aria-label="More">&#8942;</button></div>
+        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-add" aria-label="New combatant" title="New combatant">+</button><button type="button" class="icon-btn header-start" aria-label="Start combat" title="Start combat"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button><button type="button" class="icon-btn" aria-label="More">&#8942;</button><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav></div>
         <div class="frame__body">
           <div class="screen">
             <div class="cbt-card is-collapsed"><div class="type-stripes" role="img" aria-label="PC"><div class="type-stripe type--pc"></div></div><div class="cbt-card__body"><div class="cbt-card__head"><span class="cbt-name">Valen Ashford</span><button type="button" class="icon-btn chevron-btn" aria-label="Expand"></button><button type="button" class="icon-btn" aria-label="Combatant menu">&#8942;</button></div><div class="cbt-card__hp"><div class="hp-block"><span class="hp-big">42 / 42</span></div><div class="healthbar" role="img" aria-label="Full"><div class="healthbar__track"><div class="healthbar__fill fill--full" style="width:100%"></div></div></div></div><div class="cbt-card__stats"><div class="def-stats"><span>AC <b>18</b> &middot; PD <b>14</b> &middot; MD <b>12</b></span></div><span class="chip init-pill">Init <b>&ndash;</b></span></div></div></div>
@@ -1500,7 +1514,7 @@
     <div class="theme-cell">
       <span class="theme-label">Desktop · Dark</span>
       <div class="frame frame--desktop" data-theme="dark">
-        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-add" aria-label="New combatant" title="New combatant">+</button><button type="button" class="icon-btn header-start" aria-label="Start combat" title="Start combat"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button><button type="button" class="icon-btn" aria-label="More">&#8942;</button></div>
+        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-add" aria-label="New combatant" title="New combatant">+</button><button type="button" class="icon-btn header-start" aria-label="Start combat" title="Start combat"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button><button type="button" class="icon-btn" aria-label="More">&#8942;</button><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav></div>
         <div class="frame__body">
           <div class="screen" style="max-width:760px; width:100%; margin:0 auto;">
             <div class="cbt-card is-collapsed"><div class="type-stripes" role="img" aria-label="PC"><div class="type-stripe type--pc"></div></div><div class="cbt-card__body"><div class="cbt-card__head"><span class="cbt-name">Valen Ashford</span><button type="button" class="icon-btn chevron-btn" aria-label="Expand"></button><button type="button" class="icon-btn" aria-label="Combatant menu">&#8942;</button></div><div class="cbt-card__hp"><div class="hp-block"><span class="hp-big">42 / 42</span></div><div class="healthbar" role="img" aria-label="Full"><div class="healthbar__track"><div class="healthbar__fill fill--full" style="width:100%"></div></div></div></div><div class="cbt-card__stats"><div class="def-stats"><span>AC <b>18</b> &middot; PD <b>14</b> &middot; MD <b>12</b></span></div><span class="chip init-pill">Init <b>&ndash;</b></span></div></div></div>
@@ -1518,7 +1532,7 @@
     <div class="theme-cell">
       <span class="theme-label">Desktop · Light</span>
       <div class="frame frame--desktop" data-theme="light">
-        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-add" aria-label="New combatant" title="New combatant">+</button><button type="button" class="icon-btn header-start" aria-label="Start combat" title="Start combat"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button><button type="button" class="icon-btn" aria-label="More">&#8942;</button></div>
+        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-add" aria-label="New combatant" title="New combatant">+</button><button type="button" class="icon-btn header-start" aria-label="Start combat" title="Start combat"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button><button type="button" class="icon-btn" aria-label="More">&#8942;</button><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav></div>
         <div class="frame__body">
           <div class="screen" style="max-width:760px; width:100%; margin:0 auto;">
             <div class="cbt-card is-collapsed"><div class="type-stripes" role="img" aria-label="PC"><div class="type-stripe type--pc"></div></div><div class="cbt-card__body"><div class="cbt-card__head"><span class="cbt-name">Valen Ashford</span><button type="button" class="icon-btn chevron-btn" aria-label="Expand"></button><button type="button" class="icon-btn" aria-label="Combatant menu">&#8942;</button></div><div class="cbt-card__hp"><div class="hp-block"><span class="hp-big">42 / 42</span></div><div class="healthbar" role="img" aria-label="Full"><div class="healthbar__track"><div class="healthbar__fill fill--full" style="width:100%"></div></div></div></div><div class="cbt-card__stats"><div class="def-stats"><span>AC <b>18</b> &middot; PD <b>14</b> &middot; MD <b>12</b></span></div><span class="chip init-pill">Init <b>&ndash;</b></span></div></div></div>
@@ -1535,23 +1549,24 @@
 
 <!-- =========================================================================
      SCREEN — Combat (Active). Header: back · title · overflow (Undo/Redo
-     first, then Add combatant/Restart/Clear). Desktop also shows
-     [Advance][Jump][More] icon buttons in the header; mobile hides those and
-     uses an advance FAB + a floating "Jump to turn" pill instead (R4
-     restyle). Round + Escalation die render as a data sub-bar
-     (.round-esc-bar) above the card list, not header pills. Active-turn card
-     gets a leading dot; HealthBar spans all four bands (aria-label only, no
-     visible band text); condition chips all render (no overflow chip).
+     first, then Add combatant/Restart/Clear). Desktop also shows a
+     header-advance icon button before the overflow; mobile hides that and
+     uses an advance FAB instead (the earlier floating "Jump to turn" pill was
+     removed — feature dropped in archived unit 011). Round + Escalation die
+     render as a data sub-bar (.round-esc-bar) above the card list, not header
+     pills. Active-turn card gets a leading dot; HealthBar spans all four
+     bands (aria-label only, no visible band text); condition chips all
+     render (no overflow chip).
      ===================================================================== -->
 <section class="proto-section">
   <h2>Combat — Active</h2>
-  <p class="caption">Active-turn card shows a leading dot on the current turn. Header: back · title · overflow (Undo/Redo first, then Add combatant/Restart/Clear). Desktop also shows [Advance][Jump][More] icon buttons in the header; mobile hides those and uses an advance FAB + a "Jump to turn" pill instead. Round and Escalation die render as a data sub-bar (round-esc-bar) above the cards, not header pills. HealthBar spans full/wounded/bloodied/dead bands (role=img aria-label, no visible band-label word); condition chips all render (no "+K" overflow chip).</p>
+  <p class="caption">Active-turn card shows a leading dot on the current turn. Header: back · title · overflow (Undo/Redo first, then Add combatant/Restart/Clear). Desktop also shows a header-advance icon button before the overflow; mobile hides that and uses an advance FAB instead. Round and Escalation die render as a data sub-bar (round-esc-bar) above the cards, not header pills. HealthBar spans full/wounded/bloodied/dead bands (role=img aria-label, no visible band-label word); condition chips all render (no "+K" overflow chip).</p>
 
   <div class="theme-pair">
     <div class="theme-cell">
       <span class="theme-label">Mobile · Dark</span>
       <div class="frame frame--mobile" data-theme="dark">
-        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-advance" aria-label="Advance turn" title="Advance turn">&#8250;</button><button type="button" class="icon-btn" aria-label="More">&#8942;</button></div>
+        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-advance" aria-label="Advance turn" title="Advance turn">&#8250;</button><button type="button" class="icon-btn" aria-label="More">&#8942;</button><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav></div>
         <div class="frame__body">
           <div class="screen">
             <div class="round-esc-bar"><div class="round-esc-bar__item"><span class="round-esc-bar__label">Round</span><span class="round-esc-bar__val">3</span></div><div class="round-esc-bar__item"><span class="round-esc-bar__label">Escalation die</span><span class="round-esc-bar__val">+2</span></div></div>
@@ -1560,7 +1575,6 @@
             <div class="cbt-card"><div class="type-stripes" role="img" aria-label="Ally"><div class="type-stripe type--ally"></div></div><div class="cbt-card__body"><div class="cbt-card__head"><span class="cbt-name">Sir Roland</span><button type="button" class="icon-btn chevron-btn is-open" aria-label="Collapse"></button><button type="button" class="icon-btn" aria-label="Combatant menu">&#8942;</button></div><div class="cbt-card__hp"><div class="hp-block"><span class="hp-big">8 / 34</span></div><div class="healthbar" role="img" aria-label="Bloodied"><div class="healthbar__track"><div class="healthbar__fill fill--bloodied" style="width:24%"></div></div></div></div><div class="cbt-card__stats"><div class="def-stats"><span>AC <b>19</b> &middot; PD <b>16</b> &middot; MD <b>11</b></span></div><span class="chip init-pill">Init <b>15</b></span></div><div class="cond-list"><span class="chip cond-chip cond--fear">Fear<span class="cond-chip__remove" aria-hidden="true">&#215;</span></span><button type="button" class="chip tag-trigger">+ Condition</button><button type="button" class="chip tag-trigger">+ Note</button></div></div></div>
             <div class="cbt-card"><div class="type-stripes" role="img" aria-label="Enemy"><div class="type-stripe type--enemy"></div></div><div class="cbt-card__body"><div class="cbt-card__head"><span class="cbt-name">Goblin Skirmisher</span><button type="button" class="icon-btn chevron-btn is-open" aria-label="Collapse"></button><button type="button" class="icon-btn" aria-label="Combatant menu">&#8942;</button></div><div class="cbt-card__hp"><div class="hp-block"><span class="hp-big">0 / 24</span></div><div class="healthbar" role="img" aria-label="Dead"><div class="healthbar__track"><div class="healthbar__fill fill--dead" style="width:100%"></div></div></div></div><div class="cbt-card__stats"><div class="def-stats"><span>AC <b>16</b> &middot; PD <b>13</b> &middot; MD <b>10</b></span></div><span class="chip init-pill">Init <b>11</b></span></div><div class="cond-list"><span class="chip cond-chip cond--helpless">Helpless<span class="cond-chip__remove" aria-hidden="true">&#215;</span></span><button type="button" class="chip tag-trigger">+ Condition</button><button type="button" class="chip tag-trigger">+ Note</button></div></div></div>
           </div>
-          <button type="button" class="jump-turn">&#8593; Jump to turn</button>
           <button type="button" class="fab" aria-label="Advance turn">&#8250;</button>
         </div>
       </div>
@@ -1568,7 +1582,7 @@
     <div class="theme-cell">
       <span class="theme-label">Mobile · Light</span>
       <div class="frame frame--mobile" data-theme="light">
-        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-advance" aria-label="Advance turn" title="Advance turn">&#8250;</button><button type="button" class="icon-btn" aria-label="More">&#8942;</button></div>
+        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-advance" aria-label="Advance turn" title="Advance turn">&#8250;</button><button type="button" class="icon-btn" aria-label="More">&#8942;</button><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav></div>
         <div class="frame__body">
           <div class="screen">
             <div class="round-esc-bar"><div class="round-esc-bar__item"><span class="round-esc-bar__label">Round</span><span class="round-esc-bar__val">3</span></div><div class="round-esc-bar__item"><span class="round-esc-bar__label">Escalation die</span><span class="round-esc-bar__val">+2</span></div></div>
@@ -1577,7 +1591,6 @@
             <div class="cbt-card"><div class="type-stripes" role="img" aria-label="Ally"><div class="type-stripe type--ally"></div></div><div class="cbt-card__body"><div class="cbt-card__head"><span class="cbt-name">Sir Roland</span><button type="button" class="icon-btn chevron-btn is-open" aria-label="Collapse"></button><button type="button" class="icon-btn" aria-label="Combatant menu">&#8942;</button></div><div class="cbt-card__hp"><div class="hp-block"><span class="hp-big">8 / 34</span></div><div class="healthbar" role="img" aria-label="Bloodied"><div class="healthbar__track"><div class="healthbar__fill fill--bloodied" style="width:24%"></div></div></div></div><div class="cbt-card__stats"><div class="def-stats"><span>AC <b>19</b> &middot; PD <b>16</b> &middot; MD <b>11</b></span></div><span class="chip init-pill">Init <b>15</b></span></div><div class="cond-list"><span class="chip cond-chip cond--fear">Fear<span class="cond-chip__remove" aria-hidden="true">&#215;</span></span><button type="button" class="chip tag-trigger">+ Condition</button><button type="button" class="chip tag-trigger">+ Note</button></div></div></div>
             <div class="cbt-card"><div class="type-stripes" role="img" aria-label="Enemy"><div class="type-stripe type--enemy"></div></div><div class="cbt-card__body"><div class="cbt-card__head"><span class="cbt-name">Goblin Skirmisher</span><button type="button" class="icon-btn chevron-btn is-open" aria-label="Collapse"></button><button type="button" class="icon-btn" aria-label="Combatant menu">&#8942;</button></div><div class="cbt-card__hp"><div class="hp-block"><span class="hp-big">0 / 24</span></div><div class="healthbar" role="img" aria-label="Dead"><div class="healthbar__track"><div class="healthbar__fill fill--dead" style="width:100%"></div></div></div></div><div class="cbt-card__stats"><div class="def-stats"><span>AC <b>16</b> &middot; PD <b>13</b> &middot; MD <b>10</b></span></div><span class="chip init-pill">Init <b>11</b></span></div><div class="cond-list"><span class="chip cond-chip cond--helpless">Helpless<span class="cond-chip__remove" aria-hidden="true">&#215;</span></span><button type="button" class="chip tag-trigger">+ Condition</button><button type="button" class="chip tag-trigger">+ Note</button></div></div></div>
           </div>
-          <button type="button" class="jump-turn">&#8593; Jump to turn</button>
           <button type="button" class="fab" aria-label="Advance turn">&#8250;</button>
         </div>
       </div>
@@ -1588,7 +1601,7 @@
     <div class="theme-cell">
       <span class="theme-label">Desktop · Dark</span>
       <div class="frame frame--desktop" data-theme="dark">
-        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-advance" aria-label="Advance turn" title="Advance turn">&#8250;</button><button type="button" class="icon-btn" aria-label="More">&#8942;</button></div>
+        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-advance" aria-label="Advance turn" title="Advance turn">&#8250;</button><button type="button" class="icon-btn" aria-label="More">&#8942;</button><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav></div>
         <div class="frame__body">
           <div class="screen" style="max-width:820px; width:100%; margin:0 auto;">
             <div class="round-esc-bar"><div class="round-esc-bar__item"><span class="round-esc-bar__label">Round</span><span class="round-esc-bar__val">3</span></div><div class="round-esc-bar__item"><span class="round-esc-bar__label">Escalation die</span><span class="round-esc-bar__val">+2</span></div></div>
@@ -1606,7 +1619,7 @@
     <div class="theme-cell">
       <span class="theme-label">Desktop · Light</span>
       <div class="frame frame--desktop" data-theme="light">
-        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-advance" aria-label="Advance turn" title="Advance turn">&#8250;</button><button type="button" class="icon-btn" aria-label="More">&#8942;</button></div>
+        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-advance" aria-label="Advance turn" title="Advance turn">&#8250;</button><button type="button" class="icon-btn" aria-label="More">&#8942;</button><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav></div>
         <div class="frame__body">
           <div class="screen" style="max-width:820px; width:100%; margin:0 auto;">
             <div class="round-esc-bar"><div class="round-esc-bar__item"><span class="round-esc-bar__label">Round</span><span class="round-esc-bar__val">3</span></div><div class="round-esc-bar__item"><span class="round-esc-bar__label">Escalation die</span><span class="round-esc-bar__val">+2</span></div></div>
@@ -1622,8 +1635,9 @@
 </section>
 
 <!-- =========================================================================
-     SCREEN — Numpad sheet (Drawer on mobile, Dialog on desktop). Opened from an
-     HpCell; shown over a dimmed Combat — Active screen.
+     SCREEN — Numpad sheet (Drawer on mobile, Dialog on desktop). Opened by
+     tapping either the current-HP number or the health bar (both are numpad
+     triggers, HP-4); shown over a dimmed Combat — Active screen.
      ===================================================================== -->
 <section class="proto-section">
   <h2>Numpad sheet</h2>
@@ -1633,7 +1647,7 @@
     <div class="theme-cell">
       <span class="theme-label">Mobile · Dark</span>
       <div class="frame frame--mobile" data-theme="dark">
-        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-advance" aria-label="Advance turn" title="Advance turn">&#8250;</button><button type="button" class="icon-btn" aria-label="More">&#8942;</button></div>
+        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-advance" aria-label="Advance turn" title="Advance turn">&#8250;</button><button type="button" class="icon-btn" aria-label="More">&#8942;</button><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav></div>
         <div class="frame__body">
           <div class="screen" style="opacity:0.5"><div class="round-esc-bar"><div class="round-esc-bar__item"><span class="round-esc-bar__label">Round</span><span class="round-esc-bar__val">3</span></div><div class="round-esc-bar__item"><span class="round-esc-bar__label">Escalation die</span><span class="round-esc-bar__val">+2</span></div></div><div class="cbt-card is-collapsed"><div class="type-stripes" role="img" aria-label="Enemy"><div class="type-stripe type--enemy"></div></div><div class="cbt-card__body"><div class="cbt-card__head"><span class="cbt-name">Goblin Cutter</span><button type="button" class="icon-btn chevron-btn" aria-label="Expand"></button><button type="button" class="icon-btn" aria-label="Combatant menu">&#8942;</button></div><div class="cbt-card__hp"><div class="hp-block"><span class="hp-big">18 / 30</span></div><div class="healthbar" role="img" aria-label="Wounded"><div class="healthbar__track"><div class="healthbar__fill fill--wounded" style="width:60%"></div></div></div></div><div class="cbt-card__stats"><div class="def-stats"><span>AC <b>16</b> &middot; PD <b>13</b> &middot; MD <b>10</b></span></div><span class="chip init-pill">Init <b>18</b></span></div></div></div></div>
           <div class="overlay">
@@ -1652,7 +1666,7 @@
     <div class="theme-cell">
       <span class="theme-label">Mobile · Light</span>
       <div class="frame frame--mobile" data-theme="light">
-        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-advance" aria-label="Advance turn" title="Advance turn">&#8250;</button><button type="button" class="icon-btn" aria-label="More">&#8942;</button></div>
+        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-advance" aria-label="Advance turn" title="Advance turn">&#8250;</button><button type="button" class="icon-btn" aria-label="More">&#8942;</button><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav></div>
         <div class="frame__body">
           <div class="screen" style="opacity:0.5"><div class="round-esc-bar"><div class="round-esc-bar__item"><span class="round-esc-bar__label">Round</span><span class="round-esc-bar__val">3</span></div><div class="round-esc-bar__item"><span class="round-esc-bar__label">Escalation die</span><span class="round-esc-bar__val">+2</span></div></div><div class="cbt-card is-collapsed"><div class="type-stripes" role="img" aria-label="Enemy"><div class="type-stripe type--enemy"></div></div><div class="cbt-card__body"><div class="cbt-card__head"><span class="cbt-name">Goblin Cutter</span><button type="button" class="icon-btn chevron-btn" aria-label="Expand"></button><button type="button" class="icon-btn" aria-label="Combatant menu">&#8942;</button></div><div class="cbt-card__hp"><div class="hp-block"><span class="hp-big">18 / 30</span></div><div class="healthbar" role="img" aria-label="Wounded"><div class="healthbar__track"><div class="healthbar__fill fill--wounded" style="width:60%"></div></div></div></div><div class="cbt-card__stats"><div class="def-stats"><span>AC <b>16</b> &middot; PD <b>13</b> &middot; MD <b>10</b></span></div><span class="chip init-pill">Init <b>18</b></span></div></div></div></div>
           <div class="overlay">
@@ -1674,7 +1688,7 @@
     <div class="theme-cell">
       <span class="theme-label">Desktop · Dark</span>
       <div class="frame frame--desktop" data-theme="dark">
-        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-advance" aria-label="Advance turn" title="Advance turn">&#8250;</button><button type="button" class="icon-btn" aria-label="More">&#8942;</button></div>
+        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-advance" aria-label="Advance turn" title="Advance turn">&#8250;</button><button type="button" class="icon-btn" aria-label="More">&#8942;</button><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav></div>
         <div class="frame__body">
           <div class="screen" style="opacity:0.4; max-width:820px; width:100%; margin:0 auto;"><div class="round-esc-bar"><div class="round-esc-bar__item"><span class="round-esc-bar__label">Round</span><span class="round-esc-bar__val">3</span></div><div class="round-esc-bar__item"><span class="round-esc-bar__label">Escalation die</span><span class="round-esc-bar__val">+2</span></div></div><div class="cbt-card is-collapsed"><div class="type-stripes" role="img" aria-label="Enemy"><div class="type-stripe type--enemy"></div></div><div class="cbt-card__body"><div class="cbt-card__head"><span class="cbt-name">Goblin Cutter</span><button type="button" class="icon-btn chevron-btn" aria-label="Expand"></button><button type="button" class="icon-btn" aria-label="Combatant menu">&#8942;</button></div><div class="cbt-card__hp"><div class="hp-block"><span class="hp-big">18 / 30</span></div><div class="healthbar" role="img" aria-label="Wounded"><div class="healthbar__track"><div class="healthbar__fill fill--wounded" style="width:60%"></div></div></div></div><div class="cbt-card__stats"><div class="def-stats"><span>AC <b>16</b> &middot; PD <b>13</b> &middot; MD <b>10</b></span></div><span class="chip init-pill">Init <b>18</b></span></div></div></div></div>
           <div class="overlay">
@@ -1695,7 +1709,7 @@
     <div class="theme-cell">
       <span class="theme-label">Desktop · Light</span>
       <div class="frame frame--desktop" data-theme="light">
-        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-advance" aria-label="Advance turn" title="Advance turn">&#8250;</button><button type="button" class="icon-btn" aria-label="More">&#8942;</button></div>
+        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-advance" aria-label="Advance turn" title="Advance turn">&#8250;</button><button type="button" class="icon-btn" aria-label="More">&#8942;</button><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav></div>
         <div class="frame__body">
           <div class="screen" style="opacity:0.4; max-width:820px; width:100%; margin:0 auto;"><div class="round-esc-bar"><div class="round-esc-bar__item"><span class="round-esc-bar__label">Round</span><span class="round-esc-bar__val">3</span></div><div class="round-esc-bar__item"><span class="round-esc-bar__label">Escalation die</span><span class="round-esc-bar__val">+2</span></div></div><div class="cbt-card is-collapsed"><div class="type-stripes" role="img" aria-label="Enemy"><div class="type-stripe type--enemy"></div></div><div class="cbt-card__body"><div class="cbt-card__head"><span class="cbt-name">Goblin Cutter</span><button type="button" class="icon-btn chevron-btn" aria-label="Expand"></button><button type="button" class="icon-btn" aria-label="Combatant menu">&#8942;</button></div><div class="cbt-card__hp"><div class="hp-block"><span class="hp-big">18 / 30</span></div><div class="healthbar" role="img" aria-label="Wounded"><div class="healthbar__track"><div class="healthbar__fill fill--wounded" style="width:60%"></div></div></div></div><div class="cbt-card__stats"><div class="def-stats"><span>AC <b>16</b> &middot; PD <b>13</b> &middot; MD <b>10</b></span></div><span class="chip init-pill">Init <b>18</b></span></div></div></div></div>
           <div class="overlay">
@@ -2037,7 +2051,7 @@
     <div class="theme-cell">
       <span class="theme-label">Mobile · Dark</span>
       <div class="frame frame--mobile" data-theme="dark">
-        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-add" aria-label="New combatant" title="New combatant">+</button><button type="button" class="icon-btn header-start" aria-label="Start combat" title="Start combat"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button><button type="button" class="icon-btn" aria-label="More">&#8942;</button></div>
+        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-add" aria-label="New combatant" title="New combatant">+</button><button type="button" class="icon-btn header-start" aria-label="Start combat" title="Start combat"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button><button type="button" class="icon-btn" aria-label="More">&#8942;</button><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav></div>
         <div class="frame__body">
           <div class="screen" style="opacity:0.5"><div class="cbt-card is-collapsed"><div class="type-stripes" role="img" aria-label="PC"><div class="type-stripe type--pc"></div></div><div class="cbt-card__body"><div class="cbt-card__head"><span class="cbt-name">Valen Ashford</span><button type="button" class="icon-btn chevron-btn" aria-label="Expand"></button><button type="button" class="icon-btn" aria-label="Combatant menu">&#8942;</button></div><div class="cbt-card__hp"><div class="hp-block"><span class="hp-big">42 / 42</span></div><div class="healthbar" role="img" aria-label="Full"><div class="healthbar__track"><div class="healthbar__fill fill--full" style="width:100%"></div></div></div></div><div class="cbt-card__stats"><div class="def-stats"><span>AC <b>18</b> &middot; PD <b>14</b> &middot; MD <b>12</b></span></div><span class="chip init-pill">Init <b>21</b></span></div></div></div></div>
           <div class="overlay">
@@ -2058,7 +2072,7 @@
     <div class="theme-cell">
       <span class="theme-label">Mobile · Light</span>
       <div class="frame frame--mobile" data-theme="light">
-        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-add" aria-label="New combatant" title="New combatant">+</button><button type="button" class="icon-btn header-start" aria-label="Start combat" title="Start combat"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button><button type="button" class="icon-btn" aria-label="More">&#8942;</button></div>
+        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-add" aria-label="New combatant" title="New combatant">+</button><button type="button" class="icon-btn header-start" aria-label="Start combat" title="Start combat"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button><button type="button" class="icon-btn" aria-label="More">&#8942;</button><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav></div>
         <div class="frame__body">
           <div class="screen" style="opacity:0.5"><div class="cbt-card is-collapsed"><div class="type-stripes" role="img" aria-label="PC"><div class="type-stripe type--pc"></div></div><div class="cbt-card__body"><div class="cbt-card__head"><span class="cbt-name">Valen Ashford</span><button type="button" class="icon-btn chevron-btn" aria-label="Expand"></button><button type="button" class="icon-btn" aria-label="Combatant menu">&#8942;</button></div><div class="cbt-card__hp"><div class="hp-block"><span class="hp-big">42 / 42</span></div><div class="healthbar" role="img" aria-label="Full"><div class="healthbar__track"><div class="healthbar__fill fill--full" style="width:100%"></div></div></div></div><div class="cbt-card__stats"><div class="def-stats"><span>AC <b>18</b> &middot; PD <b>14</b> &middot; MD <b>12</b></span></div><span class="chip init-pill">Init <b>21</b></span></div></div></div></div>
           <div class="overlay">
@@ -2082,7 +2096,7 @@
     <div class="theme-cell">
       <span class="theme-label">Desktop · Dark</span>
       <div class="frame frame--desktop" data-theme="dark">
-        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-add" aria-label="New combatant" title="New combatant">+</button><button type="button" class="icon-btn header-start" aria-label="Start combat" title="Start combat"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button><button type="button" class="icon-btn" aria-label="More">&#8942;</button></div>
+        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-add" aria-label="New combatant" title="New combatant">+</button><button type="button" class="icon-btn header-start" aria-label="Start combat" title="Start combat"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button><button type="button" class="icon-btn" aria-label="More">&#8942;</button><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav></div>
         <div class="frame__body">
           <div class="screen" style="opacity:0.4"><div class="cbt-card is-collapsed"><div class="type-stripes" role="img" aria-label="PC"><div class="type-stripe type--pc"></div></div><div class="cbt-card__body"><div class="cbt-card__head"><span class="cbt-name">Valen Ashford</span><button type="button" class="icon-btn chevron-btn" aria-label="Expand"></button><button type="button" class="icon-btn" aria-label="Combatant menu">&#8942;</button></div><div class="cbt-card__hp"><div class="hp-block"><span class="hp-big">42 / 42</span></div><div class="healthbar" role="img" aria-label="Full"><div class="healthbar__track"><div class="healthbar__fill fill--full" style="width:100%"></div></div></div></div><div class="cbt-card__stats"><div class="def-stats"><span>AC <b>18</b> &middot; PD <b>14</b> &middot; MD <b>12</b></span></div><span class="chip init-pill">Init <b>21</b></span></div></div></div></div>
           <div class="overlay">
@@ -2104,7 +2118,7 @@
     <div class="theme-cell">
       <span class="theme-label">Desktop · Light</span>
       <div class="frame frame--desktop" data-theme="light">
-        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-add" aria-label="New combatant" title="New combatant">+</button><button type="button" class="icon-btn header-start" aria-label="Start combat" title="Start combat"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button><button type="button" class="icon-btn" aria-label="More">&#8942;</button></div>
+        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-add" aria-label="New combatant" title="New combatant">+</button><button type="button" class="icon-btn header-start" aria-label="Start combat" title="Start combat"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button><button type="button" class="icon-btn" aria-label="More">&#8942;</button><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav></div>
         <div class="frame__body">
           <div class="screen" style="opacity:0.4"><div class="cbt-card is-collapsed"><div class="type-stripes" role="img" aria-label="PC"><div class="type-stripe type--pc"></div></div><div class="cbt-card__body"><div class="cbt-card__head"><span class="cbt-name">Valen Ashford</span><button type="button" class="icon-btn chevron-btn" aria-label="Expand"></button><button type="button" class="icon-btn" aria-label="Combatant menu">&#8942;</button></div><div class="cbt-card__hp"><div class="hp-block"><span class="hp-big">42 / 42</span></div><div class="healthbar" role="img" aria-label="Full"><div class="healthbar__track"><div class="healthbar__fill fill--full" style="width:100%"></div></div></div></div><div class="cbt-card__stats"><div class="def-stats"><span>AC <b>18</b> &middot; PD <b>14</b> &middot; MD <b>12</b></span></div><span class="chip init-pill">Init <b>21</b></span></div></div></div></div>
           <div class="overlay">
@@ -2137,7 +2151,7 @@
     <div class="theme-cell">
       <span class="theme-label">Mobile · Dark</span>
       <div class="frame frame--mobile" data-theme="dark">
-        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-advance" aria-label="Advance turn" title="Advance turn">&#8250;</button><button type="button" class="icon-btn" aria-label="More">&#8942;</button></div>
+        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-advance" aria-label="Advance turn" title="Advance turn">&#8250;</button><button type="button" class="icon-btn" aria-label="More">&#8942;</button><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav></div>
         <div class="frame__body">
           <div class="screen" style="opacity:0.5"><div class="round-esc-bar"><div class="round-esc-bar__item"><span class="round-esc-bar__label">Round</span><span class="round-esc-bar__val">3</span></div><div class="round-esc-bar__item"><span class="round-esc-bar__label">Escalation die</span><span class="round-esc-bar__val">+2</span></div></div><div class="cbt-card is-collapsed"><div class="type-stripes" role="img" aria-label="Enemy"><div class="type-stripe type--enemy"></div></div><div class="cbt-card__body"><div class="cbt-card__head"><span class="cbt-name">Goblin Cutter</span><button type="button" class="icon-btn chevron-btn" aria-label="Expand"></button><button type="button" class="icon-btn" aria-label="Combatant menu">&#8942;</button></div><div class="cbt-card__hp"><div class="hp-block"><span class="hp-big">18 / 30</span></div><div class="healthbar" role="img" aria-label="Wounded"><div class="healthbar__track"><div class="healthbar__fill fill--wounded" style="width:60%"></div></div></div></div><div class="cbt-card__stats"><div class="def-stats"><span>AC <b>16</b> &middot; PD <b>13</b> &middot; MD <b>10</b></span></div><span class="chip init-pill">Init <b>18</b></span></div></div></div></div>
           <div class="overlay">
@@ -2159,7 +2173,7 @@
     <div class="theme-cell">
       <span class="theme-label">Mobile · Light</span>
       <div class="frame frame--mobile" data-theme="light">
-        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-advance" aria-label="Advance turn" title="Advance turn">&#8250;</button><button type="button" class="icon-btn" aria-label="More">&#8942;</button></div>
+        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-advance" aria-label="Advance turn" title="Advance turn">&#8250;</button><button type="button" class="icon-btn" aria-label="More">&#8942;</button><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav></div>
         <div class="frame__body">
           <div class="screen" style="opacity:0.5"><div class="round-esc-bar"><div class="round-esc-bar__item"><span class="round-esc-bar__label">Round</span><span class="round-esc-bar__val">3</span></div><div class="round-esc-bar__item"><span class="round-esc-bar__label">Escalation die</span><span class="round-esc-bar__val">+2</span></div></div><div class="cbt-card is-collapsed"><div class="type-stripes" role="img" aria-label="Enemy"><div class="type-stripe type--enemy"></div></div><div class="cbt-card__body"><div class="cbt-card__head"><span class="cbt-name">Goblin Cutter</span><button type="button" class="icon-btn chevron-btn" aria-label="Expand"></button><button type="button" class="icon-btn" aria-label="Combatant menu">&#8942;</button></div><div class="cbt-card__hp"><div class="hp-block"><span class="hp-big">18 / 30</span></div><div class="healthbar" role="img" aria-label="Wounded"><div class="healthbar__track"><div class="healthbar__fill fill--wounded" style="width:60%"></div></div></div></div><div class="cbt-card__stats"><div class="def-stats"><span>AC <b>16</b> &middot; PD <b>13</b> &middot; MD <b>10</b></span></div><span class="chip init-pill">Init <b>18</b></span></div></div></div></div>
           <div class="overlay">
@@ -2184,7 +2198,7 @@
     <div class="theme-cell">
       <span class="theme-label">Desktop · Dark</span>
       <div class="frame frame--desktop" data-theme="dark">
-        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-advance" aria-label="Advance turn" title="Advance turn">&#8250;</button><button type="button" class="icon-btn" aria-label="More">&#8942;</button></div>
+        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-advance" aria-label="Advance turn" title="Advance turn">&#8250;</button><button type="button" class="icon-btn" aria-label="More">&#8942;</button><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav></div>
         <div class="frame__body">
           <div class="screen" style="opacity:0.4"><div class="round-esc-bar"><div class="round-esc-bar__item"><span class="round-esc-bar__label">Round</span><span class="round-esc-bar__val">3</span></div><div class="round-esc-bar__item"><span class="round-esc-bar__label">Escalation die</span><span class="round-esc-bar__val">+2</span></div></div><div class="cbt-card is-collapsed"><div class="type-stripes" role="img" aria-label="Enemy"><div class="type-stripe type--enemy"></div></div><div class="cbt-card__body"><div class="cbt-card__head"><span class="cbt-name">Goblin Cutter</span><button type="button" class="icon-btn chevron-btn" aria-label="Expand"></button><button type="button" class="icon-btn" aria-label="Combatant menu">&#8942;</button></div><div class="cbt-card__hp"><div class="hp-block"><span class="hp-big">18 / 30</span></div><div class="healthbar" role="img" aria-label="Wounded"><div class="healthbar__track"><div class="healthbar__fill fill--wounded" style="width:60%"></div></div></div></div><div class="cbt-card__stats"><div class="def-stats"><span>AC <b>16</b> &middot; PD <b>13</b> &middot; MD <b>10</b></span></div><span class="chip init-pill">Init <b>18</b></span></div></div></div></div>
           <div class="overlay">
@@ -2206,7 +2220,7 @@
     <div class="theme-cell">
       <span class="theme-label">Desktop · Light</span>
       <div class="frame frame--desktop" data-theme="light">
-        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-advance" aria-label="Advance turn" title="Advance turn">&#8250;</button><button type="button" class="icon-btn" aria-label="More">&#8942;</button></div>
+        <div class="frame__chrome"><button type="button" class="icon-btn" aria-label="Back">&#8249;</button><span class="chrome-title">Goblin Ambush</span><button type="button" class="icon-btn header-advance" aria-label="Advance turn" title="Advance turn">&#8250;</button><button type="button" class="icon-btn" aria-label="More">&#8942;</button><nav class="nav-desktop" aria-label="Primary"><button type="button" class="icon-btn" aria-label="Combats" title="Combats">&#9876;</button><button type="button" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button><button type="button" class="icon-btn" aria-label="About" title="About">&#9432;</button></nav></div>
         <div class="frame__body">
           <div class="screen" style="opacity:0.4"><div class="round-esc-bar"><div class="round-esc-bar__item"><span class="round-esc-bar__label">Round</span><span class="round-esc-bar__val">3</span></div><div class="round-esc-bar__item"><span class="round-esc-bar__label">Escalation die</span><span class="round-esc-bar__val">+2</span></div></div><div class="cbt-card is-collapsed"><div class="type-stripes" role="img" aria-label="Enemy"><div class="type-stripe type--enemy"></div></div><div class="cbt-card__body"><div class="cbt-card__head"><span class="cbt-name">Goblin Cutter</span><button type="button" class="icon-btn chevron-btn" aria-label="Expand"></button><button type="button" class="icon-btn" aria-label="Combatant menu">&#8942;</button></div><div class="cbt-card__hp"><div class="hp-block"><span class="hp-big">18 / 30</span></div><div class="healthbar" role="img" aria-label="Wounded"><div class="healthbar__track"><div class="healthbar__fill fill--wounded" style="width:60%"></div></div></div></div><div class="cbt-card__stats"><div class="def-stats"><span>AC <b>16</b> &middot; PD <b>13</b> &middot; MD <b>10</b></span></div><span class="chip init-pill">Init <b>18</b></span></div></div></div></div>
           <div class="overlay">

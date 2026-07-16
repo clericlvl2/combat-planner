@@ -12,12 +12,23 @@ visible-focus requirement ([[../capabilities/platform]] PLT-5). **error** surfac
 
 **Token source of truth.** All raw design tokens (colors, `--space-*`, `--font-*`, radius scale,
 and the component dims `--card-pad`/`--card-gap`/`--card-border`/`--hp-size`/`--badge-width`/
-`--touch-min`) live in one place, `specs/design/tokens.css`, `@import`ed verbatim by
-`prototype.html`, `card-prototype.html`, and `src/routes/layout.css` — no value is re-typed in
+`--touch-min`/`--content-max`) live in one place, `specs/design/tokens.css`, `@import`ed verbatim
+by `prototype.html`, `card-prototype.html`, and `src/routes/layout.css` — no value is re-typed in
 any of the three. One documented exception: `--card-pad` and `--hp-size` were synced to the
 shipped `CombatantRow` render (12px / 18px) rather than the prototype's prior 14px / 19px value;
 the prototype design source was updated to match. Theming is keyed by a `[data-theme="light"|
 "dark"]` attribute (see [[../capabilities/settings]] SET-2), not per-theme classes.
+
+**Desktop content container ([[../capabilities/platform]] PLT-2).** `--content-max: 768px`
+(narrowed from an initial 1024px after unit-020 dogfooding) caps a shared `.content-container`
+utility (`src/routes/layout.css`'s `@utility content-container`, consuming the token via `@theme`)
+that every routed screen's body and header inner-content sit inside, centered with gutters on
+wider viewports — `AppShell.svelte`'s `<main>` wrapper, `AppHeader.svelte`, and
+`CombatHeader.svelte` all apply it, so card columns and header content stop spanning the full
+viewport past 768px (including the Combat screen, which used to clip on its sides). The
+`content-container` utility also carries horizontal `padding-inline` gutter so header/body content
+never touches the viewport's left/right edges at cap width. `prototype.html`'s
+`--desktop-w: 768px` frame canvas dimension is the design-canvas analogue of this same width.
 
 **Target vs. shipped, this doc.** This file describes the design *target* locked in by the
 converged prototype (`specs/design/prototype.html`, plus `specs/design/card-prototype.html` for
@@ -33,16 +44,21 @@ instead of silently restated as already-true.
 ```
 AppShell
 ├── NavSidebar (mobile) / AppHeader (tablet·desktop) — AppShell skips its own AppHeader on the
-│     Combat route (own-header guard); CombatHeader carries an identical `.nav-desktop` icon-nav
-│     row there instead (see "Navigation placement per breakpoint" below)
+│     Combat route (own-header guard); CombatHeader renders the same shared `DesktopNav.svelte`
+│     component there instead, as its own trailing section after CombatHeader's own page
+│     controls (see "Navigation placement per breakpoint" below)
 ├── Toaster · InstallBanner            ← global chrome
 ├── ConfirmDialog                       ← global, summoned by destructive actions
 └── <route outlet>
     ├── Combats (home)
-    │   ├── SearchField (real-time title filter, view-local only — shipped unit F (009); first
-    │   │     child of the populated list, hidden on the empty-state screen — [[../capabilities/combats-list]] CLS-9)
+    │   ├── SearchField (real-time title-**or**-description filter with matched-substring
+    │   │     highlight, view-local only — shipped unit F (009), extended unit 020; first child of
+    │   │     the populated list, hidden on the empty-state screen — [[../capabilities/combats-list]] CLS-9)
     │   ├── CombatList → CombatRow → { ColorTagDot (renders the combat title's first letter;
-    │   │     dot fill is still the picked color), CombatRowMenu }
+    │   │     dot fill is still the picked color), CombatRowMenu } — the whole `CombatRow` card is
+    │   │     both the hover surface (CLS-1) and the open target (CLS-5); only the drag handle and
+    │   │     `CombatRowMenu` opt out of the open-click and are the sole drag-initiation point
+    │   │     (CLS-6)
     │   ├── Create control: header "+" icon button (desktop, replaces the desktop FAB) ·
     │   │     FAB(create) (mobile)
     │   ├── EmptyState (desktop keeps the centered "+ New Combat" button; mobile drops it —
@@ -93,12 +109,20 @@ Shared/reused leaves: **FAB**, **IconButton**, **EmptyState**, **NumberField**, 
 
 - **Mobile:** `NavSidebar` — swipe-right reveals a sidebar with links (Combats/Settings/About).
 - **Tablet:** `AppHeader` in burger mode — header with a burger menu that opens a Sheet.
-- **Desktop:** `.nav-desktop` renders three icon buttons (⚔ Combats / ⚙ Settings / ⓘ About), each
-  carrying both `aria-label` and `title`; the current destination gets `.is-current` styling.
-  Applies globally, on every screen's header — not just Combats home. On Combats home/Settings/
-  About this row lives in the shared `AppHeader`; on the Combat screen, `AppShell` skips its own
-  AppHeader (own-header guard) and `CombatHeader` renders an identical `.nav-desktop` row itself
-  (PLT-2) so the row is still present everywhere, just sourced from two different components.
+- **Desktop:** a single shared `DesktopNav.svelte` component renders three icon buttons (⚔
+  Combats / ⚙ Settings / ⓘ About), each carrying both `aria-label` and `title`; the current
+  destination gets an `aria-current="page"`-paired highlight. Applies globally, on every screen's
+  header — not just Combats home. `AppHeader.svelte` and `CombatHeader.svelte` both consume
+  `DesktopNav` directly (no duplicated markup, unit-020 follow-up on the earlier two-component
+  duplication); on the Combat screen, `AppShell` skips its own AppHeader (own-header guard) and
+  `CombatHeader` mounts `DesktopNav` itself, so the row is present everywhere, just mounted by two
+  different header components (PLT-3).
+- **Control-then-nav sectioning (PLT-3).** In both `AppHeader` and `CombatHeader`, every
+  page-control button (Combats-home's "+" create button; Setup's header-add/header-start; Active's
+  header-advance; the `⋮` overflow menu) renders **before** `DesktopNav` in DOM/visual order.
+  `DesktopNav` itself carries a `border-left` divider (`border-l border-border pl-2` in the
+  shipped component; the `.frame--desktop .nav-desktop` rule in `prototype.html`) so it always
+  reads as its own trailing section, never interleaved with the page controls.
 
 ## Combatant card
 
@@ -122,13 +146,24 @@ Card layout, leading → trailing:
 
 - **TypeStripe** — leading edge, color + `aria-label` naming the type (kept from the compact-row
   era; stripe count pc=enemy=ally=1, matching `labels.ts`'s `typeStripeCount`).
-- **Row 1** — name + expand chevron (`.chevron-btn`, a CSS-drawn rotating corner, not a glyph
-  font character) + a trailing per-card `⋮` overflow menu (Edit/Duplicate/Remove).
+- **Row 1** — name (grows, `flex:1 1 auto`) + a trailing controls cluster holding the expand
+  chevron (`.chevron-btn`, a CSS-drawn rotating corner, not a glyph font character) immediately
+  next to the per-card `⋮` overflow menu (Edit/Duplicate/Remove) — the chevron is **not** adjacent
+  to the name; it sits in that trailing cluster (CBT-2).
 - **Row 2** — big HP (`.hp-big`, current/max, tabular figures) inside a fixed-width `.hp-block`
   wrapper (so the health bar's start position never shifts with HP digit count), an inline
   top-right temp-HP badge nested in the HP block when temp HP is carried, and a 4-band health
-  bar (`flex:1 1 auto`) that stretches to fill the remaining card width.
+  bar (`flex:1 1 auto`) that stretches to fill the remaining card width. The HP number and the
+  health bar are **one unified interactive target**, no gap between the two as separate
+  clickable regions — a single rounded hover/press area (no dead space between them) that opens
+  the HP numpad, with a pointer cursor on desktop ([[../capabilities/hp]] HP-4).
 - **Row 3** — AC/PD/MD defense stats + an Init pill (`Init N` once set, `Init –` while unset).
+  The pill's hover affordance is confined to the pill control itself (no oversized surrounding
+  hover box), and the control is sized to the prototype's 24px chip dimension, not the 44px
+  touch-target default ([[../capabilities/initiative]] INI-2 — the wrapping `Button` still meets
+  the ≥44px hit-area requirement even though the visible pill it contains is smaller). The pill
+  has a **fixed width** (72px) so a 1-digit and a 2-digit value render identically wide, a
+  **pointer cursor**, and **no `min-height`** on the wrapping control.
 - **Condition chips** — filled, full 13th-Age condition name (no icons, no 2-letter codes),
   colour-coded per condition on a shared `.chip` base (round/pill shape). This file states
   *what* renders — full-name filled chips per condition, one colour token each — not the
@@ -163,8 +198,9 @@ itself — that capability-level behavior is LIF's job, not this file's.
 
 ## Numpad sheet
 
-Bottom sheet (Drawer) on mobile, positioned Dialog panel on desktop. Opened from `HpCell`.
-Contains, in DOM order: `HpSummaryHeader` (cur/max + temp, shown before entry), `EntryDisplay`
+Bottom sheet (Drawer) on mobile, a centered modal Dialog on desktop (≥1024px — HP-6). Opened by
+tapping either the current-HP number or the health bar on the combatant card (both are numpad
+triggers, [[../capabilities/hp]] HP-4). Contains, in DOM order: `HpSummaryHeader` (cur/max + temp, shown before entry), `EntryDisplay`
 (bordered field), `CommitActions` (Deal Damage / Restore HP / Set Temp HP — rendered *above* the
 digit pad; a border+colored-text recipe per action, not the prototype's literal filled
 color-mix tint — the filled tint fails WCAG-AA with the shipped token hexes, so all three commit
@@ -201,9 +237,15 @@ PLT-4).
 
 ## Combats list row
 
-`CombatRow`: color tag (`ColorTagDot`, renders the title's first letter; fill = picked color),
-title, description, trailing `⋮` (`CombatRowMenu`: Edit / Delete). Drag handle for reorder
-(svelte-dnd-action). Desktop populated list renders as a single column, not a grid.
+`CombatRow`: leading drag handle (`GripVertical`, reorder via svelte-dnd-action, wired as the
+drag-handle so drag can **only** start there — CLS-6), color tag (`ColorTagDot`, renders the
+title's first letter; fill = picked color), title, description, trailing `⋮` (`CombatRowMenu`:
+Edit / Delete). The whole `Card` is both the whole-card hover surface (CLS-1) and the
+click-to-open target (CLS-5); the drag handle and the `⋮` menu are excluded from the open-click
+(both carry `data-no-open`, guarded by a `closest()` check in the card's click handler) so they
+don't also navigate. The active search query is highlighted (`<mark>`) in both the title and the
+description wherever it matches, case-insensitively (CLS-9). Desktop populated list renders as a
+single column, not a grid.
 
 ## shadcn-svelte primitive coverage (reverse index)
 

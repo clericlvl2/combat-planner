@@ -21,9 +21,10 @@ export default defineConfig({
 		paraglideVitePlugin({
 			project: './project.inlang',
 			outdir: './src/lib/paraglide',
-			// ADR-005: locale auto-detected from the browser, switchable in Settings, persisted.
+			// ADR-005: first run always defaults to English (baseLocale) — no browser-locale
+			// autodetection; switchable in Settings, persisted to localStorage thereafter.
 			// No URL-based localization (client-only SPA) — keep locale out of the path.
-			strategy: ['localStorage', 'preferredLanguage', 'baseLocale'],
+			strategy: ['localStorage', 'baseLocale'],
 		}),
 		// ADR-004: full-shell precache, prompt-to-reload update flow. Manifest generated here.
 		SvelteKitPWA({

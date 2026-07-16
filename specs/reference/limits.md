@@ -9,19 +9,20 @@ Capability files point here rather than repeating values — see [[../capabiliti
 
 | Field | Type | Required | Placeholder | Default |
 |-------|------|----------|-------------|---------|
-| Name | text | yes (trimmed; whitespace-only blocks submit) | "Namius Name" | — |
+| Name | text | no (trimmed; empty/whitespace-only falls back to the type placeholder as the real stored name) | "Hero Name" (PC) / "Enemy" (Enemy) / "Ally" (Ally) | — |
 | Type | PC / enemy / ally | no | — | enemy |
-| Initiative bonus | number | no | 0 | 0 |
-| Max HP | number | yes | 10 | — |
-| AC | number | yes | 10 | — |
-| PD | number | yes | 10 | — |
-| MD | number | yes | 10 | — |
+| Initiative bonus | number | no | — | 0 |
+| Max HP | number | no | — | 10 |
+| AC | number | no | — | 10 |
+| PD | number | no | — | 10 |
+| MD | number | no | — | 10 |
 | Text note | text | no | "Useful notes…" | "" |
 
-The same form (pre-filled) is reused to edit an existing combatant, plus a manual-initiative
-field as a backup entry point; the manual-initiative field is also surfaced on the add form when
-adding while the combat is Active. Changing Max HP does not auto-change current HP
-([[../capabilities/hp]] HP-5).
+Max HP/Initiative bonus/AC/PD/MD render as real pre-filled editable values (not
+placeholder-styled hints) on open. The same form (pre-filled) is reused to edit an existing
+combatant, plus a manual-initiative field as a backup entry point; the manual-initiative field is
+also surfaced on the add form when adding while the combat is Active. Changing Max HP does not
+auto-change current HP ([[../capabilities/hp]] HP-5).
 
 ## Numeric ranges (clamp-on-commit)
 

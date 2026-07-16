@@ -15,7 +15,9 @@ Combats render as a vertical list; each row shows Title, Description, and a Colo
 per-row trailing `⋮` overflow menu (Edit / Delete; the Export/share item is pending under CLS-8).
 A combat with a blank/whitespace-only title renders a placeholder title instead of a blank row.
 When there are no combats to show, an empty-state view renders in place of the list: an icon, a
-short description, and a "New combat" call-to-action that creates one (same action as CLS-2).
+short description, and a "New combat" call-to-action that creates one (same action as CLS-2). On
+desktop, hovering anywhere over a combat row applies a whole-card hover highlight (see CLS-5 for
+the matching whole-card click behavior and CLS-6 for the drag-handle carve-out).
 
 **AC:**
 - Every combat row displays title, description, and its color tag.
@@ -25,6 +27,7 @@ short description, and a "New combat" call-to-action that creates one (same acti
   [[import-export]].)
 - When the combats list is empty, the empty-state view renders an icon, a description, and a
   "New combat" CTA (instead of a bare list or no content).
+- On desktop, hovering anywhere over a combat row applies a whole-card hover highlight.
 
 ## CLS-2 — Create combat
 
@@ -33,7 +36,12 @@ added at the **top** of the list. Blocked at the 100-combat cap ([[../reference/
 message. The create dialog's title reads "New combat" and its primary button reads "Create";
 the same dialog reused for editing (CLS-3) reads "Save" instead — the button label is the only
 difference between create and edit mode. A cap-error banner shown after a blocked create clears
-on any field edit (title, description, or color tag), not only when the title changes.
+on any field edit (title, description, or color tag), not only when the title changes. The
+dialog's Cancel button renders inside the dialog panel's footer, alongside the primary button.
+Title/description placeholders resolve from paraglide i18n keys. Color-tag swatch tiles are
+buttons that keep a normal hover affordance; the currently-selected tile additionally carries a
+clear, persistent selected indicator (a visible ring/outline) distinct from hover, since the
+color tag is a form field whose current choice must stay visible.
 
 **AC:**
 - A newly created combat appears at the top of the list, in `state: setup` ([[lifecycle]] LIF-1).
@@ -42,6 +50,12 @@ on any field edit (title, description, or color tag), not only when the title ch
   dialog in edit mode (CLS-3) reads "Save".
 - Once the cap-error banner is showing, editing any field (title, description, or color tag)
   clears it — not only editing the title.
+- The Cancel button renders inside the dialog panel's footer, not outside the modal frame.
+- Color-tag swatch tiles show a normal hover affordance, and the selected tile carries a
+  persistent visible selected indicator distinct from hover; clicking a tile sets the color tag
+  and moves the indicator.
+- The title and description placeholders resolve from paraglide message keys, not hardcoded
+  string literals.
 
 ## CLS-3 — Edit combat
 
@@ -63,23 +77,29 @@ Undo scope, see [[undo-redo]] UND-2). Deletes the combat and everything owned by
 
 ## CLS-5 — Open a combat
 
-Tapping a row opens that combat. Navigating directly to a non-existent or stale combat id (e.g.
-a deleted combat's old URL) shows a styled not-found state instead of a bare error, with a
-visible, labelled control returning to the Combats list ([[platform]] PLT-10 owns the separate,
-broader app-level error boundary for thrown errors; this is the expected not-found case for a
-missing id, not a thrown error).
+The whole combat card is clickable/tappable to open that combat, **except** the drag handle
+(CLS-6) and the `⋮` menu, which do not navigate. Navigating directly to a non-existent or stale
+combat id (e.g. a deleted combat's old URL) shows a styled not-found state instead of a bare
+error, with a visible, labelled control returning to the Combats list ([[platform]] PLT-10 owns
+the separate, broader app-level error boundary for thrown errors; this is the expected
+not-found case for a missing id, not a thrown error).
 
 **AC:**
-- Tapping anywhere on a combat row (outside its `⋮` menu) navigates to that combat.
+- Tapping/clicking anywhere on a combat card navigates to that combat, except taps on the drag
+  handle or the `⋮` menu, which do not navigate.
 - Navigating to `/combats/<nonexistent-id>` renders a not-found state including a visible,
   labelled control that navigates back to `/combats`.
 
 ## CLS-6 — Manual reorder
 
-Drag to reorder; the new order persists (`listOrder`).
+Drag to reorder; the new order persists (`listOrder`). Drag is initiated **only** from the
+`lucide` grip-vertical handle — the grab/drag cursor affordance appears on the handle only, not
+on the rest of the card (the rest of the card is reserved for the CLS-5 open-combat tap).
 
 **AC:**
 - Dragging a row to a new position updates the list order, and the order survives a reload.
+- Drag-to-reorder starts only from the grip handle; the grab/drag cursor is present on the
+  handle and not on the rest of the card.
 
 ## CLS-7 — First launch
 
@@ -103,13 +123,17 @@ Export/import of a single combat or all combats is fully specified in [[import-e
 
 ## CLS-9 — Search
 
-A `SearchField` above the list filters visible rows by title, in real time, case-insensitively.
-It is view-local only: the query is never persisted (no store/domain write, ADR-002) and is lost
-on navigation/reload. Shown only while the (unfiltered) list is non-empty; hidden entirely on the
-empty-state screen (CLS-7/empty combats list) since there's nothing to search.
+A `SearchField` above the list filters visible rows by **title or description**, in real time,
+case-insensitively, and highlights the matched substring in the rendered row. It is view-local
+only: the query is never persisted (no store/domain write, ADR-002) and is lost on
+navigation/reload. Shown only while the (unfiltered) list is non-empty; hidden entirely on the
+empty-state screen (CLS-7/empty combats list) since there's nothing to search. The match
+highlight (`<mark>`) has square corners — no rounded-corner styling.
 
 **AC:**
-- Typing in the search field filters the visible combat rows to those whose title contains the
-  query (case-insensitive); clearing the field restores the full list.
+- Typing in the search field filters the visible combat rows to those whose title or
+  description contains the query (case-insensitive), with the matched substring highlighted in
+  the rendered row; clearing the field restores the full list.
+- The search match highlight has square corners (no rounded-corner class).
 - The search field is not rendered when the combats list is empty.
 - The typed query is never written to the store/Dexie and does not survive a reload.

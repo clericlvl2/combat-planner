@@ -68,7 +68,10 @@
 	<Button
 		bind:ref={anchor}
 		variant="ghost"
-		class={cn('h-auto min-h-11 min-w-11 rounded-full p-1.5', className)}
+		class={cn(
+			'group h-auto w-[4.5rem] cursor-pointer rounded-full bg-transparent p-1.5 hover:bg-transparent dark:hover:bg-transparent',
+			className,
+		)}
 		disabled={!editable}
 		aria-label={m['a11y.initCell.roll']({ name: combatant.name })}
 		aria-haspopup="dialog"
@@ -79,7 +82,7 @@
 		onclick={tap}
 	>
 		<span
-			class="chip init-pill inline-flex h-6 items-center gap-[5px] rounded-full border border-border bg-secondary px-2.5 text-sm text-muted-foreground tabular-nums"
+			class="chip init-pill flex h-6 w-full items-center justify-center gap-[5px] rounded-full border border-border bg-secondary px-2.5 text-sm text-muted-foreground tabular-nums group-hover:bg-muted group-hover:text-foreground"
 		>
 			Init
 			<b class="text-foreground">{display}</b>

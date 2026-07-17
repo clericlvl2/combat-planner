@@ -78,21 +78,18 @@
 		<h2 class="my-2 text-xs font-medium tracking-wider text-muted-foreground uppercase">
 			{m['settings.group.appearance']()}
 		</h2>
-		<div class="flex items-center justify-between gap-3 py-2">
-			<span class="shrink-0 text-sm">{m['settings.theme']()}</span>
-			<Select type="single" value={store.settings.theme} onValueChange={onThemeChange}>
-				<SelectTrigger class="h-11 flex-1 justify-between" aria-label={m['settings.theme']()}>
-					{themeLabel[store.settings.theme]()}
-				</SelectTrigger>
-				<SelectContent>
-					{#each themes as theme (theme)}
-						<SelectItem value={theme} label={themeLabel[theme]()}>
-							{themeLabel[theme]()}
-						</SelectItem>
-					{/each}
-				</SelectContent>
-			</Select>
-		</div>
+		<Select type="single" value={store.settings.theme} onValueChange={onThemeChange}>
+			<SelectTrigger class="h-11 w-full justify-between" aria-label={m['settings.theme']()}>
+				{themeLabel[store.settings.theme]()}
+			</SelectTrigger>
+			<SelectContent>
+				{#each themes as theme (theme)}
+					<SelectItem value={theme} label={themeLabel[theme]()}>
+						{themeLabel[theme]()}
+					</SelectItem>
+				{/each}
+			</SelectContent>
+		</Select>
 	</section>
 
 	<section class="rounded-[var(--radius)] border border-border bg-card px-4 py-2">

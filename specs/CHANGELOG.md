@@ -1,5 +1,10 @@
 # Changelog
 
+> **Note (2026-07-18):** as of the code-SOT workflow migration (`W-001`), this file records
+> USER-FACING RELEASES ONLY. All existing per-task rows below are frozen as historical record —
+> per-task changelog rows are discontinued going forward; git commit `Work: W-NNN` trailers now
+> own task-level history.
+
 Append-only changelog for Combat Planner spec-driven development. `/spec-close` adds one row
 per closed change unit.
 

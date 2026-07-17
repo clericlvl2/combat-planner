@@ -1,61 +1,33 @@
 # Backlog
 
-Single structured queue for tasks with no home in an active change unit yet. A task lives in
-exactly one place per state: **idea → this file · active → `specs/changes/NNN-slug/` · done →
-changelog row + archived unit**.
+next_id: W-013
 
-## Milestones
-
-| Milestone | Slice | Product value | Status |
-|---|---|---|---|
-| **M1** | Store seam (ADR-002) + Dexie persist (ADR-003) + migration transforms (ADR-013), test-first. | Core state machine + durable data; nothing real without it. | done |
-| **M2** | Combat screen vertical slice — Setup→Active, combatant row (compact/expanded), init tap/long-press, HP numpad, Advance, conditions. | The heartbeat (95% of play). End of M2 = dogfoodable: one hardcoded combat, no polish/i18n/PWA. | code-complete |
-| **M3** | Combats home — CRUD, drag reorder, first-launch, undo/redo wired. | Multi-encounter prep. | next |
-| **M4** | PWA shell (ADR-004) — offline precache, install hint, update toast. | Delivers "installable offline"; real app on the phone, not a localhost tab. | — |
-| **M5** | Settings + About + i18n wiring (Paraglide ADR-005; strings already cataloged). | Settings/About + 6 languages. | — |
-| **M6** | a11y + theming polish (WCAG-AA, dark/light, focus, ≥44px) + full Test Plan pass + CI gate. | Ship quality; one-handed / dim-room promises verified. | — |
-| **Ship v1** | Deploy static SPA on Vercel (ADR-007), PWA installable. | — | — |
-
-Milestone = roadmap grain; backlog row = task grain; a row may name its milestone in the task
-text.
-
-| ID | Task | Area | Size | Status | Unit |
-|----|------|------|------|--------|------|
-| B-001 | M2 component tests — acceptance-matrix component-layer rows (Test caveat) | TEST | M | done | `specs/changes/001-m2-component-tests-and-dogfood/` |
-| B-002 | Live-browser dogfood of round 13 — 2–3 real fights, log friction (★ Dogfood gate) | TEST | M | done | `specs/changes/001-m2-component-tests-and-dogfood/` |
-| B-006 | Decide automated axe-style a11y scan for PLT-5 (test-plan gap) | PLT | S | idea | — |
-| B-008 | Visual design: screen pass — prototype app screens/states (pre-build gap) | DESIGN | M | done | `specs/archive/003-ui-design-prototype/` |
-| B-009 | Desktop layout — revisit before M6 (pre-build gap) | DESIGN | M | done | `specs/archive/003-ui-design-prototype/` |
-| B-010 | Monster / encounter library (v2 backlog #1) | CBT | L | v2 | — |
-| B-011 | Saved party template — candidate v1.5 (v2 backlog #2) | CBT | M | v2 | — |
-| B-012 | CombatantRow temp-HP badge always visible; `combatants.md` CBT-2 says only after expand — doc/code mismatch, fix one (found in 001 Phase 1) | CBT | S | done | `specs/archive/016-temp-hp-badge-doc-fix/` |
-| B-013 | NumberField digit-cap makes max-overflow clamp unreachable via keyboard entry — decide if intended or needs a paste/programmatic-set test path (found in 001 Phase 2) | TEST | S | done | `specs/archive/012-numberfield-input-fixes/` |
-| B-015 | `/spec-close` has no commit step — unit 001 archived with everything left uncommitted in the working tree; add an explicit commit stage (what/when/message convention) to the close lifecycle. Resolved by the 2026-07-03 SDD restructure (spec-close commit stage). | INFRA | S | done | — |
-| B-016 | `src/**` code comments cite dead pre-migration doc sections (`UX §`, `Component Inventory §`, `Data Model §` — archive deleted 2026-07-03) — repoint to capability IDs or drop (found in SDD restructure sweep) | INFRA | S | done | `specs/archive/017-repoint-dead-doc-citations/` |
-| B-017 | Visual design: design tokens — bake approved prototype look into `src/routes/layout.css` (real WCAG-AA token set, replaces STUB). Split from B-008; belongs to design-chain unit C. | DESIGN | M | done | `specs/archive/005-design-tokens/` |
-| B-018 | Disable combatant toggle — disabled combatant skipped by turn advance, card renders pale (opacity ~80%) | CBT | S | idea | — |
-| B-019 | App-data export/import — all-combats + single-combat, fail-safe import, shared transforms (flow F5). Deferred past v1: unbundled from M5, descoped from the prototype + Settings Data in unit 004 (round 2); `import-export.md` / CLS-8 / CLS-1 to reconcile at close-out. | IMP | L | v2 | — |
-| B-020 | Task spec scoping — refactoring/rn units hit 150k+ tokens; doc guidance to keep specs/changes/NNN chunks ≤120k so agents don't overflow. Affects implementer dispatch & cost. | INFRA | M | idea | — |
-| B-021 | App headers unified — Combat, Combats List, Settings screens use inconsistent header styles/spacing; standardize layout & visuals per design-system. Subsumed into a full cross-screen UI-fidelity revision. | DESIGN | M | done | `specs/archive/019-ui-fidelity-grand-revision/` |
-| B-022 | Remove "Jump to Turn" button — Combat screen initiative/turn model doesn't use it; dead UI. | CBT | S | done | `specs/archive/011-remove-jump-to-turn/` |
-| B-023 | Smooth animations — interactive aspects (tap, expand, damage entry, condition toggle, etc.) lack motion; add consistent transition library. | DESIGN | L | idea | — |
-| B-024 | First-launch UX — app opening experience: onboarding flow, hints, tutorial or zero-state guidance. Brainstorm before spec. | DESIGN | M | idea | — |
-| B-025 | Update credentials — About screen credits/attribution needs current team/sources. | SET | S | idea | — |
-| B-026 | Routing edge cases — fix undefined URL states, missing param guards, back-button crashes (collect examples first). | INFRA | S | done | `specs/archive/010-route-error-boundary/` |
-| B-027 | Unified design tokens — one shared `specs/design/tokens.css` (SSOT) `@import`ed by both prototypes + `layout.css`; kill spacing/component-dim drift; move theming to `[data-theme]` attribute to enable N themes. | DESIGN | M | done | `specs/archive/014-unified-design-tokens/` |
-| B-028 | Light-theme WCAG-AA contrast pass — fix pre-existing sub-4.5:1 normal-text pairs surfaced by unit 014: `--text-faint` (both themes), `--health-wounded`/`--health-bloodied`, and combat swatches `blue`/`orange`/`green`/`neutral`/`teal` (light). Rendered as small text in SearchField, NumpadSheet HP-log badges/diffs/buttons, and condition chips. Adjust prototype design-source hexes + re-verify AA per value. | DESIGN | M | done | `specs/archive/015-light-theme-aa-contrast/` |
-| B-029 | Combatant card type is visual-only after unit 021 — the type-color dot is `aria-hidden` and the old stripe's `aria-label` (deleted `a11y.typeBadge` key) is gone, so screen readers no longer announce PC/Enemy/Ally on the card. PLT-5 documents this honestly; decide sr-only label on the dot vs. accept. | PLT | S | idea | — |
-| B-030 | NumberField `onchange`+`onblur` both call `commit()` — a blur after a change re-clamps the already-valid DOM value and clears `clamped`, so the red destructive invalid ring (unit 021 red-ring-only validation) can flicker off on blur in production. Latent wiring quirk; decide fix (dedupe the commit / keep clamped sticky). | CBT | S | idea | — |
+| ID | Pri | Loop | State | Outcome | Depends | Plan |
+|----|-----|------|-------|---------|---------|------|
+| W-001 | — | large | active | Code SOT workflow migration | — | `.claude/plans/2026-07-18-code-sot-workflow-migration.md` |
+| W-002 | S | small | inbox | Decide automated axe-style a11y scan for accessibility coverage gap | — | — |
+| W-003 | L | large | inbox | Monster / encounter library (v2) | — | — |
+| W-004 | M | small | inbox | Saved party template (v2 candidate) | — | — |
+| W-005 | S | small | inbox | Disable-combatant toggle — skipped by turn advance, card renders pale | — | — |
+| W-006 | L | large | inbox | App-data export/import — all-combats + single-combat, fail-safe import (v2) | — | — |
+| W-007 | M | small | inbox | Task spec scoping — keep large-task chunks small enough agents don't overflow context | — | — |
+| W-008 | L | large | inbox | Smooth animations — motion for tap/expand/damage-entry/condition-toggle interactions | — | — |
+| W-009 | M | small | inbox | First-launch UX — onboarding/hints/tutorial or zero-state guidance (needs brainstorm) | — | — |
+| W-010 | S | small | inbox | Update About-screen credits/attribution | — | — |
+| W-011 | S | small | inbox | Combatant card type is visual-only — screen readers no longer announce PC/Enemy/Ally; decide sr-only label vs. accept | — | — |
+| W-012 | S | small | inbox | NumberField onchange+onblur double-commit can flicker the invalid ring off on blur; decide fix | — | — |
 
 **Fields**
 
-- **ID**: `B-001`… stable, never reused.
-- **Area**: capability prefix (`HP`, `PLT`…) or `TEST` / `DESIGN` / `INFRA`.
-- **Size**: S / M / L.
-- **Status**: `idea` (needs shaping) · `ready` (could be drafted now) · `in-unit` (promoted;
-  Unit column links `specs/changes/NNN-slug/`) · `done` · `v2` (deferred past v1).
-- **Unit**: link once promoted, else `—`.
+- **ID**: `W-001`… stable, never reused; `next_id` above tracks the next one to assign.
+- **Pri**: S / M / L, a rough size/priority signal, not a hard queue order.
+- **Loop**: `small` (`/work-small`) or `large` (`/work-large`) — which loop will run this task.
+- **State**: `inbox` (unapproved idea) · `ready` (user-approved) · `active` (claimed) ·
+  `blocked` (needs external decision). No `done` state — completed rows are deleted; the
+  commit trailer `Work: W-NNN` owns history.
+- **Depends**: another `W-NNN` this row is blocked on, or `—`.
+- **Plan**: path to the row's plan file once one exists (large loop only), else `—`.
 
 **Non-goals** (not tasks, listed so nobody re-adds them as backlog rows): multi-device
 sync/cloud, rules automation, other game systems, live-session sharing — deliberate product
-non-goals (see git history for the original requirements doc).
+non-goals, see `specs/PRODUCT.md`.

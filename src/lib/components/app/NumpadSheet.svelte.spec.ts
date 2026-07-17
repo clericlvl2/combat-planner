@@ -5,12 +5,12 @@ import type { Combatant } from '$lib/db/types';
 import { createCombatant } from '$lib/stores/domain/factories';
 import NumpadSheet from './NumpadSheet.svelte';
 
-// HP-3: digit entry -> commit action callbacks fire with the entered number; empty entry is a no-op.
+// Digit entry -> commit action callbacks fire with the entered number; empty entry is a no-op.
 function makeCombatant(): Combatant {
 	return createCombatant({ name: 'Ogre', maxHp: 40 }, 0, () => 'ogre');
 }
 
-describe('NumpadSheet (HP-3)', () => {
+describe('NumpadSheet', () => {
 	it('fires onDamage with the entered number on Deal Damage', async () => {
 		const onDamage = vi.fn();
 		const onRestore = vi.fn();

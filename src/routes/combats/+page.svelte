@@ -1,6 +1,5 @@
 <!--
-  Combats home (specs/capabilities/combats-list.md CLS, specs/reference/component-inventory.md
-  "Combats list row" section) — the M3 real home: CombatList (Phase 5) + create
+  Combats home — the M3 real home: CombatList (Phase 5) + create
   FAB + EmptyState ("No combats yet") + CombatFormDialog (Phase 3) shared by create/edit. Row
   callbacks from CombatList (onOpen/onEdit/onDelete) drive navigation + this page's own dialog
   state; delete is confirm-gated inside CombatRowMenu (Phase 4), not here.
@@ -25,7 +24,7 @@
 	let editId = $state<string | null>(null);
 	const editCombat = $derived(editId ? (store.getCombat(editId) ?? null) : null);
 
-	// CLS-9 — real-time title-or-description filter, view-local only (never persisted, ADR-002).
+	// Real-time title-or-description filter, view-local only (never persisted, ADR-002).
 	let query = $state('');
 	const filteredCombats = $derived.by(() => {
 		const q = query.trim().toLowerCase();

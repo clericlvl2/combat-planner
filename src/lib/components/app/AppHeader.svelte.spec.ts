@@ -3,7 +3,7 @@ import { cleanup, render } from 'vitest-browser-svelte';
 import { m } from '$lib/i18n';
 import AppHeader from './AppHeader.svelte';
 
-// PLT-3: tablet/desktop chrome — burger opens NavSidebar (via the parent-owned onOpenNav
+// Tablet/desktop chrome — burger opens NavSidebar (via the parent-owned onOpenNav
 // callback), desktop's inline nav-desktop icon row exposes the same three destinations.
 
 afterEach(() => {

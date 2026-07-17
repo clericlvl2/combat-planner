@@ -1,12 +1,12 @@
 <!--
-  AppHeader (component-inventory.md "Hierarchy" / "Navigation placement per breakpoint", PLT-3) — the
+  AppHeader — the
   app-wide chrome bar mounted by AppShell above every non-Combat route outlet (the Combat screen
   ships its own CombatHeader — back/title/overflow — and AppShell skips this bar there, see
   AppShell's routeHasOwnHeader guard). Below the desktop breakpoint it renders a burger button
   that opens NavSidebar (tablet's "burger → Sheet" mode, the same overlay NavSidebar's own
   swipe-right gesture opens on mobile); at the desktop breakpoint it renders the shared DesktopNav
-  component after any page-specific header action, as a visually distinct trailing section (PLT-3
-  AC). Page-specific header actions (e.g. Combats home's desktop "+" create button, PLT-3) are each
+  component after any page-specific header action, as a visually distinct trailing section.
+  Page-specific header actions (e.g. Combats home's desktop "+" create button) are each
   route's own concern, not this shared chrome's, and render before the nav group.
 -->
 <script lang="ts">

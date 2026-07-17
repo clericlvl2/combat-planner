@@ -4,7 +4,7 @@ import type { Combatant } from '$lib/db/types';
 import { createCombatant } from '$lib/stores/domain/factories';
 import HealthBar from './HealthBar.svelte';
 
-// HP-1/HP-4: fill/temp-fill percentages per healthStatus band, clamp behavior at -maxHp, and the
+// Fill/temp-fill percentages per healthStatus band, clamp behavior at -maxHp, and the
 // reverse/alarm ("ml-auto" + bg-health-dead) styling that only applies once dead.
 function combatant(over: Partial<Combatant> = {}): Combatant {
 	return { ...createCombatant({ name: 'Ogre', maxHp: 100 }, 0, () => 'ogre'), ...over };
@@ -14,7 +14,7 @@ function widthPercent(el: Element): number {
 	return Number.parseFloat((el as HTMLElement).style.width);
 }
 
-describe('HealthBar (HP-1, HP-4)', () => {
+describe('HealthBar', () => {
 	it('full band: fills 100%, no temp segment, full color, correct a11y label', async () => {
 		const screen = render(HealthBar, { combatant: combatant({ currentHp: 100 }) });
 

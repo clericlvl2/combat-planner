@@ -1,7 +1,6 @@
 /**
- * Entity factories — produce well-formed entities with the defaults from
- * specs/reference/limits.md (CBT-2, HP-1). Pure; ids/timestamps injectable for deterministic
- * tests.
+ * Entity factories — produce well-formed entities with their default values.
+ * Pure; ids/timestamps injectable for deterministic tests.
  */
 import {
 	type ColorTag,
@@ -30,7 +29,7 @@ export interface CombatantInput {
 	name: string;
 	type?: CombatantType;
 	initiativeBonus?: number;
-	/** Mid-combat add only (CBT-3) — DM hand-enters a known value; left blank, it auto-rolls. */
+	/** Mid-combat add only — DM hand-enters a known value; left blank, it auto-rolls. */
 	initiative?: number;
 	maxHp?: number;
 	ac?: number;
@@ -39,7 +38,7 @@ export interface CombatantInput {
 	note?: string;
 }
 
-/** New combatant: currentHp = maxHp, temp 0, init "-" (unless given), no conditions, empty hpLog (CBT-3 addCombatant). */
+/** New combatant: currentHp = maxHp, temp 0, init "-" (unless given), no conditions, empty hpLog. */
 export function createCombatant(
 	input: CombatantInput,
 	addOrder: number,
@@ -73,7 +72,7 @@ export interface CombatInput {
 	colorTag?: ColorTag;
 }
 
-/** New combat: Setup, round 1 (hidden), no active turn, empty roster + history (CLS-2 createCombat). */
+/** New combat: Setup, round 1 (hidden), no active turn, empty roster + history. */
 export function createCombat(
 	input: CombatInput = {},
 	listOrder = 0,
@@ -98,7 +97,7 @@ export function createCombat(
 	};
 }
 
-/** Singleton settings with the SET-1/SET-2 defaults (language defaulting is the boot layer's job). */
+/** Singleton settings with default values (language defaulting is the boot layer's job). */
 export function createSettings(overrides: Partial<Omit<Settings, 'id'>> = {}): Settings {
 	return {
 		id: SETTINGS_ID,

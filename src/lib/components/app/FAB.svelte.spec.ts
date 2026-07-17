@@ -3,8 +3,8 @@ import { expect, test, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import FAB from './FAB.svelte';
 
-// component-inventory.md "Floating action button (FAB)": shared bottom-right thumb-zone Button — icon + a11y label + onclick,
-// disabled forwarded (e.g. the Active "advance" FAB at the round-wrap boundary, TRE-3).
+// Shared bottom-right thumb-zone Button — icon + a11y label + onclick,
+// disabled forwarded (e.g. the Active "advance" FAB at the round-wrap boundary).
 
 test('renders an accessible button with the given label and fires onclick', async () => {
 	const onclick = vi.fn();

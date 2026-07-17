@@ -1,7 +1,6 @@
 <!--
-  CombatRowMenu (component-inventory.md "Combats list row", CLS-1) — CombatRow's trailing `⋮` menu.
-  Exactly Edit and Delete — no Export/share item, no placeholder (CLS-1 acceptance: "trailing ⋮
-  menu with exactly Edit and Delete"). Emits intent only; the confirm-gating for Delete lives in
+  CombatRowMenu — CombatRow's trailing `⋮` menu.
+  Exactly Edit and Delete — no Export/share item, no placeholder. Emits intent only; the confirm-gating for Delete lives in
   CombatRow, not here.
 -->
 <script lang="ts">

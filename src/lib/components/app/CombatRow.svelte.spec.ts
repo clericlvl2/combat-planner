@@ -3,8 +3,8 @@ import { render } from 'vitest-browser-svelte';
 import { createCombat } from '$lib/stores/domain/factories';
 import CombatRow from './CombatRow.svelte';
 
-// CLS-1/CLS-4/CLS-5: row shows title/description/color tag, row-body tap emits open, and delete
-// is confirm-gated through the reused ConfirmDialog (UND-2: no Undo affordance is offered here).
+// Row shows title/description/color tag, row-body tap emits open, and delete
+// is confirm-gated through the reused ConfirmDialog (no Undo affordance is offered here).
 
 function fixtureCombat() {
 	return createCombat({ title: 'Goblin ambush', description: 'At the bridge', colorTag: 'red' });

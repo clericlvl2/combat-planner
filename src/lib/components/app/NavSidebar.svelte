@@ -1,9 +1,9 @@
 <!--
-  NavSidebar (component-inventory.md "Hierarchy" / "Navigation placement per breakpoint", PLT-3) — the
+  NavSidebar — the
   mobile/tablet nav overlay: links to Combats / Settings / About. Opened either by AppHeader's
   burger button (bound `open`, tablet's mode) or by swiping right from the left screen edge on
-  touch devices (mobile's mode, PLT-3 AC "swiping right on mobile opens a sidebar containing
-  links to Combats, Settings, and About"). Desktop relies on AppHeader's inline `.nav-desktop`
+  touch devices (mobile's mode: swiping right on mobile opens a sidebar containing
+  links to Combats, Settings, and About). Desktop relies on AppHeader's inline `.nav-desktop`
   icon row instead — this component still mounts there but is only reachable by an edge swipe.
 -->
 <script lang="ts">
@@ -26,7 +26,7 @@
 		return path.startsWith(href);
 	}
 
-	// Swipe-right-from-left-edge gesture (PLT-3's mobile trigger). Touch-only — it never
+	// Swipe-right-from-left-edge gesture (the mobile nav trigger). Touch-only — it never
 	// interferes with mouse/pointer interaction on tablet/desktop, which rely on the burger
 	// button or the inline nav-desktop icons instead.
 	const EDGE_ZONE_PX = 24;

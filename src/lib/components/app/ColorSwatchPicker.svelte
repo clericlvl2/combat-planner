@@ -1,5 +1,5 @@
 <!--
-  ColorSwatchPicker (component-inventory.md, CLS-2, ADR-012) — selectable row of the 8 preset color-tag
+  ColorSwatchPicker (ADR-012) — selectable row of the 8 preset color-tag
   swatches, used by CombatFormDialog (create/edit). Single-select `ToggleGroup` (same pattern as
   CombatantForm's type toggle); each item wraps a `ColorTagDot` so the selected swatch is never
   color-alone (an a11y label + selected outline both carry the state).

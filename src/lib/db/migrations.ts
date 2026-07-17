@@ -52,7 +52,7 @@ function migrateCombatantV2(raw: RawCombatant): RawCombatant {
 }
 
 /** A v1 combat carried `escalationOverride: number | 'none'`; v2 replaces it with a plain,
- *  always-set `escalation: number` (escalation die is stored, not auto-derived — TRE-6). */
+ *  always-set `escalation: number` (escalation die is stored, not auto-derived). */
 function migrateCombatV2(raw: RawCombat): RawCombat {
 	const { escalationOverride, ...rest } = raw as RawCombat & {
 		escalationOverride?: number | 'none';
@@ -87,7 +87,7 @@ export const transforms: Record<number, Transform> = {
 
 /**
  * Forward-migrate older RAW data to the current `DATA_VERSION` through the chained transforms,
- * BEFORE read-time defaulting; refuse a newer file (IMP-5 / ADR-013). One runner, two callers.
+ * BEFORE read-time defaulting; refuse a newer file (ADR-013). One runner, two callers.
  */
 export function migrate(data: RawAppData): RawAppData {
 	const fileVersion = data.dataVersion ?? DATA_VERSION;
@@ -147,8 +147,7 @@ function normalizeSettings(raw: Partial<Settings> | undefined): Settings {
 /**
  * Forward-migrate a loosely-typed parsed payload (import file or DB rows) through the
  * shape-incompatible transforms FIRST — while legacy field names are still present — THEN coerce
- * into a valid AppData with all additive fields defaulted. Shared by load + import (ADR-013,
- * IMP-3).
+ * into a valid AppData with all additive fields defaulted. Shared by load + import (ADR-013).
  */
 export function normalizeAppData(raw: RawAppData): AppData {
 	const migrated = migrate(raw);

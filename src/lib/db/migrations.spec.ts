@@ -24,7 +24,7 @@ function appData(over: Partial<AppData> = {}): AppData {
 	};
 }
 
-describe('migrate runner (ADR-013, IMP-3)', () => {
+describe('migrate runner (ADR-013)', () => {
 	it('passes a current-version file through unchanged', () => {
 		const data = appData();
 		const out = migrate(data);

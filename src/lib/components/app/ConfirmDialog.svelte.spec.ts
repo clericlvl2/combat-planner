@@ -2,7 +2,7 @@ import { afterEach, expect, test, vi } from 'vitest';
 import { cleanup, render } from 'vitest-browser-svelte';
 import ConfirmDialog from './ConfirmDialog.svelte';
 
-// CLS-4: destructive confirm gate. Restyle-only change (Phase 4) — covers the behavior contract
+// Destructive confirm gate. Restyle-only change (Phase 4) — covers the behavior contract
 // so the visual pass can't silently break the confirm/cancel callbacks or the gating itself.
 
 afterEach(() => {

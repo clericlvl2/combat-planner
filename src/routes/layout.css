@@ -11,7 +11,7 @@
  * Source of truth for every raw token (palette + scales + component dims):
  * src/lib/styles/tokens.css, imported above — no value is re-typed here. This
  * file only maps those raw tokens onto the shadcn semantic aliases and the
- * Tailwind `@theme inline` utility layer. See PLT-5 for the contrast contract.
+ * Tailwind `@theme inline` utility layer.
  * ------------------------------------------------------------------------- */
 
 :root {
@@ -136,7 +136,7 @@
 	--color-on-semantic: var(--on-semantic);
 }
 
-/* Shared desktop content container (PLT-2) — caps routed body content at --content-max
+/* Shared desktop content container — caps routed body content at --content-max
  * (768px) and centers it with gutters on wider screens. Horizontal gutter padding ensures
  * header/body content never touches the viewport left/right edges at cap width (fixes the
  * combat-screen header being flush-clipped). Nested screens (Settings, About) keep their own
@@ -148,7 +148,7 @@
 	padding-inline: var(--space-3);
 }
 
-/* Wide sibling of `.content-container` (PLT-2) — caps the Combat header chrome at
+/* Wide sibling of `.content-container` — caps the Combat header chrome at
  * --content-max-wide (1024px) instead of --content-max (768px). Body content, the
  * Round/Escalation sub-bar, and the cards stay at --content-max via `.content-container`. */
 @utility content-container-wide {
@@ -166,7 +166,7 @@
 		@apply bg-background text-foreground;
 	}
 
-	/* PLT-2 / PLT-5: suppress the visible focus ring for pointer/touch focus on form
+	/* Suppress the visible focus ring for pointer/touch focus on form
 	 * controls (a mobile tap otherwise leaves a lingering ring that reads as a stuck
 	 * outline), while keyboard `:focus-visible` (Tab) still shows the shared --ring
 	 * token everywhere. Scoped to native controls and their shadcn [data-slot]

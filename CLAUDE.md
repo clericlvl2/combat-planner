@@ -1,8 +1,8 @@
 # Combat Planner — Constitution
 
 Local-only, offline-first 13th Age initiative tracker (SvelteKit/Svelte 5 PWA). No backend, no
-telemetry, single DM, single device. Full product/rules/data context lives in `specs/` — this
-file is the compressed operating manual every session/agent loads first.
+telemetry, single DM, single device. Shipped and live. Code is the source of truth for behavior;
+`specs/` holds only ADRs, product goals, backlog, and domain glossary — see `specs/README.md`.
 
 ## Stack lock (ADRs)
 
@@ -41,41 +41,6 @@ Call `$state.snapshot()` on runes-backed state before passing it to pure domain 
 Dexie — raw `$state` proxies throw `DataCloneError` on persist. This is the single most common
 footgun in this codebase; check it first when a Dexie write throws.
 
-## Doc rules
-
-One fact, one owner file; every other mention is a pointer, never a copy. Requirements live in
-`specs/capabilities/*.md` (stable IDs, inline acceptance criteria); cross-cutting facts live in
-`specs/reference/*.md`. See `specs/README.md` for the full layout and the change-unit lifecycle.
-
-| Fact | Owner |
-|------|-------|
-| Lifecycle (Setup/Active, Start, Clear/Restart) | `specs/capabilities/lifecycle.md` (LIF) |
-| Initiative (roll/manual/lock, sort, tiebreak) | `specs/capabilities/initiative.md` (INI) |
-| Turns, rounds, escalation die | `specs/capabilities/turns-rounds-escalation.md` (TRE) |
-| HP (damage/heal/temp, bands, numpad) | `specs/capabilities/hp.md` (HP) |
-| HP change log | `specs/capabilities/hp-log.md` (LOG) |
-| Undo/redo model | `specs/capabilities/undo-redo.md` (UND) |
-| Conditions | `specs/capabilities/conditions.md` (CND) |
-| Combatants (fields, add/edit/duplicate/remove, caps) | `specs/capabilities/combatants.md` (CBT) |
-| Combats list (CRUD, reorder, color tags, first launch) | `specs/capabilities/combats-list.md` (CLS) |
-| Import/export | `specs/capabilities/import-export.md` (IMP) |
-| Settings (language/theme/reset, About) | `specs/capabilities/settings.md` (SET) |
-| Platform (offline, PWA, responsive, a11y, perf) | `specs/capabilities/platform.md` (PLT) |
-| Numeric limits & caps | `specs/reference/limits.md` |
-| 13th Age glossary & conditions | `specs/reference/glossary-conditions.md` |
-| Component catalog & control placement | `specs/reference/component-inventory.md` |
-| i18n key catalog | `specs/reference/i18n-catalog.md` |
-| Test coverage index | `specs/reference/acceptance-matrix.md` |
-| Tech/stack choices | `specs/adr/README.md` (ADR-001..013) |
-| Changelog | `specs/CHANGELOG.md` |
-| Milestones / roadmap / task backlog | `specs/backlog.md` |
-
-## Process
-
-All feature/fix work flows through `specs/` — see `specs/README.md` for the change-unit
-lifecycle and which agent does what. Don't hand-orchestrate a task that already has a `/spec-*`
-skill for it.
-
 ## Paraglide rule
 
 Never hand-edit `src/lib/paraglide/*` — it is generated. Edit `messages/*.json`, then
@@ -85,3 +50,14 @@ regenerate (`npm run prepare` / build triggers it).
 
 **Shipped code is design truth.** Token values live in `src/lib/styles/tokens.css`; component
 structure/placement is read from the components themselves. No design prototypes exist.
+
+## Work
+
+`specs/backlog.md` is the work queue (`W-NNN` rows). Two loops drive it: `/work-small` for
+low-risk changes, `/work-large` for everything else; `/work-next` picks the next row and runs
+it through the right loop.
+
+## History
+
+Linear history — rebase + fast-forward, no merge commits. Every work commit carries a
+`Work: W-NNN` trailer.

@@ -2,7 +2,7 @@ import { expect, test, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import ConditionPicker from './ConditionPicker.svelte';
 
-// CND-2: toggling a preset condition on fires onAdd, toggling an applied one off fires onRemove,
+// Toggling a preset condition on fires onAdd, toggling an applied one off fires onRemove,
 // and applied chips render distinctly (data-state) from unapplied presets (ADR-009 component layer).
 
 test('toggling an unapplied preset fires onAdd with that condition', async () => {

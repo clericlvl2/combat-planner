@@ -6,7 +6,7 @@ import { createCombat } from '$lib/stores/domain/factories';
 import CombatHeader from './CombatHeader.svelte';
 import type { CombatController } from './controller';
 
-// TRE-5: RoundCounterControl's edit popover only calls controller.editRound (never
+// RoundCounterControl's edit popover only calls controller.editRound (never
 // setEscalation); undo/redo overflow items disable at their respective stack's empty end.
 
 // controller.ts's own doc comment: drive it with a plain spy object, never a live CombatStore.
@@ -47,7 +47,7 @@ function makeUndoEntry(combat: Combat): UndoEntry {
 	return { action: 'editRound', snapshot };
 }
 
-describe('CombatHeader (TRE-5)', () => {
+describe('CombatHeader', () => {
 	it('editing the round via RoundCounterControl fires controller.editRound only', async () => {
 		const controller = makeController();
 		const combat = makeCombat({ undoStack: [makeUndoEntry(makeCombat())] });

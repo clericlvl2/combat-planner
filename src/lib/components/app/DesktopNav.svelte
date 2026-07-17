@@ -1,10 +1,10 @@
 <!--
-  DesktopNav (component-inventory.md "Navigation placement per breakpoint", PLT-3) — the single
+  DesktopNav — the single
   shared desktop-only icon-nav row (Combats / Settings / About, current destination marked
   `.is-current`-equivalent via `aria-current`), consumed by both AppHeader and CombatHeader so the
   markup exists in exactly one place (unit-019 follow-up: the two headers used to duplicate this
   row). Rendered as a visually distinct trailing section (border-l divider) after each header's own
-  page-control buttons, never interleaved with them (PLT-3).
+  page-control buttons, never interleaved with them.
 -->
 <script lang="ts">
 	import { page } from '$app/state';

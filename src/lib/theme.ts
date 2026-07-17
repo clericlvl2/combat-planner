@@ -1,5 +1,5 @@
 /**
- * Theme resolve/apply (SET-2) — single owner of setting the `data-theme`
+ * Theme resolve/apply — single owner of setting the `data-theme`
  * attribute on `document.documentElement` and the `theme-color` meta. Called
  * from the root `+layout.svelte` on mount and reactively whenever
  * `store.settings.theme` changes, so the resolved theme is correct on every

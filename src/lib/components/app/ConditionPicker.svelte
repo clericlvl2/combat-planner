@@ -1,10 +1,10 @@
 <!--
-  ConditionPicker (component-inventory.md, CND-3) — the 12 preset condition toggles, in a modal (Dialog)
+  ConditionPicker — the 12 preset condition toggles, in a modal (Dialog)
   opened from the row's "Add condition" button. Text-only pills (no icons), sorted alphabetically by
   localized label (sortConditions). Each pill is colorized via an inline --tc from conditionAccent:
   at rest a light --tc tint over --popover with --tc border + text; selected = deeper --tc fill +
-  solid --tc border + 1px --tc ring + mixed---tc text (mirrors the combatant Type selector, CND-3).
-  Membership only, unique, up to 12 (CND-2). One click = one toggle;
+  solid --tc border + 1px --tc ring + mixed---tc text (mirrors the combatant Type selector).
+  Membership only, unique, up to 12. One click = one toggle;
   the diff against the current set yields exactly one change, forwarded as add/remove intent (no
   business logic here).
 -->

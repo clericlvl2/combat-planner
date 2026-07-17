@@ -1,11 +1,11 @@
 <!--
-  CombatList (component-inventory.md, CLS-6) — vertical list of `CombatRow`, sorted by
+  CombatList — vertical list of `CombatRow`, sorted by
   `listOrder`, wrapped with `svelte-dnd-action`'s `dragHandleZone` (ADR-006) so drag-to-reorder
   only initiates from each row's `GripVertical` handle (marked with the paired `dragHandle`
   action in `CombatRow`), not the whole card. On drop (finalize) the new order is handed to
   `reorderCombats` so it persists via the store → Dexie ("drag to reorder; order survives
   reload"). Row callbacks and the active search query are passed straight through from this
-  component's own props up to the page (CLS-1, CLS-5, CLS-9).
+  component's own props up to the page.
 -->
 <script lang="ts">
 	import { dragHandleZone, type DndEvent } from 'svelte-dnd-action';

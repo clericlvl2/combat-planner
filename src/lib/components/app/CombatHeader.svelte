@@ -1,11 +1,11 @@
 <!--
-  CombatHeader (Component Inventory "Header (Combat screen)") — the one top bar across Setup and
+  CombatHeader — the one top bar across Setup and
   Active: back · chrome-title (combat.title) · desktop-only tonal roundel icon buttons (Setup:
   header-add/header-start; Active: header-advance) — mobile uses the FAB stack in
-  +page.svelte instead, PLT-3 · overflow ⋮ menu (Undo ↶ / Redo ↷ at top, each disabled at its
+  +page.svelte instead · overflow ⋮ menu (Undo ↶ / Redo ↷ at top, each disabled at its
   stack end; Setup → Clear; Active → Add, Restart, Clear) · the shared DesktopNav
   (Combats/Settings/About) renders last, as its own visually distinct section after every
-  page-control button (PLT-3). Active renders a RoundEscBar sub-bar (uppercase label /
+  page-control button. Active renders a RoundEscBar sub-bar (uppercase label /
   tabular-value pairs) below the header chrome, still tap-to-edit via the same popovers as before
   the restyle. Restart / Clear route through ConfirmDialog (undoable via the stack). Reads the
   combat; emits intent via the controller + the page-owned add form.
@@ -101,8 +101,8 @@
 		<div class="min-w-0 flex-1"></div>
 
 		{#if !isActive}
-			<!-- Setup — desktop-only header pair (mobile uses the FAB stack in +page.svelte instead,
-			     PLT-3). Add is always available; Start only once the roster isn't empty. -->
+			<!-- Setup — desktop-only header pair (mobile uses the FAB stack in +page.svelte instead).
+			     Add is always available; Start only once the roster isn't empty. -->
 			<Button
 				variant="ghost"
 				size="icon"

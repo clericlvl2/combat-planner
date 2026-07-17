@@ -1,5 +1,5 @@
 <!--
-  ColorTagDot (component-inventory.md, CLS-1, ADR-012) — bespoke swatch dot for a combat's `colorTag`.
+  ColorTagDot (ADR-012) — bespoke swatch dot for a combat's `colorTag`.
   Renders one of the 8 token-driven `bg-combat-*` utilities (layout.css); status is never
   color-alone, so it carries a role=img a11y label naming the swatch. The optional `letter`
   (the combat's title initial) is a purely visual row-disambiguator per the approved template —

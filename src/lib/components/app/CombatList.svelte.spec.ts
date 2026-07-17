@@ -3,7 +3,7 @@ import { cleanup, render } from 'vitest-browser-svelte';
 import { createCombat } from '$lib/stores/domain/factories';
 import CombatList from './CombatList.svelte';
 
-// Component test for CLS-6: rows render sorted by listOrder, and a finalize (drop) event hands
+// Component test: rows render sorted by listOrder, and a finalize (drop) event hands
 // the new id order to reorderCombats so it persists (order survives reload).
 
 afterEach(() => {

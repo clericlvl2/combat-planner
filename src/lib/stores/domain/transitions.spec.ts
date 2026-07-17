@@ -36,7 +36,7 @@ function combat(combatants: Combatant[], over: Partial<Combat> = {}): Combat {
 	return { ...createCombat({}, 0, () => 'combat'), combatants, ...over };
 }
 
-describe('start (LIF-3)', () => {
+describe('start', () => {
 	it('rolls every "-", re-sorts, goes Active round 1, points at the top, pushes a pre-Start snapshot', () => {
 		const a = mk({ id: 'a', initiative: '-', initiativeBonus: 5 }, 0);
 		const b = mk({ id: 'b', initiative: 12 }, 1);
@@ -59,7 +59,7 @@ describe('start (LIF-3)', () => {
 	});
 });
 
-describe('advanceTurn (TRE-2)', () => {
+describe('advanceTurn', () => {
 	const a = mk({ id: 'a', initiative: 20 }, 0);
 	const b = mk({ id: 'b', initiative: 10 }, 1);
 	const active = () => combat([a, b], { state: 'active', round: 1, activeCombatantId: 'a' });
@@ -110,7 +110,7 @@ describe('advanceTurn (TRE-2)', () => {
 	});
 });
 
-describe('HP transitions (HP-1, LOG-1)', () => {
+describe('HP transitions', () => {
 	it('damage drains temp first, then current, floored at −maxHp; logs delta = −n', () => {
 		const c = combat([mk({ id: 'a', currentHp: 30, tempHp: 5, maxHp: 30 })], {
 			state: 'active',
@@ -169,7 +169,7 @@ describe('HP transitions (HP-1, LOG-1)', () => {
 	});
 });
 
-describe('hpLog scope (LOG-1)', () => {
+describe('hpLog scope', () => {
 	it('appends only on HP actions — not conditions or initiative', () => {
 		const c = combat([mk({ id: 'a' })], { state: 'active', round: 1 });
 		expect(addCondition(c, 'a', 'dazed').combatants[0].hpLog).toHaveLength(0);
@@ -178,7 +178,7 @@ describe('hpLog scope (LOG-1)', () => {
 	});
 });
 
-describe('editCombatant — Max HP is a discrete undo step (CBT-4, UND-4)', () => {
+describe('editCombatant — Max HP is a discrete undo step', () => {
 	it('field edits + a Max-HP change push TWO entries; undo peels them apart', () => {
 		const c = combat([mk({ id: 'a', name: 'Alice', maxHp: 30, currentHp: 30 })]);
 		const edited = editCombatant(c, 'a', { name: 'Bob', maxHp: 50 });
@@ -203,7 +203,7 @@ describe('editCombatant — Max HP is a discrete undo step (CBT-4, UND-4)', () =
 	});
 });
 
-describe('roster (CBT-3, CBT-6, CBT-7)', () => {
+describe('roster', () => {
 	it('addCombatant: defaults (cur=max, temp 0, "-", empty hpLog), appended, undoable', () => {
 		const c = combat([]);
 		const added = addCombatant(c, { name: 'Z', maxHp: 10 }, id);
@@ -257,7 +257,7 @@ describe('roster (CBT-3, CBT-6, CBT-7)', () => {
 	});
 });
 
-describe('conditions (CND-2)', () => {
+describe('conditions', () => {
 	it('toggles unique membership; redundant toggles are no-ops', () => {
 		const c = combat([mk({ id: 'a' })]);
 		const added = addCondition(c, 'a', 'charmed');
@@ -269,14 +269,14 @@ describe('conditions (CND-2)', () => {
 	});
 });
 
-describe('rollOne (INI-2)', () => {
+describe('rollOne', () => {
 	it('sets initiative = d20 + bonus', () => {
 		const c = combat([mk({ id: 'a', initiative: '-', initiativeBonus: 3 })]);
 		expect(rollOne(c, 'a', d10).combatants[0].initiative).toBe(13);
 	});
 });
 
-describe('clearCombat / restart (LIF-5, LIF-6)', () => {
+describe('clearCombat / restart', () => {
 	function dirty(): Combat {
 		const a = mk(
 			{

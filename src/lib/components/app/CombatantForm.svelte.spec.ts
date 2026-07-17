@@ -4,13 +4,13 @@ import { cleanup, render } from 'vitest-browser-svelte';
 import { m } from '$lib/i18n';
 import CombatantForm from './CombatantForm.svelte';
 
-// Component test for CBT-3 (add-mode defaults, name-required validation, NumberField clamp,
-// onSubmit shape). Add mode only — edit-mode prefill isn't part of this AC.
+// Component test (add-mode defaults, name-required validation, NumberField clamp,
+// onSubmit shape). Add mode only — edit-mode prefill isn't part of this.
 afterEach(() => {
 	cleanup();
 });
 
-test('add mode renders real pre-filled defaults: empty name (placeholder shown), enemy type preselected, numeric fields pre-filled (CBT-3b)', async () => {
+test('add mode renders real pre-filled defaults: empty name (placeholder shown), enemy type preselected, numeric fields pre-filled', async () => {
 	const onSubmit = vi.fn();
 	const screen = render(CombatantForm, { mode: 'add', open: true, onSubmit });
 
@@ -33,7 +33,7 @@ test('add mode renders real pre-filled defaults: empty name (placeholder shown),
 	await expect.element(screen.getByLabelText(m['forms.field.note']())).toHaveValue('');
 });
 
-test('empty name does not block submit: type placeholder becomes the stored name (CBT-3c)', async () => {
+test('empty name does not block submit: type placeholder becomes the stored name', async () => {
 	const onSubmit = vi.fn();
 	const screen = render(CombatantForm, { mode: 'add', open: true, onSubmit });
 

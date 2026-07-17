@@ -4,7 +4,7 @@ import { SETTINGS_ID } from '$lib/db/types';
 import { store } from '$lib/stores';
 
 /**
- * Root load (CLS-7, client-only per ADR-007/ssr:false). Branches instead of always redirecting:
+ * Root load (client-only per ADR-007/ssr:false). Branches instead of always redirecting:
  * first launch (`!firstLaunchDone`) opens the seeded combat directly; subsequent launches land on
  * the Combats home list. `store.hydrate()` already runs `App.firstLaunch` (the seam this leans
  * on — no first-launch logic duplicated here); this load only needs to know, before hydrating,
@@ -13,7 +13,7 @@ import { store } from '$lib/stores';
  * resolve, so this load awaits its own `store.hydrate()` rather than racing it. If seeding
  * unexpectedly yields no combat, this deterministically falls through to `/combats` rather than
  * a broken/empty combat page; a genuine `store.hydrate()`/Dexie failure is left to propagate so
- * the `+error.svelte` boundary can surface it (CLS-7 / PLT-10).
+ * the `+error.svelte` boundary can surface it.
  */
 export const load = async () => {
 	const priorSettings = await db.settings.get(SETTINGS_ID);

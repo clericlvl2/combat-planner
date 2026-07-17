@@ -1,11 +1,11 @@
 <!--
-  Combat screen (specs/reference/component-inventory.md Hierarchy/FAB sections, PLT-2/PLT-3) — reads the store's reactive
+  Combat screen — reads the store's reactive
   combat + the derived VIEWS (sortedCombatants / showRoundAndEscalation / canAdvance / isActive),
   wraps them in $derived (ADR-002), and wires the thin components via an id-scoped controller.
   Setup ⇄ Active is gated by showRoundAndEscalation. The page owns the single shared NumpadSheet +
   add/edit forms, the Setup/Active floating controls (mobile-only FAB stack; desktop ≥1024px
   swaps both states' FABs for CombatHeader's icon-roundel pair — header-add/header-start in
-  Setup, header-advance in Active, PLT-3), and the auto-scroll-on-advance behavior (TRE-2) that
+  Setup, header-advance in Active), and the auto-scroll-on-advance behavior that
   scrolls the newly active row into view via the `data-active` marker CombatantRow's Card already
   carries; rows/header emit intent only.
 -->
@@ -37,7 +37,7 @@
     const Advance = chromeIcon.advance;
     const Start = chromeIcon.start;
 
-    // Auto-scroll-on-advance (TRE-2) — scrolls the newly active row into view on every advance
+    // Auto-scroll-on-advance — scrolls the newly active row into view on every advance
     // (including the round-wrap advance); no store/controller intent, CombatantRow already marks
     // its Card `data-active`.
     let mainEl = $state<HTMLElement | null>(null);
@@ -71,7 +71,7 @@
         editOpen = true;
     }
 
-    // PLT-11: browser Back closes the top-most open transient overlay (numpad, then edit, then
+    // Browser Back closes the top-most open transient overlay (numpad, then edit, then
     // add) and stays on the combat page; only Back with no overlay open leaves the page. A
     // history entry is pushed while any overlay is open; a normal (non-Back) close consumes that
     // entry via history.back() so it never pollutes forward-history navigation.
@@ -181,7 +181,7 @@
         </main>
 
         {#if active}
-            <!-- Active: Advance FAB (disabled at the r99 → r100 wrap) — mobile only (PLT-3);
+            <!-- Active: Advance FAB (disabled at the r99 → r100 wrap) — mobile only;
                  desktop (≥1024px) swaps it for CombatHeader's header-advance icon roundel. -->
             <Button
                     class="fixed right-4 bottom-4 size-14 rounded-full shadow-lg lg:hidden max-lg:focus-visible:ring-0 max-lg:focus-visible:border-transparent"
@@ -193,7 +193,7 @@
             </Button>
         {:else}
             <!-- Setup: mobile FAB stack (Add always; Start once the roster isn't empty), matching
-                 the desktop header-add/header-start pair in CombatHeader (PLT-3) — Start FAB
+                 the desktop header-add/header-start pair in CombatHeader — Start FAB
                  borrows the existing chevron glyph (no dedicated play/start icon ships yet). -->
             <Button
                     class="fixed right-4 bottom-4 size-14 rounded-full shadow-lg lg:hidden max-lg:focus-visible:ring-0 max-lg:focus-visible:border-transparent"
@@ -204,7 +204,7 @@
             </Button>
             {#if combat.combatants.length > 0}
                 <!-- Start FAB reads as a primary action (default variant = bg-primary), not a
-                     pale ghost/secondary roundel. Uses the LIF-2 play glyph (mirrors the desktop
+                     pale ghost/secondary roundel. Uses the play glyph (mirrors the desktop
                      header-start icon-roundel). -->
                 <Button
                         class="fixed right-4 bottom-24 size-14 rounded-full shadow-lg lg:hidden max-lg:focus-visible:ring-0 max-lg:focus-visible:border-transparent"

@@ -37,7 +37,7 @@ export class CombatStore {
 		return this.combats.find((c) => c.id === id);
 	}
 
-	/** Boot: load + normalize/migrate from Dexie, then run first-launch (CLS-7). */
+	/** Boot: load + normalize/migrate from Dexie, then run first-launch. */
 	async hydrate(genId?: IdGen): Promise<void> {
 		const data = await loadAppData(this.#db);
 		const { combats, settings, opened } = App.firstLaunch(data.combats, data.settings, genId);
@@ -66,7 +66,7 @@ export class CombatStore {
 		void persistCombat(this.#db, next);
 	}
 
-	// HP (HP-1/HP-2)
+	// HP
 	dealDamage = (combatId: string, id: string, n: number): void =>
 		this.#mutate(combatId, (c) => T.dealDamage(c, id, n));
 	restoreHp = (combatId: string, id: string, n: number): void =>
@@ -74,7 +74,7 @@ export class CombatStore {
 	setTempHp = (combatId: string, id: string, n: number): void =>
 		this.#mutate(combatId, (c) => T.setTempHp(c, id, n));
 
-	// Roster (CBT-3/CBT-6/CBT-7)
+	// Roster
 	addCombatant = (combatId: string, input: CombatantInput, genId?: IdGen): void =>
 		this.#mutate(combatId, (c) => T.addCombatant(c, input, genId));
 	removeCombatant = (combatId: string, id: string): void =>
@@ -82,7 +82,7 @@ export class CombatStore {
 	duplicateCombatant = (combatId: string, id: string, genId?: IdGen): void =>
 		this.#mutate(combatId, (c) => T.duplicateCombatant(c, id, genId));
 
-	// Fields (CBT-4)
+	// Fields
 	editCombatant = (
 		combatId: string,
 		id: string,
@@ -97,7 +97,7 @@ export class CombatStore {
 	setInitiative = (combatId: string, id: string, value: number): void =>
 		this.#mutate(combatId, (c) => T.setInitiative(c, id, value));
 
-	// Lifecycle (LIF)
+	// Lifecycle
 	start = (combatId: string, roll?: D20Roll): void =>
 		this.#mutate(combatId, (c) => T.start(c, roll));
 	advanceTurn = (combatId: string): void => this.#mutate(combatId, T.advanceTurn);
@@ -108,11 +108,11 @@ export class CombatStore {
 	clearCombat = (combatId: string): void => this.#mutate(combatId, T.clearCombat);
 	restart = (combatId: string): void => this.#mutate(combatId, T.restart);
 
-	// Undo/redo (UND)
+	// Undo/redo
 	undo = (combatId: string): void => this.#mutate(combatId, undoUndo);
 	redo = (combatId: string): void => this.#mutate(combatId, undoRedo);
 
-	// ── combats-list level (CLS) ────────────────────────────────────────────
+	// ── combats-list level ───────────────────────────────────────────────────
 
 	/** Create a combat at the top of the list; returns it (or null at the 100-cap). */
 	createCombat(input: CombatInput = {}, genId?: IdGen): Combat | null {
@@ -123,7 +123,7 @@ export class CombatStore {
 		return created;
 	}
 
-	/** Patch title/description/colorTag on an existing combat (CLS-3); no-op if the id is unknown. */
+	/** Patch title/description/colorTag on an existing combat; no-op if the id is unknown. */
 	editCombat(id: string, patch: App.EditCombatPatch): void {
 		const snapshot = $state.snapshot(this.combats) as Combat[];
 		const edited = App.editCombat(snapshot, id, patch);
@@ -133,7 +133,7 @@ export class CombatStore {
 		if (next) void persistCombat(this.#db, next);
 	}
 
-	/** Delete a combat (confirm-gated upstream; not undoable — UND-2). */
+	/** Delete a combat (confirm-gated upstream; not undoable). */
 	deleteCombat(id: string): void {
 		this.combats = App.deleteCombat(this.combats, id);
 		void removeCombatRow(this.#db, id);
@@ -145,7 +145,7 @@ export class CombatStore {
 		void persistCombats(this.#db, reordered);
 	}
 
-	/** Reset-all: clear combats, keep language/theme, re-arm first-launch (SET-3). */
+	/** Reset-all: clear combats, keep language/theme, re-arm first-launch. */
 	async resetAll(genId?: IdGen): Promise<void> {
 		const { settings } = App.resetAll(this.settings);
 		await clearCombats(this.#db);

@@ -1,12 +1,11 @@
 <!--
-  CombatRow (component-inventory.md, CLS-1/CLS-5/CLS-6/CLS-9) — one Combats-home list row: the
-  whole `Card` is the open target (CLS-5) and the whole-card hover surface (CLS-1); a leading
-  drag-handle (`GripVertical`, marked with svelte-dnd-action's `dragHandle` — ADR-006, CLS-6) and
+  CombatRow — one Combats-home list row: the
+  whole `Card` is the open target and the whole-card hover surface; a leading
+  drag-handle (`GripVertical`, marked with svelte-dnd-action's `dragHandle` — ADR-006) and
   the trailing `⋮` (`CombatRowMenu`, Edit/Delete only) are both excluded from the open target via
   `data-no-open` + a `closest()` guard in the card's click handler. Title/description render the
-  active search query (CLS-9) highlighted via `<mark>` segments. Delete is gated behind the reused
-  `ConfirmDialog` (CLS-4); confirming calls `onDelete` — no Undo affordance is offered here
-  (UND-2).
+  active search query highlighted via `<mark>` segments. Delete is gated behind the reused
+  `ConfirmDialog`; confirming calls `onDelete` — no Undo affordance is offered here.
 -->
 <script lang="ts">
 	import { dragHandle } from 'svelte-dnd-action';
@@ -38,10 +37,10 @@
 	const gripLabel = $derived(m['a11y.reorder']({ title: combat.title }));
 	const deleteBody = $derived(m['dialogs.deleteCombat.body']({ title: combat.title }));
 	const titleInitial = $derived(combat.title.trim().charAt(0).toUpperCase() || '?');
-	// CLS-1 — an untitled combat renders a placeholder instead of a blank row.
+	// An untitled combat renders a placeholder instead of a blank row.
 	const displayTitle = $derived(combat.title.trim() || m['combats.untitled']());
 
-	// CLS-9 — split text into matched/unmatched segments so the template can highlight all
+	// Split text into matched/unmatched segments so the template can highlight all
 	// case-insensitive occurrences of the active search query.
 	function highlightParts(text: string, needle: string): { text: string; match: boolean }[] {
 		const trimmed = needle.trim();
@@ -67,7 +66,7 @@
 		combat.description ? highlightParts(combat.description, query) : [],
 	);
 
-	// CLS-5 — the whole card opens the combat; the drag handle and the `⋮` menu opt out via
+	// The whole card opens the combat; the drag handle and the `⋮` menu opt out via
 	// `data-no-open` since their click targets can be nested deep inside icons/portals.
 	function handleCardClick(event: MouseEvent) {
 		const target = event.target as HTMLElement;

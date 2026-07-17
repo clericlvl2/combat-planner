@@ -2,7 +2,7 @@ import { expect, test, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import CombatRowMenu from './CombatRowMenu.svelte';
 
-// CLS-1 acceptance: the row menu has exactly Edit and Delete — no Export/share item, no placeholder.
+// The row menu has exactly Edit and Delete — no Export/share item, no placeholder.
 
 test('menu has exactly Edit and Delete, no Export/share or placeholder items', async () => {
 	const screen = render(CombatRowMenu, {

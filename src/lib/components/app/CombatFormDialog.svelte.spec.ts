@@ -5,7 +5,7 @@ import { m } from '$lib/i18n';
 import { createCombat } from '$lib/stores/domain/factories';
 import CombatFormDialog from './CombatFormDialog.svelte';
 
-// Component test for CLS-2/CLS-3 (create adds at top / cap message on null, edit pre-fills and
+// Component test (create adds at top / cap message on null, edit pre-fills and
 // patches only title/description/colorTag).
 afterEach(() => {
 	cleanup();

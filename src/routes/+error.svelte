@@ -1,9 +1,9 @@
 <!--
-  App-level error boundary (PLT-10) — catches a thrown error from any route `load` (incl. the
+  App-level error boundary — catches a thrown error from any route `load` (incl. the
   `/` root load) or from `store.hydrate()`/Dexie access during `+layout.svelte`'s `onMount`.
   Renders inside `+layout.svelte`'s AppShell, so the chrome (header/nav) stays present; this
   file only supplies the outlet content, matching the EmptyState pattern already used on
-  Combats home / the Combat screen (specs/reference/component-inventory.md Hierarchy section).
+  Combats home / the Combat screen.
 -->
 <script lang="ts">
 	import { goto } from '$app/navigation';

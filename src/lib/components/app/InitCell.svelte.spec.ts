@@ -5,13 +5,13 @@ import type { Combatant } from '$lib/db/types';
 import { createCombatant } from '$lib/stores/domain/factories';
 import InitCell, { LONG_PRESS_MS } from './InitCell.svelte';
 
-// INI-2: tap fires onRoll; long-press opens manual entry and Save fires onSetInitiative with the
+// Tap fires onRoll; long-press opens manual entry and Save fires onSetInitiative with the
 // typed value; the cell is non-interactive (disabled trigger) when editable is false.
 function makeCombatant(): Combatant {
 	return createCombatant({ name: 'Ogre', maxHp: 40 }, 0, () => 'ogre');
 }
 
-describe('InitCell (INI-2)', () => {
+describe('InitCell', () => {
 	it('tapping the trigger fires onRoll with the combatant id', async () => {
 		const onRoll = vi.fn();
 		const onSetInitiative = vi.fn();

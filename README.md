@@ -5,26 +5,12 @@ in the browser as an installable PWA — no backend, no account, no network call
 runtime ([ADR-007](specs/adr/ADR-007.md), [ADR-010](specs/adr/ADR-010.md)).
 All data lives locally in IndexedDB.
 
-> **Status:** build-ready skeleton (M0). No feature logic yet — route shells, the
-> token layer, the i18n catalog, the Dexie schema, and tooling are in place; the
-> store seam and combat features land in **M1**. Source is annotated with
-> `// TODO M1` / `// TODO M-phase` markers pointing at the owning spec section.
-> See [specs/](specs/) and [specs/CHANGELOG.md](specs/CHANGELOG.md).
+> **Status:** shipped and live — deployed at
+> [combat-planner-five.vercel.app](https://combat-planner-five.vercel.app).
 
 ## Stack
 
-| Concern        | Choice                                                | ADR |
-|----------------|-------------------------------------------------------|-----|
-| Framework      | SvelteKit + Svelte 5 (runes), client-only SPA         | 001 |
-| Adapter        | `@sveltejs/adapter-static` (`fallback: index.html`)   | 001 |
-| State          | Svelte 5 `$state`/`$derived` + thin store seam        | 002 |
-| Persistence    | Dexie (IndexedDB)                                      | 003 |
-| PWA            | `@vite-pwa/sveltekit` (Workbox, `registerType: prompt`) | 004 |
-| i18n           | Paraglide (inlang), compile-time, 6 locales           | 005 |
-| Drag & drop    | `svelte-dnd-action`                                   | 006 |
-| UI             | Tailwind v4 (CSS-first) + shadcn-svelte + `@lucide/svelte` | — |
-| Lint / format  | Biome                                                 | 009 |
-| Tests          | Vitest (unit + browser) + Playwright (E2E)            | 009 |
+Stack and tooling choices, with rationale, live in [`specs/adr/`](specs/adr/) (ADR-001..013).
 
 ## Requirements
 
@@ -65,15 +51,14 @@ worker that precaches the app shell for offline use.
 ## Internationalisation
 
 Messages live in `messages/<locale>.json` (flat, dot-namespaced keys). `en` is the
-source of truth; `de/es/fr/ja/ru` are **stubs** (English placeholders, flagged via
-`_translation_status`) pending translation ([ADR-005](specs/adr/ADR-005.md)).
+source of truth; other locales are translated ([ADR-005](specs/adr/ADR-005.md)).
 Paraglide compiles them to `src/lib/paraglide/` (gitignored). Access via
 `import { m } from '$lib/i18n'` → `m['nav.combats']()`.
 
 ## Documentation
 
-Process and requirements: [`specs/README.md`](specs/README.md) (change-unit lifecycle,
-capability files, backlog). Stack decisions: [`specs/adr/`](specs/adr/).
+Process/product context: [`specs/README.md`](specs/README.md). Stack decisions:
+[`specs/adr/`](specs/adr/).
 
 ## License
 

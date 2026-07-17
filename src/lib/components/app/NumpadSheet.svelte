@@ -1,11 +1,11 @@
 <!--
-  NumpadSheet (component-inventory.md "Numpad sheet", HP-6) — HP editor opened from a row's HP cell.
+  NumpadSheet — HP editor opened from a row's HP cell.
   Renders as a bottom Drawer on mobile and a centered modal Dialog on desktop (≥1024px), switched
-  via the `svelte/reactivity` MediaQuery — component-inventory.md already states desktop = modal.
+  via the `svelte/reactivity` MediaQuery.
   Summary header (cur/max + temp so the buffer is visible) · entry display · digit pad · the three
   commit actions (Deal Damage / Restore HP / Set Temp HP) · a read-only History of this combatant's
   hpLog (newest first). Empty entry → commits disabled (no-op). Commit closes the sheet; the change
-  rides the combat's Undo history (no toast). History is view-only — no undo control here (LOG).
+  rides the combat's Undo history (no toast). History is view-only — no undo control here.
   Emits commit intent only; all HP math + log append live in the store/domain.
 -->
 <script lang="ts">
@@ -40,7 +40,7 @@
 	let historyOpen = $state(false);
 	const isDesktop = new MediaQuery('(min-width: 1024px)');
 
-	// Fresh entry on each open (abandons any partial entry — HP-6 dismiss-with-no-op).
+	// Fresh entry on each open (abandons any partial entry — dismiss-with-no-op).
 	$effect(() => {
 		if (open) entry = '';
 	});
@@ -78,7 +78,7 @@
 	const Expand = chromeIcon.expand;
 
 	function push(d: string) {
-		if (entry.length >= 4) return; // ≤ 9999, covers the HP ranges in specs/reference/limits.md
+		if (entry.length >= 4) return; // ≤ 9999, covers the HP ranges
 		entry += d;
 	}
 	function backspace() {
@@ -97,7 +97,7 @@
 
 {#snippet body(c: Combatant)}
 	<div class="flex flex-col gap-3 p-4">
-		<!-- HpSummaryHeader: cur/max + temp buffer (HP-1) — cur HP is the distinctive value here -->
+		<!-- HpSummaryHeader: cur/max + temp buffer — cur HP is the distinctive value here -->
 		<div class="flex items-baseline justify-between gap-2">
 			<span class="truncate font-semibold">{c.name}</span>
 			<span class="shrink-0 tabular-nums">

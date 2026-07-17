@@ -1,7 +1,7 @@
 /**
- * Combats-list level operations (see CLS) — pure functions over the combats array / settings.
- * These live outside the per-combat undo history (UND-2: delete-combat / reset-all are
- * confirm-gated, not undoable). The reactive seam wires confirmation + persistence (M2+).
+ * Combats-list level operations — pure functions over the combats array / settings.
+ * These live outside the per-combat undo history: delete-combat / reset-all are
+ * confirm-gated, not undoable. The reactive seam wires confirmation + persistence (M2+).
  */
 import { type ColorTag, type Combat, MAX_COMBATS, type Settings } from '../../db/types';
 import { type CombatInput, createCombat } from './factories';
@@ -9,11 +9,11 @@ import { genId as defaultGenId, type IdGen } from './id';
 
 export interface CreateCombatResult {
 	combats: Combat[];
-	/** The created combat, or null when blocked by the 100-combat cap (specs/reference/limits.md). */
+	/** The created combat, or null when blocked by the 100-combat cap. */
 	created: Combat | null;
 }
 
-/** New combats are inserted at the TOP of the list (lowest listOrder); blocked past 100 (specs/reference/limits.md). */
+/** New combats are inserted at the TOP of the list (lowest listOrder); blocked past 100. */
 export function createCombatInList(
 	combats: Combat[],
 	input: CombatInput = {},
@@ -25,7 +25,7 @@ export function createCombatInList(
 	return { combats: [created, ...combats], created };
 }
 
-/** Delete a combat (and its history). Not undoable (UND-2). */
+/** Delete a combat (and its history). Not undoable. */
 export function deleteCombat(combats: Combat[], id: string): Combat[] {
 	return combats.filter((c) => c.id !== id);
 }
@@ -36,7 +36,7 @@ export interface EditCombatPatch {
 	colorTag?: ColorTag;
 }
 
-/** Patch title/description/colorTag on an existing combat; roster/state/history untouched (CLS-3). */
+/** Patch title/description/colorTag on an existing combat; roster/state/history untouched. */
 export function editCombat(combats: Combat[], id: string, patch: EditCombatPatch): Combat[] {
 	const idx = combats.findIndex((c) => c.id === id);
 	if (idx === -1) return combats;
@@ -53,7 +53,7 @@ export function editCombat(combats: Combat[], id: string, patch: EditCombatPatch
 	return out;
 }
 
-/** Re-assign listOrder from a dragged id order (CLS-6 reorderCombats). */
+/** Re-assign listOrder from a dragged id order. */
 export function reorderCombats(combats: Combat[], orderedIds: string[]): Combat[] {
 	const rank = new Map(orderedIds.map((id, i) => [id, i]));
 	return combats.map((c) => ({ ...c, listOrder: rank.get(c.id) ?? c.listOrder }));
@@ -64,7 +64,7 @@ export interface ResetAllResult {
 	settings: Settings;
 }
 
-/** Clear all combats; keep language/theme; re-arm first-launch (SET-3 resetAll). */
+/** Clear all combats; keep language/theme; re-arm first-launch. */
 export function resetAll(settings: Settings): ResetAllResult {
 	return {
 		combats: [],
@@ -75,11 +75,11 @@ export function resetAll(settings: Settings): ResetAllResult {
 export interface FirstLaunchResult {
 	combats: Combat[];
 	settings: Settings;
-	/** The auto-created combat to open, or null if first-launch already ran (CLS-7 firstLaunch). */
+	/** The auto-created combat to open, or null if first-launch already ran. */
 	opened: Combat | null;
 }
 
-/** If first-launch hasn't run, auto-create one empty combat and set the flag (CLS-7 firstLaunch). */
+/** If first-launch hasn't run, auto-create one empty combat and set the flag. */
 export function firstLaunch(
 	combats: Combat[],
 	settings: Settings,

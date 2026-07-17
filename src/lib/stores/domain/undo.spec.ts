@@ -11,14 +11,14 @@ function active(currentHp = 200): Combat {
 	return { ...createCombat({}, 0, () => 'combat'), combatants: [c], state: 'active', round: 1 };
 }
 
-describe('undo/redo history (UND-6)', () => {
+describe('undo/redo history', () => {
 	it('is bounded at 10 — the 11th action drops the oldest', () => {
 		let c = active();
 		for (let i = 0; i < UNDO_LIMIT + 5; i += 1) c = dealDamage(c, 'a', 1);
 		expect(c.undoStack).toHaveLength(UNDO_LIMIT);
 	});
 
-	it('a new action clears the redo branch (UND-6)', () => {
+	it('a new action clears the redo branch', () => {
 		let c = dealDamage(active(), 'a', 5);
 		c = undo(c);
 		expect(canRedo(c)).toBe(true);

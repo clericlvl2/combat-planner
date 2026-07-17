@@ -1,10 +1,10 @@
 <!--
-  CombatantForm (component-inventory.md, limits.md) — add/edit a combatant in a Dialog. Name is
+  CombatantForm — add/edit a combatant in a Dialog. Name is
   optional: on add-with-no-data the numeric fields (Max HP/Init/AC/PD/MD) pre-fill as real editable
-  values (10/0/10/10/10 — CBT-3b), and the Name field shows a type-specific placeholder ("Hero
-  Name"/"Enemy"/"Ally" — CBT-3c) that becomes the combatant's real stored name if left empty on
+  values (10/0/10/10/10), and the Name field shows a type-specific placeholder ("Hero
+  Name"/"Enemy"/"Ally") that becomes the combatant's real stored name if left empty on
   save. Numeric fields still clamp via NumberField. Edit mode prefills and adds the
-  manual-initiative field (CBT-4 editCombatant). Emits a normalized values object; the parent
+  manual-initiative field (editCombatant). Emits a normalized values object; the parent
   routes it to addCombatant or editCombatant. Max-HP change ⇏ current HP (handled in the store).
 -->
 <script lang="ts">
@@ -58,7 +58,7 @@
     const isDesktop = new MediaQuery('(min-width: 1024px)');
 
     // (Re)initialize the form whenever it opens (prefill on edit, real pre-filled defaults on add —
-    // CBT-3b: 10 / 0 / 10 / 10 / 10, not placeholder-only hints).
+    // 10 / 0 / 10 / 10 / 10, not placeholder-only hints).
     $effect(() => {
         if (!open) return;
         if (mode === 'edit' && combatant) {
@@ -84,7 +84,7 @@
         }
     });
 
-    // CBT-3c: type-specific name placeholder; also substituted as the real stored name when the
+    // Type-specific name placeholder; also substituted as the real stored name when the
     // name is left empty on save (see submit()).
     const namePlaceholder = $derived(
         type === 'pc'

@@ -23,7 +23,7 @@ export const typeColor: Record<CombatantType, string> = {
 	ally: 'bg-type-ally',
 };
 
-/** Condition tag color (grouped semantically for at-a-glance distinction; CND-3). */
+/** Condition tag color (grouped semantically for at-a-glance distinction). */
 export const conditionColor: Record<Condition, string> = {
 	charmed: 'border-combat-violet/30 bg-combat-violet/10 text-combat-violet',
 	confused: 'border-combat-amber/30 bg-combat-amber/10 text-combat-amber',
@@ -39,7 +39,7 @@ export const conditionColor: Record<Condition, string> = {
 	staggered: 'border-combat-neutral/30 bg-combat-neutral/10 text-combat-neutral',
 };
 
-/** Per-condition combatant-card `--combat-*` hue, used by the condition picker (CND-3). */
+/** Per-condition combatant-card `--combat-*` hue, used by the condition picker. */
 export const conditionAccent: Record<Condition, string> = {
 	charmed: 'var(--combat-violet)',
 	confused: 'var(--combat-amber)',
@@ -77,7 +77,7 @@ export const healthLabel: Record<HealthStatus, () => string> = {
 	dead: m['health.dead'],
 };
 
-/** Health band → bar fill color utility (HP-4; `dead` = reverse/alarm). */
+/** Health band → bar fill color utility (`dead` = reverse/alarm). */
 export const healthColor: Record<HealthStatus, string> = {
 	full: 'bg-health-full',
 	wounded: 'bg-health-wounded',
@@ -93,7 +93,7 @@ export const healthTextColor: Record<HealthStatus, string> = {
 	dead: 'text-health-dead',
 };
 
-/** Sorts conditions alphabetically by localized label (CND-3); returns a new array. */
+/** Sorts conditions alphabetically by localized label; returns a new array. */
 export function sortConditions(cs: Condition[]): Condition[] {
 	return [...cs].sort((a, b) => conditionLabel[a]().localeCompare(conditionLabel[b]()));
 }

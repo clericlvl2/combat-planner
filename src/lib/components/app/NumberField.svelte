@@ -33,7 +33,7 @@
 		max: number;
 		placeholder?: string;
 		required?: boolean;
-		/** Opt-in label-left inline row (CBT-3f); default false keeps the stacked label-above look
+		/** Opt-in label-left inline row; default false keeps the stacked label-above look
 		    that the combat-header round/escalation popovers rely on. */
 		inline?: boolean;
 	} = $props();

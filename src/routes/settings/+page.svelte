@@ -1,8 +1,8 @@
 <!--
-  Settings (specs/reference/component-inventory.md Hierarchy section, specs/capabilities/settings.md SET-1..5) — three
-  SettingsGroups (Language, Appearance, Data). Export/import rows are dropped from this screen (see component-inventory:
-  "DataActions (Reset-all only)"). Reset-all is confirm-gated (SET-3) via the shared
-  ConfirmDialog. The About link row is intentionally not rendered here (SET-5) — About stays
+  Settings — three
+  SettingsGroups (Language, Appearance, Data). Export/import rows are dropped from this screen
+  ("DataActions (Reset-all only)"). Reset-all is confirm-gated via the shared
+  ConfirmDialog. The About link row is intentionally not rendered here — About stays
   reachable via URL and app nav.
 -->
 <script lang="ts">
@@ -30,7 +30,7 @@
 		if (!next) return;
 		const locale = next as Locale;
 		selectedLocale = locale;
-		// SET-1: applies immediately (no reload), persists via both the Paraglide runtime and our
+		// Applies immediately (no reload), persists via both the Paraglide runtime and our
 		// own Settings record (kept in sync — Settings.language also travels with export/import).
 		setLocale(locale, { reload: false });
 		store.updateSettings({ language: locale });

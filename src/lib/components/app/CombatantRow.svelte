@@ -1,6 +1,6 @@
 <!--
-  CombatantRow (component-inventory.md "Combatant card", CBT-2) — one roster card, compact ↔ expanded via
-  Collapsible. Card shape locked in `component-inventory.md`'s "Combatant card" section ·
+  CombatantRow — one roster card, compact ↔ expanded via
+  Collapsible.
   Row 1 type-color dot + name + expand
   chevron + trailing `⋮` overflow menu · Row 2 big HP (+ temp-HP badge) inside a fixed-width block, and a
   health bar filling the remaining width · Row 3 AC/PD/MD + Init pill · Row 4 condition chips
@@ -164,7 +164,7 @@
 					</div>
 
 					<!-- Row 2: unified HP tap target — big HP (+ temp-HP badge) fixed-width block, and the
-					     health bar filling the rest, both inside one rounded hover/press area (HP-4). -->
+					     health bar filling the rest, both inside one rounded hover/press area. -->
 					<button
 						type="button"
 						class="flex min-h-10 w-full cursor-pointer items-center gap-3 rounded-md px-1 py-1 hover:bg-muted lg:min-h-8"

@@ -4,7 +4,7 @@ import type { Combatant } from '$lib/db/types';
 import CombatantRow from './CombatantRow.svelte';
 import type { CombatController } from './controller';
 
-// CBT-2 (component: CombatantRow compact <-> expanded toggle). Drives the row with a plain
+// Component: CombatantRow compact <-> expanded toggle. Drives the row with a plain
 // vi.fn() spy controller (per controller.ts's doc comment) instead of a real CombatStore/Dexie.
 
 function fixtureCombatant(overrides: Partial<Combatant> = {}): Combatant {

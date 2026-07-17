@@ -3,7 +3,7 @@ import { cleanup, render } from 'vitest-browser-svelte';
 import { m } from '$lib/i18n';
 import NavSidebar from './NavSidebar.svelte';
 
-// PLT-3: the mobile/tablet nav overlay — links to Combats/Settings/About, each with a visible
+// The mobile/tablet nav overlay — links to Combats/Settings/About, each with a visible
 // label + icon (no color-alone signifier). The swipe-right-to-open gesture itself is a touch-only
 // affordance verified manually/in e2e — not simulated here (see tasks.md Phase 1 report).
 

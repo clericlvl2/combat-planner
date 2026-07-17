@@ -10,8 +10,8 @@ import {
 	clampTempHp,
 } from './clamp';
 
-// Numeric ranges (specs/reference/limits.md) — every committed value forced into range.
-describe('clamp helpers (specs/reference/limits.md)', () => {
+// Numeric ranges — every committed value forced into range.
+describe('clamp helpers', () => {
 	it('clamps to inclusive bounds and rounds', () => {
 		expect(clamp(5, 0, 10)).toBe(5);
 		expect(clamp(-3, 0, 10)).toBe(0);

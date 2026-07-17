@@ -3,8 +3,8 @@
  * Two groups: combatant `type` and UI `chrome` (conditions are text-only tags, no icons — see
  * ConditionPicker/ConditionIconList).
  *
- * TODO M-phase (ADR-011): the chrome glyphs flagged in specs/reference/component-inventory.md
- * (Glyph gaps: clear) are pinned here pending their formal addition to ADR-011. `menu` /
+ * TODO M-phase (ADR-011): the chrome glyphs still open (Glyph gaps: clear) are pinned here
+ * pending their formal addition to ADR-011. `menu` /
  * `navCombats` / `navSettings` / `navAbout` (unit 006 Phase 1, AppHeader/NavSidebar) fill the
  * "menu/burger, settings/about nav icons" gap — Combats keeps its crossed-swords glyph.
  */
@@ -44,7 +44,7 @@ export const typeIcon: Record<CombatantType, IconComponent> = {
 	ally: Shield,
 };
 
-/** UI chrome glyphs (ADR-011 firm set + the gaps flagged in specs/reference/component-inventory.md). */
+/** UI chrome glyphs (ADR-011 firm set + the still-open glyph gaps). */
 export const chromeIcon = {
 	back: ChevronLeft,
 	undo: Undo2,
@@ -55,7 +55,7 @@ export const chromeIcon = {
 	import: Upload,
 	export: Share2,
 	roll: Dices,
-	// specs/reference/component-inventory.md gaps (pending ADR-011):
+	// Open glyph gaps (pending ADR-011):
 	edit: Pencil,
 	remove: Trash2,
 	duplicate: Copy,

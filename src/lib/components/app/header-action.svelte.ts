@@ -1,6 +1,6 @@
 /**
  * Singleton rune-backed slot for a page-specific header action (e.g. Combats home's desktop "+"
- * create button, PLT-3). AppHeader lives in AppShell, a sibling-ish ancestor of the route content
+ * create button). AppHeader lives in AppShell, a sibling-ish ancestor of the route content
  * in the component tree — not a descendant of it — so Svelte context can't flow from a page down
  * to AppHeader. This module-level `$state` singleton is the seam instead: a route sets `current`
  * on mount and clears it on unmount; AppHeader just reads it.

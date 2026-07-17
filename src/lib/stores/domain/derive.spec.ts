@@ -21,7 +21,7 @@ function combat(combatants: Combatant[], over: Partial<Combat> = {}): Combat {
 	return { ...createCombat({}, 0, id), combatants, ...over };
 }
 
-describe('sortedCombatants (INI-4)', () => {
+describe('sortedCombatants', () => {
 	it('orders rolled high→low, tiebreak by bonus then addOrder; "-" at bottom by addOrder', () => {
 		const a = combatant({ initiative: 20, initiativeBonus: 1 }, 0);
 		const b = combatant({ initiative: 20, initiativeBonus: 3 }, 1); // tie → higher bonus first
@@ -39,7 +39,7 @@ describe('sortedCombatants (INI-4)', () => {
 	});
 });
 
-describe('escalationDie (TRE-6)', () => {
+describe('escalationDie', () => {
 	it('reads the stored value, clamped 0..6, independent of round', () => {
 		expect(escalationDie(combat([], { round: 1, escalation: 0 }))).toBe(0);
 		expect(escalationDie(combat([], { round: 20, escalation: 3 }))).toBe(3);
@@ -52,7 +52,7 @@ describe('escalationDie (TRE-6)', () => {
 	});
 });
 
-describe('healthStatus (HP-4)', () => {
+describe('healthStatus', () => {
 	const c = (cur: number, max = 100) => combatant({ currentHp: cur, maxHp: max }, 0);
 	it('bands full / wounded / bloodied / dead', () => {
 		expect(healthStatus(c(100))).toBe('full');
@@ -70,7 +70,7 @@ describe('healthStatus (HP-4)', () => {
 	});
 });
 
-describe('showRoundAndEscalation / canAdvance (TRE-5, TRE-3)', () => {
+describe('showRoundAndEscalation / canAdvance', () => {
 	it('round + escalation visible only while Active', () => {
 		expect(showRoundAndEscalation(combat([], { state: 'setup' }))).toBe(false);
 		expect(showRoundAndEscalation(combat([], { state: 'active' }))).toBe(true);

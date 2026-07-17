@@ -7,8 +7,8 @@ mcpServers:
 skills:
   - webstorm-mcp-explorer
 model: sonnet
-effort: medium
-permissionMode: default
+effort: low
+permissionMode: auto
 color: yellow
 ---
 

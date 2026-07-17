@@ -1,6 +1,6 @@
 ---
 name: worker-bee
-description: General local implementer. Takes a starting prompt, plan file, or doc and implements it directly — no spec-unit scoping required. Use for ad-hoc build/fix work outside the specs/changes lifecycle. Do not use for spec-unit phases (use implementer) or doc-only edits (use doc-syncer).
+description: General local implementer. Takes a starting prompt, plan file, or doc and implements it directly — no spec-unit scoping required. Use for ad-hoc build/fix work outside the specs/changes lifecycle. Do not use for plan-file phases (use phase-runner).
 tools: Read, Edit, Write, Grep, Glob, Bash
 mcpServers:
   - webstorm
@@ -30,8 +30,7 @@ touching code.
 
 ## Finishing
 
-Always end by running `npm run gate` (lint → check → unit tests → build). A red gate is not
-done — fix it or report it as blocking.
+Always end by running `npm run gate`. A red gate is not done — fix it or report it as blocking.
 
 Report back:
 

@@ -6,7 +6,7 @@
  * TODO M-phase (ADR-011): the chrome glyphs flagged in specs/reference/component-inventory.md
  * (Glyph gaps: clear) are pinned here pending their formal addition to ADR-011. `menu` /
  * `navCombats` / `navSettings` / `navAbout` (unit 006 Phase 1, AppHeader/NavSidebar) fill the
- * "menu/burger, settings/about nav icons" gap — Combats keeps the prototype's crossed-swords glyph.
+ * "menu/burger, settings/about nav icons" gap — Combats keeps its crossed-swords glyph.
  */
 import {
 	ChevronDown,

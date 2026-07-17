@@ -1,6 +1,6 @@
 <!--
-  SearchField (Component Inventory "Combats home", CLS-1) — Combats-home real-time title filter
-  (prototype `.search-bar` recipe). This component only owns the input + its visual chrome; the
+  SearchField (Component Inventory "Combats home", CLS-1) — Combats-home real-time title filter.
+  This component only owns the input + its visual chrome; the
   filtering itself is a view-local `$derived` owned by `combats/+page.svelte` (ADR-002 — never
   persisted). Shown only while the combats list is non-empty (the page gates that, not here).
 -->

@@ -2,7 +2,7 @@
   NumberField (component-inventory.md) — labeled numeric input that clamps to its limits.md range
   on commit and surfaces the inline clamp hint. Clamp uses the domain `clamp` (single source
   of truth — clamp.ts); the store re-clamps authoritatively on mutate, so this is forgiving UX only.
-  Styled to the `.numfield` recipe (specs/design/prototype.html): bordered/rounded stepper shell
+  Styled as a bordered/rounded stepper shell
   around the value input, Decrease → value → Increase order. The value input is `type="text"`
   (not `type="number"`) so no native browser spinner arrows render, and typed entry is sanitized
   on `oninput` to digits + a single leading `-` — this keeps a lone `-`/`1e`/`1.` from blanking the
@@ -41,12 +41,11 @@
 	let clamped = $state(false);
 	const digitCap = $derived(Math.max(String(Math.abs(min)).length, String(Math.abs(max)).length));
 
-	// Prototype .field-label recipe (specs/design/prototype.html) — uppercase, muted, small caps.
+	// Field label: uppercase, muted, small caps.
 	const fieldLabelClass = 'text-xs font-medium uppercase tracking-wide text-muted-foreground';
 	const stepBtnClass =
 		'flex min-h-10 w-10 shrink-0 items-center justify-center text-lg text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:z-10 lg:focus-visible:ring-3 lg:focus-visible:ring-ring/50 active:bg-muted active:text-foreground transition-colors';
-	// Prototype .numfield recipe (specs/design/prototype.html) draws the stepper divider on
-	// --border-strong, not the default --border token.
+	// Stepper divider uses --border-strong, not the default --border token.
 	const stepBorderClass = 'border-[var(--border-strong)]';
 
 	// Allowed typed character set: digits + a single leading '-'. Keeps intermediate-invalid

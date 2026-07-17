@@ -94,7 +94,7 @@
                 : m['forms.field.name.placeholder.enemy'](),
     );
 
-    // Prototype .field-label recipe (specs/design/prototype.html) — uppercase, muted, small caps.
+    // Field label: uppercase, muted, small caps.
     // Mirrors NumberField.svelte's own field-label styling for a consistent look across the form.
     const fieldLabelClass = 'text-xs font-medium uppercase tracking-wide text-muted-foreground';
 

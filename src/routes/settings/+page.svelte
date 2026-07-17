@@ -1,7 +1,6 @@
 <!--
   Settings (specs/reference/component-inventory.md Hierarchy section, specs/capabilities/settings.md SET-1..5) — three
-  SettingsGroups (Language, Appearance, Data), per the approved `specs/design/prototype.html`
-  "SCREEN — Settings". Export/import rows are dropped from this screen (see component-inventory:
+  SettingsGroups (Language, Appearance, Data). Export/import rows are dropped from this screen (see component-inventory:
   "DataActions (Reset-all only)"). Reset-all is confirm-gated (SET-3) via the shared
   ConfirmDialog. The About link row is intentionally not rendered here (SET-5) — About stays
   reachable via URL and app nav.

@@ -50,8 +50,8 @@
 		store.deleteCombat(id);
 	}
 
-	// Desktop create control lives in AppHeader (prototype: `.icon-btn.create-desktop`), not on
-	// this page — hand it a snippet via the header-action seam while this route is mounted.
+	// Desktop create control lives in AppHeader, not on this page — hand it a snippet via the
+	// header-action seam while this route is mounted.
 	$effect(() => {
 		headerAction.set(createHeaderButton);
 		return () => headerAction.set(null);

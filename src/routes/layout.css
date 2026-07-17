@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "../../specs/design/tokens.css";
+@import "../lib/styles/tokens.css";
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
@@ -9,7 +9,7 @@
  * light, the combatant-type colors, the health/alarm bar, and the 8 combat
  * color-tag swatches are centralized and contrast-checked in one place.
  * Source of truth for every raw token (palette + scales + component dims):
- * specs/design/tokens.css, imported above — no value is re-typed here. This
+ * src/lib/styles/tokens.css, imported above — no value is re-typed here. This
  * file only maps those raw tokens onto the shadcn semantic aliases and the
  * Tailwind `@theme inline` utility layer. See PLT-5 for the contrast contract.
  * ------------------------------------------------------------------------- */

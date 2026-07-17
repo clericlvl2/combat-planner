@@ -1,7 +1,7 @@
 <!--
   CombatantRow (component-inventory.md "Combatant card", CBT-2) — one roster card, compact ↔ expanded via
-  Collapsible. Card shape ported from `specs/design/card-prototype.html` (locked in
-  `component-inventory.md`'s "Combatant card" section) · Row 1 type-color dot + name + expand
+  Collapsible. Card shape locked in `component-inventory.md`'s "Combatant card" section ·
+  Row 1 type-color dot + name + expand
   chevron + trailing `⋮` overflow menu · Row 2 big HP (+ temp-HP badge) inside a fixed-width block, and a
   health bar filling the remaining width · Row 3 AC/PD/MD + Init pill · Row 4 condition chips
   (read-only, all shown, wraps) · Row 5 note. When expanded, Row 4 also gets two tag-styled
@@ -91,13 +91,13 @@
 	const Remove = chromeIcon.remove;
 
 	/** "+ Condition" / "+ Note" triggers — same chip box as the condition tags (Badge), just
-	 *  dashed to read as an affordance rather than a value (prototype `.chip` + `.tag-trigger`
-	 *  recipe: chip gap, normal weight, `--border`-token border color). */
+	 *  dashed to read as an affordance rather than a value: chip gap, normal weight,
+	 *  `--border`-token border color. */
 	const tagTriggerClass =
 		'inline-flex h-[22px] items-center gap-[5px] rounded-full border border-dashed border-border px-2.5 py-0.5 text-sm text-muted-foreground hover:border-foreground hover:text-foreground';
 
 	/** Def-stat value styling (Row 3) — `<b>`-default (bold) weight against the muted label text,
-	 *  matching the prototype's `.def-stats b { color: var(--text) }` (no explicit font-weight). */
+	 *  text color `var(--text)` with no explicit font-weight override. */
 	const statClass = 'text-foreground tabular-nums';
 </script>
 

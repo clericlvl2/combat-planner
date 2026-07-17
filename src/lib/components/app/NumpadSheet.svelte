@@ -122,8 +122,8 @@
 		<!-- CommitActions (rendered above the digit pad — component-inventory.md "Numpad sheet"; empty entry → disabled no-op).
 		     Tint recipe: transparent fill + a tinted border + solid-color text (no bg fill) —
 		     WCAG-AA verified against both --surface/--popover themes (see phase report); a
-		     filled color-mix background per the prototype's literal `.btn--*-tint` recipe drops
-		     below 4.5:1 for at least one of the three colors in each theme with these token
+		     filled color-mix background drops below 4.5:1 for at least one of the three colors
+		     in each theme with these token
 		     hexes, so the border-only recipe is the AA-safe stand-in. -->
 		<div class="grid grid-cols-3 gap-2">
 			<Button

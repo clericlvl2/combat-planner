@@ -203,9 +203,8 @@
                 <Add class="size-5"/>
             </Button>
             {#if combat.combatants.length > 0}
-                <!-- Start FAB reads as a primary action (default variant = bg-primary), matching
-                     the prototype's `.fab--start` (inherits `.fab`'s primary fill), not a pale
-                     ghost/secondary roundel. Uses the LIF-2 play glyph (mirrors the desktop
+                <!-- Start FAB reads as a primary action (default variant = bg-primary), not a
+                     pale ghost/secondary roundel. Uses the LIF-2 play glyph (mirrors the desktop
                      header-start icon-roundel). -->
                 <Button
                         class="fixed right-4 bottom-24 size-14 rounded-full shadow-lg lg:hidden max-lg:focus-visible:ring-0 max-lg:focus-visible:border-transparent"

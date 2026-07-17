@@ -41,8 +41,7 @@
 	let colorTag = $state<ColorTag>('neutral');
 	const isDesktop = new MediaQuery('(min-width: 1024px)');
 
-	// Prototype .field-label recipe (specs/design/prototype.html) — uppercase, muted, small caps,
-	// normal weight (no extra font-medium beyond the prototype's plain-weight label).
+	// Field label: uppercase, muted, small caps, normal weight (no font-medium).
 	const fieldLabelClass = 'text-xs font-normal uppercase tracking-wide text-muted-foreground';
 
 	const formTitle = $derived(

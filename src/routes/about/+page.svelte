@@ -1,7 +1,6 @@
 <!--
   About (specs/reference/component-inventory.md Hierarchy AboutPage, specs/capabilities/settings.md SET-5) — static
-  page: app name + version, purpose, and the local-only privacy note, per the approved
-  `specs/design/prototype.html` "SCREEN — About" `.about` block.
+  page: app name + version, purpose, and the local-only privacy note.
 -->
 <script lang="ts">
 	import { m } from '$lib/i18n';

@@ -102,8 +102,7 @@
 </Popover>
 
 <style>
-	/* Light-theme init-pill override (component-inventory.md INI-2 / card-prototype.html
-	 * `[data-theme="light"] .chip.init-pill { background: #fff }`) — the secondary/surface-2
+	/* Light-theme init-pill override — the secondary/surface-2
 	 * token reads too close to the card surface on light, so the pill gets an explicit white. */
 	:global([data-theme='light'] .chip.init-pill) {
 		background: #fff;

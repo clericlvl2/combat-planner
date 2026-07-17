@@ -83,6 +83,5 @@ regenerate (`npm run prepare` / build triggers it).
 
 ## Design-truth rule
 
-Any UI-touching task loads `specs/design/*.html` and `specs/reference/component-inventory.md`
-as binding design truth before writing code — the prototypes carry the authoritative values
-(incl. light palette), `component-inventory.md` carries control placement/card layout.
+**Shipped code is design truth.** Token values live in `src/lib/styles/tokens.css`; component
+structure/placement is read from the components themselves. No design prototypes exist.

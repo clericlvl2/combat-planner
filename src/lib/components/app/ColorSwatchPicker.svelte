@@ -24,7 +24,7 @@
 		violet: m['forms.colorTag.violet'],
 	};
 
-	/** ColorTag key -> tile letter (prototype .swatch recipe) — fixed to the key, not the localized
+	/** ColorTag key -> tile letter — fixed to the key, not the localized
 	 * label, so locales whose color names collide on first letter (e.g. "green"/"violet") never
 	 * render duplicate letters. The color name itself is still carried by the aria-label. */
 	const colorTagLetter: Record<ColorTag, string> = {

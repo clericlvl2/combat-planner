@@ -1,9 +1,8 @@
 /* ---------------------------------------------------------------------------
  * Combat Planner — shared design tokens (single source of truth)
  * Raw custom properties only — no @import "tailwindcss", no @theme, no shadcn
- * aliases. Values copied verbatim from specs/design/prototype.html and
- * specs/design/card-prototype.html. Consumed via `@import` by prototype.html,
- * card-prototype.html, and src/routes/layout.css.
+ * aliases. Styling SSOT for the app, consumed via `@import` by
+ * src/routes/layout.css.
  * ------------------------------------------------------------------------- */
 
 :root {
@@ -41,11 +40,11 @@
 	--content-max-wide: 1024px;
 
 	/* Combatant card component dims */
-	/* Exception (change.md-documented): synced to shipped CombatantRow render, not prototype's prior 14px */
+	/* Synced to shipped CombatantRow render */
 	--card-pad: 10px;
 	--card-gap: var(--space-2);
 	--card-border: 1px;
-	/* Exception (change.md-documented): synced to shipped CombatantRow render, not prototype's prior 19px */
+	/* Synced to shipped CombatantRow render */
 	--hp-size: 16px;
 	--badge-width: 16px;
 }

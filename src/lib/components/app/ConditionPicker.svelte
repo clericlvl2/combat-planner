@@ -1,7 +1,8 @@
 <!--
   ConditionPicker (component-inventory.md, CND-3) — the 12 preset condition toggles, in a modal (Dialog)
   opened from the row's "Add condition" button. Text-only pills (no icons): unselected = outline,
-  selected = filled primary. Membership only, unique, up to 12 (CND-2). One click = one toggle;
+  selected = soft ~15% primary tinted fill + primary border, default text (CND-3). Membership only,
+  unique, up to 12 (CND-2). One click = one toggle;
   the diff against the current set yields exactly one change, forwarded as add/remove intent (no
   business logic here).
 -->
@@ -49,7 +50,7 @@
 			<ToggleGroupItem
 				value={c}
 				aria-label={m['a11y.condition.toggle']({ condition: conditionLabel[c](), name })}
-				class="!rounded-full min-h-11 px-3 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+				class="!rounded-full min-h-11 px-3 data-[state=on]:bg-primary/15 data-[state=on]:border-primary data-[state=on]:text-foreground"
 			>
 				{conditionLabel[c]()}
 			</ToggleGroupItem>

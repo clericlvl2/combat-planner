@@ -42,3 +42,8 @@ desktop (≥1024px) and a bottom `Drawer` on mobile ([[../reference/component-in
   remainder into a "+K" chip.
 - Expanding a row reveals all of the combatant's conditions with a removable control on each.
 - The condition picker in the expanded row exposes all 12 presets as togglable.
+- Unselected toggle pills render as plain outline chips (text-only, no dot/icon). A selected
+  pill uses a soft tinted fill (~15% `--primary` over the surface) plus a primary-colored
+  border and default foreground text — not a solid `--primary` fill with inverted text — so
+  selection reads as calm emphasis rather than a heavy block, while staying distinguishable by
+  more than color alone ([[../reference/component-inventory]], PLT-5).

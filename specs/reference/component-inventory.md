@@ -14,10 +14,23 @@ visible-focus requirement ([[../capabilities/platform]] PLT-5). **error** surfac
 and the component dims `--card-pad`/`--card-gap`/`--card-border`/`--hp-size`/`--badge-width`/
 `--touch-min`/`--content-max`) live in one place, `specs/design/tokens.css`, `@import`ed verbatim
 by `prototype.html`, `card-prototype.html`, and `src/routes/layout.css` — no value is re-typed in
-any of the three. One documented exception: `--card-pad` and `--hp-size` were synced to the
-shipped `CombatantRow` render (12px / 18px) rather than the prototype's prior 14px / 19px value;
-the prototype design source was updated to match. Theming is keyed by a `[data-theme="light"|
-"dark"]` attribute (see [[../capabilities/settings]] SET-2), not per-theme classes.
+any of the three. `--card-pad` is `10px` and `--hp-size` is `16px` (unit 024, compaction pass —
+was `12px`/`18px`, itself a unit-014 sync off an earlier prototype `14px`/`19px` value); since
+both are tokens, the prototype design source picks up each change automatically.
+
+**Deliberate prototype divergence (unit 024).** Several card dims are *not* tokenized and were
+shrunk in the app only, leaving the prototypes' literals unchanged — a user decision to keep the
+lowest-risk, code-only compaction pass: card chips (init pill, condition chips, `+ Condition`/
+`+ Note` triggers) render 22px tall in `CombatantRow`/`InitCell`/`ConditionIconList`, vs. the
+prototypes' `.chip` literal staying 24px; desktop (`lg:`) icon buttons (chevron, `⋮`) render 28px
+and the desktop HP tap row renders ≤32px in `CombatantRow`, vs. the prototypes' `.icon-btn`
+literal staying 32px. Mobile touch rows on the card (chevron, `⋮`, unified HP tap row) also
+shrank in the app, from 44px to 40px (`size-10`/`min-h-10` — a second, later-ordered user
+decision, still same unit); the prototypes' mobile literals are untouched, so app and
+prototype now diverge on mobile card dims too, not just desktop. This is a card-scoped
+exception — every other mobile touch target app-wide keeps the 44px floor
+([[../capabilities/platform]] PLT-2). Theming is keyed by a `[data-theme="light"|"dark"]`
+attribute (see [[../capabilities/settings]] SET-2), not per-theme classes.
 
 **Desktop content container ([[../capabilities/platform]] PLT-2).** `--content-max: 768px`
 (narrowed from an initial 1024px after unit-020 dogfooding) caps a shared `.content-container`
@@ -185,13 +198,15 @@ Card layout, leading → trailing:
   the HP numpad, with a pointer cursor on desktop ([[../capabilities/hp]] HP-4).
 - **Row 3** — AC/PD/MD defense stats + an Init pill (`Init N` once set, `Init –` while unset).
   The pill's hover affordance is confined to the pill control itself (no oversized surrounding
-  hover box), and the control is sized to the prototype's 24px chip dimension, not the 44px
-  touch-target default ([[../capabilities/initiative]] INI-2 — the wrapping `Button` still meets
-  the ≥44px hit-area requirement even though the visible pill it contains is smaller). The pill
-  has a **fixed width** (72px) so a 1-digit and a 2-digit value render identically wide, a
-  **pointer cursor**, and **no `min-height`** on the wrapping control.
+  hover box), and the control is sized to a 22px chip dimension in the shipped app (unit 024,
+  down from 24px — the prototype's `.chip` literal is unchanged, see "Deliberate prototype
+  divergence" above), not the 44px touch-target default ([[../capabilities/initiative]] INI-2 —
+  the wrapping `Button` still meets the ≥44px hit-area requirement even though the visible pill
+  it contains is smaller). The pill has a **fixed width** (72px) so a 1-digit and a 2-digit value
+  render identically wide, a **pointer cursor**, and **no `min-height`** on the wrapping control.
 - **Condition chips** — filled, full 13th-Age condition name (no icons, no 2-letter codes),
-  colour-coded per condition on a shared `.chip` base (round/pill shape). This file states
+  colour-coded per condition on a shared `.chip` base (round/pill shape), 22px tall in the
+  shipped app (unit 024, down from 24px; prototype `.chip` literal unchanged). This file states
   *what* renders — full-name filled chips per condition, one colour token each — not the
   `color-mix()` recipe, which is prototype/CSS implementation detail owned by
   `card-prototype.html`.

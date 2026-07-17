@@ -23,7 +23,7 @@
 {#if conditions.length}
 	<div class="flex flex-wrap items-center gap-1">
 		{#each conditions as c (c)}
-			<Badge variant="outline" class={['h-6 gap-1.5 px-2.5 text-sm font-normal', conditionColor[c]]}>
+			<Badge variant="outline" class={['h-[22px] gap-1.5 px-2.5 text-sm font-normal', conditionColor[c]]}>
 				{conditionLabel[c]()}
 				{#if removable}
 					<button

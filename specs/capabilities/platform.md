@@ -21,7 +21,11 @@ screen requires connectivity.
 
 Mobile-first; layout adapts per breakpoint (mobile/tablet/desktop) with no feature desktop-only.
 Primary actions stay reachable in the mobile thumb zone via bottom-right floating controls.
-Touch targets ≥44px in all modes. Exact control placement per breakpoint:
+Touch targets ≥44px in all modes, with one deliberate card-scoped exception: the combatant
+card's interactive rows (expand chevron, `⋮` menu trigger, unified HP tap row) measure 40px on
+the touch axis below `lg` (unit 024, user decision) — still clearing the WCAG 2.2 AA 2.5.8
+24px target-size minimum, just below the stricter 44px WCAG 2.1 AAA / Apple HIG tier the rest of
+the app keeps. Every other surface keeps the ≥44px floor. Exact control placement per breakpoint:
 [[../reference/component-inventory]].
 
 On desktop, the Combat screen is a single centered column — extrapolated from the mobile
@@ -70,7 +74,9 @@ renders the row on which screen).
 **AC:**
 - No feature is available on desktop but missing on mobile, or vice versa.
 - On mobile, the screen's primary action is reachable via a bottom-right floating control.
-- All interactive targets measure at least 44px on the touch axis.
+- All interactive targets measure at least 44px on the touch axis, except the combatant card's
+  chevron, `⋮` menu trigger, and unified HP tap row, which measure 40px below `lg` (the amended
+  card-scoped exception; [[combatants]] CBT-2).
 - On desktop, the Combat screen renders as a single centered column (no split-pane), reusing
   the mobile card composition unchanged.
 - A shared desktop container caps content width at 768px and centers it, with horizontal gutter

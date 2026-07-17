@@ -42,11 +42,11 @@
 
 	/* Combatant card component dims */
 	/* Exception (change.md-documented): synced to shipped CombatantRow render, not prototype's prior 14px */
-	--card-pad: 12px;
+	--card-pad: 10px;
 	--card-gap: var(--space-2);
 	--card-border: 1px;
 	/* Exception (change.md-documented): synced to shipped CombatantRow render, not prototype's prior 19px */
-	--hp-size: 18px;
+	--hp-size: 16px;
 	--badge-width: 16px;
 }
 

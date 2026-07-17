@@ -33,7 +33,9 @@ row expands it to reveal an editable note field and the condition picker.
 The trailing controls cluster holds the expand/collapse chevron immediately next to the
 persistent `⋮` menu (Edit/Duplicate/Remove) — not beside the name/title — and the two render at
 the same size. The card container carries no internal gap rule between its rows. On mobile, the
-card's `⋮` overflow trigger is a ≥44px touch target.
+card's chevron, `⋮` overflow trigger, and unified HP tap row ([[hp]] HP-4) each measure 40px on
+the touch axis — a deliberate card-scoped exception to the app-wide ≥44px floor (unit 024, user
+decision; [[platform]] PLT-2 amended).
 
 **AC:**
 - All fields listed above are visible on the compact row without expanding.
@@ -43,7 +45,8 @@ card's `⋮` overflow trigger is a ≥44px touch target.
 - The temp-HP badge is visible on the compact row without expanding whenever `tempHp > 0`.
 - The expand/collapse chevron sits in the trailing controls cluster next to the `⋮` menu, and
   the two render at the same size.
-- On mobile, the card's `⋮` overflow trigger is a ≥44px touch target.
+- On mobile, the card's chevron, `⋮` overflow trigger, and unified HP tap row each measure 40px
+  on the touch axis (card-scoped exception to the app-wide ≥44px floor, [[platform]] PLT-2).
 
 ## CBT-3 — Add combatant
 

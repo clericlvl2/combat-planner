@@ -53,18 +53,24 @@ triggers. Do not split across parallel implementers.
 
 ## Phase 3 — Prototype card literals
 
-**Owns:** `specs/design/card-prototype.html`, `specs/design/prototype.html`
-**Parallel-safe with:** Phase 2
+**CANCELLED before dispatch (user decision, 2026-07-17).** Prototype literal dims stay as-is —
+prototypes deliberately remain shifted from code on `.chip` height (24px) and `.icon-btn` size
+(32px). Only the token-driven `--card-pad`/`--hp-size` deltas reach the prototypes, via the
+shared `tokens.css` import from Phase 1. See change.md "What changes" / "Out of scope". No
+files owned; nothing to implement or verify beyond a no-diff check on both prototype files.
 
-Non-tokenized literal dims in the design-source prototypes (the `--card-pad`/`--hp-size` deltas
-flow in via the tokens.css import from Phase 1; only the hardcoded chip/icon literals need editing
-here).
+## Phase 4 — Mobile 40px touch rows (second scope change, 2026-07-17)
 
-- [ ] `card-prototype.html`: `.chip` height `24px` → `22px`; `.icon-btn` `width`/`height`
-      `32px` → `28px`.
-- [ ] `prototype.html`: `.chip` height `24px` → `22px`; `.cbt-card .icon-btn` `width`/`height`
-      `32px` → `28px` (leave the unrelated `.icon-btn` `height: 24px` at line ~396, which is not
-      the card icon button, untouched — verify before editing).
-- [ ] Both prototypes still render the combatant card with the new dims.
+**Owns:** `src/lib/components/app/CombatantRow.svelte`
+**Parallel-safe with:** none (added after Phases 1–2 landed and were code-verified; runs alone)
+
+User decision after inspecting shipped result: card mobile touch rows shrink 44px → 40px
+(amended PLT-2 card exception — see change.md "What changes"). Three class edits, nothing else:
+
+- [ ] Chevron button: `size-11 lg:size-7` → `size-10 lg:size-7`.
+- [ ] `⋮` DropdownMenuTrigger button: `size-11 lg:size-7` → `size-10 lg:size-7`.
+- [ ] Unified HP tap `<button>`: `min-h-11` → `min-h-10` (keep `lg:min-h-8` and all other
+      classes untouched).
+- [ ] No other changes in the file; both icon buttons stay the same size as each other.
 
 **Gate:** `npm run gate` must pass before this phase is reported done.

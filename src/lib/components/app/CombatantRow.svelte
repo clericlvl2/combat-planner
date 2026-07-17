@@ -94,7 +94,7 @@
 	 *  dashed to read as an affordance rather than a value (prototype `.chip` + `.tag-trigger`
 	 *  recipe: chip gap, normal weight, `--border`-token border color). */
 	const tagTriggerClass =
-		'inline-flex h-6 items-center gap-[5px] rounded-full border border-dashed border-border px-2.5 py-0.5 text-sm text-muted-foreground hover:border-foreground hover:text-foreground';
+		'inline-flex h-[22px] items-center gap-[5px] rounded-full border border-dashed border-border px-2.5 py-0.5 text-sm text-muted-foreground hover:border-foreground hover:text-foreground';
 
 	/** Def-stat value styling (Row 3) — `<b>`-default (bold) weight against the muted label text,
 	 *  matching the prototype's `.def-stats b { color: var(--text) }` (no explicit font-weight). */
@@ -128,7 +128,7 @@
 						<div class="flex shrink-0 items-center gap-0.5">
 							<CollapsibleTrigger>
 								{#snippet child({ props })}
-									<Button {...props} variant="ghost" size="icon" class="size-11 lg:size-8" aria-label={toggleLabel}>
+									<Button {...props} variant="ghost" size="icon" class="size-10 lg:size-7" aria-label={toggleLabel}>
 										<Chevron
 											class={['size-4 text-muted-foreground transition-transform', open && 'rotate-180']}
 										/>
@@ -139,7 +139,7 @@
 							<DropdownMenu>
 								<DropdownMenuTrigger>
 									{#snippet child({ props })}
-										<Button {...props} variant="ghost" size="icon" class="size-11 lg:size-8" aria-label={menuLabel}>
+										<Button {...props} variant="ghost" size="icon" class="size-10 lg:size-7" aria-label={menuLabel}>
 											<Overflow class="size-4" />
 										</Button>
 									{/snippet}
@@ -167,7 +167,7 @@
 					     health bar filling the rest, both inside one rounded hover/press area (HP-4). -->
 					<button
 						type="button"
-						class="flex min-h-11 w-full cursor-pointer items-center gap-3 rounded-md px-1 py-1 hover:bg-muted"
+						class="flex min-h-10 w-full cursor-pointer items-center gap-3 rounded-md px-1 py-1 hover:bg-muted lg:min-h-8"
 						aria-label={hpLabel}
 						onclick={() => onOpenNumpad(combatant.id)}
 					>

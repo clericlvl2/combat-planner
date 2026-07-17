@@ -1,8 +1,10 @@
 <!--
   ConditionPicker (component-inventory.md, CND-3) — the 12 preset condition toggles, in a modal (Dialog)
-  opened from the row's "Add condition" button. Text-only pills (no icons): unselected = outline,
-  selected = soft ~15% primary tinted fill + primary border, default text (CND-3). Membership only,
-  unique, up to 12 (CND-2). One click = one toggle;
+  opened from the row's "Add condition" button. Text-only pills (no icons), sorted alphabetically by
+  localized label (sortConditions). Each pill is colorized via an inline --tc from conditionAccent:
+  at rest a light --tc tint over --popover with --tc border + text; selected = deeper --tc fill +
+  solid --tc border + 1px --tc ring + mixed---tc text (mirrors the combatant Type selector, CND-3).
+  Membership only, unique, up to 12 (CND-2). One click = one toggle;
   the diff against the current set yields exactly one change, forwarded as add/remove intent (no
   business logic here).
 -->
@@ -13,7 +15,7 @@
 	import { ToggleGroup, ToggleGroupItem } from '$lib/components/ui/toggle-group';
 	import { type Condition, CONDITIONS } from '$lib/db/types';
 	import { m } from '$lib/i18n';
-	import { conditionLabel } from './labels';
+	import { conditionAccent, conditionLabel, sortConditions } from './labels';
 
 	let {
 		open = $bindable(false),
@@ -36,6 +38,8 @@
 		for (const c of set) if (!conditions.includes(c)) onAdd(c);
 		for (const c of conditions) if (!set.includes(c)) onRemove(c);
 	}
+
+	const sorted = $derived(sortConditions([...CONDITIONS]));
 </script>
 
 {#snippet toggles()}
@@ -46,11 +50,12 @@
 		variant="outline"
 		class="flex flex-wrap justify-start gap-1.5"
 	>
-		{#each CONDITIONS as c (c)}
+		{#each sorted as c (c)}
 			<ToggleGroupItem
 				value={c}
 				aria-label={m['a11y.condition.toggle']({ condition: conditionLabel[c](), name })}
-				class="!rounded-full min-h-11 px-3 data-[state=on]:bg-primary/15 data-[state=on]:border-primary data-[state=on]:text-foreground aria-pressed:bg-primary/15 aria-pressed:border-primary aria-pressed:text-foreground"
+				style="--tc: {conditionAccent[c]}"
+				class="!rounded-[12px] min-h-11 px-4 text-sm font-medium bg-[color-mix(in_srgb,var(--tc)_9%,var(--popover))] border-[color-mix(in_srgb,var(--tc)_28%,var(--border))] text-[var(--tc)] hover:bg-[color-mix(in_srgb,var(--tc)_15%,var(--popover))] data-[state=on]:bg-[color-mix(in_srgb,var(--tc)_18%,var(--popover))] data-[state=on]:border-[var(--tc)] data-[state=on]:ring-1 data-[state=on]:ring-[var(--tc)] data-[state=on]:text-[color-mix(in_srgb,var(--tc)_55%,var(--foreground))] aria-pressed:bg-[color-mix(in_srgb,var(--tc)_18%,var(--popover))] aria-pressed:border-[var(--tc)] aria-pressed:ring-1 aria-pressed:ring-[var(--tc)] aria-pressed:text-[color-mix(in_srgb,var(--tc)_55%,var(--foreground))]"
 			>
 				{conditionLabel[c]()}
 			</ToggleGroupItem>

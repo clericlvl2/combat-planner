@@ -39,6 +39,22 @@ export const conditionColor: Record<Condition, string> = {
 	staggered: 'border-combat-neutral/30 bg-combat-neutral/10 text-combat-neutral',
 };
 
+/** Per-condition combatant-card `--combat-*` hue, used by the condition picker (CND-3). */
+export const conditionAccent: Record<Condition, string> = {
+	charmed: 'var(--combat-violet)',
+	confused: 'var(--combat-amber)',
+	dazed: 'var(--combat-teal)',
+	fear: 'var(--combat-red)',
+	helpless: 'var(--combat-neutral)',
+	hindered: 'var(--combat-orange)',
+	shocked: 'var(--combat-blue)',
+	stuck: 'var(--combat-orange)',
+	stunned: 'var(--combat-teal)',
+	vulnerable: 'var(--combat-red)',
+	weakened: 'var(--combat-red)',
+	staggered: 'var(--combat-neutral)',
+};
+
 export const conditionLabel: Record<Condition, () => string> = {
 	charmed: m['conditions.charmed'],
 	confused: m['conditions.confused'],
@@ -76,3 +92,8 @@ export const healthTextColor: Record<HealthStatus, string> = {
 	bloodied: 'text-health-bloodied',
 	dead: 'text-health-dead',
 };
+
+/** Sorts conditions alphabetically by localized label (CND-3); returns a new array. */
+export function sortConditions(cs: Condition[]): Condition[] {
+	return [...cs].sort((a, b) => conditionLabel[a]().localeCompare(conditionLabel[b]()));
+}

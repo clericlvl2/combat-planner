@@ -42,8 +42,16 @@ desktop (≥1024px) and a bottom `Drawer` on mobile ([[../reference/component-in
   remainder into a "+K" chip.
 - Expanding a row reveals all of the combatant's conditions with a removable control on each.
 - The condition picker in the expanded row exposes all 12 presets as togglable.
-- Unselected toggle pills render as plain outline chips (text-only, no dot/icon). A selected
-  pill uses a soft tinted fill (~15% `--primary` over the surface) plus a primary-colored
-  border and default foreground text — not a solid `--primary` fill with inverted text — so
-  selection reads as calm emphasis rather than a heavy block, while staying distinguishable by
-  more than color alone ([[../reference/component-inventory]], PLT-5).
+- Each picker toggle pill carries its own condition's combatant-card hue: an inline `--tc`
+  custom property (from a per-condition accent map) matches the same `--combat-*` hue that
+  condition uses on the card chip. Pills are text-only (no dot/icon), rounded to 12px. At rest,
+  a pill shows a light tint of `--tc` over the modal surface, a `--tc`-tinted border, and
+  `--tc`-colored text. When selected, the pill deepens to a stronger same-hue fill, a solid
+  `--tc` border, a 1px `--tc` ring, and mixed-`--tc` text — mirroring the combatant Type
+  selector's selected recipe. Selection stays distinguishable by more than color alone (fill
+  depth plus ring, not color alone), and font-weight is constant across rest/selected states so
+  toggling a pill causes no row reflow ([[../reference/component-inventory]], PLT-5).
+- Both the expanded-row picker and the combatant-card condition chips (`ConditionIconList`)
+  render conditions ordered alphabetically by their localized label; the card chip's visual
+  style is otherwise unchanged — only the order differs. The picker's sort is recomputed
+  reactively so it re-sorts when the app language changes.

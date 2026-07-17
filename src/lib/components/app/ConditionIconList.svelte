@@ -9,7 +9,7 @@
 	import type { Condition } from '$lib/db/types';
 	import { m } from '$lib/i18n';
 	import { chromeIcon } from '$lib/icons';
-	import { conditionColor, conditionLabel } from './labels';
+	import { conditionColor, conditionLabel, sortConditions } from './labels';
 
 	let {
 		conditions,
@@ -18,11 +18,13 @@
 	}: { conditions: Condition[]; removable?: boolean; onRemove?: (c: Condition) => void } = $props();
 
 	const CloseIcon = chromeIcon.close;
+
+	const sorted = $derived(sortConditions(conditions));
 </script>
 
 {#if conditions.length}
 	<div class="flex flex-wrap items-center gap-1">
-		{#each conditions as c (c)}
+		{#each sorted as c (c)}
 			<Badge variant="outline" class={['h-[22px] gap-1.5 px-2.5 text-sm font-normal', conditionColor[c]]}>
 				{conditionLabel[c]()}
 				{#if removable}

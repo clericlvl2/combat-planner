@@ -48,14 +48,14 @@
 		value={conditions}
 		onValueChange={handle}
 		variant="outline"
-		class="flex flex-wrap justify-start gap-1.5"
+		class="flex flex-wrap justify-start gap-2"
 	>
 		{#each sorted as c (c)}
 			<ToggleGroupItem
 				value={c}
 				aria-label={m['a11y.condition.toggle']({ condition: conditionLabel[c](), name })}
 				style="--tc: {conditionAccent[c]}"
-				class="!rounded-[12px] min-h-11 px-4 text-sm font-medium bg-[color-mix(in_srgb,var(--tc)_9%,var(--popover))] border-[color-mix(in_srgb,var(--tc)_28%,var(--border))] text-[var(--tc)] hover:bg-[color-mix(in_srgb,var(--tc)_15%,var(--popover))] data-[state=on]:bg-[color-mix(in_srgb,var(--tc)_18%,var(--popover))] data-[state=on]:border-[var(--tc)] data-[state=on]:ring-1 data-[state=on]:ring-[var(--tc)] data-[state=on]:text-[color-mix(in_srgb,var(--tc)_55%,var(--foreground))] aria-pressed:bg-[color-mix(in_srgb,var(--tc)_18%,var(--popover))] aria-pressed:border-[var(--tc)] aria-pressed:ring-1 aria-pressed:ring-[var(--tc)] aria-pressed:text-[color-mix(in_srgb,var(--tc)_55%,var(--foreground))]"
+				class="!rounded-[12px] h-10 px-4 text-sm font-medium bg-[color-mix(in_srgb,var(--tc)_9%,var(--popover))] border-[color-mix(in_srgb,var(--tc)_28%,var(--border))] text-[var(--tc)] hover:bg-[color-mix(in_srgb,var(--tc)_15%,var(--popover))] data-[state=on]:bg-[color-mix(in_srgb,var(--tc)_18%,var(--popover))] data-[state=on]:border-[var(--tc)] data-[state=on]:ring-1 data-[state=on]:ring-[var(--tc)] data-[state=on]:text-[color-mix(in_srgb,var(--tc)_55%,var(--foreground))] aria-pressed:bg-[color-mix(in_srgb,var(--tc)_18%,var(--popover))] aria-pressed:border-[var(--tc)] aria-pressed:ring-1 aria-pressed:ring-[var(--tc)] aria-pressed:text-[color-mix(in_srgb,var(--tc)_55%,var(--foreground))]"
 			>
 				{conditionLabel[c]()}
 			</ToggleGroupItem>

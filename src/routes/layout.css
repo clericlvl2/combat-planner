@@ -165,4 +165,19 @@
 	body {
 		@apply bg-background text-foreground;
 	}
+
+	/* PLT-2 / PLT-5: suppress the visible focus ring for pointer/touch focus on form
+	 * controls (a mobile tap otherwise leaves a lingering ring that reads as a stuck
+	 * outline), while keyboard `:focus-visible` (Tab) still shows the shared --ring
+	 * token everywhere. Scoped to native controls and their shadcn [data-slot]
+	 * wrappers rather than removing the focus style outright. */
+	input:focus:not(:focus-visible),
+	select:focus:not(:focus-visible),
+	textarea:focus:not(:focus-visible),
+	[data-slot="input"]:focus:not(:focus-visible),
+	[data-slot="select-trigger"]:focus:not(:focus-visible),
+	[data-slot="textarea"]:focus:not(:focus-visible) {
+		outline: none;
+		box-shadow: none;
+	}
 }

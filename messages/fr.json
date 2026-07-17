@@ -15,6 +15,7 @@
 	"combats.empty.description": "Créez votre premier combat pour suivre l'initiative et les PV.",
 	"combats.empty.cta": "Nouveau combat",
 	"combats.untitled": "Combat sans titre",
+	"combats.defaultTitle": "Nouveau combat",
 	"combats.search.placeholder": "Rechercher des combats…",
 	"combat.round": "Manche {n}",
 	"combat.round.label": "Manche",

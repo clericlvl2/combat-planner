@@ -1,21 +1,18 @@
 <!--
   Settings (specs/reference/component-inventory.md Hierarchy section, specs/capabilities/settings.md SET-1..5) — three
-  SettingsGroups (Language, Appearance, Data) + a headingless About link row, per the approved
-  `specs/design/prototype.html` "SCREEN — Settings". Export/import rows are dropped from this
-  screen (see component-inventory: "DataActions (Reset-all only)"). Reset-all is confirm-gated
-  (SET-3) via the shared ConfirmDialog.
+  SettingsGroups (Language, Appearance, Data), per the approved `specs/design/prototype.html`
+  "SCREEN — Settings". Export/import rows are dropped from this screen (see component-inventory:
+  "DataActions (Reset-all only)"). Reset-all is confirm-gated (SET-3) via the shared
+  ConfirmDialog. The About link row is intentionally not rendered here (SET-5) — About stays
+  reachable via URL and app nav.
 -->
 <script lang="ts">
 	import ConfirmDialog from '$lib/components/app/ConfirmDialog.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Select, SelectContent, SelectItem, SelectTrigger } from '$lib/components/ui/select';
-	import { ToggleGroup, ToggleGroupItem } from '$lib/components/ui/toggle-group';
 	import type { Locale, Theme } from '$lib/db/types';
 	import { getLocale, locales, m, setLocale } from '$lib/i18n';
-	import { chromeIcon } from '$lib/icons';
 	import { store } from '$lib/stores';
-
-	const ChevronIcon = chromeIcon.advance;
 
 	// Bracket-indexing `m` with a runtime key isn't type-safe (see labels.ts) — pin each locale to
 	// its message fn once.
@@ -39,6 +36,14 @@
 		setLocale(locale, { reload: false });
 		store.updateSettings({ language: locale });
 	}
+
+	const themeLabel: Record<Theme, () => string> = {
+		system: m['settings.theme.system'],
+		dark: m['settings.theme.dark'],
+		light: m['settings.theme.light'],
+	};
+
+	const themes: Theme[] = ['system', 'dark', 'light'];
 
 	function onThemeChange(next: string) {
 		if (!next) return;
@@ -75,24 +80,18 @@
 		</h2>
 		<div class="flex items-center justify-between gap-3 py-2">
 			<span class="shrink-0 text-sm">{m['settings.theme']()}</span>
-			<ToggleGroup
-				type="single"
-				variant="outline"
-				value={store.settings.theme}
-				onValueChange={onThemeChange}
-				class="flex-1"
-				aria-label={m['settings.theme']()}
-			>
-				<ToggleGroupItem value="system" class="h-11 flex-1">
-					{m['settings.theme.system']()}
-				</ToggleGroupItem>
-				<ToggleGroupItem value="dark" class="h-11 flex-1">
-					{m['settings.theme.dark']()}
-				</ToggleGroupItem>
-				<ToggleGroupItem value="light" class="h-11 flex-1">
-					{m['settings.theme.light']()}
-				</ToggleGroupItem>
-			</ToggleGroup>
+			<Select type="single" value={store.settings.theme} onValueChange={onThemeChange}>
+				<SelectTrigger class="h-11 flex-1 justify-between" aria-label={m['settings.theme']()}>
+					{themeLabel[store.settings.theme]()}
+				</SelectTrigger>
+				<SelectContent>
+					{#each themes as theme (theme)}
+						<SelectItem value={theme} label={themeLabel[theme]()}>
+							{themeLabel[theme]()}
+						</SelectItem>
+					{/each}
+				</SelectContent>
+			</Select>
 		</div>
 	</section>
 
@@ -116,14 +115,6 @@
 			</Button>
 		</div>
 	</section>
-
-	<a
-		href="/about"
-		class="focus-visible:border-ring focus-visible:ring-ring/50 flex min-h-11 items-center justify-between gap-3 rounded-[var(--radius)] border border-border bg-card px-4 py-2 text-sm outline-none focus-visible:ring-3"
-	>
-		{m['settings.group.about']()}
-		<ChevronIcon class="size-4 text-muted-foreground" aria-hidden="true" />
-	</a>
 </div>
 
 <ConfirmDialog

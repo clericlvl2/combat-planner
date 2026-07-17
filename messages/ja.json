@@ -15,6 +15,7 @@
 	"combats.empty.description": "最初の戦闘を作成して、イニシアチブとHPの管理を始めましょう。",
 	"combats.empty.cta": "新しい戦闘",
 	"combats.untitled": "無題の戦闘",
+	"combats.defaultTitle": "新しい戦闘",
 	"combats.search.placeholder": "戦闘を検索…",
 	"combat.round": "ラウンド {n}",
 	"combat.round.label": "ラウンド",

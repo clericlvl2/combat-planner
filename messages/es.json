@@ -15,6 +15,7 @@
 	"combats.empty.description": "Crea tu primer combate para empezar a seguir la iniciativa y los PV.",
 	"combats.empty.cta": "Nuevo combate",
 	"combats.untitled": "Combate sin título",
+	"combats.defaultTitle": "Nuevo combate",
 	"combats.search.placeholder": "Buscar combates…",
 	"combat.round": "Ronda {n}",
 	"combat.round.label": "Ronda",

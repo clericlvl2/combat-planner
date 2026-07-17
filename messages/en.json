@@ -15,6 +15,7 @@
 	"combats.empty.description": "Create your first encounter to start tracking initiative and HP.",
 	"combats.empty.cta": "New combat",
 	"combats.untitled": "Untitled combat",
+	"combats.defaultTitle": "New combat",
 	"combats.search.placeholder": "Search combats…",
 	"combat.round": "Round {n}",
 	"combat.round.label": "Round",

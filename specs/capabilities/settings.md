@@ -24,7 +24,9 @@ offline.
 
 ## SET-2 — Theme
 
-Dark and light themes, following system preference by default; manual toggle in Settings; choice
+Dark and light themes, following system preference by default; manual choice in Settings, made
+via a `Select` dropdown — the same component/shape as the SET-1 language selector, showing the
+current theme (System/Dark/Light) in the trigger — rather than a multi-button toggle; choice
 persists. Color tags and health states remain legible in both themes. Applied via a
 `[data-theme="light"|"dark"]` attribute on the document root (not a `.dark` class), so additional
 themes are a token-block addition rather than a code change — no new theme is exposed in the UI
@@ -32,6 +34,9 @@ yet.
 
 **AC:**
 - With no manual choice, the theme follows the OS/browser color-scheme preference.
+- The theme control renders as a `Select` dropdown (trigger + content + items), matching the
+  language selector's shape, offering System/Dark/Light and showing the current choice in the
+  trigger.
 - Toggling the theme in Settings persists across reloads.
 
 ## SET-3 — Reset all
@@ -53,7 +58,12 @@ IMP-1 and IMP-3.
 ## SET-5 — About page
 
 A short static page: what the app is, its version, and a privacy note that data is local-only.
+The Settings screen itself does **not** link to it — the About link row was removed from
+Settings — but the page is still reachable by direct URL (`/about`) and remains a destination in
+the app nav ([[platform]] PLT-3).
 
 **AC:**
 - The About page states the app's purpose, shows a version string, and states that data never
   leaves the device.
+- The Settings screen renders no About link/row; `/about` still renders the page directly and
+  About remains a nav destination.

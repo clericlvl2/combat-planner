@@ -50,6 +50,14 @@ desktop focus ring is unaffected); mobile bottom-drawers (used by the `Combatant
 a working swipe-to-close drag handle; and interactive buttons show a pointer cursor on hover
 app-wide.
 
+App-wide, on all viewports, form fields (native `input`/`select`/`textarea` and the shadcn
+`Input`/`Select`-trigger/`Textarea` wrappers) suppress their focus ring for pointer/touch focus —
+via `:focus:not(:focus-visible)` — while a keyboard `Tab` focus on the same field still shows the
+visible ring everywhere; this is a plain a11y-preserving refinement, not the FAB's
+breakpoint-gated suppression above. The three `⋮` overflow `DropdownMenu`s (`CombatRowMenu`,
+`CombatantRow`, `CombatHeader`) render their items at ≥44px tall on all viewports (a shared
+`DropdownMenuItem` sizing, not a per-menu override).
+
 On mobile, the combat screen's bottom padding exceeds 2× the FAB height plus the inter-FAB gaps,
 so content is never hidden behind the stacked FABs; the combat-screen header's overflow (`⋮`)
 and icon controls are ≥44px touch targets.
@@ -82,6 +90,10 @@ renders the row on which screen).
   is unaffected.
 - Mobile bottom-drawers include a working swipe-to-close handle, and buttons show a pointer
   cursor on hover.
+- On a form field, pointer/touch focus shows no focus ring while a keyboard `Tab` focus on the
+  same field shows the visible ring, on both mobile and desktop viewports.
+- Each item in the `CombatRowMenu`, `CombatantRow` `⋮`, and `CombatHeader` `⋮` dropdown menus
+  measures ≥44px on the touch axis.
 
 ## PLT-3 — Navigation per breakpoint
 
@@ -144,7 +156,9 @@ start bar ([[../reference/component-inventory]]).
 ## PLT-5 — Accessibility (WCAG 2.1 AA)
 
 Practical WCAG 2.1 AA: contrast in both themes, ≥44px touch targets (PLT-2), visible focus,
-semantic labels, scalable text. Color tags and health states are never conveyed by color alone
+semantic labels, scalable text. Visible-focus a11y is preserved even where pointer/touch focus is
+suppressed (PLT-2): keyboard focus still shows a ring everywhere; only pointer/touch focus (which
+never needs the ring) is hidden. Color tags and health states are never conveyed by color alone
 except one deliberate exception: the combats-list `ColorTagDot` (the dot's fill is the picked
 color with no accompanying label; the dot's letter is the combat title's initial — a
 disambiguator, not a color signifier — so the picked color itself carries no status information

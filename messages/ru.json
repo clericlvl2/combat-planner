@@ -15,6 +15,7 @@
 	"combats.empty.description": "Создайте свой первый бой, чтобы начать отслеживать инициативу и ОЗ.",
 	"combats.empty.cta": "Новый бой",
 	"combats.untitled": "Бой без названия",
+	"combats.defaultTitle": "Новый бой",
 	"combats.search.placeholder": "Поиск боёв…",
 	"combat.round": "Раунд {n}",
 	"combat.round.label": "Раунд",

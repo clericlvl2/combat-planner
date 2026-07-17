@@ -69,7 +69,8 @@
 			open = false;
 			return;
 		}
-		const created = store.createCombat({ title, description, colorTag });
+		const resolvedTitle = title.trim() ? title : m['combats.defaultTitle']();
+		const created = store.createCombat({ title: resolvedTitle, description, colorTag });
 		if (!created) return;
 		open = false;
 	}

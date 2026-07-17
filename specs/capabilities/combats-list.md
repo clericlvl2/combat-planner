@@ -13,7 +13,9 @@ owns only that a combat has one.
 
 Combats render as a vertical list; each row shows Title, Description, and a Color tag, plus a
 per-row trailing `⋮` overflow menu (Edit / Delete; the Export/share item is pending under CLS-8).
-A combat with a blank/whitespace-only title renders a placeholder title instead of a blank row.
+A combat with a blank/whitespace-only title renders a placeholder title instead of a blank row —
+in practice this now only surfaces for a combat whose title went blank by some means other than
+Create (e.g. edited to blank, CLS-3), since Create itself always persists a real title (CLS-2).
 When there are no combats to show, an empty-state view renders in place of the list: an icon, a
 short description, and a "New combat" call-to-action that creates one (same action as CLS-2). On
 desktop, hovering anywhere over a combat row applies a whole-card hover highlight (see CLS-5 for
@@ -23,7 +25,8 @@ corner radius matches the combatant card's radius ([[../reference/component-inve
 **AC:**
 - Every combat row displays title, description, and its color tag.
 - A combat whose title is empty or whitespace-only shows the localized placeholder title
-  ("Untitled combat") instead of a blank row.
+  ("Untitled combat") instead of a blank row (surfaces only for non-Create paths to blank —
+  see CLS-2 for Create's default-title behavior).
 - The row `⋮` menu exposes Edit and Delete. (The Export/share item is added when CLS-8 lands —
   [[import-export]].)
 - When the combats list is empty, the empty-state view renders an icon, a description, and a
@@ -33,8 +36,13 @@ corner radius matches the combatant card's radius ([[../reference/component-inve
 ## CLS-2 — Create combat
 
 Fields: Title, Description, Color tag (chosen from the preset swatch palette, rendered as a
-single full-width stretched row of equal-width swatches — not a fixed-square wrapping grid). New
-combat is added at the **top** of the list. Creating past the 100-combat cap
+single full-width stretched row of equal-width swatches — not a fixed-square wrapping grid). A
+blank or whitespace-only Title is not stored as empty: it resolves to a localized default title
+(paraglide key `combats.defaultTitle`, "New combat" — [[../reference/i18n-catalog]]), which is
+persisted as the combat's stored title; a non-blank title is stored verbatim. This default-title
+fallback applies to Create only — editing an existing combat to a blank title is unaffected
+(CLS-3) and still surfaces the "Untitled combat" placeholder (CLS-1). New combat is added at the
+**top** of the list. Creating past the 100-combat cap
 ([[../reference/limits]]) is blocked **silently**: nothing is created, the dialog stays open, and
 no inline cap-error message is shown — amended: the prior cap-error banner and its
 field-edit-clears-it behavior are both gone. The dialog is a centered `Dialog` on desktop
@@ -50,6 +58,9 @@ field whose current choice must stay visible.
 
 **AC:**
 - A newly created combat appears at the top of the list, in `state: setup` ([[lifecycle]] LIF-1).
+- Creating a combat with a blank or whitespace-only title stores the localized default title
+  (`combats.defaultTitle`, "New combat") as that combat's title, not an empty string; a non-blank
+  title is stored verbatim.
 - Creating a 101st combat is blocked silently: nothing is created, the dialog stays open, and no
   error message is shown.
 - The form renders as a centered `Dialog` at ≥1024px and a bottom `Drawer` below it.

@@ -59,6 +59,7 @@ a11y.*         accessible labels for controls
 | `combats.empty.description` | Create your first encounter to start tracking initiative and HP. |
 | `combats.empty.cta` | New combat |
 | `combats.untitled` | Untitled combat |
+| `combats.defaultTitle` | New combat |
 | `combats.search.placeholder` | Search combats… |
 
 ## combat.* — header (both states)

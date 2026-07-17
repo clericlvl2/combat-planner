@@ -34,6 +34,39 @@ test('create mode calls store.createCombat with the form values', async () => {
 	expect(editCombatFn).not.toHaveBeenCalled();
 });
 
+test('create mode with a blank title persists the localized default title', async () => {
+	const createCombatFn = vi.fn(() => createCombat({ title: 'New combat' }, 0, () => 'new'));
+	const editCombatFn = vi.fn();
+	const store = { createCombat: createCombatFn, editCombat: editCombatFn };
+	const screen = render(CombatFormDialog, { open: true, store });
+
+	await screen.getByRole('button', { name: m['forms.action.create']() }).click();
+
+	expect(createCombatFn).toHaveBeenCalledTimes(1);
+	expect(createCombatFn).toHaveBeenCalledWith({
+		title: m['combats.defaultTitle'](),
+		description: '',
+		colorTag: 'neutral',
+	});
+});
+
+test('create mode with a whitespace-only title persists the localized default title', async () => {
+	const createCombatFn = vi.fn(() => createCombat({ title: 'New combat' }, 0, () => 'new'));
+	const editCombatFn = vi.fn();
+	const store = { createCombat: createCombatFn, editCombat: editCombatFn };
+	const screen = render(CombatFormDialog, { open: true, store });
+
+	await userEvent.fill(screen.getByLabelText(m['forms.field.title']()), '   ');
+	await screen.getByRole('button', { name: m['forms.action.create']() }).click();
+
+	expect(createCombatFn).toHaveBeenCalledTimes(1);
+	expect(createCombatFn).toHaveBeenCalledWith({
+		title: m['combats.defaultTitle'](),
+		description: '',
+		colorTag: 'neutral',
+	});
+});
+
 test('create mode blocks silently and keeps the dialog open when store returns null (cap hit)', async () => {
 	const createCombatFn = vi.fn(() => null);
 	const store = { createCombat: createCombatFn, editCombat: vi.fn() };

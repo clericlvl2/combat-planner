@@ -15,6 +15,7 @@
 	"combats.empty.description": "Erstelle deinen ersten Kampf, um Initiative und TP zu verfolgen.",
 	"combats.empty.cta": "Neuer Kampf",
 	"combats.untitled": "Unbenannter Kampf",
+	"combats.defaultTitle": "Neuer Kampf",
 	"combats.search.placeholder": "Kämpfe durchsuchen…",
 	"combat.round": "Runde {n}",
 	"combat.round.label": "Runde",

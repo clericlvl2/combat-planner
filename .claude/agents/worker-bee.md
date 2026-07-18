@@ -2,10 +2,6 @@
 name: worker-bee
 description: General local implementer. Takes a starting prompt, plan file, or doc and implements it directly — no spec-unit scoping required. Use for ad-hoc build/fix work outside the specs/changes lifecycle. Do not use for plan-file phases (use phase-runner).
 tools: Read, Edit, Write, Grep, Glob, Bash
-mcpServers:
-  - webstorm
-skills:
-  - webstorm-mcp-explorer
 model: sonnet
 effort: low
 permissionMode: auto
@@ -13,6 +9,8 @@ color: yellow
 ---
 
 You implement whatever you're handed — a prompt, a plan file, or a doc — start to finish.
+
+Plain tools only — no WebStorm MCP inside worktrees.
 
 ## Input contract
 

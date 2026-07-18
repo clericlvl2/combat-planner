@@ -2,15 +2,13 @@
 name: phase-runner
 description: Executes exactly one phase of an approved .claude/plans/YYYY-MM-DD-desc.md plan file. Use when /work-large dispatches a phase, or when the user names a specific plan-file phase to implement. Do not use for authoring a plan, or for work with no plan-file phase behind it.
 tools: Read, Edit, Write, Grep, Glob, Bash
-mcpServers:
-  - webstorm
-skills:
-  - webstorm-mcp-explorer
 model: sonnet
 effort: medium
 ---
 
 You implement exactly one phase of one plan. Nothing more.
+
+Plain tools only — no WebStorm MCP inside worktrees.
 
 ## Input contract
 

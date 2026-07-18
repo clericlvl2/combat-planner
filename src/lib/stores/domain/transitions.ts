@@ -24,7 +24,7 @@ import {
 	clampPd,
 	clampRound,
 } from './clamp';
-import { canAdvance, sortedCombatants } from './derive';
+import { canAdvance, nextEnabledTurn, sortedCombatants } from './derive';
 import { type CombatantInput, createCombatant } from './factories';
 import { applyDamage, applyHeal, applySetMax, applySetTemp } from './hp';
 import { type D20Roll, d20 as defaultD20, genId as defaultGenId, type IdGen } from './id';
@@ -157,6 +157,7 @@ export function duplicateCombatant(
 		tempHp: 0,
 		conditions: [],
 		hpLog: [],
+		disabled: false,
 	};
 	const pushed = pushUndo(combat, 'duplicateCombatant');
 	return { ...pushed, combatants: [...pushed.combatants, copy], updatedAt: now() };
@@ -179,6 +180,19 @@ export function removeCondition(combat: Combat, id: string, condition: Condition
 	return mapCombatant(pushUndo(combat, 'removeCondition'), id, (cb) => ({
 		...cb,
 		conditions: cb.conditions.filter((x) => x !== condition),
+	}));
+}
+
+/**
+ * Toggle disabled. Excluded from the turn pointer + rendered pale (UI); still damageable, still
+ * condition- and initiative-editable, stays in initiative order. Active-disable leaves the
+ * pointer put by design — no pointer logic here.
+ */
+export function toggleDisabled(combat: Combat, id: string): Combat {
+	if (!find(combat, id)) return combat;
+	return mapCombatant(pushUndo(combat, 'toggleDisabled'), id, (c) => ({
+		...c,
+		disabled: !c.disabled,
 	}));
 }
 
@@ -253,7 +267,7 @@ export function editCombatant(
 
 // ── lifecycle ─────────────────────────────────────────────────────────────
 
-/** Start: roll all "-", re-sort, Active, round 1, pointer = top of order. */
+/** Start: roll all "-", re-sort, Active, round 1, pointer = first enabled in order. */
 export function start(combat: Combat, roll: D20Roll = defaultD20): Combat {
 	if (combat.state !== 'setup') return combat;
 	const pushed = pushUndo(combat, 'start');
@@ -270,27 +284,30 @@ export function start(combat: Combat, roll: D20Roll = defaultD20): Combat {
 		escalation: 0,
 		updatedAt: now(),
 	};
-	const top = sortedCombatants(rolled)[0];
+	const sorted = sortedCombatants(rolled);
+	const top = sorted.find((c) => !c.disabled) ?? sorted[0];
 	return { ...rolled, activeCombatantId: top ? top.id : NONE };
 }
 
 /**
- * Advance the turn; wrap → round+1 AND escalation+1 (decoupled from round otherwise). Blocked at
- * the r99 wrap. A plain turn advance within the same round never touches escalation.
+ * Advance the turn to the next ENABLED combatant, skipping any disabled ones; wrap → round+1 AND
+ * escalation+1 exactly once, regardless of how many disabled were skipped (decoupled from round
+ * otherwise). Blocked at the r99 wrap. A plain turn advance within the same round never touches
+ * escalation.
  */
 export function advanceTurn(combat: Combat): Combat {
 	if (!canAdvance(combat)) return combat;
 	const pushed = pushUndo(combat, 'advanceTurn');
-	const sorted = sortedCombatants(pushed);
-	const idx = sorted.findIndex((c) => c.id === pushed.activeCombatantId);
-	if (idx >= 0 && idx < sorted.length - 1) {
-		return { ...pushed, activeCombatantId: sorted[idx + 1].id, updatedAt: now() };
+	const next = nextEnabledTurn(pushed);
+	if (!next) return combat; // unreachable given canAdvance, kept for type safety
+	if (!next.wrapped) {
+		return { ...pushed, activeCombatantId: next.id, updatedAt: now() };
 	}
 	return {
 		...pushed,
 		round: clampRound(pushed.round + 1),
 		escalation: clampEscalation(pushed.escalation + 1),
-		activeCombatantId: sorted[0].id,
+		activeCombatantId: next.id,
 		updatedAt: now(),
 	};
 }
@@ -330,6 +347,7 @@ export function restart(combat: Combat): Combat {
 		tempHp: 0,
 		conditions: [],
 		hpLog: [],
+		disabled: false,
 	}));
 	return {
 		...pushed,

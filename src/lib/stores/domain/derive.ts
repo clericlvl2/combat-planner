@@ -49,14 +49,41 @@ export function sortedCombatants(combat: Combat): Combatant[] {
 	return [...rolled, ...unrolled];
 }
 
+export interface NextTurn {
+	id: string;
+	wrapped: boolean;
+}
+
 /**
- * canAdvance: Active, non-empty, and NOT the round-99 → round-100 wrap. Advancing
- * within round 99 (not yet on the last combatant) still works.
+ * Next ENABLED combatant after the active one in initiative order, wrapping to the top.
+ * `wrapped` = the scan passed the end of the order (→ round + escalation bump).
+ * null when no combatant is enabled.
+ */
+export function nextEnabledTurn(combat: Combat): NextTurn | null {
+	const sorted = sortedCombatants(combat);
+	const n = sorted.length;
+	if (n === 0) return null;
+	const idx = sorted.findIndex((c) => c.id === combat.activeCombatantId);
+	let wrapped = false;
+	let i = idx;
+	for (let step = 0; step < n; step += 1) {
+		i += 1;
+		if (i >= n) {
+			i = 0;
+			wrapped = true;
+		}
+		if (!sorted[i].disabled) return { id: sorted[i].id, wrapped };
+	}
+	return null; // all disabled
+}
+
+/**
+ * canAdvance: Active, non-empty, at least one enabled combatant, and NOT the round-99 →
+ * round-100 wrap. Advancing within round 99 (not yet on the last enabled combatant) still works.
  */
 export function canAdvance(combat: Combat): boolean {
 	if (combat.state !== 'active' || combat.combatants.length === 0) return false;
-	const sorted = sortedCombatants(combat);
-	const idx = sorted.findIndex((c) => c.id === combat.activeCombatantId);
-	const onLast = idx === sorted.length - 1;
-	return !(combat.round >= 99 && onLast);
+	const next = nextEnabledTurn(combat);
+	if (!next) return false; // all disabled
+	return !(combat.round >= 99 && next.wrapped); // r99→100 wrap block
 }

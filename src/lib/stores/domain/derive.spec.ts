@@ -5,6 +5,7 @@ import {
 	escalationDie,
 	healthPercent,
 	healthStatus,
+	nextEnabledTurn,
 	showRoundAndEscalation,
 	sortedCombatants,
 } from './derive';
@@ -92,5 +93,54 @@ describe('showRoundAndEscalation / canAdvance', () => {
 		// active on the first at round 99 → still advances within the round
 		const withinR99 = combat([a, b], { state: 'active', round: 99, activeCombatantId: a.id });
 		expect(canAdvance(withinR99)).toBe(true);
+	});
+});
+
+describe('nextEnabledTurn', () => {
+	it('returns the plain next combatant, unwrapped, when it is enabled', () => {
+		const a = combatant({ initiative: 20 }, 0);
+		const b = combatant({ initiative: 10 }, 1);
+		const next = nextEnabledTurn(combat([a, b], { activeCombatantId: a.id }));
+		expect(next).toEqual({ id: b.id, wrapped: false });
+	});
+
+	it('skips disabled combatants and reports wrapped when it passes the end', () => {
+		const a = combatant({ initiative: 20 }, 0);
+		const b = combatant({ initiative: 15, disabled: true }, 1);
+		const c = combatant({ initiative: 10 }, 2);
+		const next = nextEnabledTurn(combat([a, b, c], { activeCombatantId: a.id }));
+		expect(next).toEqual({ id: c.id, wrapped: false });
+
+		const wrapped = nextEnabledTurn(combat([a, b, c], { activeCombatantId: c.id }));
+		expect(wrapped).toEqual({ id: a.id, wrapped: true });
+	});
+
+	it('returns null when every combatant is disabled', () => {
+		const a = combatant({ initiative: 20, disabled: true }, 0);
+		const b = combatant({ initiative: 10, disabled: true }, 1);
+		expect(nextEnabledTurn(combat([a, b], { activeCombatantId: a.id }))).toBeNull();
+	});
+});
+
+describe('canAdvance — disabled interplay', () => {
+	it('false when zero combatants are enabled', () => {
+		const a = combatant({ initiative: 20, disabled: true }, 0);
+		const b = combatant({ initiative: 10, disabled: true }, 1);
+		expect(canAdvance(combat([a, b], { state: 'active', activeCombatantId: a.id }))).toBe(false);
+	});
+
+	it('true when a disabled combatant must be skipped to reach the next enabled one', () => {
+		const a = combatant({ initiative: 20 }, 0);
+		const b = combatant({ initiative: 15, disabled: true }, 1);
+		const c = combatant({ initiative: 10 }, 2);
+		expect(canAdvance(combat([a, b, c], { state: 'active', activeCombatantId: a.id }))).toBe(true);
+	});
+
+	it('the round-99 wrap block still holds when a wrap is reached by skipping disabled', () => {
+		const a = combatant({ initiative: 20, disabled: true }, 0);
+		const b = combatant({ initiative: 10 }, 1);
+		// a is disabled, so the only enabled next-turn candidate is b wrapping back to itself.
+		const r99 = combat([a, b], { state: 'active', round: 99, activeCombatantId: b.id });
+		expect(canAdvance(r99)).toBe(false);
 	});
 });

@@ -19,6 +19,7 @@ import {
 	setMaxHp,
 	setTempHp,
 	start,
+	toggleDisabled,
 } from './transitions';
 import { redo, undo } from './undo';
 
@@ -56,6 +57,13 @@ describe('start', () => {
 		expect(back.state).toBe('setup');
 		expect(back.activeCombatantId).toBe('none');
 		expect(back.combatants[0].initiative).toBe('-');
+	});
+
+	it('pointer lands on the first ENABLED combatant in order, skipping a disabled top', () => {
+		const a = mk({ id: 'a', initiative: 20, disabled: true }, 0);
+		const b = mk({ id: 'b', initiative: 10 }, 1);
+		const next = start(combat([a, b]), d10);
+		expect(next.activeCombatantId).toBe('b');
 	});
 });
 
@@ -107,6 +115,30 @@ describe('advanceTurn', () => {
 		expect(out).toBe(r99);
 		// within round 99 still advances
 		expect(advanceTurn({ ...r99, activeCombatantId: 'a' }).activeCombatantId).toBe('b');
+	});
+
+	it('skips a disabled combatant to reach the next enabled one', () => {
+		const x = mk({ id: 'x', initiative: 30 }, 0);
+		const y = mk({ id: 'y', initiative: 20, disabled: true }, 1);
+		const z = mk({ id: 'z', initiative: 10 }, 2);
+		const st = combat([x, y, z], { state: 'active', round: 1, activeCombatantId: 'x' });
+		expect(advanceTurn(st).activeCombatantId).toBe('z');
+	});
+
+	it('wraps exactly once — round + escalation bump a single time regardless of how many disabled are skipped', () => {
+		const x = mk({ id: 'x', initiative: 30 }, 0);
+		const y = mk({ id: 'y', initiative: 20, disabled: true }, 1);
+		const z = mk({ id: 'z', initiative: 10, disabled: true }, 2);
+		const st = combat([x, y, z], {
+			state: 'active',
+			round: 1,
+			escalation: 0,
+			activeCombatantId: 'x',
+		});
+		const wrapped = advanceTurn(st);
+		expect(wrapped.round).toBe(2);
+		expect(wrapped.activeCombatantId).toBe('x'); // only enabled combatant, wraps back to itself
+		expect(escalationDie(wrapped)).toBe(1);
 	});
 });
 
@@ -226,7 +258,7 @@ describe('roster', () => {
 	});
 
 	it('duplicate: Windows suffix skipping taken names; resets; copies stats; bottom', () => {
-		const g = mk({ id: 'g', name: 'Goblin', maxHp: 22, ac: 14, note: 'sneaky' }, 0);
+		const g = mk({ id: 'g', name: 'Goblin', maxHp: 22, ac: 14, note: 'sneaky', disabled: true }, 0);
 		const g1 = mk({ id: 'g1', name: 'Goblin 1' }, 1);
 		const dup = duplicateCombatant(combat([g, g1]), 'g', id);
 		const copy = dup.combatants[2];
@@ -237,6 +269,7 @@ describe('roster', () => {
 			note: 'sneaky',
 			currentHp: 22,
 			initiative: '-',
+			disabled: false, // reset even when the source was disabled
 		});
 		expect(copy.hpLog).toEqual([]);
 		expect(copy.addOrder).toBe(2);
@@ -269,6 +302,35 @@ describe('conditions', () => {
 	});
 });
 
+describe('toggleDisabled', () => {
+	it('flips the flag, undoable/redoable', () => {
+		const c = combat([mk({ id: 'a', disabled: false })]);
+		const toggled = toggleDisabled(c, 'a');
+		expect(toggled.combatants[0].disabled).toBe(true);
+		expect(toggled.undoStack.at(-1)?.action).toBe('toggleDisabled');
+		const back = undo(toggled);
+		expect(back.combatants[0].disabled).toBe(false);
+		const again = redo(back);
+		expect(again.combatants[0].disabled).toBe(true);
+	});
+
+	it('unknown id is a no-op', () => {
+		const c = combat([mk({ id: 'a' })]);
+		expect(toggleDisabled(c, 'nope')).toBe(c);
+	});
+
+	it('active-disable: pointer stays put; the next advance then skips it', () => {
+		const a = mk({ id: 'a', initiative: 20 }, 0);
+		const b = mk({ id: 'b', initiative: 10 }, 1);
+		const active = combat([a, b], { state: 'active', round: 1, activeCombatantId: 'a' });
+		const disabled = toggleDisabled(active, 'a');
+		expect(disabled.activeCombatantId).toBe('a'); // pointer untouched
+		expect(disabled.combatants.find((c) => c.id === 'a')?.disabled).toBe(true);
+		const advanced = advanceTurn(disabled);
+		expect(advanced.activeCombatantId).toBe('b'); // skips the now-disabled a on wrap-back later too
+	});
+});
+
 describe('rollOne', () => {
 	it('sets initiative = d20 + bonus', () => {
 		const c = combat([mk({ id: 'a', initiative: '-', initiativeBonus: 3 })]);
@@ -286,6 +348,7 @@ describe('clearCombat / restart', () => {
 				conditions: ['dazed'],
 				hpLog: [{ type: 'damage', delta: -25, currentHp: 5, tempHp: 4, maxHp: 30, round: 2 }],
 				initiative: 18,
+				disabled: true,
 			},
 			0,
 		);
@@ -318,6 +381,7 @@ describe('clearCombat / restart', () => {
 			tempHp: 0,
 			conditions: [],
 			hpLog: [],
+			disabled: false,
 		});
 		expect(re.round).toBe(1);
 		expect(re.state).toBe('setup');

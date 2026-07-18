@@ -23,6 +23,13 @@ export const typeColor: Record<CombatantType, string> = {
 	ally: 'bg-type-ally',
 };
 
+/** Per-type combatant color as a CSS var, used for the active-turn card halo. */
+export const typeAccent: Record<CombatantType, string> = {
+	pc: 'var(--type-pc)',
+	enemy: 'var(--type-enemy)',
+	ally: 'var(--type-ally)',
+};
+
 /** Condition tag color (grouped semantically for at-a-glance distinction). */
 export const conditionColor: Record<Condition, string> = {
 	charmed: 'border-combat-violet/30 bg-combat-violet/10 text-combat-violet',

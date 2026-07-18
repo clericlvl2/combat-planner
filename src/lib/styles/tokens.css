@@ -69,6 +69,9 @@
 	--primary-text: #16191f;
 	--ring: #7c8794;
 
+	/* Active-turn halo alpha, applied to the combatant's own --type-* color */
+	--halo-alpha: 52%;
+
 	/* Semantic — combatant type (dark ~ Tailwind -400) */
 	--type-pc: #34d399;
 	--type-enemy: #f87171;
@@ -109,6 +112,8 @@
 	--primary: #1f242c;
 	--primary-text: #f7f8fa;
 	--ring: #7c8794;
+
+	--halo-alpha: 60%;
 
 	/* Semantic — combatant type (light ~ -500/-600) */
 	--type-pc: #059669;

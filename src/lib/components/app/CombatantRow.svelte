@@ -14,7 +14,8 @@
   `⋮` actions menu (edit / duplicate / remove, visible collapsed or expanded). Active-turn
   highlight when `active` (health-band card-bg tint removed per the R4 restyle — the health bar's
   fill colour change alone is the signal). Reads the combatant; emits intent via the controller +
-  the page-owned numpad/edit dialogs (no business logic here).
+  the page-owned numpad/edit dialogs (no business logic here). Active-turn highlight is a
+  type-colored halo (outer box-shadow, no border-color swap) when `active`.
 -->
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
@@ -37,7 +38,7 @@
 	import ConditionPicker from './ConditionPicker.svelte';
 	import HealthBar from './HealthBar.svelte';
 	import InitCell from './InitCell.svelte';
-	import { typeColor } from './labels';
+	import { typeAccent, typeColor } from './labels';
 
 	let {
 		combatant,
@@ -70,6 +71,11 @@
 	);
 	const menuLabel = $derived(m['a11y.combatRowMenu']({ title: combatant.name }));
 	const showNoteEditor = $derived(combatant.note !== '' || noteEditing);
+	const haloStyle = $derived(
+		active
+			? `--halo: color-mix(in srgb, ${typeAccent[combatant.type]} var(--halo-alpha), transparent)`
+			: undefined,
+	);
 
 	$effect(() => {
 		if (noteEditing) noteEl?.focus();
@@ -105,10 +111,11 @@
 <Card
 	class={[
 		'overflow-hidden rounded-card border-[length:var(--card-border)] border-border p-0 ring-0',
-		active && 'border-ring ring-2 ring-ring',
+		active && 'shadow-[0_0_12px_1px_var(--halo)]',
 		combatant.disabled && 'opacity-50',
 	]}
 	data-active={active}
+	style={haloStyle}
 >
 	<div class="flex items-stretch">
 		<div class="min-w-0 flex-1 p-[var(--card-pad)]">
@@ -116,9 +123,6 @@
 				<div class="flex flex-col">
 					<!-- Row 1: active-turn dot + name + trailing controls cluster (expand chevron, overflow menu) -->
 					<div class="flex items-center gap-2">
-						{#if active}
-							<span class="shrink-0 text-[14px] leading-none text-ring" aria-hidden="true">▶</span>
-						{/if}
 						<span
 							class={['size-2 shrink-0 rounded-full', typeColor[combatant.type]]}
 							aria-hidden="true"

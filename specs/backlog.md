@@ -4,7 +4,6 @@ next_id: W-013
 
 | ID | Pri | Loop | State | Outcome | Depends | Plan |
 |----|-----|------|-------|---------|---------|------|
-| W-001 | — | large | active | Code SOT workflow migration | — | `.claude/plans/2026-07-18-code-sot-workflow-migration.md` |
 | W-002 | S | small | inbox | Decide automated axe-style a11y scan for accessibility coverage gap | — | — |
 | W-003 | L | large | inbox | Monster / encounter library (v2) | — | — |
 | W-004 | M | small | inbox | Saved party template (v2 candidate) | — | — |

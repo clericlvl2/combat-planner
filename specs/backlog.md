@@ -1,6 +1,6 @@
 # Backlog
 
-next_id: W-018
+next_id: W-019
 
 | ID | Pri | Loop | State | Outcome | Depends | Plan |
 |----|-----|------|-------|---------|---------|------|
@@ -12,6 +12,7 @@ next_id: W-018
 | W-014 | M | small | inbox | Active-turn card indicator — new visual treatment (needs brainstorm) | — | — |
 | W-015 | L | large | inbox | Tailwind/styles/tokens grand revision — simplify + unify with modern theming; kill 100-word class lists on simple buttons | — | — |
 | W-017 | M | large | inbox | Rethink a11y scope — commit to color contrast + large mobile tap targets; explicitly drop screen-reader/ARIA/invisible support (needs brainstorm) | — | — |
+| W-018 | S | small | inbox | Audit tools (check:i18n, svelte-check, vitest globs) for worktree-cwd false-green like biome check . had; main gate backstops but in-worktree advisory checks may silently pass | — | — |
 
 **Fields**
 

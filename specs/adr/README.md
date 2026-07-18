@@ -11,7 +11,8 @@ Combat Planner is a **local-only, offline-first, installable PWA** — a single-
 initiative tracker, no backend, no accounts, no network dependency, no telemetry. The
 architecture honors four hard constraints: fully offline, durable local persistence (an
 interrupted write must not corrupt existing combats), fully private (no telemetry/analytics), and
-mobile-first/one-handed/WCAG 2.1 AA with 6 bundled languages and dark+light themes.
+mobile-first/one-handed with high-contrast theming and large tap targets, 6 bundled languages and
+dark+light themes.
 
 ## Stack at a glance
 

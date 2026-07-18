@@ -8,7 +8,6 @@ next_id: W-022
 | W-006 | L | large | inbox | App-data export/import — all-combats + single-combat, fail-safe import (v2) | — | — |
 | W-008 | L | large | inbox | Smooth animations — motion for tap/expand/damage-entry/condition-toggle interactions | — | — |
 | W-009 | M | small | inbox | First-launch UX — onboarding/hints/tutorial or zero-state guidance (needs brainstorm) | — | — |
-| W-014 | M | small | inbox | Active-turn card indicator — new visual treatment (needs brainstorm) | — | — |
 | W-015 | L | large | inbox | Tailwind/styles/tokens grand revision — simplify + unify with modern theming; kill 100-word class lists on simple buttons | — | — |
 | W-019 | M | large | inbox | Icon revision — audit every `lucide-svelte` icon in use, fix each choice or swap for a better-fitting one | — | — |
 | W-021 | M | large | inbox | ADR revision — audit all 13 ADRs for outdated/stale content post code-SOT migration; reconcile with shipped truth, drop dead references to removed spec docs (needs brainstorm) | — | — |

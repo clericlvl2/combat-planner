@@ -55,7 +55,8 @@ structure/placement is read from the components themselves. No design prototypes
 
 `specs/backlog.md` is the work queue (`W-NNN` rows). Two loops drive it: `/work-small` for
 low-risk changes, `/work-large` for everything else; `/work-next` picks the next row and runs
-it through the right loop.
+it through the right loop. Each unit runs in its own git worktree per `/work-next`'s canonical
+worktree-per-unit lifecycle.
 
 ## History
 

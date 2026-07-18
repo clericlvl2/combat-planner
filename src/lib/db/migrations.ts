@@ -117,6 +117,7 @@ function normalizeCombatant(raw: RawCombatant): Combatant {
 		note: raw.note ?? '',
 		conditions: raw.conditions ?? [],
 		hpLog: raw.hpLog ?? [],
+		disabled: raw.disabled ?? false,
 	};
 }
 

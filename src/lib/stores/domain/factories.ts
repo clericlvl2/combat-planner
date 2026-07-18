@@ -63,6 +63,7 @@ export function createCombatant(
 		note: clampNote(input.note ?? ''),
 		conditions: [],
 		hpLog: [],
+		disabled: false,
 	};
 }
 

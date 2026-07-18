@@ -62,6 +62,7 @@ describe('normalizeAppData — read-time defaulting (additive, no transform — 
 		expect(combatant.hpLog).toEqual([]);
 		expect(combatant.conditions).toEqual([]);
 		expect(combatant.currentHp).toBe(12); // defaulted from maxHp
+		expect(combatant.disabled).toBe(false); // legacy row lacks `disabled` — defaults false
 		expect(out.combats[0].undoStack).toEqual([]);
 		expect(out.dataVersion).toBe(DATA_VERSION);
 	});

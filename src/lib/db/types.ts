@@ -121,7 +121,8 @@ export type UndoableAction =
 	| 'editRound'
 	| 'setEscalation'
 	| 'clearCombat'
-	| 'restart';
+	| 'restart'
+	| 'toggleDisabled';
 
 /**
  * A combat's reversible state — everything except the history stacks themselves (so snapshots
@@ -159,6 +160,7 @@ export interface Combatant {
 	conditions: Condition[];
 	/** Read-only HP change history; inline on the combatant (ADR-003/013). */
 	hpLog: HpLogEntry[];
+	disabled: boolean;
 }
 
 /** One fight. One Dexie row per combat. */

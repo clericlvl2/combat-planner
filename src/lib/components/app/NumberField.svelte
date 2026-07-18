@@ -127,7 +127,6 @@
 			{required}
 			aria-invalid={clamped}
 			onchange={commit}
-			onblur={commit}
 			oninput={onTypedInput}
 			onpaste={onPaste}
 		/>

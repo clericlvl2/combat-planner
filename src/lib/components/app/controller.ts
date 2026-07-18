@@ -27,6 +27,7 @@ export interface CombatController {
 	// fields / roster
 	edit(id: string, patch: CombatantFieldPatch & { maxHp?: number }): void;
 	duplicate(id: string): void;
+	toggleDisabled(id: string): void;
 	remove(id: string): void;
 	addCombatant(input: CombatantInput): void;
 	// lifecycle
@@ -52,6 +53,7 @@ export function makeController(store: CombatStore, combatId: string): CombatCont
 		removeCondition: (id, c) => store.removeCondition(combatId, id, c),
 		edit: (id, patch) => store.editCombatant(combatId, id, patch),
 		duplicate: (id) => store.duplicateCombatant(combatId, id),
+		toggleDisabled: (id) => store.toggleDisabled(combatId, id),
 		remove: (id) => store.removeCombatant(combatId, id),
 		addCombatant: (input) => store.addCombatant(combatId, input),
 		start: () => store.start(combatId),

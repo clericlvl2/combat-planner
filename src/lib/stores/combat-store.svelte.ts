@@ -81,6 +81,8 @@ export class CombatStore {
 		this.#mutate(combatId, (c) => T.removeCombatant(c, id));
 	duplicateCombatant = (combatId: string, id: string, genId?: IdGen): void =>
 		this.#mutate(combatId, (c) => T.duplicateCombatant(c, id, genId));
+	toggleDisabled = (combatId: string, id: string): void =>
+		this.#mutate(combatId, (c) => T.toggleDisabled(c, id));
 
 	// Fields
 	editCombatant = (

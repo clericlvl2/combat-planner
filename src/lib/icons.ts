@@ -9,6 +9,7 @@
  * "menu/burger, settings/about nav icons" gap — Combats keeps its crossed-swords glyph.
  */
 import {
+	Ban,
 	ChevronDown,
 	ChevronLeft,
 	ChevronRight,
@@ -59,6 +60,7 @@ export const chromeIcon = {
 	edit: Pencil,
 	remove: Trash2,
 	duplicate: Copy,
+	disable: Ban,
 	close: X,
 	expand: ChevronDown,
 	backspace: ChevronLeft,

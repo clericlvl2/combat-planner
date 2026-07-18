@@ -24,6 +24,7 @@ function fixtureCombatant(overrides: Partial<Combatant> = {}): Combatant {
 		note: '',
 		conditions: [],
 		hpLog: [],
+		disabled: false,
 		...overrides,
 	};
 }
@@ -39,6 +40,7 @@ function spyController(): CombatController {
 		removeCondition: vi.fn(),
 		edit: vi.fn(),
 		duplicate: vi.fn(),
+		toggleDisabled: vi.fn(),
 		remove: vi.fn(),
 		addCombatant: vi.fn(),
 		start: vi.fn(),
@@ -98,4 +100,66 @@ test('collapsing a still-empty note resets it back to the "+ Note" chip on next 
 	await screen.getByRole('button', { name: 'Expand Rulf' }).click();
 	await expect.element(screen.getByRole('button', { name: '+ Note' })).toBeVisible();
 	await expect.element(screen.getByPlaceholder('Add note')).not.toBeInTheDocument();
+});
+
+test('a disabled combatant renders its card at reduced opacity', async () => {
+	const combatant = fixtureCombatant({ disabled: true });
+	const controller = spyController();
+	const screen = render(CombatantRow, {
+		combatant,
+		controller,
+		onOpenNumpad: vi.fn(),
+		onEdit: vi.fn(),
+	});
+
+	const card = screen.container.querySelector('[data-slot="card"]') as HTMLElement;
+	expect(card.className).toContain('opacity-50');
+});
+
+test('an enabled combatant renders its card without the disabled opacity class', async () => {
+	const combatant = fixtureCombatant({ disabled: false });
+	const controller = spyController();
+	const screen = render(CombatantRow, {
+		combatant,
+		controller,
+		onOpenNumpad: vi.fn(),
+		onEdit: vi.fn(),
+	});
+
+	const card = screen.container.querySelector('[data-slot="card"]') as HTMLElement;
+	expect(card.className).not.toContain('opacity-50');
+});
+
+test('the overflow menu shows "Disable" for an enabled combatant and toggles it', async () => {
+	const combatant = fixtureCombatant({ disabled: false });
+	const controller = spyController();
+	const screen = render(CombatantRow, {
+		combatant,
+		controller,
+		onOpenNumpad: vi.fn(),
+		onEdit: vi.fn(),
+	});
+
+	await screen.getByRole('button', { name: 'Actions for Rulf' }).click();
+	await expect.element(screen.getByRole('menuitem', { name: 'Disable' })).toBeVisible();
+
+	await screen.getByRole('menuitem', { name: 'Disable' }).click();
+	expect(controller.toggleDisabled).toHaveBeenCalledWith('c1');
+});
+
+test('the overflow menu shows "Enable" for a disabled combatant and toggles it', async () => {
+	const combatant = fixtureCombatant({ disabled: true });
+	const controller = spyController();
+	const screen = render(CombatantRow, {
+		combatant,
+		controller,
+		onOpenNumpad: vi.fn(),
+		onEdit: vi.fn(),
+	});
+
+	await screen.getByRole('button', { name: 'Actions for Rulf' }).click();
+	await expect.element(screen.getByRole('menuitem', { name: 'Enable' })).toBeVisible();
+
+	await screen.getByRole('menuitem', { name: 'Enable' }).click();
+	expect(controller.toggleDisabled).toHaveBeenCalledWith('c1');
 });

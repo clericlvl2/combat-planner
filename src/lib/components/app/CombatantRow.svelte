@@ -88,6 +88,7 @@
 	const Overflow = chromeIcon.overflow;
 	const Edit = chromeIcon.edit;
 	const Duplicate = chromeIcon.duplicate;
+	const Disable = chromeIcon.disable;
 	const Remove = chromeIcon.remove;
 
 	/** "+ Condition" / "+ Note" triggers — same chip box as the condition tags (Badge), just
@@ -105,6 +106,7 @@
 	class={[
 		'overflow-hidden rounded-card border-[length:var(--card-border)] border-border p-0 ring-0',
 		active && 'border-ring ring-2 ring-ring',
+		combatant.disabled && 'opacity-50',
 	]}
 	data-active={active}
 >
@@ -152,6 +154,10 @@
 									<DropdownMenuItem onSelect={() => controller.duplicate(combatant.id)}>
 										<Duplicate class="size-4" />
 										{m['forms.action.duplicate']()}
+									</DropdownMenuItem>
+									<DropdownMenuItem onSelect={() => controller.toggleDisabled(combatant.id)}>
+										<Disable class="size-4" />
+										{combatant.disabled ? m['forms.action.enable']() : m['forms.action.disable']()}
 									</DropdownMenuItem>
 									<DropdownMenuSeparator />
 									<DropdownMenuItem variant="destructive" onSelect={() => controller.remove(combatant.id)}>

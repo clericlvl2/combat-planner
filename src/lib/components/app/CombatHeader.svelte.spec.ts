@@ -21,6 +21,7 @@ function makeController(): CombatController {
 		removeCondition: vi.fn(),
 		edit: vi.fn(),
 		duplicate: vi.fn(),
+		toggleDisabled: vi.fn(),
 		remove: vi.fn(),
 		addCombatant: vi.fn(),
 		start: vi.fn(),

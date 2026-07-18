@@ -1,6 +1,6 @@
 # Backlog
 
-next_id: W-021
+next_id: W-022
 
 | ID | Pri | Loop | State | Outcome | Depends | Plan |
 |----|-----|------|-------|---------|---------|------|
@@ -11,6 +11,7 @@ next_id: W-021
 | W-014 | M | small | inbox | Active-turn card indicator — new visual treatment (needs brainstorm) | — | — |
 | W-015 | L | large | inbox | Tailwind/styles/tokens grand revision — simplify + unify with modern theming; kill 100-word class lists on simple buttons | — | — |
 | W-019 | M | large | inbox | Icon revision — audit every `lucide-svelte` icon in use, fix each choice or swap for a better-fitting one | — | — |
+| W-021 | M | large | inbox | ADR revision — audit all 13 ADRs for outdated/stale content post code-SOT migration; reconcile with shipped truth, drop dead references to removed spec docs (needs brainstorm) | — | — |
 
 **Fields**
 

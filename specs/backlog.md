@@ -1,6 +1,6 @@
 # Backlog
 
-next_id: W-020
+next_id: W-021
 
 | ID | Pri | Loop | State | Outcome | Depends | Plan |
 |----|-----|------|-------|---------|---------|------|
@@ -11,6 +11,7 @@ next_id: W-020
 | W-014 | M | small | inbox | Active-turn card indicator — new visual treatment (needs brainstorm) | — | — |
 | W-015 | L | large | inbox | Tailwind/styles/tokens grand revision — simplify + unify with modern theming; kill 100-word class lists on simple buttons | — | — |
 | W-017 | M | large | inbox | Rethink a11y scope — commit to color contrast + large mobile tap targets; explicitly drop screen-reader/ARIA/invisible support (needs brainstorm) | — | — |
+| W-020 | S | small | ready | Compile paraglide before gate `check` — new i18n keys face stale/missing generated paraglide (check runs before build); wire `paraglide-js compile` into check + prepare | — | .claude/plans/2026-07-18-paraglide-compile-before-check.md |
 | W-019 | M | large | inbox | Icon revision — audit every `lucide-svelte` icon in use, fix each choice or swap for a better-fitting one | — | — |
 
 **Fields**

@@ -11,7 +11,7 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"check:i18n": "node scripts/check-i18n-parity.mjs",
-		"lint": "biome check .",
+		"lint": "biome check scripts src messages e2e project.inlang static *.ts *.json",
 		"format": "biome format --write .",
 		"test:unit": "vitest",
 		"test:e2e": "playwright test",

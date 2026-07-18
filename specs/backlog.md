@@ -5,7 +5,6 @@ next_id: W-020
 | ID | Pri | Loop | State | Outcome | Depends | Plan |
 |----|-----|------|-------|---------|---------|------|
 | W-003 | L | large | inbox | Monster / encounter library (v2) | — | — |
-| W-005 | S | small | inbox | Disable-combatant toggle — skipped by turn advance, card renders pale | — | — |
 | W-006 | L | large | inbox | App-data export/import — all-combats + single-combat, fail-safe import (v2) | — | — |
 | W-008 | L | large | inbox | Smooth animations — motion for tap/expand/damage-entry/condition-toggle interactions | — | — |
 | W-009 | M | small | inbox | First-launch UX — onboarding/hints/tutorial or zero-state guidance (needs brainstorm) | — | — |

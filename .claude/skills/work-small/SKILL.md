@@ -22,12 +22,19 @@ through on momentum.
    plan file for small work.
 3. **Explicit approval** — present the sketch and stop. Wait for the user to say go. Never
    implement in the same turn as the sketch.
-4. **Implement** — either do it directly yourself, or dispatch `worker-bee` with the approved
-   sketch as its input contract.
-5. **Check** — run a targeted check for what changed (e.g. the relevant test file, lint on
-   touched files), then the full `npm run gate`. Red gate is not done — fix it or report it as
-   blocking before proceeding.
-6. **Commit** — one commit, message carries a `Work: W-NNN` trailer matching the backlog row's
-   ID. Keep history linear.
-7. **Clear the row** — delete the row from `specs/backlog.md`. The commit trailer is now the
-   only record of the work; the backlog only tracks what's left.
+4. **Enter the worktree** — run the unit in a worktree per `work-next`'s canonical
+   worktree-per-unit lifecycle (`EnterWorktree` + prep steps).
+5. **Implement** — in the worktree, either do it directly yourself, or dispatch `worker-bee`
+   with the approved sketch as its input contract.
+6. **Check** — run a targeted check for what changed (e.g. the relevant test file, lint on
+   touched files) inside the worktree. This is advisory only — never run the full `npm run gate`
+   in the worktree.
+7. **Commit** — one commit on the worktree branch, message carries a `Work: W-NNN` trailer
+   matching the backlog row's ID. Keep history linear.
+8. **Integrate** — exit the worktree and integrate per `work-next`'s lifecycle: rebase the
+   worktree branch onto main, then fast-forward main onto it. No merge commit.
+9. **Full gate** — run the full `npm run gate` on main, post-integration. Red gate is not done —
+   fix it or report it as blocking before proceeding; follow `work-next`'s guard, never leave
+   main ungated.
+10. **Clear the row** — delete the row from `specs/backlog.md`. The commit trailer is now the
+    only record of the work; the backlog only tracks what's left.

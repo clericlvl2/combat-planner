@@ -71,10 +71,10 @@
 	);
 	const menuLabel = $derived(m['a11y.combatRowMenu']({ title: combatant.name }));
 	const showNoteEditor = $derived(combatant.note !== '' || noteEditing);
+	// --halo is always defined (even when inactive) so the box-shadow can transition smoothly on
+	// BOTH turn-enter and turn-leave; the shadow itself only paints while `active`.
 	const haloStyle = $derived(
-		active
-			? `--halo: color-mix(in srgb, ${typeAccent[combatant.type]} var(--halo-alpha), transparent)`
-			: undefined,
+		`--halo: color-mix(in srgb, ${typeAccent[combatant.type]} var(--halo-alpha), transparent)`,
 	);
 
 	$effect(() => {
@@ -110,7 +110,7 @@
 
 <Card
 	class={[
-		'overflow-hidden rounded-card border-[length:var(--card-border)] border-border p-0 ring-0',
+		'overflow-hidden rounded-card border-[length:var(--card-border)] border-border p-0 ring-0 transition-shadow duration-300 ease-out',
 		active && 'shadow-[0_0_12px_1px_var(--halo)]',
 		combatant.disabled && 'opacity-50',
 	]}

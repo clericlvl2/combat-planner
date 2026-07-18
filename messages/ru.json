@@ -112,6 +112,8 @@
 	"forms.action.cancel": "Отмена",
 	"forms.action.duplicate": "Дублировать",
 	"forms.action.remove": "Удалить",
+	"forms.action.disable": "Отключить",
+	"forms.action.enable": "Включить",
 	"forms.action.edit": "Редактировать",
 	"settings.title": "Настройки",
 	"settings.group.appearance": "Внешний вид",

@@ -112,6 +112,8 @@
 	"forms.action.cancel": "キャンセル",
 	"forms.action.duplicate": "複製",
 	"forms.action.remove": "削除",
+	"forms.action.disable": "無効化",
+	"forms.action.enable": "有効化",
 	"forms.action.edit": "編集",
 	"settings.title": "設定",
 	"settings.group.appearance": "外観",

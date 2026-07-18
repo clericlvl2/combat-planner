@@ -112,6 +112,8 @@
 	"forms.action.cancel": "Cancel",
 	"forms.action.duplicate": "Duplicate",
 	"forms.action.remove": "Remove",
+	"forms.action.disable": "Disable",
+	"forms.action.enable": "Enable",
 	"forms.action.edit": "Edit",
 	"settings.title": "Settings",
 	"settings.group.appearance": "Appearance",

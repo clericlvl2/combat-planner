@@ -63,7 +63,11 @@ whose last gate was red/ungated; never start the next unit against an ungated ma
 **Worktree caveats:** never run the full `npm run gate` inside a worktree (biome false-green +
 missing generated deps); in-worktree checks are advisory only; in-worktree vitest needs
 `CHOKIDAR_USEPOLLING=true` (sibling worktrees exhaust the inotify budget); never use WebStorm MCP
-inside a worktree (it is bound to the main checkout and will read/write the wrong tree).
+inside a worktree (it is bound to the main checkout and will read/write the wrong tree). The
+"biome false-green" is biome-specific (its `!**/.claude` ignore glob eats the worktree path);
+`check:i18n`, `svelte-check`, and `vitest` were audited (W-018) and are cwd-safe — identical
+counts in a worktree vs main — so the gate-on-main rule exists for biome + missing generated
+deps, not because those three lie.
 
 **Backlog-mutation rule:** claims, row deletions, and inbox follow-ups are edited **only on
 main** and **committed immediately** — never left as an uncommitted working change, and never

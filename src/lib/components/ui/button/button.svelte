@@ -26,6 +26,9 @@
 				"icon-lg": "size-9",
 				touch: "min-h-11 min-w-11",
 				action: "h-11 rounded-sm",
+				fab: "size-14 rounded-full",
+				chrome: "size-11 lg:size-9",
+				row: "size-10 lg:size-8",
 			},
 		},
 		defaultVariants: {

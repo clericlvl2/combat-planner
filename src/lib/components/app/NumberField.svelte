@@ -44,7 +44,7 @@
 	// Field label: uppercase, muted, small caps.
 	const fieldLabelClass = 'text-xs font-medium uppercase tracking-wide text-muted-foreground';
 	const stepBtnClass =
-		'flex min-h-10 w-10 shrink-0 items-center justify-center text-lg text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:z-10 lg:focus-visible:ring-3 lg:focus-visible:ring-ring/50 active:bg-muted active:text-foreground transition-colors';
+		'flex min-h-11 w-11 shrink-0 items-center justify-center text-lg text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:z-10 lg:focus-visible:ring-3 lg:focus-visible:ring-ring/50 active:bg-muted active:text-foreground transition-colors';
 	// Stepper divider uses --border-strong, not the default --border token.
 	const stepBorderClass = 'border-[var(--border-strong)]';
 
@@ -121,7 +121,8 @@
 			aria-valuemin={min}
 			aria-valuemax={max}
 			aria-valuenow={value ?? undefined}
-			class="min-h-10 flex-1 rounded-none border-0 bg-transparent text-[13px] text-center tabular-nums shadow-none focus-visible:ring-0 dark:bg-transparent"
+			size="action"
+			class="flex-1 rounded-none border-0 bg-transparent text-[13px] text-center tabular-nums shadow-none focus-visible:ring-0 dark:bg-transparent"
 			value={value ?? ''}
 			{placeholder}
 			{required}

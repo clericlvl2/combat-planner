@@ -121,7 +121,7 @@
             <!-- Name (optional — empty on save falls back to the type-specific placeholder as the real name) -->
             <div class="flex flex-col gap-[5px]">
                 <Label for="cf-name" class={fieldLabelClass}>{m['forms.field.name']()}</Label>
-                <Input id="cf-name" class="min-h-11" bind:value={name} placeholder={namePlaceholder}/>
+                <Input id="cf-name" size="action" bind:value={name} placeholder={namePlaceholder}/>
             </div>
 
             <!-- Type -->

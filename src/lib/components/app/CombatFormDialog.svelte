@@ -89,7 +89,8 @@
 				id="cf-title"
 				bind:value={title}
 				placeholder={m['forms.field.title.placeholder']()}
-				class="h-11 rounded-sm border-[var(--border-strong)] text-[15px] md:text-[15px]"
+				size="action"
+				class="border-[var(--border-strong)] text-[15px] md:text-[15px]"
 			/>
 		</div>
 

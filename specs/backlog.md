@@ -7,7 +7,7 @@ next_id: W-022
 | W-003 | L | large | inbox | Monster / encounter library (v2) | — | — |
 | W-006 | L | large | inbox | App-data export/import — all-combats + single-combat, fail-safe import (v2) | — | — |
 | W-008 | L | large | inbox | Smooth animations — motion for tap/expand/damage-entry/condition-toggle interactions | — | — |
-| W-009 | M | small | inbox | First-launch UX — onboarding/hints/tutorial or zero-state guidance (needs brainstorm) | — | — |
+| W-009 | M | large | active | Empty-state system — unified zero-state treatment across all screens | — | `.claude/plans/2026-07-19-empty-state-system.md` |
 | W-019 | M | large | inbox | Icon revision — audit every `lucide-svelte` icon in use, fix each choice or swap for a better-fitting one | — | — |
 
 **Fields**

@@ -9,11 +9,13 @@
 
 	let {
 		icon,
+		iconClass,
 		title,
 		description,
 		children,
 	}: {
 		icon?: IconComponent;
+		iconClass?: string;
 		title: string;
 		description?: string;
 		children?: Snippet;
@@ -24,7 +26,9 @@
 
 <div class="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
 	{#if Icon}
-		<Icon class="size-10 text-muted-foreground opacity-50" />
+		<div class="grid size-14 place-items-center rounded-2xl border bg-secondary">
+			<Icon class="size-7 {iconClass ?? 'text-muted-foreground'}" />
+		</div>
 	{/if}
 	<p class="text-lg font-semibold">{title}</p>
 	{#if description}

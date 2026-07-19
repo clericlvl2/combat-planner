@@ -23,15 +23,18 @@ import {
 	Play,
 	Plus,
 	Redo2,
+	Search,
 	Settings,
 	Share2,
 	Shield,
 	Skull,
 	Swords,
 	Trash2,
+	TriangleAlert,
 	Undo2,
 	Upload,
 	User,
+	Users,
 	X,
 } from '@lucide/svelte';
 import type { CombatantType } from '$lib/db/types';
@@ -69,4 +72,7 @@ export const chromeIcon = {
 	navSettings: Settings,
 	navAbout: Info,
 	start: Play,
+	search: Search,
+	alert: TriangleAlert,
+	roster: Users,
 } satisfies Record<string, IconComponent>;

@@ -20,10 +20,24 @@ test('omits description when not given', async () => {
 	expect(screen.container.textContent).not.toContain('Add one');
 });
 
-test('renders the optional icon', async () => {
+test('renders the optional icon in a framed tile', async () => {
 	const screen = render(EmptyState, { title: 'No combats yet', icon: Swords });
 
-	expect(screen.container.querySelector('svg')).not.toBeNull();
+	const svg = screen.container.querySelector('svg');
+	expect(svg).not.toBeNull();
+	expect(svg?.parentElement?.className).toContain('rounded-2xl');
+	expect(svg?.parentElement?.className).toContain('bg-secondary');
+});
+
+test('applies iconClass to the icon', async () => {
+	const screen = render(EmptyState, {
+		title: 'No combats yet',
+		icon: Swords,
+		iconClass: 'text-health-bloodied',
+	});
+
+	const svg = screen.container.querySelector('svg');
+	expect(svg?.getAttribute('class')).toContain('text-health-bloodied');
 });
 
 test('renders CTA slot content passed as children', async () => {

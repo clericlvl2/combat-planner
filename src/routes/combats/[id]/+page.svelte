@@ -16,6 +16,7 @@
     import CombatantRow from '$lib/components/app/CombatantRow.svelte';
     import CombatHeader from '$lib/components/app/CombatHeader.svelte';
     import {makeController} from '$lib/components/app/controller';
+    import FAB from '$lib/components/app/FAB.svelte';
     import NumpadSheet from '$lib/components/app/NumpadSheet.svelte';
     import {Button} from '$lib/components/ui/button';
     import {m} from '$lib/i18n';
@@ -183,14 +184,13 @@
         {#if active}
             <!-- Active: Advance FAB (disabled at the r99 → r100 wrap) — mobile only;
                  desktop (≥1024px) swaps it for CombatHeader's header-advance icon roundel. -->
-            <Button
-                    class="fixed right-4 bottom-4 size-14 rounded-full shadow-lg lg:hidden max-lg:focus-visible:ring-0 max-lg:focus-visible:border-transparent"
+            <FAB
+                    icon={Advance}
+                    label={m['active.advance']()}
                     disabled={!canAdv}
-                    aria-label={m['active.advance']()}
                     onclick={controller.advance}
-            >
-                <Advance class="size-6"/>
-            </Button>
+                    class="lg:hidden max-lg:focus-visible:ring-0 max-lg:focus-visible:border-transparent"
+            />
         {:else}
             <!-- Setup: mobile FAB stack (Add always; Start once the roster isn't empty), matching
                  the desktop header-add/header-start pair in CombatHeader — Start FAB
@@ -206,13 +206,12 @@
                 <!-- Start FAB reads as a primary action (default variant = bg-primary), not a
                      pale ghost/secondary roundel. Uses the play glyph (mirrors the desktop
                      header-start icon-roundel). -->
-                <Button
-                        class="fixed right-4 bottom-24 size-14 rounded-full shadow-lg lg:hidden max-lg:focus-visible:ring-0 max-lg:focus-visible:border-transparent"
-                        aria-label={m['setup.start']()}
+                <FAB
+                        icon={Start}
+                        label={m['setup.start']()}
                         onclick={controller.start}
-                >
-                    <Start class="size-6"/>
-                </Button>
+                        class="bottom-24 lg:hidden max-lg:focus-visible:ring-0 max-lg:focus-visible:border-transparent"
+                />
             {/if}
         {/if}
     </div>

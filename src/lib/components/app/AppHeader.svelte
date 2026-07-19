@@ -40,8 +40,8 @@
 	<div class="content-container-wide flex w-full items-center gap-2">
 		<Button
 			variant="ghost"
-			size="icon"
-			class="-ml-3 min-h-11 min-w-11 lg:hidden"
+			size="touch"
+			class="-ml-3 lg:hidden"
 			aria-label={m['nav.open']()}
 			onclick={onOpenNav}
 		>

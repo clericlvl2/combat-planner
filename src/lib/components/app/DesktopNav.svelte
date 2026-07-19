@@ -35,8 +35,8 @@
 		<Button
 			href={link.href}
 			variant="ghost"
-			size="icon"
-			class={['min-h-11 min-w-11', current && 'bg-secondary text-secondary-foreground']}
+			size="touch"
+			class={[current && 'bg-secondary text-secondary-foreground']}
 			aria-label={link.label}
 			aria-current={current ? 'page' : undefined}
 			title={link.label}

@@ -60,8 +60,7 @@
 {#snippet createHeaderButton()}
 	<Button
 		variant="ghost"
-		size="icon"
-		class="min-h-11 min-w-11"
+		size="touch"
 		aria-label={m['combats.create']()}
 		title={m['combats.create']()}
 		onclick={openCreate}

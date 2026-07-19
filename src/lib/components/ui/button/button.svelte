@@ -13,6 +13,7 @@
 				ghost: "hover:bg-muted hover:text-foreground dark:hover:bg-muted/50 aria-expanded:bg-muted aria-expanded:text-foreground",
 				destructive: "bg-destructive/10 hover:bg-destructive/20 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/20 text-destructive focus-visible:border-destructive/40 dark:hover:bg-destructive/30",
 				link: "text-primary underline-offset-4 hover:underline",
+				soft: "border-[color-mix(in_oklab,var(--tc)_30%,transparent)] bg-transparent text-[var(--tc)] hover:bg-[color-mix(in_oklab,var(--tc)_10%,transparent)]",
 			},
 			size: {
 				default: "h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
@@ -23,6 +24,8 @@
 				"icon-xs": "size-6 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
 				"icon-sm": "size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
 				"icon-lg": "size-9",
+				touch: "min-h-11 min-w-11",
+				action: "h-11 rounded-sm",
 			},
 		},
 		defaultVariants: {

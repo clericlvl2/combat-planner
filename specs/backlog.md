@@ -1,6 +1,6 @@
 # Backlog
 
-next_id: W-023
+next_id: W-024
 
 | ID | Pri | Loop | State | Outcome | Depends | Plan |
 |----|-----|------|-------|---------|---------|------|

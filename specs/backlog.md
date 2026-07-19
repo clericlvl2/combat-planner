@@ -4,7 +4,7 @@ next_id: W-024
 
 | ID | Pri | Loop | State | Outcome | Depends | Plan |
 |----|-----|------|-------|---------|---------|------|
-| W-003 | L | large | inbox | Monster / encounter library (v2) | — | — |
+| W-003 | L | large | ready | Monster / encounter library (v2) | — | — |
 | W-006 | L | large | inbox | App-data export/import — all-combats + single-combat, fail-safe import (v2) | — | — |
 | W-008 | L | large | inbox | Smooth animations — motion for tap/expand/damage-entry/condition-toggle interactions | — | — |
 | W-019 | M | large | inbox | Icon revision — audit every `lucide-svelte` icon in use, fix each choice or swap for a better-fitting one | — | — |

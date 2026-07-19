@@ -16,7 +16,7 @@
 
 <div class="flex min-h-dvh flex-col">
     <EmptyState icon={Search} title={m['route.notFound.title']()} description={m['route.notFound.description']()}>
-        <Button aria-label={m['route.notFound.back']()} onclick={() => goto('/combats')}>
+        <Button size="action" aria-label={m['route.notFound.back']()} onclick={() => goto('/combats')}>
             {m['route.notFound.back']()}
         </Button>
     </EmptyState>

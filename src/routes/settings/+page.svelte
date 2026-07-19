@@ -103,8 +103,8 @@
 			<Button
 				type="button"
 				variant="destructive"
-				size="lg"
-				class="h-11 w-full"
+				size="action"
+				class="w-full"
 				onclick={() => (resetConfirmOpen = true)}
 			>
 				{m['settings.data.resetAll']()}

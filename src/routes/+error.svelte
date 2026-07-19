@@ -37,12 +37,12 @@
 		description={m['appError.body']()}
 	>
 		<div class="flex w-full flex-col gap-2 lg:flex-row lg:justify-center">
-			<Button size="lg" class="w-full lg:w-auto" aria-label={m['appError.reload']()} onclick={reload}>
+			<Button size="action" class="w-full lg:w-auto" aria-label={m['appError.reload']()} onclick={reload}>
 				{m['appError.reload']()}
 			</Button>
 			<Button
 				variant="outline"
-				size="lg"
+				size="action"
 				class="w-full lg:w-auto"
 				aria-label={m['appError.goToCombats']()}
 				onclick={goToCombats}

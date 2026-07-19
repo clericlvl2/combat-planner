@@ -60,7 +60,7 @@
 {#snippet createHeaderButton()}
 	<Button
 		variant="ghost"
-		size="touch"
+		size="chrome"
 		aria-label={m['combats.create']()}
 		title={m['combats.create']()}
 		onclick={openCreate}
@@ -79,7 +79,7 @@
 		title={m['combats.empty.title']()}
 		description={m['combats.empty.description']()}
 	>
-		<Button size="lg" class="hidden lg:inline-flex" onclick={openCreate}>
+		<Button size="action" class="hidden lg:inline-flex" onclick={openCreate}>
 			<Add class="size-5" />
 			{m['combats.empty.cta']()}
 		</Button>

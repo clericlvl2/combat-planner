@@ -212,12 +212,13 @@
             <Button
                     type="button"
                     variant="outline"
-                    class="h-11 min-w-0 flex-1 shrink basis-0 rounded-sm border-[var(--border-strong)]"
+                    size="action"
+                    class="min-w-0 flex-1 shrink basis-0 border-[var(--border-strong)]"
                     onclick={() => (open = false)}
             >
                 {m['forms.action.cancel']()}
             </Button>
-            <Button type="submit" size="lg" class="h-11 min-w-0 flex-1 shrink basis-0 rounded-sm">
+            <Button type="submit" size="action" class="min-w-0 flex-1 shrink basis-0">
                 {mode === 'add' ? m['forms.action.add']() : m['forms.action.save']()}
             </Button>
         </DialogFooter>

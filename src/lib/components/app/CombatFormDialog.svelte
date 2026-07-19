@@ -112,16 +112,16 @@
 			<Button
 				type="button"
 				variant="outline"
-				size="lg"
-				class="h-11 min-w-0 flex-1 shrink basis-0 rounded-sm border-[var(--border-strong)]"
+				size="action"
+				class="min-w-0 flex-1 shrink basis-0 border-[var(--border-strong)]"
 				onclick={() => (open = false)}
 			>
 				{m['forms.action.cancel']()}
 			</Button>
 			<Button
 				type="submit"
-				size="lg"
-				class="h-11 min-w-0 flex-1 shrink basis-0 rounded-sm font-semibold"
+				size="action"
+				class="min-w-0 flex-1 shrink basis-0 font-semibold"
 			>
 				{combat ? m['forms.action.save']() : m['forms.action.create']()}
 			</Button>

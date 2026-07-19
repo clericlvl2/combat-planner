@@ -127,24 +127,27 @@
 		     hexes, so the border-only recipe is the AA-safe stand-in. -->
 		<div class="grid grid-cols-3 gap-2">
 			<Button
-				variant="outline"
-				class="h-11 text-xs font-bold border-destructive/30 bg-transparent text-destructive hover:bg-destructive/10 dark:border-destructive/30 dark:bg-transparent dark:hover:bg-destructive/10"
+				variant="soft"
+				style="--tc: var(--destructive)"
+				class="h-11 text-xs font-bold"
 				disabled={empty}
 				onclick={() => commit(onDamage)}
 			>
 				{m['numpad.dealDamage']()}
 			</Button>
 			<Button
-				variant="outline"
-				class="h-11 text-xs font-bold border-health-full/30 bg-transparent text-health-full hover:bg-health-full/10 dark:border-health-full/30 dark:bg-transparent dark:hover:bg-health-full/10"
+				variant="soft"
+				style="--tc: var(--health-full)"
+				class="h-11 text-xs font-bold"
 				disabled={empty}
 				onclick={() => commit(onRestore)}
 			>
 				{m['numpad.restoreHp']()}
 			</Button>
 			<Button
-				variant="outline"
-				class="h-11 text-xs font-bold border-combat-blue/30 bg-transparent text-combat-blue hover:bg-combat-blue/10 dark:border-combat-blue/30 dark:bg-transparent dark:hover:bg-combat-blue/10"
+				variant="soft"
+				style="--tc: var(--combat-blue)"
+				class="h-11 text-xs font-bold"
 				disabled={empty}
 				onclick={() => commit(onSetTempHp)}
 			>

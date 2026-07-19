@@ -110,7 +110,7 @@
 
 <Card
 	class={[
-		'overflow-hidden rounded-card border-[length:var(--card-border)] border-border p-0 ring-0 transition-shadow duration-300 ease-out',
+		'overflow-hidden rounded-xl border-[length:var(--card-border)] border-border p-0 ring-0 transition-shadow duration-300 ease-out',
 		active && 'shadow-[0_0_12px_1px_var(--halo)]',
 		combatant.disabled && 'opacity-50',
 	]}

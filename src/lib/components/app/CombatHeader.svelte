@@ -191,7 +191,7 @@
 	     full-bleed like the header bar above it. -->
 	<div class="content-container mt-3 w-full">
 		<div
-			class="flex items-center justify-between rounded-[var(--radius)] border border-border bg-card px-3 py-2.5"
+			class="flex items-center justify-between rounded-xl border border-border bg-card px-3 py-2.5"
 		>
 			<Popover bind:open={roundOpen}>
 				<PopoverTrigger

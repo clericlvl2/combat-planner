@@ -6,33 +6,6 @@
  * ------------------------------------------------------------------------- */
 
 :root {
-	/* Radius scale */
-	--radius: 10px;
-	--radius-sm: 6px;
-	--radius-lg: 14px;
-	--radius-md: calc(var(--radius) - 2px);
-	--radius-xl: 18px;
-	--radius-card: 12px;
-
-	/* Spacing scale */
-	--space-1: 4px;
-	--space-2: 8px;
-	--space-3: 12px;
-	--space-4: 16px;
-	--space-5: 24px;
-	--space-6: 32px;
-
-	/* Type scale */
-	--font-xs: 11px;
-	--font-sm: 13px;
-	--font-md: 15px;
-	--font-lg: 18px;
-	--font-xl: 22px;
-
-	/* Letter-spacing (tracking) scale */
-	--tracking-wide: 0.04em;
-	--tracking-wider: 0.06em;
-
 	--touch-min: 44px;
 
 	/* Layout container dims */
@@ -42,7 +15,7 @@
 	/* Combatant card component dims */
 	/* Synced to shipped CombatantRow render */
 	--card-pad: 10px;
-	--card-gap: var(--space-2);
+	--card-gap: 8px;
 	--card-border: 1px;
 	/* Synced to shipped CombatantRow render */
 	--hp-size: 16px;

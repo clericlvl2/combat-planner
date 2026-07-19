@@ -48,15 +48,6 @@
 }
 
 @theme inline {
-	/* Radius scale — reference the tokens.css-backed raw vars (`:root` in
-	 * tokens.css) rather than redefining literals; `inline` substitutes the
-	 * var() expression directly into generated utilities. */
-	--radius-sm: var(--radius-sm);
-	--radius-md: var(--radius-md);
-	--radius-lg: var(--radius-lg);
-	--radius-xl: var(--radius-xl);
-	--radius-card: var(--radius-card);
-
 	/* Desktop content max-width (tokens.css --content-max) — exposed so the shared
 	 * `.content-container` utility below (and any other consumer) can reference it via the
 	 * Tailwind theme layer, not just the raw custom property. */
@@ -65,25 +56,6 @@
 	 * `.content-container-wide` utility below (Combat header chrome only; body/cards stay at
 	 * --content-max). */
 	--content-max-wide: var(--content-max-wide);
-
-	/* Spacing scale — `--spacing` is Tailwind's base unit (utilities compute
-	 * as calc(var(--spacing) * n)); aliasing it to tokens.css `--space-1`
-	 * (4px) makes p-4/gap-2/etc token-driven instead of coincidentally equal. */
-	--spacing: var(--space-1);
-
-	/* Typography scale (tokens.css --font-*) wired into Tailwind's text-* tokens so every
-	 * text-xs/sm/base/lg/xl call site renders the design scale, not stock Tailwind sizes. */
-	--text-xs: var(--font-xs);
-	--text-sm: var(--font-sm);
-	--text-base: var(--font-md);
-	--text-lg: var(--font-lg);
-	--text-xl: var(--font-xl);
-
-	/* Letter-spacing (tracking) scale (tokens.css --tracking-*) aliased onto Tailwind's
-	 * tracking-wide/tracking-wider utilities so call sites use the design scale, not stock
-	 * Tailwind values. */
-	--tracking-wide: var(--tracking-wide);
-	--tracking-wider: var(--tracking-wider);
 
 	/* Design shadows aliased onto Tailwind's shadow-sm/shadow-md so shadcn overlays
 	 * (popover/select/dropdown) render the design shadow instead of the Tailwind stock one. */
@@ -145,7 +117,7 @@
 	width: 100%;
 	margin-inline: auto;
 	max-width: var(--content-max);
-	padding-inline: var(--space-3);
+	padding-inline: 12px;
 }
 
 /* Wide sibling of `.content-container` — caps the Combat header chrome at
@@ -155,7 +127,7 @@
 	width: 100%;
 	margin-inline: auto;
 	max-width: var(--content-max-wide);
-	padding-inline: var(--space-3);
+	padding-inline: 12px;
 }
 
 @layer base {

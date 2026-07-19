@@ -6,13 +6,18 @@
 -->
 <script lang="ts">
     import {goto} from '$app/navigation';
+    import EmptyState from '$lib/components/app/EmptyState.svelte';
     import {Button} from '$lib/components/ui/button';
     import {m} from '$lib/i18n';
+    import {chromeIcon} from '$lib/icons';
+
+    const Search = chromeIcon.search;
 </script>
 
-<div class="flex min-h-dvh flex-col items-center justify-center gap-3 py-4 text-center text-muted-foreground">
-    <p class="text-lg font-semibold text-foreground">{m['route.notFound.title']()}</p>
-    <Button aria-label={m['route.notFound.back']()} onclick={() => goto('/combats')}>
-        {m['route.notFound.back']()}
-    </Button>
+<div class="flex min-h-dvh flex-col">
+    <EmptyState icon={Search} title={m['route.notFound.title']()} description={m['route.notFound.description']()}>
+        <Button aria-label={m['route.notFound.back']()} onclick={() => goto('/combats')}>
+            {m['route.notFound.back']()}
+        </Button>
+    </EmptyState>
 </div>

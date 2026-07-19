@@ -16,6 +16,7 @@
     import CombatantRow from '$lib/components/app/CombatantRow.svelte';
     import CombatHeader from '$lib/components/app/CombatHeader.svelte';
     import {makeController} from '$lib/components/app/controller';
+    import EmptyState from '$lib/components/app/EmptyState.svelte';
     import FAB from '$lib/components/app/FAB.svelte';
     import NumpadSheet from '$lib/components/app/NumpadSheet.svelte';
     import {Button} from '$lib/components/ui/button';
@@ -37,6 +38,8 @@
     const Add = chromeIcon.add;
     const Advance = chromeIcon.advance;
     const Start = chromeIcon.start;
+    const Search = chromeIcon.search;
+    const Roster = chromeIcon.roster;
 
     // Auto-scroll-on-advance — scrolls the newly active row into view on every advance
     // (including the round-wrap advance); no store/controller intent, CombatantRow already marks
@@ -142,11 +145,12 @@
 {#if !store.ready}
     <p class="p-4 text-muted-foreground">…</p>
 {:else if !combat}
-    <div class="flex min-h-dvh flex-col items-center justify-center gap-3 p-4 text-center text-muted-foreground">
-        <p class="text-lg font-semibold text-foreground">{m['combat.notFound.title']()}</p>
-        <Button aria-label={m['combat.notFound.back']()} onclick={() => goto('/combats')}>
-            {m['combat.notFound.back']()}
-        </Button>
+    <div class="flex min-h-dvh flex-col">
+        <EmptyState icon={Search} title={m['combat.notFound.title']()} description={m['combat.notFound.description']()}>
+            <Button variant="ghost" aria-label={m['combat.notFound.back']()} onclick={() => goto('/combats')}>
+                {m['combat.notFound.back']()}
+            </Button>
+        </EmptyState>
     </div>
 {:else}
     <div class="mx-auto flex min-h-dvh w-full flex-col pb-56 lg:pb-8">
@@ -164,9 +168,11 @@
                 class="content-container flex w-full flex-1 flex-col gap-2 p-3 {active ? 'pt-2' : ''}"
         >
             {#if display.length === 0}
-                <div class="flex flex-1 flex-col items-center justify-center gap-3 py-16 text-center text-muted-foreground">
-                    <p class="text-lg font-semibold text-foreground">{m['setup.empty.title']()}</p>
-                </div>
+                <EmptyState icon={Roster} title={m['setup.empty.title']()} description={m['setup.empty.description']()}>
+                    <Button size="lg" class="hidden w-full lg:flex" onclick={() => (addOpen = true)}>
+                        {m['setup.empty.cta']()}
+                    </Button>
+                </EmptyState>
             {:else}
                 {#each display as c (c.id)}
                     <CombatantRow

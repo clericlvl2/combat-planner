@@ -11,6 +11,9 @@
 	import EmptyState from '$lib/components/app/EmptyState.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { m } from '$lib/i18n';
+	import { chromeIcon } from '$lib/icons';
+
+	const Alert = chromeIcon.alert;
 
 	function reload() {
 		location.reload();
@@ -27,7 +30,12 @@
      thrown `/` load or store.hydrate()/Dexie error lands here instead of the framework's
      unstyled default page. -->
 <div role="alert" aria-live="assertive" data-error-status={page.status} class="contents">
-	<EmptyState title={m['appError.title']()} description={m['appError.body']()}>
+	<EmptyState
+		icon={Alert}
+		iconClass="text-health-bloodied"
+		title={m['appError.title']()}
+		description={m['appError.body']()}
+	>
 		<div class="flex w-full flex-col gap-2 lg:flex-row lg:justify-center">
 			<Button size="lg" class="w-full lg:w-auto" aria-label={m['appError.reload']()} onclick={reload}>
 				{m['appError.reload']()}

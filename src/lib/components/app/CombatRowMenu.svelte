@@ -35,7 +35,7 @@
 			<Button
 				{...props}
 				variant="ghost"
-				size="touch"
+				size="chrome"
 				aria-label={menuLabel}
 			>
 				<Overflow class="size-4" />

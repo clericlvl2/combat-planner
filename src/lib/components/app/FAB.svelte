@@ -27,7 +27,8 @@
 </script>
 
 <Button
-	class={cn('fixed right-4 bottom-4 size-14 rounded-full shadow-lg', className)}
+	size="fab"
+	class={cn('fixed right-4 bottom-4 shadow-lg', className)}
 	{disabled}
 	aria-label={label}
 	{onclick}

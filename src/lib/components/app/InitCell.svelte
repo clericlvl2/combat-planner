@@ -97,7 +97,7 @@
 			min={RANGES.initiative.min}
 			max={RANGES.initiative.max}
 		/>
-		<Button size="sm" class="mt-2 w-full" onclick={save}>{m['forms.action.save']()}</Button>
+		<Button size="action" class="mt-2 w-full" onclick={save}>{m['forms.action.save']()}</Button>
 	</PopoverContent>
 </Popover>
 

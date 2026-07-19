@@ -105,8 +105,8 @@
 			     Add is always available; Start only once the roster isn't empty. -->
 			<Button
 				variant="ghost"
-				size="icon"
-				class="hidden size-11 rounded-full bg-foreground/10 lg:inline-flex lg:size-8"
+				size="chrome"
+				class="hidden rounded-full bg-foreground/10 lg:inline-flex"
 				aria-label={m['setup.addCombatant']()}
 				title={m['setup.addCombatant']()}
 				onclick={onAdd}
@@ -116,8 +116,8 @@
 			{#if combat.combatants.length > 0}
 				<Button
 					variant="ghost"
-					size="icon"
-					class="hidden size-11 rounded-full bg-foreground/10 lg:inline-flex lg:size-8"
+					size="chrome"
+					class="hidden rounded-full bg-foreground/10 lg:inline-flex"
 					aria-label={m['setup.start']()}
 					title={m['setup.start']()}
 					onclick={onStart}
@@ -130,8 +130,8 @@
 			     header-add/header-start pattern above); mobile keeps the Advance FAB. -->
 			<Button
 				variant="ghost"
-				size="icon"
-				class="hidden size-11 rounded-full bg-foreground/10 lg:inline-flex lg:size-8"
+				size="chrome"
+				class="hidden rounded-full bg-foreground/10 lg:inline-flex"
 				disabled={!canAdvance}
 				aria-label={m['active.advance']()}
 				title={m['active.advance']()}
@@ -148,8 +148,8 @@
 					<Button
 						{...props}
 						variant="ghost"
-						size="icon"
-						class="size-11 shrink-0 lg:size-8"
+						size="chrome"
+						class="shrink-0"
 						aria-label={m['a11y.combatRowMenu']({ title: combat.title })}
 					>
 						<Overflow class="size-5" />
@@ -212,7 +212,7 @@
 						max={RANGES.round.max}
 					/>
 					<div class="flex justify-end">
-						<Button size="lg" class="w-full" onclick={saveRound}>{m['forms.action.save']()}</Button>
+						<Button size="action" class="w-full" onclick={saveRound}>{m['forms.action.save']()}</Button>
 					</div>
 				</PopoverContent>
 			</Popover>
@@ -241,7 +241,7 @@
 						max={RANGES.escalation.max}
 					/>
 					<div class="flex justify-end">
-						<Button size="lg" class="w-full" onclick={saveEsc}>{m['forms.action.save']()}</Button>
+						<Button size="action" class="w-full" onclick={saveEsc}>{m['forms.action.save']()}</Button>
 					</div>
 				</PopoverContent>
 			</Popover>

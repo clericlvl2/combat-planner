@@ -134,7 +134,7 @@
 						<div class="flex shrink-0 items-center gap-0.5">
 							<CollapsibleTrigger>
 								{#snippet child({ props })}
-									<Button {...props} variant="ghost" size="icon" class="size-10 lg:size-7" aria-label={toggleLabel}>
+									<Button {...props} variant="ghost" size="row" aria-label={toggleLabel}>
 										<Chevron
 											class={['size-4 text-muted-foreground transition-transform', open && 'rotate-180']}
 										/>
@@ -145,7 +145,7 @@
 							<DropdownMenu>
 								<DropdownMenuTrigger>
 									{#snippet child({ props })}
-										<Button {...props} variant="ghost" size="icon" class="size-10 lg:size-7" aria-label={menuLabel}>
+										<Button {...props} variant="ghost" size="row" aria-label={menuLabel}>
 											<Overflow class="size-4" />
 										</Button>
 									{/snippet}

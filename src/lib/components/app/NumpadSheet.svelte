@@ -128,8 +128,9 @@
 		<div class="grid grid-cols-3 gap-2">
 			<Button
 				variant="soft"
+				size="action"
 				style="--tc: var(--destructive)"
-				class="h-11 text-xs font-bold"
+				class="text-xs font-bold"
 				disabled={empty}
 				onclick={() => commit(onDamage)}
 			>
@@ -137,8 +138,9 @@
 			</Button>
 			<Button
 				variant="soft"
+				size="action"
 				style="--tc: var(--health-full)"
-				class="h-11 text-xs font-bold"
+				class="text-xs font-bold"
 				disabled={empty}
 				onclick={() => commit(onRestore)}
 			>
@@ -146,8 +148,9 @@
 			</Button>
 			<Button
 				variant="soft"
+				size="action"
 				style="--tc: var(--combat-blue)"
-				class="h-11 text-xs font-bold"
+				class="text-xs font-bold"
 				disabled={empty}
 				onclick={() => commit(onSetTempHp)}
 			>
@@ -160,19 +163,21 @@
 			{#each ['1', '2', '3', '4', '5', '6', '7', '8', '9'] as d (d)}
 				<Button
 					variant="outline"
-					class="h-11 text-lg font-semibold"
+					size="action"
+					class="text-lg font-semibold"
 					aria-label={m['a11y.numpad.digit']({ n: d })}
 					onclick={() => push(d)}
 				>
 					{d}
 				</Button>
 			{/each}
-			<Button variant="ghost" class="h-11" aria-label={m['a11y.numpad.clear']()} onclick={clear}>
+			<Button variant="ghost" size="action" aria-label={m['a11y.numpad.clear']()} onclick={clear}>
 				<ClearIcon class="size-5" />
 			</Button>
 			<Button
 				variant="outline"
-				class="h-11 text-lg font-semibold"
+				size="action"
+				class="text-lg font-semibold"
 				aria-label={m['a11y.numpad.digit']({ n: '0' })}
 				onclick={() => push('0')}
 			>
@@ -180,7 +185,7 @@
 			</Button>
 			<Button
 				variant="ghost"
-				class="h-11"
+				size="action"
 				aria-label={m['a11y.numpad.backspace']()}
 				onclick={backspace}
 			>

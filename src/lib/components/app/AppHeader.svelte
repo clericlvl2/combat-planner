@@ -40,7 +40,7 @@
 	<div class="content-container-wide flex w-full items-center gap-2">
 		<Button
 			variant="ghost"
-			size="touch"
+			size="chrome"
 			class="-ml-3 lg:hidden"
 			aria-label={m['nav.open']()}
 			onclick={onOpenNav}

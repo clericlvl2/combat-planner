@@ -37,10 +37,11 @@
 			<AlertDialogDescription>{body}</AlertDialogDescription>
 		</AlertDialogHeader>
 		<AlertDialogFooter class="mx-0 mb-0 flex-row gap-2 rounded-b-none border-t-0 bg-transparent p-0">
-			<AlertDialogCancel class="h-11 flex-1">{m['dialogs.cancel']()}</AlertDialogCancel>
+			<AlertDialogCancel size="action" class="flex-1">{m['dialogs.cancel']()}</AlertDialogCancel>
 			<AlertDialogAction
 				variant="destructive"
-				class="h-11 flex-1 bg-destructive text-white hover:bg-destructive/90 dark:bg-destructive dark:hover:bg-destructive/90"
+				size="action"
+				class="flex-1 bg-destructive text-white hover:bg-destructive/90 dark:bg-destructive dark:hover:bg-destructive/90"
 				onclick={onConfirm}
 			>
 				{confirmLabel}

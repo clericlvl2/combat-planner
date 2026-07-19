@@ -1,6 +1,6 @@
 # Backlog
 
-next_id: W-022
+next_id: W-023
 
 | ID | Pri | Loop | State | Outcome | Depends | Plan |
 |----|-----|------|-------|---------|---------|------|
@@ -8,6 +8,7 @@ next_id: W-022
 | W-006 | L | large | inbox | App-data export/import — all-combats + single-combat, fail-safe import (v2) | — | — |
 | W-008 | L | large | inbox | Smooth animations — motion for tap/expand/damage-entry/condition-toggle interactions | — | — |
 | W-019 | M | large | inbox | Icon revision — audit every `lucide-svelte` icon in use, fix each choice or swap for a better-fitting one | — | — |
+| W-022 | M | large | active | Button height system — unify text-button height (44px) + icon-button 4-tier scale via size variants | — | `.claude/plans/2026-07-19-button-height-system.md` |
 
 **Fields**
 

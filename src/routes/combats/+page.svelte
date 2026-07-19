@@ -79,7 +79,7 @@
 		title={m['combats.empty.title']()}
 		description={m['combats.empty.description']()}
 	>
-		<Button size="lg" class="hidden w-full lg:flex" onclick={openCreate}>
+		<Button size="lg" class="hidden lg:inline-flex" onclick={openCreate}>
 			<Add class="size-5" />
 			{m['combats.empty.cta']()}
 		</Button>

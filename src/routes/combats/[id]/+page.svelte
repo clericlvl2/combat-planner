@@ -147,7 +147,7 @@
 {:else if !combat}
     <div class="flex min-h-dvh flex-col">
         <EmptyState icon={Search} title={m['combat.notFound.title']()} description={m['combat.notFound.description']()}>
-            <Button variant="ghost" aria-label={m['combat.notFound.back']()} onclick={() => goto('/combats')}>
+            <Button aria-label={m['combat.notFound.back']()} onclick={() => goto('/combats')}>
                 {m['combat.notFound.back']()}
             </Button>
         </EmptyState>
@@ -169,7 +169,7 @@
         >
             {#if display.length === 0}
                 <EmptyState icon={Roster} title={m['setup.empty.title']()} description={m['setup.empty.description']()}>
-                    <Button size="lg" class="hidden w-full lg:flex" onclick={() => (addOpen = true)}>
+                    <Button size="lg" class="hidden lg:inline-flex" onclick={() => (addOpen = true)}>
                         {m['setup.empty.cta']()}
                     </Button>
                 </EmptyState>

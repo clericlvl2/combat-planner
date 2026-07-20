@@ -18,7 +18,7 @@
     import {ToggleGroup, ToggleGroupItem} from '$lib/components/ui/toggle-group';
     import {type Combatant, type CombatantType, COMBATANT_TYPES, UNROLLED} from '$lib/db/types';
     import {m} from '$lib/i18n';
-    import {NOTE_MAX_LENGTH, RANGES} from '$lib/stores/domain/constants';
+    import {NAME_MAX_LENGTH, NOTE_MAX_LENGTH, RANGES} from '$lib/stores/domain/constants';
     import NumberField from './NumberField.svelte';
     import {typeLabel} from './labels';
 
@@ -121,7 +121,7 @@
             <!-- Name (optional — empty on save falls back to the type-specific placeholder as the real name) -->
             <div class="flex flex-col gap-[5px]">
                 <Label for="cf-name" class={fieldLabelClass}>{m['forms.field.name']()}</Label>
-                <Input id="cf-name" size="action" bind:value={name} placeholder={namePlaceholder}/>
+                <Input id="cf-name" size="action" bind:value={name} maxlength={NAME_MAX_LENGTH} placeholder={namePlaceholder}/>
             </div>
 
             <!-- Type -->

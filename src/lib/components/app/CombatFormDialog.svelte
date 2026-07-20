@@ -17,6 +17,7 @@
 	import { type Combat, type ColorTag } from '$lib/db/types';
 	import { m } from '$lib/i18n';
 	import type { CombatInput, EditCombatPatch } from '$lib/stores/domain';
+	import { DESCRIPTION_MAX_LENGTH, TITLE_MAX_LENGTH } from '$lib/stores/domain/constants';
 	import ColorSwatchPicker from './ColorSwatchPicker.svelte';
 
 	/** Narrow store surface this dialog needs — lets tests pass a plain spy object. */
@@ -88,6 +89,7 @@
 			<Input
 				id="cf-title"
 				bind:value={title}
+				maxlength={TITLE_MAX_LENGTH}
 				placeholder={m['forms.field.title.placeholder']()}
 				size="action"
 				class="border-[var(--border-strong)] text-[15px] md:text-[15px]"
@@ -99,6 +101,7 @@
 			<Textarea
 				id="cf-description"
 				bind:value={description}
+				maxlength={DESCRIPTION_MAX_LENGTH}
 				placeholder={m['forms.field.description.placeholder']()}
 				class="rounded-sm border-[var(--border-strong)] text-[15px] md:text-[15px]"
 			/>

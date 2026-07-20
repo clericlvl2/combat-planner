@@ -8,7 +8,6 @@ next_id: W-025
 | W-006 | L | large | inbox | App-data export/import — all-combats + single-combat, fail-safe import (v2) | — | — |
 | W-008 | L | large | inbox | Smooth animations — motion for tap/expand/damage-entry/condition-toggle interactions | — | — |
 | W-019 | M | large | inbox | Icon revision — audit every `lucide-svelte` icon in use, fix each choice or swap for a better-fitting one | — | — |
-| W-024 | S | small | inbox | Remove Reset All (Settings DataActions section, `App.resetAll`/`store.resetAll`, associated i18n keys) | — | — |
 
 **Fields**
 

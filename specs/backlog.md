@@ -1,6 +1,6 @@
 # Backlog
 
-next_id: W-026
+next_id: W-028
 
 | ID | Pri | Loop | State | Outcome | Depends | Plan |
 |----|-----|------|-------|---------|---------|------|
@@ -9,6 +9,8 @@ next_id: W-026
 | W-008 | L | large | inbox | Smooth animations — motion for tap/expand/damage-entry/condition-toggle interactions | — | — |
 | W-019 | M | large | inbox | Icon revision — audit every `lucide-svelte` icon in use, fix each choice or swap for a better-fitting one | — | — |
 | W-025 | M | large | active | Cap user-fillable text fields (title/name/description) + fix mobile header overflow on long titles | — | `.claude/plans/2026-07-20-cap-and-safeguard-text-fields.md` |
+| W-026 | S | small | inbox | i18n: `forms.type.pc` ja value still literal "PC" — reword to a translated word (matches en's "PC"→"Player" change already applied; de/es/fr/ru already use word forms SC/PJ/PJ/Игрок, only ja untouched); opus-linguist review confirmed ja's Latin-acronym convention is correct for AC/PD/MD/HP but this key is a plain UI label, not system jargon, so it should follow the other 5 locales | — | — |
+| W-027 | S | small | inbox | i18n: verify ru `forms.field.md` value "МЗ" expands to Ментальная Защита (Mental), not Магическая (Magical) — semantic check only, flagged by opus-linguist review, no source string currently states the expansion so confirm intent wherever it's documented (about/credits copy or leave a code comment) | — | — |
 
 **Fields**
 

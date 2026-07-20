@@ -203,7 +203,7 @@
                  borrows the existing chevron glyph (no dedicated play/start icon ships yet). -->
             <Button
                     size="fab"
-                    class="fixed right-4 bottom-4 shadow-lg lg:hidden max-lg:focus-visible:ring-0 max-lg:focus-visible:border-transparent"
+                    class="fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] shadow-lg lg:hidden max-lg:focus-visible:ring-0 max-lg:focus-visible:border-transparent"
                     aria-label={m['setup.addCombatant']()}
                     onclick={() => (addOpen = true)}
             >
@@ -217,7 +217,7 @@
                         icon={Start}
                         label={m['setup.start']()}
                         onclick={controller.start}
-                        class="bottom-24 lg:hidden max-lg:focus-visible:ring-0 max-lg:focus-visible:border-transparent"
+                        class="bottom-[calc(6rem+env(safe-area-inset-bottom))] lg:hidden max-lg:focus-visible:ring-0 max-lg:focus-visible:border-transparent"
                 />
             {/if}
         {/if}

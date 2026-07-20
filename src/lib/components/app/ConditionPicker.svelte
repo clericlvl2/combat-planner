@@ -80,7 +80,7 @@
 				<DrawerTitle>{m['conditions.add']()}</DrawerTitle>
 			</DrawerHeader>
 
-			<div class="px-4 pb-4">
+			<div class="px-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
 				{@render toggles()}
 			</div>
 		</DrawerContent>

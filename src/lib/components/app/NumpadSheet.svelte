@@ -248,9 +248,11 @@
 {:else}
 	<Drawer bind:open>
 		<DrawerContent class="mx-auto max-w-md">
-			{#if combatant}
-				{@render body(combatant)}
-			{/if}
+			<div class="pb-[calc(1rem+env(safe-area-inset-bottom))]">
+				{#if combatant}
+					{@render body(combatant)}
+				{/if}
+			</div>
 		</DrawerContent>
 	</Drawer>
 {/if}

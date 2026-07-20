@@ -2,7 +2,13 @@
  * Numeric clamps. Every committed value is forced into range —
  * validation is forgiving to keep live play fast ("clamp to their range on commit").
  */
-import { NOTE_MAX_LENGTH, RANGES } from './constants';
+import {
+	DESCRIPTION_MAX_LENGTH,
+	NAME_MAX_LENGTH,
+	NOTE_MAX_LENGTH,
+	RANGES,
+	TITLE_MAX_LENGTH,
+} from './constants';
 
 /** Clamp to an inclusive [min, max]; NaN falls back to min, ±Infinity to the nearer bound. */
 export function clamp(value: number, min: number, max: number): number {
@@ -36,3 +42,17 @@ export const clampEscalation = (v: number): number =>
 /** Notes are hard-capped during input; no rounding, just truncate. */
 export const clampNote = (note: string): string =>
 	note.length > NOTE_MAX_LENGTH ? note.slice(0, NOTE_MAX_LENGTH) : note;
+
+/** Combat titles are hard-capped during input; no rounding, just truncate. */
+export const clampTitle = (title: string): string =>
+	title.length > TITLE_MAX_LENGTH ? title.slice(0, TITLE_MAX_LENGTH) : title;
+
+/** Combatant names are hard-capped during input; no rounding, just truncate. */
+export const clampName = (name: string): string =>
+	name.length > NAME_MAX_LENGTH ? name.slice(0, NAME_MAX_LENGTH) : name;
+
+/** Combat descriptions are hard-capped during input; no rounding, just truncate. */
+export const clampDescription = (description: string): string =>
+	description.length > DESCRIPTION_MAX_LENGTH
+		? description.slice(0, DESCRIPTION_MAX_LENGTH)
+		: description;

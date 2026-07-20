@@ -4,6 +4,7 @@
  * confirm-gated, not undoable. The reactive seam wires confirmation + persistence (M2+).
  */
 import { type ColorTag, type Combat, MAX_COMBATS, type Settings } from '../../db/types';
+import { clampDescription, clampTitle } from './clamp';
 import { type CombatInput, createCombat } from './factories';
 import { genId as defaultGenId, type IdGen } from './id';
 
@@ -43,8 +44,11 @@ export function editCombat(combats: Combat[], id: string, patch: EditCombatPatch
 	const current = combats[idx];
 	const next: Combat = {
 		...current,
-		title: patch.title !== undefined ? patch.title.trim() : current.title,
-		description: patch.description !== undefined ? patch.description.trim() : current.description,
+		title: patch.title !== undefined ? clampTitle(patch.title.trim()) : current.title,
+		description:
+			patch.description !== undefined
+				? clampDescription(patch.description.trim())
+				: current.description,
 		colorTag: patch.colorTag ?? current.colorTag,
 		updatedAt: Date.now(),
 	};

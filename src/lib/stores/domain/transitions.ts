@@ -20,6 +20,7 @@ import {
 	clampInitiativeBonus,
 	clampMaxHp,
 	clampMd,
+	clampName,
 	clampNote,
 	clampPd,
 	clampRound,
@@ -150,7 +151,7 @@ export function duplicateCombatant(
 	const copy: Combatant = {
 		...src,
 		id: genId(),
-		name: duplicateName(src.name, taken),
+		name: clampName(duplicateName(src.name, taken)),
 		addOrder: nextAddOrder(combat),
 		initiative: UNROLLED,
 		currentHp: src.maxHp,
@@ -227,7 +228,7 @@ export interface CombatantFieldPatch {
 
 function applyFieldPatch(c: Combatant, patch: CombatantFieldPatch): Combatant {
 	const next = { ...c };
-	if (patch.name !== undefined) next.name = patch.name.trim();
+	if (patch.name !== undefined) next.name = clampName(patch.name.trim());
 	if (patch.type !== undefined) next.type = patch.type;
 	if (patch.initiativeBonus !== undefined)
 		next.initiativeBonus = clampInitiativeBonus(patch.initiativeBonus);

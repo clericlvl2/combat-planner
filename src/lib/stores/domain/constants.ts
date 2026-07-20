@@ -19,6 +19,15 @@ export const RANGES = {
 /** Note hard cap during input. */
 export const NOTE_MAX_LENGTH = 250;
 
+/** Combat title hard cap during input. */
+export const TITLE_MAX_LENGTH = 60;
+
+/** Combatant name hard cap during input. */
+export const NAME_MAX_LENGTH = 40;
+
+/** Combat description hard cap during input. */
+export const DESCRIPTION_MAX_LENGTH = 200;
+
 /** d20 roll bounds — Start auto-roll / per-combatant roll. */
 export const D20 = { min: 1, max: 20 } as const;
 

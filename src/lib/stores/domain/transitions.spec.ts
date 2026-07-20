@@ -233,6 +233,12 @@ describe('editCombatant — Max HP is a discrete undo step', () => {
 		expect(fieldOnly.combatants[0].ac).toBe(15);
 		expect(editCombatant(c, 'a', { maxHp: 10 }).combatants[0].currentHp).toBe(30);
 	});
+
+	it('truncates an over-length name edit to 40 chars', () => {
+		const c = combat([mk({ id: 'a', name: 'Alice' })]);
+		const edited = editCombatant(c, 'a', { name: 'x'.repeat(100) });
+		expect(edited.combatants[0].name).toHaveLength(40);
+	});
 });
 
 describe('roster', () => {
@@ -248,6 +254,18 @@ describe('roster', () => {
 			hpLog: [],
 		});
 		expect(added.undoStack).toHaveLength(1);
+	});
+
+	it('addCombatant truncates an over-length name to 40 chars', () => {
+		const c = combat([]);
+		const added = addCombatant(c, { name: 'x'.repeat(100), maxHp: 10 }, id);
+		expect(added.combatants[0].name).toHaveLength(40);
+	});
+
+	it('duplicateCombatant truncates the generated name to 40 chars', () => {
+		const g = mk({ id: 'g', name: 'x'.repeat(40) }, 0);
+		const dup = duplicateCombatant(combat([g]), 'g', id);
+		expect(dup.combatants[1].name.length).toBeLessThanOrEqual(40);
 	});
 
 	it('addCombatant / duplicateCombatant blocked at the 30 cap', () => {

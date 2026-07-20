@@ -15,12 +15,15 @@ import {
 } from '../../db/types';
 import {
 	clampAc,
+	clampDescription,
 	clampInitiative,
 	clampInitiativeBonus,
 	clampMaxHp,
 	clampMd,
+	clampName,
 	clampNote,
 	clampPd,
+	clampTitle,
 } from './clamp';
 import { COMBATANT_DEFAULTS } from './constants';
 import { genId as defaultGenId, type IdGen } from './id';
@@ -47,7 +50,7 @@ export function createCombatant(
 	const maxHp = clampMaxHp(input.maxHp ?? COMBATANT_DEFAULTS.maxHp);
 	return {
 		id: genId(),
-		name: input.name.trim(),
+		name: clampName(input.name.trim()),
 		type: input.type ?? 'enemy',
 		addOrder,
 		initiative: input.initiative !== undefined ? clampInitiative(input.initiative) : UNROLLED,
@@ -82,8 +85,8 @@ export function createCombat(
 	const now = Date.now();
 	return {
 		id: genId(),
-		title: input.title?.trim() ?? '',
-		description: input.description?.trim() ?? '',
+		title: clampTitle(input.title?.trim() ?? ''),
+		description: clampDescription(input.description?.trim() ?? ''),
 		colorTag: input.colorTag ?? 'neutral',
 		listOrder,
 		state: 'setup',

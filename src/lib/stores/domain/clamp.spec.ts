@@ -2,12 +2,15 @@ import { describe, expect, it } from 'vitest';
 import {
 	clamp,
 	clampCurrentHp,
+	clampDescription,
 	clampEscalation,
 	clampInitiative,
 	clampMaxHp,
+	clampName,
 	clampNote,
 	clampRound,
 	clampTempHp,
+	clampTitle,
 } from './clamp';
 
 // Numeric ranges — every committed value forced into range.
@@ -44,5 +47,20 @@ describe('clamp helpers', () => {
 	it('truncates a note to 250 chars', () => {
 		expect(clampNote('x'.repeat(300))).toHaveLength(250);
 		expect(clampNote('short')).toBe('short');
+	});
+
+	it('truncates a title to 60 chars', () => {
+		expect(clampTitle('x'.repeat(100))).toHaveLength(60);
+		expect(clampTitle('short')).toBe('short');
+	});
+
+	it('truncates a name to 40 chars', () => {
+		expect(clampName('x'.repeat(100))).toHaveLength(40);
+		expect(clampName('short')).toBe('short');
+	});
+
+	it('truncates a description to 200 chars', () => {
+		expect(clampDescription('x'.repeat(300))).toHaveLength(200);
+		expect(clampDescription('short')).toBe('short');
 	});
 });

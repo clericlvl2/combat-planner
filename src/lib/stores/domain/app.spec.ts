@@ -15,6 +15,16 @@ describe('createCombatInList', () => {
 		expect((created as Combat).listOrder).toBeLessThan(existing.listOrder);
 	});
 
+	it('truncates an over-length title/description on create to the caps', () => {
+		const { created } = createCombatInList(
+			[],
+			{ title: 'x'.repeat(100), description: 'y'.repeat(300) },
+			id,
+		);
+		expect(created?.title).toHaveLength(60);
+		expect(created?.description).toHaveLength(200);
+	});
+
 	it('blocks creation past the 100-combat cap', () => {
 		const full = Array.from({ length: 100 }, (_, i) => createCombat({}, i, () => `c${i}`));
 		const { combats, created } = createCombatInList(full, {}, id);
@@ -72,6 +82,17 @@ describe('editCombat', () => {
 		const combats = [createCombat({}, 0, () => 'a')];
 		const out = editCombat(combats, 'missing', { title: 'x' });
 		expect(out).toBe(combats);
+	});
+
+	it('truncates an over-length title/description edit to the caps', () => {
+		const original = createCombat({}, 0, () => 'a');
+		const out = editCombat([original], 'a', {
+			title: 'x'.repeat(100),
+			description: 'y'.repeat(300),
+		});
+		const edited = out.find((c) => c.id === 'a');
+		expect(edited?.title).toHaveLength(60);
+		expect(edited?.description).toHaveLength(200);
 	});
 });
 

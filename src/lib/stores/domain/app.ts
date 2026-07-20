@@ -59,19 +59,6 @@ export function reorderCombats(combats: Combat[], orderedIds: string[]): Combat[
 	return combats.map((c) => ({ ...c, listOrder: rank.get(c.id) ?? c.listOrder }));
 }
 
-export interface ResetAllResult {
-	combats: Combat[];
-	settings: Settings;
-}
-
-/** Clear all combats; keep language/theme; re-arm first-launch. */
-export function resetAll(settings: Settings): ResetAllResult {
-	return {
-		combats: [],
-		settings: { ...settings, firstLaunchDone: false },
-	};
-}
-
 export interface FirstLaunchResult {
 	combats: Combat[];
 	settings: Settings;

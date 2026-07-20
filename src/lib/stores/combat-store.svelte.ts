@@ -6,7 +6,6 @@
  */
 import { db } from '../db';
 import {
-	clearCombats,
 	loadAppData,
 	type PersistenceDb,
 	persistCombat,
@@ -145,18 +144,6 @@ export class CombatStore {
 		const reordered = App.reorderCombats($state.snapshot(this.combats) as Combat[], orderedIds);
 		this.combats = reordered;
 		void persistCombats(this.#db, reordered);
-	}
-
-	/** Reset-all: clear combats, keep language/theme, re-arm first-launch. */
-	async resetAll(genId?: IdGen): Promise<void> {
-		const { settings } = App.resetAll(this.settings);
-		await clearCombats(this.#db);
-		const launched = App.firstLaunch([], settings, genId);
-		this.combats = launched.combats;
-		this.settings = launched.settings;
-		const writes: Promise<void>[] = [persistSettings(this.#db, launched.settings)];
-		if (launched.opened) writes.push(persistCombat(this.#db, launched.opened));
-		await Promise.all(writes);
 	}
 
 	updateSettings(patch: Partial<Omit<Settings, 'id'>>): void {

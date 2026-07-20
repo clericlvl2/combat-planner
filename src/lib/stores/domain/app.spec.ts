@@ -1,13 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Combat } from '../../db/types';
-import {
-	createCombatInList,
-	deleteCombat,
-	editCombat,
-	firstLaunch,
-	reorderCombats,
-	resetAll,
-} from './app';
+import { createCombatInList, deleteCombat, editCombat, firstLaunch, reorderCombats } from './app';
 import { createCombat, createSettings } from './factories';
 
 let seq = 0;
@@ -82,16 +75,7 @@ describe('editCombat', () => {
 	});
 });
 
-describe('resetAll / firstLaunch', () => {
-	it('resetAll clears combats, keeps language/theme, re-arms first-launch', () => {
-		const settings = createSettings({ language: 'de', theme: 'dark', firstLaunchDone: true });
-		const { combats, settings: next } = resetAll(settings);
-		expect(combats).toEqual([]);
-		expect(next.language).toBe('de');
-		expect(next.theme).toBe('dark');
-		expect(next.firstLaunchDone).toBe(false);
-	});
-
+describe('firstLaunch', () => {
 	it('firstLaunch auto-creates one empty combat and sets the flag, once', () => {
 		const fresh = createSettings();
 		const run = firstLaunch([], fresh, id);

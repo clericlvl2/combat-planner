@@ -244,7 +244,7 @@
                 <DrawerTitle class="text-lg font-semibold">{formTitle}</DrawerTitle>
             </DrawerHeader>
 
-            <div class="flex min-h-0 flex-1 flex-col px-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+            <div class="flex min-h-0 flex-1 flex-col px-4 pb-[calc(1rem_+_env(safe-area-inset-bottom))]">
                 {@render formBody()}
             </div>
         </DrawerContent>

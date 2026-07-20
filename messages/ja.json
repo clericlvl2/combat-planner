@@ -80,7 +80,7 @@
 	"forms.field.name.placeholder.enemy": "敵",
 	"forms.field.name.placeholder.ally": "味方",
 	"forms.field.type": "種別",
-	"forms.type.pc": "PC",
+	"forms.type.pc": "プレイヤー",
 	"forms.type.enemy": "敵",
 	"forms.type.ally": "味方",
 	"forms.field.initBonus": "イニシアチブボーナス",

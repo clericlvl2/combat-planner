@@ -1,6 +1,6 @@
 # Backlog
 
-next_id: W-025
+next_id: W-026
 
 | ID | Pri | Loop | State | Outcome | Depends | Plan |
 |----|-----|------|-------|---------|---------|------|
@@ -8,6 +8,7 @@ next_id: W-025
 | W-006 | L | large | inbox | App-data export/import — all-combats + single-combat, fail-safe import (v2) | — | — |
 | W-008 | L | large | inbox | Smooth animations — motion for tap/expand/damage-entry/condition-toggle interactions | — | — |
 | W-019 | M | large | inbox | Icon revision — audit every `lucide-svelte` icon in use, fix each choice or swap for a better-fitting one | — | — |
+| W-025 | M | large | active | Cap user-fillable text fields (title/name/description) + fix mobile header overflow on long titles | — | `.claude/plans/2026-07-20-cap-and-safeguard-text-fields.md` |
 
 **Fields**
 

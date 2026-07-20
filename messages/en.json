@@ -80,7 +80,7 @@
 	"forms.field.name.placeholder.enemy": "Enemy",
 	"forms.field.name.placeholder.ally": "Ally",
 	"forms.field.type": "Type",
-	"forms.type.pc": "PC",
+	"forms.type.pc": "Player",
 	"forms.type.enemy": "Enemy",
 	"forms.type.ally": "Ally",
 	"forms.field.initBonus": "Initiative bonus",

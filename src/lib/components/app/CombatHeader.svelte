@@ -92,7 +92,7 @@
 			href="/combats"
 			variant="ghost"
 			aria-label={m['a11y.back']()}
-			class="-ml-2 flex min-h-11 min-w-0 max-w-full items-center justify-start gap-1 px-2 text-lg font-semibold"
+			class="-ml-2 flex min-h-11 min-w-0 max-w-full shrink items-center justify-start gap-1 px-2 text-lg font-semibold"
 		>
 			<Back class="size-5 shrink-0" />
 			<span class="min-w-0 truncate">{combat.title}</span>

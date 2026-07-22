@@ -130,6 +130,32 @@
 	padding-inline: 12px;
 }
 
+/* Bottom-of-screen comfort spacing that also clears the iOS home-indicator/notch —
+ * viewport-fit=cover (app.html) lets content draw under it, so fixed/sticky bottom
+ * elements need env(safe-area-inset-bottom), not just a flat value. max() takes
+ * whichever is larger: the 1rem comfort floor on ordinary devices, or the real
+ * device inset on notched ones — never both added together. */
+@utility pb-safe {
+	padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+@utility bottom-safe {
+	bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+/* Second fixed element stacked above a .bottom-safe sibling (Setup screen's Start
+ * FAB above the Add FAB) — same safe-area floor, plus the fixed 5rem stacking gap. */
+@utility bottom-safe-stack {
+	bottom: calc(max(1rem, env(safe-area-inset-bottom)) + 5rem);
+}
+
+/* Label+control stack used by every form field in CombatFormDialog/CombatantForm. */
+@utility form-field-group {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+
 @layer base {
 	* {
 		@apply border-border outline-ring/50;

@@ -30,6 +30,7 @@ ConditionPicker.svelte     condition toggles
 ConditionIconList.svelte   first-few + "+K" overflow condition chips
 controller.ts               non-visual combat-screen controller/wiring helper
 labels.ts                   shared label/text helper
+dialogFormChrome.ts          shared footer/action-button classes (CombatFormDialog/CombatantForm)
 header-action.svelte.ts     shared header-action state helper
 ```
 

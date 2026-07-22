@@ -28,7 +28,7 @@
 
 <Button
 	size="fab"
-	class={cn('fixed right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] shadow-lg', className)}
+	class={cn('fixed right-4 bottom-safe shadow-lg', className)}
 	{disabled}
 	aria-label={label}
 	{onclick}

@@ -19,6 +19,7 @@
     import {type Combatant, type CombatantType, COMBATANT_TYPES, UNROLLED} from '$lib/db/types';
     import {m} from '$lib/i18n';
     import {NAME_MAX_LENGTH, NOTE_MAX_LENGTH, RANGES} from '$lib/stores/domain/constants';
+    import {DIALOG_ACTION_BUTTON_CLASS, DIALOG_FOOTER_CLASS} from './dialogFormChrome';
     import NumberField from './NumberField.svelte';
     import {typeLabel} from './labels';
 
@@ -119,13 +120,13 @@
     >
         <div class="-mx-3 flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto px-3">
             <!-- Name (optional — empty on save falls back to the type-specific placeholder as the real name) -->
-            <div class="flex flex-col gap-[5px]">
+            <div class="form-field-group">
                 <Label for="cf-name" class={fieldLabelClass}>{m['forms.field.name']()}</Label>
                 <Input id="cf-name" size="action" bind:value={name} maxlength={NAME_MAX_LENGTH} placeholder={namePlaceholder}/>
             </div>
 
             <!-- Type -->
-            <div class="flex flex-col gap-[5px]">
+            <div class="form-field-group">
                 <Label class={fieldLabelClass}>{m['forms.field.type']()}</Label>
                 <ToggleGroup
                         type="single"
@@ -197,7 +198,7 @@
                 />
             </div>
 
-            <div class="flex flex-col gap-[5px]">
+            <div class="form-field-group">
                 <Label for="cf-note" class={fieldLabelClass}>{m['forms.field.note']()}</Label>
                 <Textarea
                         id="cf-note"
@@ -208,17 +209,17 @@
             </div>
         </div>
 
-        <DialogFooter class="mx-0 mb-0 flex-row justify-center gap-2 border-t-0 bg-transparent p-0 pt-1">
+        <DialogFooter class={DIALOG_FOOTER_CLASS}>
             <Button
                     type="button"
                     variant="outline"
                     size="action"
-                    class="min-w-0 flex-1 shrink basis-0 border-[var(--border-strong)]"
+                    class="{DIALOG_ACTION_BUTTON_CLASS} border-[var(--border-strong)]"
                     onclick={() => (open = false)}
             >
                 {m['forms.action.cancel']()}
             </Button>
-            <Button type="submit" size="action" class="min-w-0 flex-1 shrink basis-0">
+            <Button type="submit" size="action" class={DIALOG_ACTION_BUTTON_CLASS}>
                 {mode === 'add' ? m['forms.action.add']() : m['forms.action.save']()}
             </Button>
         </DialogFooter>
@@ -244,7 +245,7 @@
                 <DrawerTitle class="text-lg font-semibold">{formTitle}</DrawerTitle>
             </DrawerHeader>
 
-            <div class="flex min-h-0 flex-1 flex-col px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+            <div class="flex min-h-0 flex-1 flex-col px-4 pb-safe">
                 {@render formBody()}
             </div>
         </DrawerContent>

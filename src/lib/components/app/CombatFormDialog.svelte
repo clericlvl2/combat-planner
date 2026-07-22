@@ -19,6 +19,7 @@
 	import type { CombatInput, EditCombatPatch } from '$lib/stores/domain';
 	import { DESCRIPTION_MAX_LENGTH, TITLE_MAX_LENGTH } from '$lib/stores/domain/constants';
 	import ColorSwatchPicker from './ColorSwatchPicker.svelte';
+	import { DIALOG_ACTION_BUTTON_CLASS, DIALOG_FOOTER_CLASS } from './dialogFormChrome';
 
 	/** Narrow store surface this dialog needs — lets tests pass a plain spy object. */
 	export interface CombatFormStore {
@@ -84,7 +85,7 @@
 			submit();
 		}}
 	>
-		<div class="flex flex-col gap-[5px]">
+		<div class="form-field-group">
 			<Label for="cf-title" class={fieldLabelClass}>{m['forms.field.title']()}</Label>
 			<Input
 				id="cf-title"
@@ -96,7 +97,7 @@
 			/>
 		</div>
 
-		<div class="flex flex-col gap-[5px]">
+		<div class="form-field-group">
 			<Label for="cf-description" class={fieldLabelClass}>{m['forms.field.description']()}</Label>
 			<Textarea
 				id="cf-description"
@@ -107,17 +108,17 @@
 			/>
 		</div>
 
-		<div class="flex flex-col gap-[5px]">
+		<div class="form-field-group">
 			<Label class={fieldLabelClass}>{m['forms.field.colorTag']()}</Label>
 			<ColorSwatchPicker bind:value={colorTag} />
 		</div>
 
-		<DialogFooter class="mx-0 mb-0 flex-row justify-center gap-2 border-t-0 bg-transparent p-0 pt-1">
+		<DialogFooter class={DIALOG_FOOTER_CLASS}>
 			<Button
 				type="button"
 				variant="outline"
 				size="action"
-				class="min-w-0 flex-1 shrink basis-0 border-[var(--border-strong)]"
+				class="{DIALOG_ACTION_BUTTON_CLASS} border-[var(--border-strong)]"
 				onclick={() => (open = false)}
 			>
 				{m['forms.action.cancel']()}
@@ -125,7 +126,7 @@
 			<Button
 				type="submit"
 				size="action"
-				class="min-w-0 flex-1 shrink basis-0 font-semibold"
+				class="{DIALOG_ACTION_BUTTON_CLASS} font-semibold"
 			>
 				{combat ? m['forms.action.save']() : m['forms.action.create']()}
 			</Button>
@@ -152,7 +153,7 @@
 				<DrawerTitle class="text-lg font-semibold">{formTitle}</DrawerTitle>
 			</DrawerHeader>
 
-			<div class="px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+			<div class="px-4 pb-safe">
 				{@render formBody()}
 			</div>
 		</DrawerContent>

@@ -19,7 +19,6 @@
     import {type Combatant, type CombatantType, COMBATANT_TYPES, UNROLLED} from '$lib/db/types';
     import {m} from '$lib/i18n';
     import {NAME_MAX_LENGTH, NOTE_MAX_LENGTH, RANGES} from '$lib/stores/domain/constants';
-    import {DIALOG_ACTION_BUTTON_CLASS, DIALOG_FOOTER_CLASS} from './dialogFormChrome';
     import NumberField from './NumberField.svelte';
     import {typeLabel} from './labels';
 
@@ -209,17 +208,17 @@
             </div>
         </div>
 
-        <DialogFooter class={DIALOG_FOOTER_CLASS}>
+        <DialogFooter class="mx-0 mb-0 flex-row justify-center gap-2 border-t-0 bg-transparent p-0 pt-1">
             <Button
                     type="button"
                     variant="outline"
                     size="action"
-                    class="{DIALOG_ACTION_BUTTON_CLASS} border-[var(--border-strong)]"
+                    class="min-w-0 flex-1 shrink basis-0 border-[var(--border-strong)]"
                     onclick={() => (open = false)}
             >
                 {m['forms.action.cancel']()}
             </Button>
-            <Button type="submit" size="action" class={DIALOG_ACTION_BUTTON_CLASS}>
+            <Button type="submit" size="action" class="min-w-0 flex-1 shrink basis-0">
                 {mode === 'add' ? m['forms.action.add']() : m['forms.action.save']()}
             </Button>
         </DialogFooter>

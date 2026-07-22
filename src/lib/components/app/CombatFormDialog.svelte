@@ -19,7 +19,6 @@
 	import type { CombatInput, EditCombatPatch } from '$lib/stores/domain';
 	import { DESCRIPTION_MAX_LENGTH, TITLE_MAX_LENGTH } from '$lib/stores/domain/constants';
 	import ColorSwatchPicker from './ColorSwatchPicker.svelte';
-	import { DIALOG_ACTION_BUTTON_CLASS, DIALOG_FOOTER_CLASS } from './dialogFormChrome';
 
 	/** Narrow store surface this dialog needs — lets tests pass a plain spy object. */
 	export interface CombatFormStore {
@@ -113,12 +112,12 @@
 			<ColorSwatchPicker bind:value={colorTag} />
 		</div>
 
-		<DialogFooter class={DIALOG_FOOTER_CLASS}>
+		<DialogFooter class="mx-0 mb-0 flex-row justify-center gap-2 border-t-0 bg-transparent p-0 pt-1">
 			<Button
 				type="button"
 				variant="outline"
 				size="action"
-				class="{DIALOG_ACTION_BUTTON_CLASS} border-[var(--border-strong)]"
+				class="min-w-0 flex-1 shrink basis-0 border-[var(--border-strong)]"
 				onclick={() => (open = false)}
 			>
 				{m['forms.action.cancel']()}
@@ -126,7 +125,7 @@
 			<Button
 				type="submit"
 				size="action"
-				class="{DIALOG_ACTION_BUTTON_CLASS} font-semibold"
+				class="min-w-0 flex-1 shrink basis-0 font-semibold"
 			>
 				{combat ? m['forms.action.save']() : m['forms.action.create']()}
 			</Button>

@@ -213,7 +213,7 @@
                             title={m['library.picker.empty.title']()}
                             description={m['library.picker.empty.description']()}
                     >
-                        <Button type="button" size="action" onclick={() => onOpenLibrary?.()}>
+                        <Button type="button" size="action" class="touch-none" onclick={() => onOpenLibrary?.()}>
                             {m['library.picker.empty.openLibrary']()}
                         </Button>
                     </EmptyState>
@@ -226,7 +226,7 @@
                                 bind:value={templateQuery}
                                 placeholder={m['library.picker.search.placeholder']()}
                                 aria-label={m['library.picker.search.placeholder']()}
-                                class="w-full bg-transparent text-foreground outline-none placeholder:text-[var(--text-faint)]"
+                                class="w-full touch-none bg-transparent text-foreground outline-none placeholder:text-[var(--text-faint)]"
                         />
                     </div>
                     <div class="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto">
@@ -357,7 +357,7 @@
                     type="button"
                     variant="outline"
                     size="action"
-                    class="min-w-0 flex-1 shrink basis-0 border-[var(--border-strong)]"
+                    class="min-w-0 flex-1 shrink basis-0 touch-none border-[var(--border-strong)]"
                     onclick={() => (open = false)}
             >
                 {m['forms.action.cancel']()}
@@ -365,7 +365,7 @@
             <Button
                     type="submit"
                     size="action"
-                    class="min-w-0 flex-1 shrink basis-0"
+                    class="min-w-0 flex-1 shrink basis-0 touch-none"
                     disabled={mode === 'add' && source === 'library' && pickedTemplateId === null}
             >
                 {mode === 'add' ? m['forms.action.add']() : m['forms.action.save']()}

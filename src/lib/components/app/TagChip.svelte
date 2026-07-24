@@ -20,7 +20,16 @@
 		name,
 		removable = false,
 		onRemove,
-	}: { name: string; removable?: boolean; onRemove?: (name: string) => void } = $props();
+		class: className,
+	}: {
+		name: string;
+		removable?: boolean;
+		onRemove?: (name: string) => void;
+		/** Extra chip classes. Drawer call sites pass `touch-none` so a swipe started on a chip
+		    reaches vaul instead of being claimed as a scroll pan; list call sites leave it off so
+		    the page still scrolls when dragged from a chip. */
+		class?: string;
+	} = $props();
 
 	const CloseIcon = chromeIcon.close;
 
@@ -58,6 +67,7 @@
 	class={[
 		'h-[22px] gap-1.5 border-[color-mix(in_srgb,var(--tc)_28%,var(--border))] bg-[color-mix(in_srgb,var(--tc)_9%,var(--popover))] px-2.5 text-sm font-normal text-[var(--tc)] transition-colors duration-[600ms]',
 		holding && 'bg-[color-mix(in_srgb,var(--destructive)_55%,var(--popover))]',
+		className,
 	]}
 	onpointerdown={startHold}
 	onpointerup={cancelHold}

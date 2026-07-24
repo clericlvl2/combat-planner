@@ -260,11 +260,11 @@
 			<Label class={fieldLabelClass}>{m['library.tags.field']()}</Label>
 			<div class="flex flex-wrap items-center gap-1.5">
 				{#each pendingTags as tagName (tagName)}
-					<TagChip name={tagName} removable onRemove={togglePendingTag} />
+					<TagChip name={tagName} removable onRemove={togglePendingTag} class="touch-none" />
 				{/each}
 				<button
 					type="button"
-					class="inline-flex h-[22px] items-center gap-[5px] rounded-full border border-dashed border-border px-2.5 py-0.5 text-sm text-muted-foreground hover:border-foreground hover:text-foreground"
+					class="inline-flex h-[22px] touch-none items-center gap-[5px] rounded-full border border-dashed border-border px-2.5 py-0.5 text-sm text-muted-foreground hover:border-foreground hover:text-foreground"
 					onclick={() => (tagsOpen = true)}
 				>
 					{m['library.tags.editTrigger']()}
@@ -277,12 +277,12 @@
 				type="button"
 				variant="outline"
 				size="action"
-				class="min-w-0 flex-1 shrink basis-0 border-[var(--border-strong)]"
+				class="min-w-0 flex-1 shrink basis-0 touch-none border-[var(--border-strong)]"
 				onclick={() => (open = false)}
 			>
 				{m['forms.action.cancel']()}
 			</Button>
-			<Button type="submit" size="action" class="min-w-0 flex-1 shrink basis-0 font-semibold">
+			<Button type="submit" size="action" class="min-w-0 flex-1 shrink basis-0 touch-none font-semibold">
 				{entry ? m['forms.action.save']() : m['forms.action.create']()}
 			</Button>
 		</DialogFooter>

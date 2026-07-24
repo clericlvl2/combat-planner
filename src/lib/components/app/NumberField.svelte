@@ -43,8 +43,11 @@
 
 	// Field label: uppercase, muted, small caps.
 	const fieldLabelClass = 'text-xs font-medium uppercase tracking-wide text-muted-foreground';
+	// `touch-none` for the same reason Input/Textarea carry it: inside a mobile drawer the browser
+	// would claim a vertical drag off a stepper as a pan of the form's scroll container and cancel
+	// vaul's swipe-to-close mid-gesture.
 	const stepBtnClass =
-		'flex min-h-11 w-11 shrink-0 items-center justify-center text-lg text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:z-10 lg:focus-visible:ring-3 lg:focus-visible:ring-ring/50 active:bg-muted active:text-foreground transition-colors';
+		'touch-none flex min-h-11 w-11 shrink-0 items-center justify-center text-lg text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:z-10 lg:focus-visible:ring-3 lg:focus-visible:ring-ring/50 active:bg-muted active:text-foreground transition-colors';
 	// Stepper divider uses --border-strong, not the default --border token.
 	const stepBorderClass = 'border-[var(--border-strong)]';
 

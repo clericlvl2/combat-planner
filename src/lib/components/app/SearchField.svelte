@@ -1,13 +1,19 @@
 <!--
-  SearchField — Combats-home real-time title filter.
-  This component only owns the input + its visual chrome; the
-  filtering itself is a view-local `$derived` owned by `combats/+page.svelte` (ADR-002 — never
-  persisted). Shown only while the combats list is non-empty (the page gates that, not here).
+  SearchField — real-time text filter input, originally the Combats-home title filter and now
+  reused by /library's name(+tag) search. This component only owns the input + its visual chrome;
+  the filtering itself is a view-local `$derived` owned by the caller's `+page.svelte` (ADR-002 —
+  never persisted). Shown only while the underlying list is non-empty (the page gates that, not
+  here). `placeholder`/`ariaLabel` default to the original combats copy so the combats caller
+  (which passes neither) is unchanged.
 -->
 <script lang="ts">
 	import { m } from '$lib/i18n';
 
-	let { value = $bindable('') }: { value?: string } = $props();
+	let {
+		value = $bindable(''),
+		placeholder = m['combats.search.placeholder'](),
+		ariaLabel = m['combats.search.placeholder'](),
+	}: { value?: string; placeholder?: string; ariaLabel?: string } = $props();
 </script>
 
 <div
@@ -17,8 +23,8 @@
 	<input
 		type="search"
 		bind:value
-		placeholder={m['combats.search.placeholder']()}
-		aria-label={m['combats.search.placeholder']()}
+		{placeholder}
+		aria-label={ariaLabel}
 		class="w-full bg-transparent text-foreground outline-none placeholder:text-[var(--text-faint)]"
 	/>
 </div>

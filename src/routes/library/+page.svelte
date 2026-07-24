@@ -4,27 +4,30 @@
   stable filter+sort). A mobile FAB and a desktop header "+" (via the shared `headerAction`
   singleton, mirroring combats/+page.svelte's pattern) both open the create dialog. Delete is
   confirm-gated inside LibraryRow (LibraryRowMenu), not here.
-  P4b note: the create/edit form dialog (LibraryEntryFormDialog) and its save-feedback toasts are
-  a sibling phase's scope — see the placeholder comment near the bottom of this file for the
-  exact mount point and the `createOpen`/`editEntry` state this phase leaves in place for it.
+  Create/edit is handled by LibraryEntryFormDialog: create submits fire a success/cap-reached
+  toast via its `onCreateResult` callback (dialog owns open/close; the page owns the toast);
+  edit submits stay silent.
 -->
 <script lang="ts">
 	import EmptyState from '$lib/components/app/EmptyState.svelte';
 	import FAB from '$lib/components/app/FAB.svelte';
 	import { headerAction } from '$lib/components/app/header-action.svelte';
+	import LibraryEntryFormDialog from '$lib/components/app/LibraryEntryFormDialog.svelte';
 	import LibraryList from '$lib/components/app/LibraryList.svelte';
 	import SearchField from '$lib/components/app/SearchField.svelte';
 	import { Button } from '$lib/components/ui/button';
-	import type { CombatantTemplate } from '$lib/db/types';
+	import { toast } from '$lib/components/ui/sonner';
+	import { MAX_LIBRARY_ENTRIES, type CombatantTemplate } from '$lib/db/types';
 	import { m } from '$lib/i18n';
 	import { chromeIcon } from '$lib/icons';
 	import { store } from '$lib/stores';
+	import type { CombatantTemplateInput } from '$lib/stores/domain/factories';
+	import type { EditTemplatePatch } from '$lib/stores/domain/library';
 
 	const Add = chromeIcon.add;
 	const EmptyIcon = chromeIcon.navLibrary;
 
-	// P4b owns opening/mounting the create/edit form dialog; this phase only declares the
-	// page-level state it will bind to and sets it from the FAB/header "+"/row-edit call sites.
+	// Opened from the FAB/header "+" (create) and each row's edit action (edit, seeded below).
 	let createOpen = $state(false);
 	let editEntry = $state<CombatantTemplate | null>(null);
 
@@ -42,6 +45,21 @@
 	}
 	function deleteEntry(id: string) {
 		store.removeTemplate(id);
+	}
+
+	// Narrow store surface LibraryEntryFormDialog needs (test-double-friendly, same pattern as
+	// CombatFormDialog's CombatFormStore).
+	const libraryFormStore = {
+		addTemplate: (input: CombatantTemplateInput) => store.addTemplate(input),
+		editTemplate: (id: string, patch: EditTemplatePatch) => store.editTemplate(id, patch),
+	};
+
+	function onCreateResult(created: CombatantTemplate | null) {
+		if (created) {
+			toast(m['toasts.library.saved']());
+		} else {
+			toast.error(m['toasts.library.capReached']({ max: MAX_LIBRARY_ENTRIES }));
+		}
 	}
 
 	// Desktop create control lives in AppHeader, not on this page — hand it a snippet via the
@@ -82,11 +100,20 @@
 	<FAB icon={Add} label={m['library.create']()} onclick={openCreate} class="lg:hidden" />
 {:else}
 	<div class="flex flex-col gap-2 pt-3 pb-24">
-		<SearchField bind:value={query} />
+		<SearchField
+			bind:value={query}
+			placeholder={m['library.search.placeholder']()}
+			ariaLabel={m['library.search.placeholder']()}
+		/>
 		<LibraryList entries={store.libraryEntries} {query} onEdit={openEdit} onDelete={deleteEntry} />
 	</div>
 
 	<FAB icon={Add} label={m['library.create']()} onclick={openCreate} class="lg:hidden" />
 {/if}
 
-<!-- P4b: mount <LibraryEntryFormDialog bind:open={createOpen} {editEntry} .../> + onCreateResult toasts here -->
+<LibraryEntryFormDialog
+	bind:open={createOpen}
+	entry={editEntry}
+	store={libraryFormStore}
+	{onCreateResult}
+/>

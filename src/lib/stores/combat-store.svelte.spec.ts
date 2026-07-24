@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { PersistenceDb } from '../db/persistence';
-import { MAX_LIBRARY_ENTRIES } from '../db/types';
 import type { Combat, CombatantTemplate, Settings } from '../db/types';
+import { MAX_LIBRARY_ENTRIES } from '../db/types';
 import { CombatStore } from './combat-store.svelte';
 import { createCombatantTemplate } from './domain/factories';
 

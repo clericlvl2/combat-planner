@@ -86,9 +86,7 @@ test('renders a Dialog on desktop viewports', async () => {
 		onCreateTag: vi.fn(),
 	});
 
-	await expect
-		.element(screen.getByRole('dialog', { name: 'Assign tags' }))
-		.toBeVisible();
+	await expect.element(screen.getByRole('dialog', { name: 'Assign tags' })).toBeVisible();
 });
 
 test('renders a Drawer on mobile viewports', async () => {
@@ -101,9 +99,7 @@ test('renders a Drawer on mobile viewports', async () => {
 		onCreateTag: vi.fn(),
 	});
 
-	await expect
-		.element(screen.getByRole('dialog', { name: 'Assign tags' }))
-		.toBeVisible();
+	await expect.element(screen.getByRole('dialog', { name: 'Assign tags' })).toBeVisible();
 	expect(document.querySelector('[data-vaul-drawer-direction]')).not.toBeNull();
 });
 

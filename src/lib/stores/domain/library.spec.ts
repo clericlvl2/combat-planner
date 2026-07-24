@@ -46,8 +46,17 @@ describe('addTemplateToList', () => {
 
 describe('editTemplateInList', () => {
 	it('patches fields and re-clamps changed numerics, bumping updatedAt', () => {
-		const original = createCombatantTemplate({ name: 'Orc', maxHp: 20 }, () => 'a', () => 1);
-		const out = editTemplateInList([original], 'a', { maxHp: 9999, note: 'x'.repeat(1000) }, () => 2);
+		const original = createCombatantTemplate(
+			{ name: 'Orc', maxHp: 20 },
+			() => 'a',
+			() => 1,
+		);
+		const out = editTemplateInList(
+			[original],
+			'a',
+			{ maxHp: 9999, note: 'x'.repeat(1000) },
+			() => 2,
+		);
 		const edited = out.find((t) => t.id === 'a');
 		expect(edited?.maxHp).toBeLessThan(9999);
 		expect(edited?.note.length).toBeLessThan(1000);
@@ -135,7 +144,11 @@ describe('normalizeTagName', () => {
 
 describe('toggleTemplateTag', () => {
 	it('adds a tag not yet present, bumping updatedAt', () => {
-		const t = createCombatantTemplate({ name: 'A' }, () => 'a', () => 1);
+		const t = createCombatantTemplate(
+			{ name: 'A' },
+			() => 'a',
+			() => 1,
+		);
 		const out = toggleTemplateTag([t], 'a', 'Undead', () => 2);
 		expect(out[0].tags).toEqual(['Undead']);
 		expect(out[0].updatedAt).toBe(2);

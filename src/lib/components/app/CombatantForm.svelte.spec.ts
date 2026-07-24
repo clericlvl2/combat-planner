@@ -145,9 +145,7 @@ test('an empty library shows the empty state, and "Open library" calls onOpenLib
 
 	await screen.getByRole('radio', { name: m['library.picker.tab.library']() }).click();
 
-	await expect
-		.element(screen.getByText(m['library.picker.empty.title']()))
-		.toBeVisible();
+	await expect.element(screen.getByText(m['library.picker.empty.title']())).toBeVisible();
 	await screen.getByRole('button', { name: m['library.picker.empty.openLibrary']() }).click();
 	expect(onOpenLibrary).toHaveBeenCalledTimes(1);
 });
@@ -184,17 +182,13 @@ test('picking a template prefills the field form', async () => {
 	await screen.getByRole('radio', { name: m['library.picker.tab.library']() }).click();
 	await screen.getByRole('button', { name: /Ogre/ }).click();
 
-	await expect
-		.element(screen.getByText(m['library.picker.from']({ name: 'Ogre' })))
-		.toBeVisible();
+	await expect.element(screen.getByText(m['library.picker.from']({ name: 'Ogre' }))).toBeVisible();
 	await expect.element(screen.getByLabelText(m['forms.field.name']())).toHaveValue('Ogre');
 	await expect.element(screen.getByLabelText(m['forms.field.maxHp']())).toHaveValue('40');
 	await expect.element(screen.getByLabelText(m['forms.field.ac']())).toHaveValue('15');
 	await expect.element(screen.getByLabelText(m['forms.field.pd']())).toHaveValue('12');
 	await expect.element(screen.getByLabelText(m['forms.field.md']())).toHaveValue('10');
-	await expect
-		.element(screen.getByLabelText(m['forms.field.initBonus']()))
-		.toHaveValue('2');
+	await expect.element(screen.getByLabelText(m['forms.field.initBonus']())).toHaveValue('2');
 	await expect.element(screen.getByLabelText(m['forms.field.note']())).toHaveValue('Big and mean');
 });
 

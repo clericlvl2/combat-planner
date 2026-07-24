@@ -26,9 +26,21 @@ function subtitles(screen: ReturnType<typeof render>) {
 }
 
 test('renders entries sorted by name, case-insensitive', async () => {
-	const goblin = createCombatantTemplate({ name: 'goblin' }, () => 'a', () => 1);
-	const ancientDragon = createCombatantTemplate({ name: 'Ancient Dragon' }, () => 'b', () => 1);
-	const zombie = createCombatantTemplate({ name: 'Zombie' }, () => 'c', () => 1);
+	const goblin = createCombatantTemplate(
+		{ name: 'goblin' },
+		() => 'a',
+		() => 1,
+	);
+	const ancientDragon = createCombatantTemplate(
+		{ name: 'Ancient Dragon' },
+		() => 'b',
+		() => 1,
+	);
+	const zombie = createCombatantTemplate(
+		{ name: 'Zombie' },
+		() => 'c',
+		() => 1,
+	);
 
 	const screen = render(LibraryList, {
 		entries: [zombie, goblin, ancientDragon],
@@ -61,7 +73,10 @@ test('same-name duplicates order by updatedAt descending (stable, regardless of 
 		onToggleTag: vi.fn(),
 	});
 
-	expect(subtitles(screen)).toEqual(['HP 9 · AC 10 · PD 10 · MD 10', 'HP 7 · AC 10 · PD 10 · MD 10']);
+	expect(subtitles(screen)).toEqual([
+		'HP 9 · AC 10 · PD 10 · MD 10',
+		'HP 7 · AC 10 · PD 10 · MD 10',
+	]);
 });
 
 test('when updatedAt ties, orders by id (stable tiebreaker)', async () => {
@@ -83,12 +98,23 @@ test('when updatedAt ties, orders by id (stable tiebreaker)', async () => {
 		onToggleTag: vi.fn(),
 	});
 
-	expect(subtitles(screen)).toEqual(['HP 9 · AC 10 · PD 10 · MD 10', 'HP 7 · AC 10 · PD 10 · MD 10']);
+	expect(subtitles(screen)).toEqual([
+		'HP 9 · AC 10 · PD 10 · MD 10',
+		'HP 7 · AC 10 · PD 10 · MD 10',
+	]);
 });
 
 test('filters entries by name, case-insensitively', async () => {
-	const goblin = createCombatantTemplate({ name: 'Goblin' }, () => 'a', () => 1);
-	const zombie = createCombatantTemplate({ name: 'Zombie' }, () => 'b', () => 1);
+	const goblin = createCombatantTemplate(
+		{ name: 'Goblin' },
+		() => 'a',
+		() => 1,
+	);
+	const zombie = createCombatantTemplate(
+		{ name: 'Zombie' },
+		() => 'b',
+		() => 1,
+	);
 
 	const screen = render(LibraryList, {
 		entries: [goblin, zombie],
@@ -102,9 +128,21 @@ test('filters entries by name, case-insensitively', async () => {
 });
 
 test('filters by a tag name match too (combined name+tag search)', async () => {
-	const goblin = createCombatantTemplate({ name: 'Goblin', tags: ['Undead'] }, () => 'a', () => 1);
-	const zombie = createCombatantTemplate({ name: 'Zombie', tags: ['Undead'] }, () => 'b', () => 1);
-	const dragon = createCombatantTemplate({ name: 'Dragon', tags: ['Boss'] }, () => 'c', () => 1);
+	const goblin = createCombatantTemplate(
+		{ name: 'Goblin', tags: ['Undead'] },
+		() => 'a',
+		() => 1,
+	);
+	const zombie = createCombatantTemplate(
+		{ name: 'Zombie', tags: ['Undead'] },
+		() => 'b',
+		() => 1,
+	);
+	const dragon = createCombatantTemplate(
+		{ name: 'Dragon', tags: ['Boss'] },
+		() => 'c',
+		() => 1,
+	);
 
 	const screen = render(LibraryList, {
 		entries: [goblin, zombie, dragon],
@@ -118,9 +156,21 @@ test('filters by a tag name match too (combined name+tag search)', async () => {
 });
 
 test('tag-pill filtering (`selected`) narrows to entries carrying any selected tag (OR)', async () => {
-	const goblin = createCombatantTemplate({ name: 'Goblin', tags: ['Undead'] }, () => 'a', () => 1);
-	const zombie = createCombatantTemplate({ name: 'Zombie', tags: ['Boss'] }, () => 'b', () => 1);
-	const dragon = createCombatantTemplate({ name: 'Dragon', tags: [] }, () => 'c', () => 1);
+	const goblin = createCombatantTemplate(
+		{ name: 'Goblin', tags: ['Undead'] },
+		() => 'a',
+		() => 1,
+	);
+	const zombie = createCombatantTemplate(
+		{ name: 'Zombie', tags: ['Boss'] },
+		() => 'b',
+		() => 1,
+	);
+	const dragon = createCombatantTemplate(
+		{ name: 'Dragon', tags: [] },
+		() => 'c',
+		() => 1,
+	);
 
 	const screen = render(LibraryList, {
 		entries: [goblin, zombie, dragon],
@@ -134,8 +184,16 @@ test('tag-pill filtering (`selected`) narrows to entries carrying any selected t
 });
 
 test('a text query and a tag-pill selection AND together', async () => {
-	const goblin = createCombatantTemplate({ name: 'Goblin', tags: ['Undead'] }, () => 'a', () => 1);
-	const ghoul = createCombatantTemplate({ name: 'Ghoul', tags: ['Boss'] }, () => 'b', () => 1);
+	const goblin = createCombatantTemplate(
+		{ name: 'Goblin', tags: ['Undead'] },
+		() => 'a',
+		() => 1,
+	);
+	const ghoul = createCombatantTemplate(
+		{ name: 'Ghoul', tags: ['Boss'] },
+		() => 'b',
+		() => 1,
+	);
 
 	const screen = render(LibraryList, {
 		entries: [goblin, ghoul],

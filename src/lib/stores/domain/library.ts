@@ -135,7 +135,7 @@ export function toggleTemplateTag(
 	if (canonical === null && !hasTag) return list;
 	const tags = hasTag
 		? current.tags.filter((t) => t.toLowerCase() !== lower)
-		: [...current.tags, (canonical as string)];
+		: [...current.tags, canonical as string];
 	const next: CombatantTemplate = { ...current, tags, updatedAt: now() };
 	const out = list.slice();
 	out[idx] = next;
@@ -154,7 +154,5 @@ export function allTagNames(list: CombatantTemplate[]): string[] {
 			if (!seen.has(key)) seen.set(key, tag);
 		}
 	}
-	return [...seen.values()].sort((a, b) =>
-		a.localeCompare(b, undefined, { sensitivity: 'base' }),
-	);
+	return [...seen.values()].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
 }

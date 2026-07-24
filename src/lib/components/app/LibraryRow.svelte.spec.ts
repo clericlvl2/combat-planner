@@ -7,12 +7,24 @@ import LibraryRow from './LibraryRow.svelte';
 // delete is confirm-gated through the reused ConfirmDialog.
 
 function fixtureEntry() {
-	return createCombatantTemplate({ name: 'Goblin', type: 'enemy', maxHp: 7, ac: 15, pd: 10, md: 8 });
+	return createCombatantTemplate({
+		name: 'Goblin',
+		type: 'enemy',
+		maxHp: 7,
+		ac: 15,
+		pd: 10,
+		md: 8,
+	});
 }
 
 test('renders name and the HP/AC/PD/MD subtitle', async () => {
 	const entry = fixtureEntry();
-	const screen = render(LibraryRow, { entry, onEdit: vi.fn(), onDelete: vi.fn(), onToggleTag: vi.fn() });
+	const screen = render(LibraryRow, {
+		entry,
+		onEdit: vi.fn(),
+		onDelete: vi.fn(),
+		onToggleTag: vi.fn(),
+	});
 
 	await expect.element(screen.getByText('Goblin')).toBeVisible();
 	await expect.element(screen.getByText('HP 7 · AC 15 · PD 10 · MD 8')).toBeVisible();
@@ -20,7 +32,12 @@ test('renders name and the HP/AC/PD/MD subtitle', async () => {
 
 test('does not wrap the name in a <mark> highlight', async () => {
 	const entry = fixtureEntry();
-	const screen = render(LibraryRow, { entry, onEdit: vi.fn(), onDelete: vi.fn(), onToggleTag: vi.fn() });
+	const screen = render(LibraryRow, {
+		entry,
+		onEdit: vi.fn(),
+		onDelete: vi.fn(),
+		onToggleTag: vi.fn(),
+	});
 
 	await expect.element(screen.getByText('Goblin')).toBeVisible();
 	expect(document.body.querySelector('mark')).toBeNull();
@@ -67,7 +84,7 @@ test('cancelling the confirm dialog does not call onDelete', async () => {
 	expect(onDelete).not.toHaveBeenCalled();
 });
 
-test('renders a chip for each of the entry\'s tags', async () => {
+test("renders a chip for each of the entry's tags", async () => {
 	const entry = createCombatantTemplate({ name: 'Goblin', tags: ['Undead', 'Boss'] });
 	const screen = render(LibraryRow, {
 		entry,
@@ -96,7 +113,7 @@ test('the "+Tags" trigger opens the tag-assignment dialog scoped to this entry',
 	await expect.element(screen.getByRole('button', { name: 'Boss' })).toBeVisible();
 });
 
-test('keyboard-activating a tag chip\'s ✕ calls onToggleTag with that tag name', async () => {
+test("keyboard-activating a tag chip's ✕ calls onToggleTag with that tag name", async () => {
 	const entry = createCombatantTemplate({ name: 'Goblin', tags: ['Undead'] });
 	const onToggleTag = vi.fn();
 	const screen = render(LibraryRow, { entry, onEdit: vi.fn(), onDelete: vi.fn(), onToggleTag });

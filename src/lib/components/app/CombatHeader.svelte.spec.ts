@@ -32,6 +32,7 @@ function makeController(): CombatController {
 		restart: vi.fn(),
 		editRound: vi.fn(),
 		setEscalation: vi.fn(),
+		saveToLibrary: vi.fn(),
 	};
 }
 

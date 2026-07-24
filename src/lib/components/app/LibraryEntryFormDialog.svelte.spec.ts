@@ -13,7 +13,11 @@ afterEach(() => {
 
 test('create mode calls store.addTemplate with the form values and closes on success', async () => {
 	const addTemplateFn = vi.fn(() =>
-		createCombatantTemplate({ name: 'Goblin' }, () => 'new', () => 0),
+		createCombatantTemplate(
+			{ name: 'Goblin' },
+			() => 'new',
+			() => 0,
+		),
 	);
 	const editTemplateFn = vi.fn();
 	const store = { addTemplate: addTemplateFn, editTemplate: editTemplateFn };
@@ -50,7 +54,11 @@ test('create mode calls store.addTemplate with the form values and closes on suc
 
 test('create mode with a blank name falls back to the type-specific placeholder as the real name', async () => {
 	const addTemplateFn = vi.fn(() =>
-		createCombatantTemplate({ name: 'Enemy' }, () => 'new', () => 0),
+		createCombatantTemplate(
+			{ name: 'Enemy' },
+			() => 'new',
+			() => 0,
+		),
 	);
 	const store = { addTemplate: addTemplateFn, editTemplate: vi.fn() };
 	const screen = render(LibraryEntryFormDialog, {
@@ -82,19 +90,31 @@ test('create mode blocks on the cap: dialog stays open, form preserved, onCreate
 	await expect
 		.element(screen.getByRole('dialog', { name: m['forms.library.create.title']() }))
 		.toBeVisible();
-	await expect
-		.element(screen.getByLabelText(m['forms.field.name']()))
-		.toHaveValue('One too many');
+	await expect.element(screen.getByLabelText(m['forms.field.name']())).toHaveValue('One too many');
 });
 
 test('edit mode pre-fills from the existing template', async () => {
 	const entry = createCombatantTemplate(
-		{ name: 'Dragon', type: 'pc', maxHp: 40, ac: 20, pd: 18, md: 16, initiativeBonus: 5, note: 'Boss' },
+		{
+			name: 'Dragon',
+			type: 'pc',
+			maxHp: 40,
+			ac: 20,
+			pd: 18,
+			md: 16,
+			initiativeBonus: 5,
+			note: 'Boss',
+		},
 		() => 'existing',
 		() => 0,
 	);
 	const store = { addTemplate: vi.fn(), editTemplate: vi.fn() };
-	const screen = render(LibraryEntryFormDialog, { open: true, entry, store, onCreateResult: vi.fn() });
+	const screen = render(LibraryEntryFormDialog, {
+		open: true,
+		entry,
+		store,
+		onCreateResult: vi.fn(),
+	});
 
 	await expect
 		.element(screen.getByRole('dialog', { name: m['forms.library.edit.title']() }))
@@ -106,7 +126,11 @@ test('edit mode pre-fills from the existing template', async () => {
 });
 
 test('edit mode calls store.editTemplate silently (no onCreateResult) and closes on submit', async () => {
-	const entry = createCombatantTemplate({ name: 'Dragon' }, () => 'existing', () => 0);
+	const entry = createCombatantTemplate(
+		{ name: 'Dragon' },
+		() => 'existing',
+		() => 0,
+	);
 	const editTemplateFn = vi.fn();
 	const addTemplateFn = vi.fn();
 	const onCreateResult = vi.fn();
@@ -129,23 +153,37 @@ test('edit mode calls store.editTemplate silently (no onCreateResult) and closes
 		.not.toBeInTheDocument();
 });
 
-test('edit mode renders a chip for each of the entry\'s tags', async () => {
+test("edit mode renders a chip for each of the entry's tags", async () => {
 	const entry = createCombatantTemplate(
 		{ name: 'Dragon', tags: ['Boss', 'Undead'] },
 		() => 'existing',
 		() => 0,
 	);
 	const store = { addTemplate: vi.fn(), editTemplate: vi.fn() };
-	const screen = render(LibraryEntryFormDialog, { open: true, entry, store, onCreateResult: vi.fn() });
+	const screen = render(LibraryEntryFormDialog, {
+		open: true,
+		entry,
+		store,
+		onCreateResult: vi.fn(),
+	});
 
 	await expect.element(screen.getByText('Boss')).toBeVisible();
 	await expect.element(screen.getByText('Undead')).toBeVisible();
 });
 
 test('"Edit tags" opens the tag-assignment dialog', async () => {
-	const entry = createCombatantTemplate({ name: 'Dragon', tags: ['Boss'] }, () => 'existing', () => 0);
+	const entry = createCombatantTemplate(
+		{ name: 'Dragon', tags: ['Boss'] },
+		() => 'existing',
+		() => 0,
+	);
 	const store = { addTemplate: vi.fn(), editTemplate: vi.fn() };
-	const screen = render(LibraryEntryFormDialog, { open: true, entry, store, onCreateResult: vi.fn() });
+	const screen = render(LibraryEntryFormDialog, {
+		open: true,
+		entry,
+		store,
+		onCreateResult: vi.fn(),
+	});
 
 	await screen.getByRole('button', { name: m['library.tags.editTrigger']() }).click();
 
@@ -156,7 +194,11 @@ test('"Edit tags" opens the tag-assignment dialog', async () => {
 
 test('create-mode: a tag created via the Edit-tags dialog lands in the submitted payload', async () => {
 	const addTemplateFn = vi.fn(() =>
-		createCombatantTemplate({ name: 'Goblin', tags: ['Undead'] }, () => 'new', () => 0),
+		createCombatantTemplate(
+			{ name: 'Goblin', tags: ['Undead'] },
+			() => 'new',
+			() => 0,
+		),
 	);
 	const store = { addTemplate: addTemplateFn, editTemplate: vi.fn() };
 	const screen = render(LibraryEntryFormDialog, { open: true, store, onCreateResult: vi.fn() });
@@ -173,9 +215,18 @@ test('create-mode: a tag created via the Edit-tags dialog lands in the submitted
 });
 
 test('nested tag dialog: Escape closes only the tag surface, focus returns to "Edit tags", form state intact', async () => {
-	const entry = createCombatantTemplate({ name: 'Dragon', tags: ['Boss'] }, () => 'existing', () => 0);
+	const entry = createCombatantTemplate(
+		{ name: 'Dragon', tags: ['Boss'] },
+		() => 'existing',
+		() => 0,
+	);
 	const store = { addTemplate: vi.fn(), editTemplate: vi.fn() };
-	const screen = render(LibraryEntryFormDialog, { open: true, entry, store, onCreateResult: vi.fn() });
+	const screen = render(LibraryEntryFormDialog, {
+		open: true,
+		entry,
+		store,
+		onCreateResult: vi.fn(),
+	});
 
 	await userEvent.fill(screen.getByLabelText(m['forms.field.name']()), 'Dragon, unsaved edit');
 

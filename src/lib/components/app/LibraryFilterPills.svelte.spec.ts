@@ -51,16 +51,14 @@ test('selection persists across expand/collapse', async () => {
 	expect(onChange).toHaveBeenCalledExactlyOnceWith(['Alpha']);
 
 	await screen.getByRole('button', { name: 'More' }).click();
-	await expect.element(screen.getByRole('button', { name: 'Alpha' })).toHaveAttribute(
-		'aria-pressed',
-		'true',
-	);
+	await expect
+		.element(screen.getByRole('button', { name: 'Alpha' }))
+		.toHaveAttribute('aria-pressed', 'true');
 
 	await screen.getByRole('button', { name: 'Less' }).click();
-	await expect.element(screen.getByRole('button', { name: 'Alpha' })).toHaveAttribute(
-		'aria-pressed',
-		'true',
-	);
+	await expect
+		.element(screen.getByRole('button', { name: 'Alpha' }))
+		.toHaveAttribute('aria-pressed', 'true');
 });
 
 test('clicking a second pill adds it (OR semantics) rather than replacing the first', async () => {

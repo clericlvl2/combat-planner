@@ -1,9 +1,10 @@
 # Backlog
 
-next_id: W-030
+next_id: W-031
 
 | ID | Pri | Loop | State | Outcome | Depends | Plan |
 |----|-----|------|-------|---------|---------|------|
+| W-030 | S | small | active | Drawer swipe-close dead spots — form controls (stepper, toggle pills, chips, footer, raw search input) contest the vaul gesture in CombatantForm + LibraryEntryFormDialog | — | — |
 | W-028 | M | large | active | Progressive nav lag + Settings won't open — suspect stuck bits-ui overlay body-lock; needs runtime repro | — | `specs/reports/2026-07-20-nav-lag-overlay-lock.md` |
 | W-006 | L | large | inbox | App-data export/import — all-combats + single-combat, fail-safe import (v2) | — | — |
 | W-008 | L | large | inbox | Smooth animations — motion for tap/expand/damage-entry/condition-toggle interactions | — | — |

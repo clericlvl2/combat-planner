@@ -14,6 +14,7 @@
 
 	const links = $derived([
 		{ href: '/combats', label: m['nav.combats'](), icon: chromeIcon.navCombats },
+		{ href: '/library', label: m['nav.library'](), icon: chromeIcon.navLibrary },
 		{ href: '/settings', label: m['nav.settings'](), icon: chromeIcon.navSettings },
 		{ href: '/about', label: m['nav.about'](), icon: chromeIcon.navAbout },
 	]);

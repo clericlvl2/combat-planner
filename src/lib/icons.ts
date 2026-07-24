@@ -10,6 +10,7 @@
  */
 import {
 	Ban,
+	BookOpen,
 	ChevronDown,
 	ChevronLeft,
 	ChevronRight,
@@ -71,6 +72,7 @@ export const chromeIcon = {
 	navCombats: Swords,
 	navSettings: Settings,
 	navAbout: Info,
+	navLibrary: BookOpen,
 	start: Play,
 	search: Search,
 	alert: TriangleAlert,

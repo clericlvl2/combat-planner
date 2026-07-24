@@ -3,10 +3,12 @@
 	import AppShell from '$lib/components/app/AppShell.svelte';
 	import { applyTheme } from '$lib/theme';
 	import { store } from '$lib/stores';
+	import { Toaster } from '$lib/components/ui/sonner';
 	import './layout.css';
 
-	// TODO M-phase: AppShell still needs the Toaster / InstallBanner / ConfirmDialog global
-	// singletons — out of unit 006 Phase 1's scope (AppShell + per-breakpoint nav only).
+	// TODO M-phase: AppShell still needs the InstallBanner / ConfirmDialog global singletons —
+	// out of unit 006 Phase 1's scope (AppShell + per-breakpoint nav only). The Toaster singleton
+	// is mounted below (W-003 Phase 3).
 	let { children } = $props();
 
 	onMount(async () => {
@@ -32,3 +34,5 @@
 		{@render children()}
 	</AppShell>
 {/key}
+
+<Toaster theme={store.settings.theme} />

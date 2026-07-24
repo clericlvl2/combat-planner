@@ -104,3 +104,27 @@ export const healthTextColor: Record<HealthStatus, string> = {
 export function sortConditions(cs: Condition[]): Condition[] {
 	return [...cs].sort((a, b) => conditionLabel[a]().localeCompare(conditionLabel[b]()));
 }
+
+/**
+ * The 8 `--combat-*` swatches (ADR-012), reused here via a deterministic hash of the tag's
+ * (lowercased) name — tags are an open vocabulary, so the mapping is computed rather than
+ * hand-authored per value like `conditionAccent`.
+ */
+const TAG_ACCENT_PALETTE = [
+	'--combat-blue',
+	'--combat-green',
+	'--combat-violet',
+	'--combat-amber',
+	'--combat-teal',
+	'--combat-red',
+	'--combat-orange',
+	'--combat-neutral',
+] as const;
+
+/** Deterministic tag → `--combat-*` accent, hashed from the lowercased tag name (no tag ids). */
+export function tagAccent(name: string): string {
+	let h = 0;
+	const key = name.toLowerCase();
+	for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
+	return `var(${TAG_ACCENT_PALETTE[h % TAG_ACCENT_PALETTE.length]})`;
+}

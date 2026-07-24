@@ -1,9 +1,12 @@
 <!--
   Library home — the combatant-template management screen: EmptyState ("No templates yet") when
-  the library is empty, otherwise a name-only SearchField + LibraryList (which owns its own
-  stable filter+sort). A mobile FAB and a desktop header "+" (via the shared `headerAction`
-  singleton, mirroring combats/+page.svelte's pattern) both open the create dialog. Delete is
-  confirm-gated inside LibraryRow (LibraryRowMenu), not here.
+  the library is empty, otherwise a name+tag SearchField + the Flat-Pills tag filter +
+  LibraryList (which owns its own stable filter+sort). A mobile FAB and a desktop header "+" (via
+  the shared `headerAction` singleton, mirroring combats/+page.svelte's pattern) both open the
+  create dialog. Delete is confirm-gated inside LibraryRow (LibraryRowMenu), not here.
+  `allTags` is a derived union (never stored, ADR-002) over `store.libraryEntries`; `selected` (the
+  tag-pill filter) is intersected against it before use so a tag that died by losing its last
+  entry can't keep silently narrowing the list.
   Create/edit is handled by LibraryEntryFormDialog: create submits fire a success/cap-reached
   toast via its `onCreateResult` callback (dialog owns open/close; the page owns the toast);
   edit submits stay silent.
@@ -13,6 +16,7 @@
 	import FAB from '$lib/components/app/FAB.svelte';
 	import { headerAction } from '$lib/components/app/header-action.svelte';
 	import LibraryEntryFormDialog from '$lib/components/app/LibraryEntryFormDialog.svelte';
+	import LibraryFilterPills from '$lib/components/app/LibraryFilterPills.svelte';
 	import LibraryList from '$lib/components/app/LibraryList.svelte';
 	import SearchField from '$lib/components/app/SearchField.svelte';
 	import { Button } from '$lib/components/ui/button';
@@ -22,7 +26,7 @@
 	import { chromeIcon } from '$lib/icons';
 	import { store } from '$lib/stores';
 	import type { CombatantTemplateInput } from '$lib/stores/domain/factories';
-	import type { EditTemplatePatch } from '$lib/stores/domain/library';
+	import { allTagNames, type EditTemplatePatch } from '$lib/stores/domain/library';
 
 	const Add = chromeIcon.add;
 	const EmptyIcon = chromeIcon.navLibrary;
@@ -31,9 +35,20 @@
 	let createOpen = $state(false);
 	let editEntry = $state<CombatantTemplate | null>(null);
 
-	// Real-time name filter, view-local only (never persisted, ADR-002). LibraryList owns the
-	// actual filter+sort derivation from `entries`/`query`.
+	// Real-time name+tag filter, view-local only (never persisted, ADR-002). LibraryList owns the
+	// actual filter+sort derivation from `entries`/`query`/`selected`.
 	let query = $state('');
+
+	// Derived union, never stored (ADR-002). Stale selections (a tag that lost its last entry)
+	// are pruned by intersecting against this before use.
+	const allTags = $derived(allTagNames(store.libraryEntries));
+
+	let rawSelected = $state<string[]>([]);
+	const selected = $derived(rawSelected.filter((name) => allTags.includes(name)));
+
+	function onFilterChange(names: string[]) {
+		rawSelected = names;
+	}
 
 	function openCreate() {
 		editEntry = null;
@@ -45,6 +60,9 @@
 	}
 	function deleteEntry(id: string) {
 		store.removeTemplate(id);
+	}
+	function onToggleTag(templateId: string, name: string) {
+		store.toggleTemplateTag(templateId, name);
 	}
 
 	// Narrow store surface LibraryEntryFormDialog needs (test-double-friendly, same pattern as
@@ -105,7 +123,16 @@
 			placeholder={m['library.search.placeholder']()}
 			ariaLabel={m['library.search.placeholder']()}
 		/>
-		<LibraryList entries={store.libraryEntries} {query} onEdit={openEdit} onDelete={deleteEntry} />
+		<LibraryFilterPills {allTags} {selected} onChange={onFilterChange} />
+		<LibraryList
+			entries={store.libraryEntries}
+			{query}
+			{selected}
+			{allTags}
+			onEdit={openEdit}
+			onDelete={deleteEntry}
+			{onToggleTag}
+		/>
 	</div>
 
 	<FAB icon={Add} label={m['library.create']()} onclick={openCreate} class="lg:hidden" />
@@ -116,4 +143,5 @@
 	entry={editEntry}
 	store={libraryFormStore}
 	{onCreateResult}
+	{allTags}
 />

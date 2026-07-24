@@ -6,7 +6,7 @@ import { createCombatantTemplate } from '$lib/stores/domain/factories';
 import LibraryEntryFormDialog from './LibraryEntryFormDialog.svelte';
 
 // Component test (create adds at top / cap message via onCreateResult(null) keeps the dialog
-// open, edit pre-fills and patches silently, no initiative/tags field in this phase).
+// open, edit pre-fills and patches silently including tags, no initiative field).
 afterEach(() => {
 	cleanup();
 });
@@ -37,6 +37,7 @@ test('create mode calls store.addTemplate with the form values and closes on suc
 		pd: 10,
 		md: 10,
 		note: '',
+		tags: [],
 	});
 	expect(editTemplateFn).not.toHaveBeenCalled();
 	expect(onCreateResult).toHaveBeenCalledTimes(1);
@@ -126,4 +127,79 @@ test('edit mode calls store.editTemplate silently (no onCreateResult) and closes
 	await expect
 		.element(screen.getByRole('dialog', { name: m['forms.library.edit.title']() }))
 		.not.toBeInTheDocument();
+});
+
+test('edit mode renders a chip for each of the entry\'s tags', async () => {
+	const entry = createCombatantTemplate(
+		{ name: 'Dragon', tags: ['Boss', 'Undead'] },
+		() => 'existing',
+		() => 0,
+	);
+	const store = { addTemplate: vi.fn(), editTemplate: vi.fn() };
+	const screen = render(LibraryEntryFormDialog, { open: true, entry, store, onCreateResult: vi.fn() });
+
+	await expect.element(screen.getByText('Boss')).toBeVisible();
+	await expect.element(screen.getByText('Undead')).toBeVisible();
+});
+
+test('"Edit tags" opens the tag-assignment dialog', async () => {
+	const entry = createCombatantTemplate({ name: 'Dragon', tags: ['Boss'] }, () => 'existing', () => 0);
+	const store = { addTemplate: vi.fn(), editTemplate: vi.fn() };
+	const screen = render(LibraryEntryFormDialog, { open: true, entry, store, onCreateResult: vi.fn() });
+
+	await screen.getByRole('button', { name: m['library.tags.editTrigger']() }).click();
+
+	await expect
+		.element(screen.getByRole('dialog', { name: m['library.tags.assign.title']() }))
+		.toBeVisible();
+});
+
+test('create-mode: a tag created via the Edit-tags dialog lands in the submitted payload', async () => {
+	const addTemplateFn = vi.fn(() =>
+		createCombatantTemplate({ name: 'Goblin', tags: ['Undead'] }, () => 'new', () => 0),
+	);
+	const store = { addTemplate: addTemplateFn, editTemplate: vi.fn() };
+	const screen = render(LibraryEntryFormDialog, { open: true, store, onCreateResult: vi.fn() });
+
+	await userEvent.fill(screen.getByLabelText(m['forms.field.name']()), 'Goblin');
+	await screen.getByRole('button', { name: m['library.tags.editTrigger']() }).click();
+	await userEvent.fill(screen.getByPlaceholder(m['library.tags.newTag.placeholder']()), 'Undead');
+	await userEvent.keyboard('{Enter}');
+	// The pending tag is reflected as a chip on the form.
+	await expect.element(screen.getByRole('button', { name: 'Remove tag Undead' })).toBeVisible();
+	await screen.getByRole('button', { name: m['forms.action.create']() }).click();
+
+	expect(addTemplateFn).toHaveBeenCalledWith(expect.objectContaining({ tags: ['Undead'] }));
+});
+
+test('nested tag dialog: Escape closes only the tag surface, focus returns to "Edit tags", form state intact', async () => {
+	const entry = createCombatantTemplate({ name: 'Dragon', tags: ['Boss'] }, () => 'existing', () => 0);
+	const store = { addTemplate: vi.fn(), editTemplate: vi.fn() };
+	const screen = render(LibraryEntryFormDialog, { open: true, entry, store, onCreateResult: vi.fn() });
+
+	await userEvent.fill(screen.getByLabelText(m['forms.field.name']()), 'Dragon, unsaved edit');
+
+	const editTagsTrigger = screen.getByRole('button', { name: m['library.tags.editTrigger']() });
+	await editTagsTrigger.click();
+	await expect
+		.element(screen.getByRole('dialog', { name: m['library.tags.assign.title']() }))
+		.toBeVisible();
+
+	await userEvent.keyboard('{Escape}');
+
+	// Only the tag dialog closed — the form dialog (edit title) is still open.
+	await expect
+		.element(screen.getByRole('dialog', { name: m['library.tags.assign.title']() }))
+		.not.toBeInTheDocument();
+	await expect
+		.element(screen.getByRole('dialog', { name: m['forms.library.edit.title']() }))
+		.toBeVisible();
+
+	// Focus returned to the "Edit tags" trigger.
+	await expect.element(editTagsTrigger).toHaveFocus();
+
+	// The underlying form state (the unsaved name edit) survived untouched.
+	await expect
+		.element(screen.getByLabelText(m['forms.field.name']()))
+		.toHaveValue('Dragon, unsaved edit');
 });

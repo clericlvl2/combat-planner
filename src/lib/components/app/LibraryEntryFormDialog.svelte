@@ -1,10 +1,16 @@
 <!--
-  LibraryEntryFormDialog — Name/Type/Max HP/AC/PD/MD/Init Bonus/Note form for a library template,
-  shared by create and edit. Mode is inferred from the optional `entry` prop (present = edit,
-  absent/null = create), same convention as CombatFormDialog. The field set mirrors
+  LibraryEntryFormDialog — Name/Type/Max HP/AC/PD/MD/Init Bonus/Note/Tags form for a library
+  template, shared by create and edit. Mode is inferred from the optional `entry` prop (present =
+  edit, absent/null = create), same convention as CombatFormDialog. The field set mirrors
   CombatantForm's (minus `initiative`, which is a combat-instance-only field templates never
-  carry); a Tags section is deliberately left out of this phase but this component's structure
-  leaves room to append one below Note without restructuring (P5).
+  carry).
+  Tags: local `pendingTags` (seeded from `entry.tags` on edit-open, `[]` on create-open) render as
+  removable TagChips plus an "Edit tags" affordance opening a TagAssignmentDialog scoped to
+  `pendingTags` — nothing persists until Save; `onToggle`/`onCreateTag` mutate `pendingTags`
+  locally via the domain `normalizeTagName` against `allTags ∪ pendingTags`. This is a deliberate
+  nested modal (Dialog-over-Dialog desktop, Drawer-over-Dialog mobile): the tag dialog's own
+  Escape/backdrop dismisses only itself, focus returns to the "Edit tags" trigger (bits-ui's
+  default focus-scope restore, since we never override it), and this form's state is untouched.
   Save-feedback contract: create submits call `onCreateResult(created)` and the dialog itself
   decides whether to close (created → close; null/cap → stays open, form content preserved). Edit
   submits stay silent (mirrors combat editing) and never call `onCreateResult`. This dialog is
@@ -22,10 +28,12 @@
 	import { type CombatantTemplate, type CombatantType, COMBATANT_TYPES } from '$lib/db/types';
 	import { m } from '$lib/i18n';
 	import type { CombatantTemplateInput } from '$lib/stores/domain/factories';
-	import type { EditTemplatePatch } from '$lib/stores/domain/library';
+	import { type EditTemplatePatch, normalizeTagName } from '$lib/stores/domain/library';
 	import { NAME_MAX_LENGTH, NOTE_MAX_LENGTH, RANGES } from '$lib/stores/domain/constants';
 	import NumberField from './NumberField.svelte';
 	import { typeLabel } from './labels';
+	import TagAssignmentDialog from './TagAssignmentDialog.svelte';
+	import TagChip from './TagChip.svelte';
 
 	/** Narrow store surface this dialog needs — lets tests pass a plain spy object. */
 	export interface LibraryEntryFormStore {
@@ -38,12 +46,15 @@
 		open = $bindable(false),
 		store,
 		onCreateResult,
+		allTags = [],
 	}: {
 		/** Present = edit mode (seeded from this template); absent/null = create mode. */
 		entry?: CombatantTemplate | null;
 		open?: boolean;
 		store: LibraryEntryFormStore;
 		onCreateResult: (created: CombatantTemplate | null) => void;
+		/** Live derived union of every template's tags (never stored, ADR-002). */
+		allTags?: string[];
 	} = $props();
 
 	let name = $state('');
@@ -54,6 +65,8 @@
 	let pd = $state<number | null>(null);
 	let md = $state<number | null>(null);
 	let note = $state('');
+	let pendingTags = $state<string[]>([]);
+	let tagsOpen = $state(false);
 	const isDesktop = new MediaQuery('(min-width: 1024px)');
 
 	// (Re)initialize the form whenever it opens (prefill on edit, blank/default on create).
@@ -68,6 +81,7 @@
 			pd = entry.pd;
 			md = entry.md;
 			note = entry.note;
+			pendingTags = [...entry.tags];
 		} else {
 			name = '';
 			type = 'enemy';
@@ -77,8 +91,32 @@
 			pd = 10;
 			md = 10;
 			note = '';
+			pendingTags = [];
 		}
 	});
+
+	const combinedTags = $derived.by(() => {
+		const seen = new Map<string, string>();
+		for (const t of [...allTags, ...pendingTags]) {
+			const key = t.toLowerCase();
+			if (!seen.has(key)) seen.set(key, t);
+		}
+		return [...seen.values()].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+	});
+
+	function togglePendingTag(name: string) {
+		const lower = name.toLowerCase();
+		pendingTags = pendingTags.some((t) => t.toLowerCase() === lower)
+			? pendingTags.filter((t) => t.toLowerCase() !== lower)
+			: [...pendingTags, name];
+	}
+
+	function createPendingTag(raw: string) {
+		const canonical = normalizeTagName(raw, combinedTags);
+		if (canonical === null) return;
+		if (pendingTags.some((t) => t.toLowerCase() === canonical.toLowerCase())) return;
+		pendingTags = [...pendingTags, canonical];
+	}
 
 	// Type-specific name placeholder; also substituted as the real stored name when the
 	// name is left empty on save (mirrors CombatantForm's namePlaceholder/submit()).
@@ -108,6 +146,7 @@
 			pd: pd ?? undefined,
 			md: md ?? undefined,
 			note,
+			tags: pendingTags,
 		};
 
 		if (entry) {
@@ -217,7 +256,21 @@
 			/>
 		</div>
 
-		<!-- P5 appends a Tags section here, below Note. -->
+		<div class="form-field-group">
+			<Label class={fieldLabelClass}>{m['library.tags.field']()}</Label>
+			<div class="flex flex-wrap items-center gap-1.5">
+				{#each pendingTags as tagName (tagName)}
+					<TagChip name={tagName} removable onRemove={togglePendingTag} />
+				{/each}
+				<button
+					type="button"
+					class="inline-flex h-[22px] items-center gap-[5px] rounded-full border border-dashed border-border px-2.5 py-0.5 text-sm text-muted-foreground hover:border-foreground hover:text-foreground"
+					onclick={() => (tagsOpen = true)}
+				>
+					{m['library.tags.editTrigger']()}
+				</button>
+			</div>
+		</div>
 
 		<DialogFooter class="mx-0 mb-0 flex-row justify-center gap-2 border-t-0 bg-transparent p-0 pt-1">
 			<Button
@@ -263,3 +316,11 @@
 		</DrawerContent>
 	</Drawer>
 {/if}
+
+<TagAssignmentDialog
+	bind:open={tagsOpen}
+	allTags={combinedTags}
+	selected={pendingTags}
+	onToggle={togglePendingTag}
+	onCreateTag={createPendingTag}
+/>

@@ -20,7 +20,7 @@ function names(screen: ReturnType<typeof render>) {
 
 function subtitles(screen: ReturnType<typeof render>) {
 	const list = screen.getByRole('list').element();
-	return Array.from(list.querySelectorAll('.text-muted-foreground'))
+	return Array.from(list.querySelectorAll('.truncate.text-sm.text-muted-foreground'))
 		.map((el) => el.textContent?.trim())
 		.filter((text): text is string => Boolean(text));
 }
@@ -34,6 +34,7 @@ test('renders entries sorted by name, case-insensitive', async () => {
 		entries: [zombie, goblin, ancientDragon],
 		onEdit: vi.fn(),
 		onDelete: vi.fn(),
+		onToggleTag: vi.fn(),
 	});
 
 	expect(names(screen)).toEqual(['Ancient Dragon', 'goblin', 'Zombie']);
@@ -57,6 +58,7 @@ test('same-name duplicates order by updatedAt descending (stable, regardless of 
 		entries: [older, newer],
 		onEdit: vi.fn(),
 		onDelete: vi.fn(),
+		onToggleTag: vi.fn(),
 	});
 
 	expect(subtitles(screen)).toEqual(['HP 9 · AC 10 · PD 10 · MD 10', 'HP 7 · AC 10 · PD 10 · MD 10']);
@@ -78,6 +80,7 @@ test('when updatedAt ties, orders by id (stable tiebreaker)', async () => {
 		entries: [b, a],
 		onEdit: vi.fn(),
 		onDelete: vi.fn(),
+		onToggleTag: vi.fn(),
 	});
 
 	expect(subtitles(screen)).toEqual(['HP 9 · AC 10 · PD 10 · MD 10', 'HP 7 · AC 10 · PD 10 · MD 10']);
@@ -92,6 +95,55 @@ test('filters entries by name, case-insensitively', async () => {
 		query: 'gob',
 		onEdit: vi.fn(),
 		onDelete: vi.fn(),
+		onToggleTag: vi.fn(),
+	});
+
+	expect(names(screen)).toEqual(['Goblin']);
+});
+
+test('filters by a tag name match too (combined name+tag search)', async () => {
+	const goblin = createCombatantTemplate({ name: 'Goblin', tags: ['Undead'] }, () => 'a', () => 1);
+	const zombie = createCombatantTemplate({ name: 'Zombie', tags: ['Undead'] }, () => 'b', () => 1);
+	const dragon = createCombatantTemplate({ name: 'Dragon', tags: ['Boss'] }, () => 'c', () => 1);
+
+	const screen = render(LibraryList, {
+		entries: [goblin, zombie, dragon],
+		query: 'undead',
+		onEdit: vi.fn(),
+		onDelete: vi.fn(),
+		onToggleTag: vi.fn(),
+	});
+
+	expect(names(screen)).toEqual(['Goblin', 'Zombie']);
+});
+
+test('tag-pill filtering (`selected`) narrows to entries carrying any selected tag (OR)', async () => {
+	const goblin = createCombatantTemplate({ name: 'Goblin', tags: ['Undead'] }, () => 'a', () => 1);
+	const zombie = createCombatantTemplate({ name: 'Zombie', tags: ['Boss'] }, () => 'b', () => 1);
+	const dragon = createCombatantTemplate({ name: 'Dragon', tags: [] }, () => 'c', () => 1);
+
+	const screen = render(LibraryList, {
+		entries: [goblin, zombie, dragon],
+		selected: ['Undead', 'Boss'],
+		onEdit: vi.fn(),
+		onDelete: vi.fn(),
+		onToggleTag: vi.fn(),
+	});
+
+	expect(names(screen)).toEqual(['Goblin', 'Zombie']);
+});
+
+test('a text query and a tag-pill selection AND together', async () => {
+	const goblin = createCombatantTemplate({ name: 'Goblin', tags: ['Undead'] }, () => 'a', () => 1);
+	const ghoul = createCombatantTemplate({ name: 'Ghoul', tags: ['Boss'] }, () => 'b', () => 1);
+
+	const screen = render(LibraryList, {
+		entries: [goblin, ghoul],
+		query: 'g',
+		selected: ['Undead'],
+		onEdit: vi.fn(),
+		onDelete: vi.fn(),
+		onToggleTag: vi.fn(),
 	});
 
 	expect(names(screen)).toEqual(['Goblin']);

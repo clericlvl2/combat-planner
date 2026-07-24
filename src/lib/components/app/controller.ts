@@ -9,7 +9,7 @@
  * `$state` and persists — see the store seam). The store owns the rules; this only narrows + binds.
  */
 
-import type { Condition } from '$lib/db/types';
+import type { CombatantTemplate, Condition } from '$lib/db/types';
 import type { CombatantInput, CombatStore } from '$lib/stores';
 import type { CombatantFieldPatch } from '$lib/stores/domain/transitions';
 
@@ -30,6 +30,7 @@ export interface CombatController {
 	toggleDisabled(id: string): void;
 	remove(id: string): void;
 	addCombatant(input: CombatantInput): void;
+	saveToLibrary(id: string): CombatantTemplate | null;
 	// lifecycle
 	start(): void;
 	advance(): void;
@@ -56,6 +57,7 @@ export function makeController(store: CombatStore, combatId: string): CombatCont
 		toggleDisabled: (id) => store.toggleDisabled(combatId, id),
 		remove: (id) => store.removeCombatant(combatId, id),
 		addCombatant: (input) => store.addCombatant(combatId, input),
+		saveToLibrary: (id) => store.createTemplateFromCombatant(combatId, id),
 		start: () => store.start(combatId),
 		advance: () => store.advanceTurn(combatId),
 		undo: () => store.undo(combatId),

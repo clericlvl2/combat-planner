@@ -47,6 +47,7 @@
 		controller,
 		onOpenNumpad,
 		onEdit,
+		onSaveToLibrary,
 	}: {
 		combatant: Combatant;
 		active?: boolean;
@@ -54,6 +55,7 @@
 		controller: CombatController;
 		onOpenNumpad: (id: string) => void;
 		onEdit: (id: string) => void;
+		onSaveToLibrary: (id: string) => void;
 	} = $props();
 
 	let open = $state(false);
@@ -96,6 +98,7 @@
 	const Duplicate = chromeIcon.duplicate;
 	const Disable = chromeIcon.disable;
 	const Remove = chromeIcon.remove;
+	const SaveToLibrary = chromeIcon.navLibrary;
 
 	/** "+ Condition" / "+ Note" triggers — same chip box as the condition tags (Badge), just
 	 *  dashed to read as an affordance rather than a value: chip gap, normal weight,
@@ -158,6 +161,10 @@
 									<DropdownMenuItem onSelect={() => controller.duplicate(combatant.id)}>
 										<Duplicate class="size-4" />
 										{m['forms.action.duplicate']()}
+									</DropdownMenuItem>
+									<DropdownMenuItem onSelect={() => onSaveToLibrary(combatant.id)}>
+										<SaveToLibrary class="size-4" />
+										{m['forms.action.saveToLibrary']()}
 									</DropdownMenuItem>
 									<DropdownMenuItem onSelect={() => controller.toggleDisabled(combatant.id)}>
 										<Disable class="size-4" />

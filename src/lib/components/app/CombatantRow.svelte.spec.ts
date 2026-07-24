@@ -62,6 +62,7 @@ test('collapsed row hides the note/condition-picker triggers; expanding reveals 
 		controller,
 		onOpenNumpad: vi.fn(),
 		onEdit: vi.fn(),
+		onSaveToLibrary: vi.fn(),
 	});
 
 	await expect.element(screen.getByRole('button', { name: 'Expand Rulf' })).toBeVisible();
@@ -84,6 +85,7 @@ test('collapsing a still-empty note resets it back to the "+ Note" chip on next 
 		controller,
 		onOpenNumpad: vi.fn(),
 		onEdit: vi.fn(),
+		onSaveToLibrary: vi.fn(),
 	});
 
 	await screen.getByRole('button', { name: 'Expand Rulf' }).click();
@@ -110,6 +112,7 @@ test('a disabled combatant renders its card at reduced opacity', async () => {
 		controller,
 		onOpenNumpad: vi.fn(),
 		onEdit: vi.fn(),
+		onSaveToLibrary: vi.fn(),
 	});
 
 	const card = screen.container.querySelector('[data-slot="card"]') as HTMLElement;
@@ -124,6 +127,7 @@ test('an enabled combatant renders its card without the disabled opacity class',
 		controller,
 		onOpenNumpad: vi.fn(),
 		onEdit: vi.fn(),
+		onSaveToLibrary: vi.fn(),
 	});
 
 	const card = screen.container.querySelector('[data-slot="card"]') as HTMLElement;
@@ -138,6 +142,7 @@ test('the overflow menu shows "Disable" for an enabled combatant and toggles it'
 		controller,
 		onOpenNumpad: vi.fn(),
 		onEdit: vi.fn(),
+		onSaveToLibrary: vi.fn(),
 	});
 
 	await screen.getByRole('button', { name: 'Actions for Rulf' }).click();
@@ -155,6 +160,7 @@ test('the overflow menu shows "Enable" for a disabled combatant and toggles it',
 		controller,
 		onOpenNumpad: vi.fn(),
 		onEdit: vi.fn(),
+		onSaveToLibrary: vi.fn(),
 	});
 
 	await screen.getByRole('button', { name: 'Actions for Rulf' }).click();
@@ -162,4 +168,23 @@ test('the overflow menu shows "Enable" for a disabled combatant and toggles it',
 
 	await screen.getByRole('menuitem', { name: 'Enable' }).click();
 	expect(controller.toggleDisabled).toHaveBeenCalledWith('c1');
+});
+
+test('the overflow menu shows "Save to library" and calls onSaveToLibrary with the combatant id', async () => {
+	const combatant = fixtureCombatant();
+	const controller = spyController();
+	const onSaveToLibrary = vi.fn();
+	const screen = render(CombatantRow, {
+		combatant,
+		controller,
+		onOpenNumpad: vi.fn(),
+		onEdit: vi.fn(),
+		onSaveToLibrary,
+	});
+
+	await screen.getByRole('button', { name: 'Actions for Rulf' }).click();
+	await expect.element(screen.getByRole('menuitem', { name: 'Save to library' })).toBeVisible();
+
+	await screen.getByRole('menuitem', { name: 'Save to library' }).click();
+	expect(onSaveToLibrary).toHaveBeenCalledWith('c1');
 });

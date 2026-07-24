@@ -20,6 +20,8 @@
     import FAB from '$lib/components/app/FAB.svelte';
     import NumpadSheet from '$lib/components/app/NumpadSheet.svelte';
     import {Button} from '$lib/components/ui/button';
+    import {toast} from '$lib/components/ui/sonner';
+    import {MAX_LIBRARY_ENTRIES} from '$lib/db/types';
     import {m} from '$lib/i18n';
     import {chromeIcon} from '$lib/icons';
     import {store} from '$lib/stores';
@@ -126,6 +128,20 @@
         });
     }
 
+    function openLibrary() {
+        addOpen = false;
+        goto('/library');
+    }
+
+    function saveToLibrary(cid: string) {
+        const result = controller.saveToLibrary(cid);
+        if (result) {
+            toast(m['toasts.library.saved']());
+        } else {
+            toast.error(m['toasts.library.capReached']({max: MAX_LIBRARY_ENTRIES}));
+        }
+    }
+
     function submitEdit(v: CombatantFormValues) {
         if (!editId) return;
         controller.edit(editId, {
@@ -182,6 +198,7 @@
                             {controller}
                             onOpenNumpad={openNumpad}
                             onEdit={openEdit}
+                            onSaveToLibrary={saveToLibrary}
                     />
                 {/each}
             {/if}
@@ -230,6 +247,12 @@
             onRestore={controller.restore}
             onSetTempHp={controller.setTempHp}
     />
-    <CombatantForm mode="add" bind:open={addOpen} onSubmit={submitAdd}/>
+    <CombatantForm
+            mode="add"
+            bind:open={addOpen}
+            onSubmit={submitAdd}
+            templates={store.libraryEntries}
+            onOpenLibrary={openLibrary}
+    />
     <CombatantForm mode="edit" combatant={editCombatant} bind:open={editOpen} onSubmit={submitEdit}/>
 {/if}

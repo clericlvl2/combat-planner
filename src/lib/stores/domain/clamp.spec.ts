@@ -9,6 +9,7 @@ import {
 	clampName,
 	clampNote,
 	clampRound,
+	clampTagName,
 	clampTempHp,
 	clampTitle,
 } from './clamp';
@@ -62,5 +63,10 @@ describe('clamp helpers', () => {
 	it('truncates a description to 200 chars', () => {
 		expect(clampDescription('x'.repeat(300))).toHaveLength(200);
 		expect(clampDescription('short')).toBe('short');
+	});
+
+	it('truncates a tag name to 30 chars', () => {
+		expect(clampTagName('x'.repeat(50))).toHaveLength(30);
+		expect(clampTagName('short')).toBe('short');
 	});
 });

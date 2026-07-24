@@ -15,6 +15,7 @@ import {
 	type AppData,
 	type Combat,
 	type Combatant,
+	type CombatantTemplate,
 	type CombatSnapshot,
 	DATA_VERSION,
 	type Settings,
@@ -35,6 +36,8 @@ export class NewerDataVersionError extends Error {
 /** Loosely-typed inbound shapes (a parsed import file or older DB rows may be partial). */
 export type RawCombatant = Partial<Combatant>;
 export type RawCombat = Partial<Omit<Combat, 'combatants'>> & { combatants?: RawCombatant[] };
+/** A library row may predate the `tags` field (additive-only, no shape transform needed). */
+export type RawCombatantTemplate = Partial<CombatantTemplate>;
 export interface RawAppData {
 	dataVersion?: number;
 	settings?: Partial<Settings>;
@@ -136,6 +139,29 @@ export function normalizeCombat(raw: RawCombat): Combat {
 		activeCombatantId: raw.activeCombatantId ?? 'none',
 		undoStack: raw.undoStack ?? [],
 		redoStack: raw.redoStack ?? [],
+		createdAt: raw.createdAt ?? now,
+		updatedAt: raw.updatedAt ?? now,
+	};
+}
+
+/**
+ * Read-time defaulting for a library entry row (not wired into `migrate()`/`normalizeAppData` —
+ * `libraryEntries` is outside `AppData`, per the export exclusion; called directly from the
+ * persistence loader). `tags` defaults to `[]`, same additive style as `normalizeCombatant`.
+ */
+export function normalizeCombatantTemplate(raw: RawCombatantTemplate): CombatantTemplate {
+	const now = Date.now();
+	return {
+		id: raw.id ?? crypto.randomUUID(),
+		name: raw.name ?? '',
+		type: raw.type ?? 'enemy',
+		initiativeBonus: raw.initiativeBonus ?? 0,
+		maxHp: raw.maxHp ?? 1,
+		ac: raw.ac ?? 10,
+		pd: raw.pd ?? 10,
+		md: raw.md ?? 10,
+		note: raw.note ?? '',
+		tags: raw.tags ?? [],
 		createdAt: raw.createdAt ?? now,
 		updatedAt: raw.updatedAt ?? now,
 	};

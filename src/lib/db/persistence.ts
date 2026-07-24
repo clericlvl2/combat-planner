@@ -7,8 +7,14 @@
  * settings is the singleton row. Hydrate-on-boot reads all rows + normalizes/migrates (migrations.ts).
  */
 
-import { normalizeAppData } from './migrations';
-import { type AppData, type Combat, SETTINGS_ID, type Settings } from './types';
+import { normalizeAppData, normalizeCombatantTemplate } from './migrations';
+import {
+	type AppData,
+	type Combat,
+	type CombatantTemplate,
+	SETTINGS_ID,
+	type Settings,
+} from './types';
 
 /** The minimal surface this module needs from Dexie — keeps the seam mockable. */
 export interface PersistenceDb {
@@ -23,6 +29,11 @@ export interface PersistenceDb {
 		get(id: string): Promise<Settings | undefined>;
 		put(settings: Settings): Promise<unknown>;
 	};
+	libraryEntries: {
+		toArray(): Promise<CombatantTemplate[]>;
+		put(entry: CombatantTemplate): Promise<unknown>;
+		delete(id: string): Promise<void>;
+	};
 }
 
 /** Hydrate full AppData on boot: read all rows, normalize + forward-migrate (ADR-013). */
@@ -36,6 +47,28 @@ export async function loadAppData(db: PersistenceDb): Promise<AppData> {
 		settings,
 		combats: [...combats].sort((a, b) => a.listOrder - b.listOrder),
 	});
+}
+
+/**
+ * Load all library entries (normalized/defaulted at read time). Outside `AppData` — the
+ * combatant library is not part of export/import (W-006's territory) — so this is called
+ * independently from the store's `hydrate()`, not folded into `loadAppData`.
+ */
+export async function loadLibraryEntries(db: PersistenceDb): Promise<CombatantTemplate[]> {
+	const entries = await db.libraryEntries.toArray();
+	return entries.map(normalizeCombatantTemplate);
+}
+
+/** Persist one library entry row (called on every mutation — the single writer, ADR-002/003). */
+export async function persistLibraryEntry(
+	db: PersistenceDb,
+	entry: CombatantTemplate,
+): Promise<void> {
+	await db.libraryEntries.put(entry);
+}
+
+export async function removeLibraryEntryRow(db: PersistenceDb, id: string): Promise<void> {
+	await db.libraryEntries.delete(id);
 }
 
 /** Persist one combat row (called on every mutation — the single writer, ADR-002/003). */

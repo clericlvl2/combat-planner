@@ -6,6 +6,7 @@ import {
 	DATA_VERSION,
 	MAX_COMBATANTS,
 	MAX_COMBATS,
+	MAX_LIBRARY_ENTRIES,
 } from './types';
 
 // Smoke test for the unit layer (Vitest, ADR-009). Real transition/derivation cases
@@ -20,6 +21,7 @@ describe('data model constants', () => {
 	it('pins the hard caps and data version (ADR-013)', () => {
 		expect(MAX_COMBATANTS).toBe(30);
 		expect(MAX_COMBATS).toBe(100);
+		expect(MAX_LIBRARY_ENTRIES).toBe(1000);
 		expect(DATA_VERSION).toBe(2);
 	});
 });

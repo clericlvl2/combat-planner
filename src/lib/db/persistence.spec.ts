@@ -3,18 +3,22 @@ import { createCombat, createSettings } from '../stores/domain/factories';
 import {
 	clearCombats,
 	loadAppData,
+	loadLibraryEntries,
 	type PersistenceDb,
 	persistCombat,
+	persistLibraryEntry,
 	persistSettings,
 	removeCombatRow,
+	removeLibraryEntryRow,
 	stripHistory,
 } from './persistence';
-import { type Combat, SETTINGS_ID, type Settings } from './types';
+import { type Combat, type CombatantTemplate, SETTINGS_ID, type Settings } from './types';
 
 /** In-memory PersistenceDb fake (real IndexedDB round-trip is covered by e2e). */
 function fakeDb(): PersistenceDb {
 	const combats = new Map<string, Combat>();
 	const settings = new Map<string, Settings>();
+	const libraryEntries = new Map<string, CombatantTemplate>();
 	return {
 		combats: {
 			toArray: async () => [...combats.values()],
@@ -29,6 +33,29 @@ function fakeDb(): PersistenceDb {
 			get: async (id) => settings.get(id),
 			put: async (s) => settings.set(s.id, structuredClone(s)),
 		},
+		libraryEntries: {
+			toArray: async () => [...libraryEntries.values()],
+			put: async (e) => libraryEntries.set(e.id, structuredClone(e)),
+			delete: async (id) => void libraryEntries.delete(id),
+		},
+	};
+}
+
+function template(over: Partial<CombatantTemplate> = {}): CombatantTemplate {
+	return {
+		id: 't1',
+		name: 'Goblin',
+		type: 'enemy',
+		initiativeBonus: 0,
+		maxHp: 10,
+		ac: 10,
+		pd: 10,
+		md: 10,
+		note: '',
+		tags: [],
+		createdAt: 0,
+		updatedAt: 0,
+		...over,
 	};
 }
 
@@ -80,6 +107,34 @@ describe('persistence round-trip (ADR-003)', () => {
 		expect((await loadAppData(db)).combats.map((c) => c.id)).toEqual(['b']);
 		await clearCombats(db);
 		expect((await loadAppData(db)).combats).toEqual([]);
+	});
+});
+
+describe('library entries round-trip (ADR-003) — additive-only, outside AppData', () => {
+	it('persisted entries round-trip through loadLibraryEntries', async () => {
+		await persistLibraryEntry(db, template({ id: 'a', name: 'Goblin' }));
+		await persistLibraryEntry(db, template({ id: 'b', name: 'Orc' }));
+
+		const loaded = await loadLibraryEntries(db);
+		expect(loaded.map((e) => e.name).sort()).toEqual(['Goblin', 'Orc']);
+	});
+
+	it('normalizes a partial/legacy row at read time (tags defaults to [])', async () => {
+		await db.libraryEntries.put({ id: 'x' } as CombatantTemplate);
+		const loaded = await loadLibraryEntries(db);
+		expect(loaded[0].tags).toEqual([]);
+		expect(loaded[0].type).toBe('enemy');
+	});
+
+	it('removeLibraryEntryRow deletes a row', async () => {
+		await persistLibraryEntry(db, template({ id: 'a' }));
+		await persistLibraryEntry(db, template({ id: 'b' }));
+		await removeLibraryEntryRow(db, 'a');
+		expect((await loadLibraryEntries(db)).map((e) => e.id)).toEqual(['b']);
+	});
+
+	it('an empty table hydrates to an empty array', async () => {
+		expect(await loadLibraryEntries(db)).toEqual([]);
 	});
 });
 

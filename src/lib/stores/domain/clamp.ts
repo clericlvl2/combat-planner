@@ -7,6 +7,7 @@ import {
 	NAME_MAX_LENGTH,
 	NOTE_MAX_LENGTH,
 	RANGES,
+	TAG_NAME_MAX_LENGTH,
 	TITLE_MAX_LENGTH,
 } from './constants';
 
@@ -56,3 +57,7 @@ export const clampDescription = (description: string): string =>
 	description.length > DESCRIPTION_MAX_LENGTH
 		? description.slice(0, DESCRIPTION_MAX_LENGTH)
 		: description;
+
+/** Library tag names are hard-capped during input; no rounding, just truncate. */
+export const clampTagName = (name: string): string =>
+	name.length > TAG_NAME_MAX_LENGTH ? name.slice(0, TAG_NAME_MAX_LENGTH) : name;

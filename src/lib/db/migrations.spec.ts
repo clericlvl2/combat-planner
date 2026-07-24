@@ -5,6 +5,7 @@ import {
 	NewerDataVersionError,
 	normalizeAppData,
 	normalizeCombat,
+	normalizeCombatantTemplate,
 	type RawAppData,
 	transforms,
 } from './migrations';
@@ -130,5 +131,26 @@ describe('v2 transform — monster→enemy, escalationOverride→escalation (ADR
 			}),
 		);
 		expect(out.combats[0].undoStack[0].snapshot.combatants[0].type).toBe('enemy');
+	});
+});
+
+describe('normalizeCombatantTemplate — read-time defaulting for library rows (ADR-013)', () => {
+	it('defaults tags to [] on a bare partial', () => {
+		const template = normalizeCombatantTemplate({ id: 't' });
+		expect(template.tags).toEqual([]);
+		expect(template.type).toBe('enemy');
+		expect(template.name).toBe('');
+		expect(template.maxHp).toBe(1);
+	});
+
+	it('defaults tags to [] on a fully-empty raw object', () => {
+		const template = normalizeCombatantTemplate({});
+		expect(template.tags).toEqual([]);
+		expect(typeof template.id).toBe('string');
+	});
+
+	it('preserves an already-present tags array untouched', () => {
+		const template = normalizeCombatantTemplate({ id: 't', tags: ['boss', 'Undead'] });
+		expect(template.tags).toEqual(['boss', 'Undead']);
 	});
 });

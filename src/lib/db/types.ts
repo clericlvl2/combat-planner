@@ -10,6 +10,7 @@ export const DATA_VERSION = 2;
 /** Hard caps. */
 export const MAX_COMBATANTS = 30;
 export const MAX_COMBATS = 100;
+export const MAX_LIBRARY_ENTRIES = 1000;
 
 /** Bundled UI locales (ADR-005). English is the source language. */
 export type Locale = 'en' | 'de' | 'es' | 'fr' | 'ja' | 'ru';
@@ -205,4 +206,25 @@ export interface AppData {
 	dataVersion: number;
 	settings: Settings;
 	combats: Combat[];
+}
+
+/**
+ * A reusable stat-block template — the combatant-library entry shape (same fields as a
+ * `Combatant` minus its combat-instance fields: no `currentHp`/`tempHp`/`conditions`/`hpLog`/
+ * `disabled`/`addOrder`/`initiative`). Tags are plain strings, no separate tag entity — the
+ * derived tag list is computed from every template's `tags` (never stored, ADR-002).
+ */
+export interface CombatantTemplate {
+	id: string;
+	name: string;
+	type: CombatantType;
+	initiativeBonus: number;
+	maxHp: number;
+	ac: number;
+	pd: number;
+	md: number;
+	note: string;
+	tags: string[];
+	createdAt: number;
+	updatedAt: number;
 }

@@ -194,7 +194,8 @@ export class CombatStore {
 
 	/** Delete a template (confirm-gated upstream; not undoable). */
 	removeTemplate(id: string): void {
-		this.libraryEntries = Library.removeTemplateFromList(this.libraryEntries, id);
+		const snapshot = $state.snapshot(this.libraryEntries) as CombatantTemplate[];
+		this.libraryEntries = Library.removeTemplateFromList(snapshot, id);
 		void removeLibraryEntryRow(this.#db, id);
 	}
 

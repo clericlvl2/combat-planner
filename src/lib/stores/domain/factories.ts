@@ -6,6 +6,7 @@ import {
 	type ColorTag,
 	type Combat,
 	type Combatant,
+	type CombatantTemplate,
 	type CombatantType,
 	DATA_VERSION,
 	NONE,
@@ -67,6 +68,43 @@ export function createCombatant(
 		conditions: [],
 		hpLog: [],
 		disabled: false,
+	};
+}
+
+export interface CombatantTemplateInput {
+	name: string;
+	type?: CombatantType;
+	initiativeBonus?: number;
+	maxHp?: number;
+	ac?: number;
+	pd?: number;
+	md?: number;
+	note?: string;
+	tags?: string[];
+}
+
+/** New library template: same field clamps as `createCombatant`, no combat-instance fields. */
+export function createCombatantTemplate(
+	input: CombatantTemplateInput,
+	genId: IdGen = defaultGenId,
+	now: () => number = Date.now,
+): CombatantTemplate {
+	const timestamp = now();
+	return {
+		id: genId(),
+		name: clampName(input.name.trim()),
+		type: input.type ?? 'enemy',
+		initiativeBonus: clampInitiativeBonus(
+			input.initiativeBonus ?? COMBATANT_DEFAULTS.initiativeBonus,
+		),
+		maxHp: clampMaxHp(input.maxHp ?? COMBATANT_DEFAULTS.maxHp),
+		ac: clampAc(input.ac ?? COMBATANT_DEFAULTS.ac),
+		pd: clampPd(input.pd ?? COMBATANT_DEFAULTS.pd),
+		md: clampMd(input.md ?? COMBATANT_DEFAULTS.md),
+		note: clampNote(input.note ?? ''),
+		tags: input.tags ?? [],
+		createdAt: timestamp,
+		updatedAt: timestamp,
 	};
 }
 

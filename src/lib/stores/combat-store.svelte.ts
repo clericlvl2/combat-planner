@@ -7,16 +7,25 @@
 import { db } from '../db';
 import {
 	loadAppData,
+	loadLibraryEntries,
 	type PersistenceDb,
 	persistCombat,
 	persistCombats,
+	persistLibraryEntry,
 	persistSettings,
 	removeCombatRow,
+	removeLibraryEntryRow,
 } from '../db/persistence';
-import type { Combat, Condition, Settings } from '../db/types';
+import type { Combat, CombatantTemplate, Condition, Settings } from '../db/types';
 import * as App from './domain/app';
-import { type CombatantInput, type CombatInput, createSettings } from './domain/factories';
+import {
+	type CombatantInput,
+	type CombatantTemplateInput,
+	type CombatInput,
+	createSettings,
+} from './domain/factories';
 import type { D20Roll, IdGen } from './domain/id';
+import * as Library from './domain/library';
 import * as T from './domain/transitions';
 import { redo as undoRedo, undo as undoUndo } from './domain/undo';
 
@@ -25,6 +34,8 @@ export class CombatStore {
 
 	settings = $state<Settings>(createSettings());
 	combats = $state<Combat[]>([]);
+	/** The combatant library — no tag state; the tag list is derived at consumers (ADR-002). */
+	libraryEntries = $state<CombatantTemplate[]>([]);
 	/** False until the first hydrate resolves; gates the UI boot (M2+). */
 	ready = $state(false);
 
@@ -38,10 +49,14 @@ export class CombatStore {
 
 	/** Boot: load + normalize/migrate from Dexie, then run first-launch. */
 	async hydrate(genId?: IdGen): Promise<void> {
-		const data = await loadAppData(this.#db);
+		const [data, libraryEntries] = await Promise.all([
+			loadAppData(this.#db),
+			loadLibraryEntries(this.#db),
+		]);
 		const { combats, settings, opened } = App.firstLaunch(data.combats, data.settings, genId);
 		this.combats = combats;
 		this.settings = settings;
+		this.libraryEntries = libraryEntries;
 		this.ready = true;
 		if (opened) {
 			// First launch mutated state — persist the new combat + flag.
@@ -150,6 +165,57 @@ export class CombatStore {
 		const next = { ...($state.snapshot(this.settings) as Settings), ...patch };
 		this.settings = next;
 		void persistSettings(this.#db, next);
+	}
+
+	// ── library ──────────────────────────────────────────────────────────────
+
+	/** Create a template; returns it (or null at the `MAX_LIBRARY_ENTRIES` cap). Not undoable. */
+	addTemplate(input: CombatantTemplateInput, genId?: IdGen): CombatantTemplate | null {
+		const { list, created } = Library.addTemplateToList(
+			$state.snapshot(this.libraryEntries) as CombatantTemplate[],
+			input,
+			genId,
+		);
+		if (!created) return null;
+		this.libraryEntries = list;
+		void persistLibraryEntry(this.#db, created);
+		return created;
+	}
+
+	/** Patch fields on an existing template; no-op if the id is unknown. */
+	editTemplate(id: string, patch: Library.EditTemplatePatch): void {
+		const snapshot = $state.snapshot(this.libraryEntries) as CombatantTemplate[];
+		const edited = Library.editTemplateInList(snapshot, id, patch);
+		if (edited === snapshot) return; // unknown id — no-op
+		this.libraryEntries = edited;
+		const next = edited.find((t) => t.id === id);
+		if (next) void persistLibraryEntry(this.#db, next);
+	}
+
+	/** Delete a template (confirm-gated upstream; not undoable). */
+	removeTemplate(id: string): void {
+		this.libraryEntries = Library.removeTemplateFromList(this.libraryEntries, id);
+		void removeLibraryEntryRow(this.#db, id);
+	}
+
+	/**
+	 * Copy a live combatant's field values into a new (untagged) template; returns it (or null
+	 * at the cap). No-op-returning-null if the combat/combatant id is unknown.
+	 */
+	createTemplateFromCombatant(combatId: string, combatantId: string): CombatantTemplate | null {
+		const combatant = this.getCombat(combatId)?.combatants.find((c) => c.id === combatantId);
+		if (!combatant) return null;
+		return this.addTemplate(Library.templateInputFromCombatant($state.snapshot(combatant)));
+	}
+
+	/** Add/remove a tag on one template (case-insensitive canonicalization); no-op on unknown id. */
+	toggleTemplateTag(templateId: string, name: string): void {
+		const snapshot = $state.snapshot(this.libraryEntries) as CombatantTemplate[];
+		const toggled = Library.toggleTemplateTag(snapshot, templateId, name);
+		if (toggled === snapshot) return; // unknown id — no-op
+		this.libraryEntries = toggled;
+		const next = toggled.find((t) => t.id === templateId);
+		if (next) void persistLibraryEntry(this.#db, next);
 	}
 }
 

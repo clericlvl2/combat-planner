@@ -5,7 +5,7 @@ description: Run the large work loop for anything past the small-loop bar — ar
 
 You run the LARGE loop end-to-end for one backlog row: research, author a plan file in-thread
 with the user, get one approval, run it phase by phase via `phase-runner`, gate, get an
-independent `taster-bee` pass, remediate, commit, clear the row. The unit runs in a worktree per
+independent `guard-bee` pass, remediate, commit, clear the row. The unit runs in a worktree per
 `work-next`'s canonical worktree-per-unit lifecycle.
 
 ## Steps
@@ -41,7 +41,7 @@ independent `taster-bee` pass, remediate, commit, clear the row. The unit runs i
 3. **One explicit approval** — present the finished plan and stop. Wait for the user to say go.
    Never start phase execution in the same turn as presenting the plan.
 4. **Record the base SHA** — capture `git rev-parse HEAD` before any phase starts. This is what
-   the taster-bee diffs against later.
+   the guard-bee diffs against later.
 5. **Run phases** — dispatch each phase to a `phase-runner` agent, giving it: the plan path, the
    phase name, and that phase's owned-files list. Run file-disjoint phases in parallel (single
    message, multiple Agent calls); run everything else sequentially, waiting for each phase to
@@ -50,10 +50,10 @@ independent `taster-bee` pass, remediate, commit, clear the row. The unit runs i
 6. **Check per phase** — after each phase, review its report. Per-phase checks are targeted and
    advisory only; the SINGLE full `npm run gate` runs on main, after all phases are integrated
    (not inside the worktree, not after every phase).
-7. **Independent review** — dispatch a `taster-bee` agent against `base..HEAD` with the base SHA,
+7. **Independent review** — dispatch a `guard-bee` agent against `base..HEAD` with the base SHA,
    the allowed paths, and the plan path (for its acceptance criteria) explicitly passed in.
 8. **Remediate** — any FAIL inside the approved scope gets auto-remediated (dispatch the fix,
-   don't ask). After every remediation, run a fresh `taster-bee` pass — don't declare done off a
+   don't ask). After every remediation, run a fresh `guard-bee` pass — don't declare done off a
    stale review. Do NOT auto-remediate: repeated identical failure, new scope, a destructive
    action, or an unresolved product choice — stop and ask instead.
 9. **Commit** — one commit per phase, linear history, no merge commits, each carrying a

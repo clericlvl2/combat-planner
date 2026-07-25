@@ -164,111 +164,113 @@
 
 {#snippet formBody()}
 	<form
-		class="flex flex-col gap-3"
+		class="flex min-h-0 flex-1 flex-col gap-3"
 		onsubmit={(e) => {
 			e.preventDefault();
 			submit();
 		}}
 	>
-		<div class="form-field-group">
-			<Label for="lf-name" class={fieldLabelClass}>{m['forms.field.name']()}</Label>
-			<Input
-				id="lf-name"
-				bind:value={name}
-				maxlength={NAME_MAX_LENGTH}
-				placeholder={namePlaceholder}
-				size="action"
-				class="border-[var(--border-strong)] text-[15px] md:text-[15px]"
-			/>
-		</div>
+		<div class="-mx-3 flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto px-3">
+			<div class="form-field-group">
+				<Label for="lf-name" class={fieldLabelClass}>{m['forms.field.name']()}</Label>
+				<Input
+					id="lf-name"
+					bind:value={name}
+					maxlength={NAME_MAX_LENGTH}
+					placeholder={namePlaceholder}
+					size="action"
+					class="border-[var(--border-strong)] text-[15px] md:text-[15px]"
+				/>
+			</div>
 
-		<div class="form-field-group">
-			<Label class={fieldLabelClass}>{m['forms.field.type']()}</Label>
-			<ToggleGroup
-				type="single"
-				value={type}
-				onValueChange={(v) => v && (type = v as CombatantType)}
-				class="w-full gap-2"
-			>
-				{#each COMBATANT_TYPES as t (t)}
-					<ToggleGroupItem
-						value={t}
-						style="--tc: var(--type-{t})"
-						class="flex min-h-11 flex-1 items-center justify-start gap-1.5 !rounded-sm border border-border bg-secondary pl-3.5 text-muted-foreground data-[state=on]:border-[var(--tc)] data-[state=on]:bg-[color-mix(in_srgb,var(--tc)_14%,var(--secondary))] data-[state=on]:font-semibold data-[state=on]:text-foreground data-[state=on]:ring-1 data-[state=on]:ring-[var(--tc)]"
-					>
-						<span class="size-2 shrink-0 rounded-full bg-[var(--tc)]"></span>
-						{typeLabel[t]()}
-					</ToggleGroupItem>
-				{/each}
-			</ToggleGroup>
-		</div>
-
-		<div class="grid grid-cols-2 gap-2">
-			<NumberField
-				id="lf-maxhp"
-				label={m['forms.field.maxHp']()}
-				bind:value={maxHp}
-				min={RANGES.maxHp.min}
-				max={RANGES.maxHp.max}
-			/>
-			<NumberField
-				id="lf-ac"
-				label={m['forms.field.ac']()}
-				bind:value={ac}
-				min={RANGES.ac.min}
-				max={RANGES.ac.max}
-			/>
-		</div>
-
-		<div class="grid grid-cols-2 gap-2">
-			<NumberField
-				id="lf-pd"
-				label={m['forms.field.pd']()}
-				bind:value={pd}
-				min={RANGES.pd.min}
-				max={RANGES.pd.max}
-			/>
-			<NumberField
-				id="lf-md"
-				label={m['forms.field.md']()}
-				bind:value={md}
-				min={RANGES.md.min}
-				max={RANGES.md.max}
-			/>
-		</div>
-
-		<NumberField
-			id="lf-initbonus"
-			label={m['forms.field.initBonus']()}
-			bind:value={initiativeBonus}
-			min={RANGES.initiativeBonus.min}
-			max={RANGES.initiativeBonus.max}
-		/>
-
-		<div class="form-field-group">
-			<Label for="lf-note" class={fieldLabelClass}>{m['forms.field.note']()}</Label>
-			<Textarea
-				id="lf-note"
-				bind:value={note}
-				maxlength={NOTE_MAX_LENGTH}
-				placeholder={m['forms.field.note.placeholder']()}
-				class="rounded-sm border-[var(--border-strong)] text-[15px] md:text-[15px]"
-			/>
-		</div>
-
-		<div class="form-field-group">
-			<Label class={fieldLabelClass}>{m['library.tags.field']()}</Label>
-			<div class="flex flex-wrap items-center gap-1.5">
-				{#each pendingTags as tagName (tagName)}
-					<TagChip name={tagName} removable onRemove={togglePendingTag} class="touch-none" />
-				{/each}
-				<button
-					type="button"
-					class="inline-flex h-[22px] touch-none items-center gap-[5px] rounded-full border border-dashed border-border px-2.5 py-0.5 text-sm text-muted-foreground hover:border-foreground hover:text-foreground"
-					onclick={() => (tagsOpen = true)}
+			<div class="form-field-group">
+				<Label class={fieldLabelClass}>{m['forms.field.type']()}</Label>
+				<ToggleGroup
+					type="single"
+					value={type}
+					onValueChange={(v) => v && (type = v as CombatantType)}
+					class="w-full gap-2"
 				>
-					{m['library.tags.editTrigger']()}
-				</button>
+					{#each COMBATANT_TYPES as t (t)}
+						<ToggleGroupItem
+							value={t}
+							style="--tc: var(--type-{t})"
+							class="flex min-h-11 flex-1 items-center justify-start gap-1.5 !rounded-sm border border-border bg-secondary pl-3.5 text-muted-foreground data-[state=on]:border-[var(--tc)] data-[state=on]:bg-[color-mix(in_srgb,var(--tc)_14%,var(--secondary))] data-[state=on]:font-semibold data-[state=on]:text-foreground data-[state=on]:ring-1 data-[state=on]:ring-[var(--tc)]"
+						>
+							<span class="size-2 shrink-0 rounded-full bg-[var(--tc)]"></span>
+							{typeLabel[t]()}
+						</ToggleGroupItem>
+					{/each}
+				</ToggleGroup>
+			</div>
+
+			<div class="grid grid-cols-2 gap-2">
+				<NumberField
+					id="lf-maxhp"
+					label={m['forms.field.maxHp']()}
+					bind:value={maxHp}
+					min={RANGES.maxHp.min}
+					max={RANGES.maxHp.max}
+				/>
+				<NumberField
+					id="lf-ac"
+					label={m['forms.field.ac']()}
+					bind:value={ac}
+					min={RANGES.ac.min}
+					max={RANGES.ac.max}
+				/>
+			</div>
+
+			<div class="grid grid-cols-2 gap-2">
+				<NumberField
+					id="lf-pd"
+					label={m['forms.field.pd']()}
+					bind:value={pd}
+					min={RANGES.pd.min}
+					max={RANGES.pd.max}
+				/>
+				<NumberField
+					id="lf-md"
+					label={m['forms.field.md']()}
+					bind:value={md}
+					min={RANGES.md.min}
+					max={RANGES.md.max}
+				/>
+			</div>
+
+			<NumberField
+				id="lf-initbonus"
+				label={m['forms.field.initBonus']()}
+				bind:value={initiativeBonus}
+				min={RANGES.initiativeBonus.min}
+				max={RANGES.initiativeBonus.max}
+			/>
+
+			<div class="form-field-group">
+				<Label for="lf-note" class={fieldLabelClass}>{m['forms.field.note']()}</Label>
+				<Textarea
+					id="lf-note"
+					bind:value={note}
+					maxlength={NOTE_MAX_LENGTH}
+					placeholder={m['forms.field.note.placeholder']()}
+					class="rounded-sm border-[var(--border-strong)] text-[15px] md:text-[15px]"
+				/>
+			</div>
+
+			<div class="form-field-group">
+				<Label class={fieldLabelClass}>{m['library.tags.field']()}</Label>
+				<div class="flex flex-wrap items-center gap-1.5">
+					{#each pendingTags as tagName (tagName)}
+						<TagChip name={tagName} removable onRemove={togglePendingTag} class="touch-none" />
+					{/each}
+					<button
+						type="button"
+						class="inline-flex h-[22px] touch-none items-center gap-[5px] rounded-full border border-dashed border-border px-2.5 py-0.5 text-sm text-muted-foreground hover:border-foreground hover:text-foreground"
+						onclick={() => (tagsOpen = true)}
+					>
+						{m['library.tags.editTrigger']()}
+					</button>
+				</div>
 			</div>
 		</div>
 
@@ -298,9 +300,7 @@
 				<DialogTitle class="text-lg font-semibold">{formTitle}</DialogTitle>
 			</DialogHeader>
 
-			<div class="-mx-3 min-h-0 flex-1 overflow-y-auto px-3">
-				{@render formBody()}
-			</div>
+			{@render formBody()}
 		</DialogContent>
 	</Dialog>
 {:else}
@@ -310,7 +310,7 @@
 				<DrawerTitle class="text-lg font-semibold">{formTitle}</DrawerTitle>
 			</DrawerHeader>
 
-			<div class="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 pb-safe">
+			<div class="flex min-h-0 flex-1 flex-col px-4 pb-safe">
 				{@render formBody()}
 			</div>
 		</DrawerContent>

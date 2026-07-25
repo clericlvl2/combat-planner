@@ -254,3 +254,13 @@ test('nested tag dialog: Escape closes only the tag surface, focus returns to "E
 		.element(screen.getByLabelText(m['forms.field.name']()))
 		.toHaveValue('Dragon, unsaved edit');
 });
+
+test('the submit button is not a descendant of the scroll container (footer stays pinned)', async () => {
+	const store = { addTemplate: vi.fn(), editTemplate: vi.fn() };
+	const screen = render(LibraryEntryFormDialog, { open: true, store, onCreateResult: vi.fn() });
+
+	const submitButton = screen.getByRole('button', { name: m['forms.action.create']() }).element();
+	const scrollContainer = submitButton.closest('.overflow-y-auto');
+
+	expect(scrollContainer?.contains(submitButton)).not.toBe(true);
+});

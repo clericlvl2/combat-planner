@@ -1,11 +1,14 @@
 <!--
-  LibraryFilterPills — the /library "Flat Pills" tag filter. A fixed top bar (more/less text
-  trigger, always right-aligned, always in the same place) sits above the pill row. Collapsed: the
-  quick row is the first 6 tags alphabetically, plus any currently-selected tag outside that six
-  appended after them (a selected filter is never invisible while collapsed) — rendered in a
-  single horizontally-scrollable row. Expanded: every tag (alphabetical), wrapped. Selecting is OR
-  semantics (no "match all"); toggling a pill updates `selected` and calls `onChange`. Pills are
-  color-accented via `tagAccent` (border+fill when selected, never color alone).
+  LibraryFilterPills — the /library "Flat Pills" tag filter. The more/less trigger is rendered
+  inline within the pill row itself (no dedicated top bar), only when the tag count exceeds the
+  quick-row size (> 6). Collapsed: the quick row is the first 6 tags alphabetically, plus any
+  currently-selected tag outside that six appended after them (a selected filter is never invisible
+  while collapsed) — rendered in a single horizontally-scrollable row (scrollbar hidden, edge fade
+  masking the scrollable content). Expanded: every tag (alphabetical), wrapped. In both states the
+  layout is a two-column grid (pill area + more/less trigger) so toggling never shifts the trigger's
+  position. Selecting is OR semantics (no "match all"); toggling a pill updates `selected` and calls
+  `onChange`. Pills are color-accented via `tagAccent` only while selected; unselected pills are
+  neutral.
 -->
 <script lang="ts">
 	import { m } from '$lib/i18n';
@@ -20,6 +23,9 @@
 	}: { allTags: string[]; selected?: string[]; onChange: (names: string[]) => void } = $props();
 
 	let expanded = $state(false);
+	let scrollEl = $state<HTMLDivElement | null>(null);
+	let fadeLeft = $state(false);
+	let fadeRight = $state(false);
 
 	const quickTags = $derived.by(() => {
 		const quick = allTags.slice(0, QUICK_COUNT);
@@ -38,21 +44,39 @@
 		selected = next;
 		onChange(next);
 	}
+
+	function updateFade() {
+		const el = scrollEl;
+		if (!el) {
+			fadeLeft = false;
+			fadeRight = false;
+			return;
+		}
+		fadeLeft = el.scrollLeft > 0;
+		fadeRight = el.scrollLeft < el.scrollWidth - el.clientWidth - 1;
+	}
+
+	$effect(() => {
+		visibleTags;
+		updateFade();
+	});
+
+	const fadeStyle = $derived(
+		`mask-image: linear-gradient(to right, transparent 0, #000 ${fadeLeft ? '1rem' : '0px'}, #000 calc(100% - ${fadeRight ? '1rem' : '0px'}), transparent 100%)`,
+	);
 </script>
 
 {#if allTags.length > 0}
-	<div class="flex flex-col gap-1.5">
-		<div class="flex items-center justify-end">
-			<button
-				type="button"
-				class="text-sm font-medium text-muted-foreground hover:text-foreground"
-				onclick={() => (expanded = !expanded)}
-			>
-				{expanded ? m['library.filter.less']() : m['library.filter.more']()}
-			</button>
-		</div>
-
-		<div class={['flex gap-1.5', expanded ? 'flex-wrap' : 'flex-nowrap overflow-x-auto']}>
+	<div class="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-1.5">
+		<div
+			bind:this={scrollEl}
+			onscroll={updateFade}
+			style={expanded ? undefined : fadeStyle}
+			class={[
+				'gap-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+				expanded ? 'flex flex-wrap' : 'flex flex-nowrap overflow-x-auto',
+			]}
+		>
 			{#each visibleTags as name (name)}
 				{@const isSelected = selected.includes(name)}
 				<button
@@ -60,10 +84,10 @@
 					aria-pressed={isSelected}
 					style="--tc: {tagAccent(name)}"
 					class={[
-						'inline-flex h-11 min-w-11 shrink-0 items-center justify-center rounded-full border px-3 text-sm font-medium whitespace-nowrap',
-						'border-[color-mix(in_srgb,var(--tc)_28%,var(--border))] bg-[color-mix(in_srgb,var(--tc)_9%,var(--popover))] text-[var(--tc)]',
-						isSelected &&
-							'border-[var(--tc)] bg-[color-mix(in_srgb,var(--tc)_18%,var(--popover))] text-[color-mix(in_srgb,var(--tc)_55%,var(--foreground))]',
+						'inline-flex h-8 shrink-0 items-center justify-center rounded-md border px-2.5 text-sm font-medium whitespace-nowrap',
+						isSelected
+							? 'border-[var(--tc)] bg-[color-mix(in_srgb,var(--tc)_18%,var(--popover))] text-[color-mix(in_srgb,var(--tc)_55%,var(--foreground))]'
+							: 'border-border bg-transparent text-muted-foreground hover:bg-muted',
 					]}
 					onclick={() => toggle(name)}
 				>
@@ -71,5 +95,15 @@
 				</button>
 			{/each}
 		</div>
+
+		{#if allTags.length > QUICK_COUNT}
+			<button
+				type="button"
+				class="inline-flex h-8 shrink-0 items-center justify-center px-2 text-sm font-medium whitespace-nowrap text-muted-foreground hover:text-foreground"
+				onclick={() => (expanded = !expanded)}
+			>
+				{expanded ? m['library.filter.less']() : m['library.filter.more']()}
+			</button>
+		{/if}
 	</div>
 {/if}

@@ -53,6 +53,7 @@
 </script>
 
 <Card
+	role="listitem"
 	class="flex-col items-stretch gap-2 overflow-hidden rounded-xl border border-[var(--border)] p-3 ring-0"
 >
 	<div class="flex items-center gap-3">

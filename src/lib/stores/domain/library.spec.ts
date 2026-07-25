@@ -161,6 +161,13 @@ describe('toggleTemplateTag', () => {
 		expect(out[0].updatedAt).toBe(5);
 	});
 
+	it('removes a present tag when the input is whitespace-padded', () => {
+		const t = { ...createCombatantTemplate({ name: 'A' }, () => 'a'), tags: ['Undead'] };
+		const out = toggleTemplateTag([t], 'a', ' Undead ', () => 5);
+		expect(out[0].tags).toEqual([]);
+		expect(out[0].updatedAt).toBe(5);
+	});
+
 	it('reuses existing casing from elsewhere in the list when adding', () => {
 		const a = { ...createCombatantTemplate({ name: 'A' }, () => 'a'), tags: ['Undead'] };
 		const b = createCombatantTemplate({ name: 'B' }, () => 'b');

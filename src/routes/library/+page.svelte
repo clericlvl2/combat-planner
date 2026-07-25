@@ -74,7 +74,7 @@
 
 	function onCreateResult(created: CombatantTemplate | null) {
 		if (created) {
-			toast(m['toasts.library.saved']());
+			toast.success(m['toasts.library.saved']());
 		} else {
 			toast.error(m['toasts.library.capReached']({ max: MAX_LIBRARY_ENTRIES }));
 		}

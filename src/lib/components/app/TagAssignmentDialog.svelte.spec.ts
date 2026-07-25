@@ -60,6 +60,40 @@ test('submitting the new-tag input fires onCreateTag with the trimmed value', as
 	expect(onCreateTag).toHaveBeenCalledExactlyOnceWith('Boss');
 });
 
+test('submitting a name already selected does not fire onCreateTag and clears the input', async () => {
+	const onCreateTag = vi.fn();
+	const onToggle = vi.fn();
+	const screen = render(TagAssignmentDialog, {
+		open: true,
+		allTags: ['Boss'],
+		selected: ['Boss'],
+		onToggle,
+		onCreateTag,
+	});
+
+	const input = screen.getByPlaceholder('New tag…');
+	await userEvent.fill(input, '  boss  ');
+	await userEvent.keyboard('{Enter}');
+
+	expect(onCreateTag).not.toHaveBeenCalled();
+	expect(onToggle).not.toHaveBeenCalled();
+	await expect.element(input).toHaveValue('');
+});
+
+test('shows a muted empty-state hint when there are no tags', async () => {
+	const screen = render(TagAssignmentDialog, {
+		open: true,
+		allTags: [],
+		selected: [],
+		onToggle: vi.fn(),
+		onCreateTag: vi.fn(),
+	});
+
+	await expect
+		.element(screen.getByText('No tags yet — type a name above to create one.'))
+		.toBeVisible();
+});
+
 test('submitting an empty new-tag input is ignored', async () => {
 	const onCreateTag = vi.fn();
 	const screen = render(TagAssignmentDialog, {

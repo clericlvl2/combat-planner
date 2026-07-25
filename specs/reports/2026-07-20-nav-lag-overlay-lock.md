@@ -51,3 +51,15 @@ history reconciliation + body-lock release → `/work-large`).
   `src/lib/components/ui/select/*` — bits-ui wrappers; check scroll-lock / body pointer-events
   release on unmount.
 - `src/lib/components/app/NavSidebar.svelte`, `NumpadSheet.svelte`, `CombatantForm.svelte`.
+
+## Update — 2026-07-24: overlay exit timing changed (library/common UX review, Phase 7)
+
+Phase 7 of the 2026-07-24 library/common UX review restored overlay open/close animations
+app-wide by defining the missing `data-open` / `data-closed` custom variants in
+`src/routes/layout.css` (they bridge bits-ui's `data-state="open|closed"` onto the
+`data-open:animate-in` / `data-closed:animate-out` classes the ui wrappers already carried but
+that were previously dead CSS). Consequence for this investigation: overlay elements (nav Sheet,
+numpad Sheet, dialogs, selects, popovers, alert-dialogs) now stay **mounted during their exit
+animation** instead of unmounting instantly on close. W-028's eventual runtime repro must account
+for this changed close timing — the body-lock teardown / `history.back()` race now overlaps a
+live exit animation window that did not exist before.

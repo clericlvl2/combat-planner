@@ -115,11 +115,21 @@ describe('CombatStore library delegation (ADR-002 seam) — thin methods only', 
 		expect(db._libraryEntries.get('o1')?.name).toBe('Orc');
 	});
 
-	it('addTemplate surfaces null when the 1000-entry cap is reached', () => {
-		const store = new CombatStore(fakeDb());
-		for (let i = 0; i < MAX_LIBRARY_ENTRIES; i++) {
-			store.addTemplate({ name: `t${i}` }, () => `t${i}`);
+	it('addTemplate surfaces null when the 1000-entry cap is reached', async () => {
+		// Seed the cap boundary through the real hydrate path instead of 1000 addTemplate
+		// calls — each call snapshots the whole growing array (O(n²)), which times out
+		// under full-suite load.
+		const db = fakeDb();
+		for (let i = 0; i < MAX_LIBRARY_ENTRIES - 1; i++) {
+			await db.libraryEntries.put(createCombatantTemplate({ name: `t${i}` }, () => `t${i}`));
 		}
+		const store = new CombatStore(db);
+		await store.hydrate(() => 'gen');
+		expect(store.libraryEntries).toHaveLength(MAX_LIBRARY_ENTRIES - 1);
+
+		const last = store.addTemplate({ name: 'Last' }, () => 'last');
+		expect(last?.name).toBe('Last');
+
 		const overflow = store.addTemplate({ name: 'Overflow' }, () => 'overflow');
 		expect(overflow).toBeNull();
 		expect(store.libraryEntries).toHaveLength(MAX_LIBRARY_ENTRIES);
@@ -162,6 +172,29 @@ describe('CombatStore library delegation (ADR-002 seam) — thin methods only', 
 	it('createTemplateFromCombatant returns null for an unknown combat/combatant id', () => {
 		const store = new CombatStore(fakeDb());
 		expect(store.createTemplateFromCombatant('nope', 'nope')).toBeNull();
+	});
+
+	// Regression: LibraryEntryFormDialog hands `fields.tags` straight through as a `$state`
+	// proxy. Without a snapshot at the store seam the raw proxy reaches Dexie's structured
+	// clone and throws DataCloneError (the fake db's structuredClone reproduces that here).
+	it('addTemplate/editTemplate snapshot a $state tags array before persisting', async () => {
+		const db = fakeDb();
+		const store = new CombatStore(db);
+
+		const addTags = $state(['Undead']);
+		const created = store.addTemplate({ name: 'Orc', tags: addTags }, () => 'o1');
+		expect(created?.name).toBe('Orc');
+		await Promise.resolve();
+		const persisted = db._libraryEntries.get('o1');
+		expect(Array.isArray(persisted?.tags)).toBe(true);
+		expect(persisted?.tags).toEqual(['Undead']);
+
+		const editTags = $state(['Boss']);
+		store.editTemplate('o1', { tags: editTags });
+		await Promise.resolve();
+		const editedPersisted = db._libraryEntries.get('o1');
+		expect(Array.isArray(editedPersisted?.tags)).toBe(true);
+		expect(editedPersisted?.tags).toEqual(['Boss']);
 	});
 
 	it('toggleTemplateTag adds/removes and persists the affected row', async () => {

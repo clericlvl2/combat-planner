@@ -129,7 +129,7 @@ export function toggleTemplateTag(
 	const idx = list.findIndex((t) => t.id === templateId);
 	if (idx === -1) return list;
 	const current = list[idx];
-	const lower = name.toLowerCase();
+	const lower = name.trim().toLowerCase();
 	const hasTag = current.tags.some((t) => t.toLowerCase() === lower);
 	const canonical = normalizeTagName(name, allTagNames(list));
 	if (canonical === null && !hasTag) return list;

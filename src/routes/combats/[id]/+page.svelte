@@ -136,7 +136,12 @@
     function saveToLibrary(cid: string) {
         const result = controller.saveToLibrary(cid);
         if (result) {
-            toast(m['toasts.library.saved']());
+            toast.success(m['toasts.library.saved'](), {
+                action: {
+                    label: m['toasts.library.goToLibrary'](),
+                    onClick: () => goto('/library'),
+                },
+            });
         } else {
             toast.error(m['toasts.library.capReached']({max: MAX_LIBRARY_ENTRIES}));
         }

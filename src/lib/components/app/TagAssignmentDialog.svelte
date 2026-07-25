@@ -15,7 +15,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import { ToggleGroup, ToggleGroupItem } from '$lib/components/ui/toggle-group';
 	import { m } from '$lib/i18n';
-	import { tagAccent } from './labels';
+	import { modalToggleItemClass, tagAccent } from './labels';
 
 	let {
 		open = $bindable(false),
@@ -39,6 +39,12 @@
 		e.preventDefault();
 		const trimmed = newTag.trim();
 		if (trimmed.length === 0) return;
+		// Idempotent "ensure assigned": a name already selected is a no-op (never removes it) —
+		// clear the input and bail before onCreateTag, which on LibraryRow is the toggle itself.
+		if (selected.some((s) => s.toLowerCase() === trimmed.toLowerCase())) {
+			newTag = '';
+			return;
+		}
 		onCreateTag(trimmed);
 		newTag = '';
 	}
@@ -60,24 +66,23 @@
 		/>
 	</form>
 
-	<ToggleGroup
-		type="multiple"
-		value={selected}
-		onValueChange={handle}
-		variant="outline"
-		class="flex flex-wrap justify-start gap-2 pt-3"
-	>
-		{#each allTags as name (name)}
-			<ToggleGroupItem
-				value={name}
-				aria-label={name}
-				style="--tc: {tagAccent(name)}"
-				class="!rounded-[12px] h-10 px-4 text-sm font-medium bg-[color-mix(in_srgb,var(--tc)_9%,var(--popover))] border-[color-mix(in_srgb,var(--tc)_28%,var(--border))] text-[var(--tc)] hover:bg-[color-mix(in_srgb,var(--tc)_15%,var(--popover))] data-[state=on]:bg-[color-mix(in_srgb,var(--tc)_18%,var(--popover))] data-[state=on]:border-[var(--tc)] data-[state=on]:ring-1 data-[state=on]:ring-[var(--tc)] data-[state=on]:text-[color-mix(in_srgb,var(--tc)_55%,var(--foreground))] aria-pressed:bg-[color-mix(in_srgb,var(--tc)_18%,var(--popover))] aria-pressed:border-[var(--tc)] aria-pressed:ring-1 aria-pressed:ring-[var(--tc)] aria-pressed:text-[color-mix(in_srgb,var(--tc)_55%,var(--foreground))]"
-			>
-				{name}
-			</ToggleGroupItem>
-		{/each}
-	</ToggleGroup>
+	{#if allTags.length === 0}
+		<p class="pt-3 text-sm text-muted-foreground">{m['library.tags.empty']()}</p>
+	{:else}
+		<ToggleGroup
+			type="multiple"
+			value={selected}
+			onValueChange={handle}
+			variant="outline"
+			class="flex flex-wrap justify-start gap-2 pt-3"
+		>
+			{#each allTags as name (name)}
+				<ToggleGroupItem value={name} aria-label={name} style="--tc: {tagAccent(name)}" class={modalToggleItemClass}>
+					{name}
+				</ToggleGroupItem>
+			{/each}
+		</ToggleGroup>
+	{/if}
 {/snippet}
 
 {#if isDesktop.current}

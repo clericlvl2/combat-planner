@@ -5,10 +5,13 @@
   touch devices (mobile's mode: swiping right on mobile opens a sidebar containing
   links to Combats, Settings, and About). Desktop relies on AppHeader's inline `.nav-desktop`
   icon row instead — this component still mounts there but is only reachable by an edge swipe.
+  Vaul Drawer (direction="left"), transform-animated — same primitive as the bottom sheets,
+  which also gets swipe-left-to-close for free.
 -->
 <script lang="ts">
 	import { page } from '$app/state';
-	import { Sheet, SheetContent, SheetHeader, SheetTitle } from '$lib/components/ui/sheet';
+	import { Button } from '$lib/components/ui/button';
+	import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle } from '$lib/components/ui/drawer';
 	import { m } from '$lib/i18n';
 	import { chromeIcon } from '$lib/icons';
 
@@ -68,11 +71,20 @@
 
 <svelte:window ontouchstart={onTouchStart} ontouchmove={onTouchMove} ontouchend={onTouchEnd} />
 
-<Sheet bind:open>
-	<SheetContent side="left" class="w-64 gap-0 p-0">
-		<SheetHeader class="border-b border-border">
-			<SheetTitle class="text-lg font-semibold">{m['about.appName']()}</SheetTitle>
-		</SheetHeader>
+<Drawer bind:open direction="left" shouldScaleBackground={false}>
+	<DrawerContent class="!w-64 gap-0 p-0 !rounded-none [&>[data-vaul-handle]]:!hidden">
+		<DrawerHeader class="border-b border-border">
+			<DrawerTitle class="text-lg font-semibold">{m['about.appName']()}</DrawerTitle>
+		</DrawerHeader>
+		<DrawerClose>
+			{#snippet child({ props })}
+				{@const CloseIcon = chromeIcon.close}
+				<Button variant="ghost" size="icon" class="absolute top-3 right-3" {...props}>
+					<CloseIcon class="size-4" />
+					<span class="sr-only">{m['a11y.close']()}</span>
+				</Button>
+			{/snippet}
+		</DrawerClose>
 		<nav class="flex flex-col gap-1 p-2" aria-label={m['nav.primary']()}>
 			{#each links as link (link.href)}
 				{@const current = isCurrent(link.href)}
@@ -91,5 +103,5 @@
 				</a>
 			{/each}
 		</nav>
-	</SheetContent>
-</Sheet>
+	</DrawerContent>
+</Drawer>

@@ -4,6 +4,16 @@
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
+/* Bridge bits-ui's data-state attribute onto the data-open/data-closed utility
+ * variants the shadcn ui wrappers author against. bits-ui only ever emits
+ * data-state="open|closed"; without these two variants the pervasive
+ * `data-open:animate-in` / `data-closed:animate-out` classes across the overlay
+ * wrappers (sheet/dialog/dropdown/popover/select/alert-dialog) compile to
+ * [data-open]/[data-closed] selectors that never match — dead CSS, no animation.
+ * Defining them restores every authored overlay enter/exit animation app-wide. */
+@custom-variant data-open (&[data-state="open"]);
+@custom-variant data-closed (&[data-state="closed"]);
+
 /* ---------------------------------------------------------------------------
  * Token layer (ADR-008 / ADR-012). Theme is fully CSS-variable driven so dark/
  * light, the combatant-type colors, the health/alarm bar, and the 8 combat

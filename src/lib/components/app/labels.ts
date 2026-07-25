@@ -30,21 +30,21 @@ export const typeAccent: Record<CombatantType, string> = {
 	ally: 'var(--type-ally)',
 };
 
-/** Condition tag color (grouped semantically for at-a-glance distinction). */
-export const conditionColor: Record<Condition, string> = {
-	charmed: 'border-combat-violet/30 bg-combat-violet/10 text-combat-violet',
-	confused: 'border-combat-amber/30 bg-combat-amber/10 text-combat-amber',
-	dazed: 'border-combat-teal/30 bg-combat-teal/10 text-combat-teal',
-	fear: 'border-combat-red/30 bg-combat-red/10 text-combat-red',
-	helpless: 'border-combat-neutral/30 bg-combat-neutral/10 text-combat-neutral',
-	hindered: 'border-combat-orange/30 bg-combat-orange/10 text-combat-orange',
-	shocked: 'border-combat-blue/30 bg-combat-blue/10 text-combat-blue',
-	stuck: 'border-combat-orange/30 bg-combat-orange/10 text-combat-orange',
-	stunned: 'border-combat-teal/30 bg-combat-teal/10 text-combat-teal',
-	vulnerable: 'border-combat-red/30 bg-combat-red/10 text-combat-red',
-	weakened: 'border-combat-red/30 bg-combat-red/10 text-combat-red',
-	staggered: 'border-combat-neutral/30 bg-combat-neutral/10 text-combat-neutral',
-};
+/**
+ * Shared card-chip visual formula for both tag chips (TagChip) and condition chips
+ * (ConditionIconList) — one palette, one color-mix formula keyed off an inline `--tc` accent
+ * (28% border / 9% bg over `--popover`, `--tc` text). Consumers set `style="--tc: …"`.
+ */
+export const chipAccentClass =
+	'h-[22px] gap-1.5 border-[color-mix(in_srgb,var(--tc)_28%,var(--border))] bg-[color-mix(in_srgb,var(--tc)_9%,var(--popover))] px-2.5 text-sm font-normal text-[var(--tc)]';
+
+/**
+ * Shared modal ToggleGroupItem class string used by both TagAssignmentDialog and ConditionPicker —
+ * hoisted here to keep the two byte-for-byte identical (guarded against drift). Consumers set
+ * `style="--tc: …"`.
+ */
+export const modalToggleItemClass =
+	'!rounded-[12px] h-10 px-4 text-sm font-medium bg-[color-mix(in_srgb,var(--tc)_9%,var(--popover))] border-[color-mix(in_srgb,var(--tc)_28%,var(--border))] text-[var(--tc)] hover:bg-[color-mix(in_srgb,var(--tc)_15%,var(--popover))] data-[state=on]:bg-[color-mix(in_srgb,var(--tc)_18%,var(--popover))] data-[state=on]:border-[var(--tc)] data-[state=on]:ring-1 data-[state=on]:ring-[var(--tc)] data-[state=on]:text-[color-mix(in_srgb,var(--tc)_55%,var(--foreground))] aria-pressed:bg-[color-mix(in_srgb,var(--tc)_18%,var(--popover))] aria-pressed:border-[var(--tc)] aria-pressed:ring-1 aria-pressed:ring-[var(--tc)] aria-pressed:text-[color-mix(in_srgb,var(--tc)_55%,var(--foreground))]';
 
 /** Per-condition combatant-card `--combat-*` hue, used by the condition picker. */
 export const conditionAccent: Record<Condition, string> = {

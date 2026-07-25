@@ -9,7 +9,7 @@
 	import type { Condition } from '$lib/db/types';
 	import { m } from '$lib/i18n';
 	import { chromeIcon } from '$lib/icons';
-	import { conditionColor, conditionLabel, sortConditions } from './labels';
+	import { chipAccentClass, conditionAccent, conditionLabel, sortConditions } from './labels';
 
 	let {
 		conditions,
@@ -25,7 +25,7 @@
 {#if conditions.length}
 	<div class="flex flex-wrap items-center gap-1">
 		{#each sorted as c (c)}
-			<Badge variant="outline" class={['h-[22px] gap-1.5 px-2.5 text-sm font-normal', conditionColor[c]]}>
+			<Badge variant="outline" style="--tc: {conditionAccent[c]}" class={chipAccentClass}>
 				{conditionLabel[c]()}
 				{#if removable}
 					<button

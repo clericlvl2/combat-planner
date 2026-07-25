@@ -30,6 +30,18 @@ test('renders name and the HP/AC/PD/MD subtitle', async () => {
 	await expect.element(screen.getByText('HP 7 · AC 15 · PD 10 · MD 8')).toBeVisible();
 });
 
+test('root row element carries role="listitem" for the parent role="list"', async () => {
+	const entry = fixtureEntry();
+	const screen = render(LibraryRow, {
+		entry,
+		onEdit: vi.fn(),
+		onDelete: vi.fn(),
+		onToggleTag: vi.fn(),
+	});
+
+	await expect.element(screen.getByRole('listitem')).toBeVisible();
+});
+
 test('does not wrap the name in a <mark> highlight', async () => {
 	const entry = fixtureEntry();
 	const screen = render(LibraryRow, {

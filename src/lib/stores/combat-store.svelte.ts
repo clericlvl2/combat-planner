@@ -173,7 +173,7 @@ export class CombatStore {
 	addTemplate(input: CombatantTemplateInput, genId?: IdGen): CombatantTemplate | null {
 		const { list, created } = Library.addTemplateToList(
 			$state.snapshot(this.libraryEntries) as CombatantTemplate[],
-			input,
+			$state.snapshot(input) as CombatantTemplateInput,
 			genId,
 		);
 		if (!created) return null;
@@ -185,7 +185,11 @@ export class CombatStore {
 	/** Patch fields on an existing template; no-op if the id is unknown. */
 	editTemplate(id: string, patch: Library.EditTemplatePatch): void {
 		const snapshot = $state.snapshot(this.libraryEntries) as CombatantTemplate[];
-		const edited = Library.editTemplateInList(snapshot, id, patch);
+		const edited = Library.editTemplateInList(
+			snapshot,
+			id,
+			$state.snapshot(patch) as Library.EditTemplatePatch,
+		);
 		if (edited === snapshot) return; // unknown id — no-op
 		this.libraryEntries = edited;
 		const next = edited.find((t) => t.id === id);

@@ -3,14 +3,35 @@ import { cleanup, render } from 'vitest-browser-svelte';
 import LibraryFilterPills from './LibraryFilterPills.svelte';
 
 // Quick row = first 6 tags alphabetically, plus any out-of-range selected tag (never invisible);
-// more/less expands/collapses to show every tag; selection is OR semantics and survives
-// expand/collapse.
+// the inline more/less trigger only renders when the tag count exceeds the 6-tag quick row (7+),
+// expands/collapses to show every tag; selection is OR semantics and survives expand/collapse.
 
 afterEach(() => {
 	cleanup();
 });
 
 const TAGS = ['Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf', 'Hotel'];
+
+test('no more/less trigger when tag count is at or below the quick row (6)', async () => {
+	const screen = render(LibraryFilterPills, {
+		allTags: TAGS.slice(0, 6),
+		selected: [],
+		onChange: vi.fn(),
+	});
+
+	expect(screen.getByRole('button', { name: 'More' }).query()).toBeNull();
+	expect(screen.getByRole('button', { name: 'Less' }).query()).toBeNull();
+});
+
+test('the more trigger appears once the tag count exceeds 6', async () => {
+	const screen = render(LibraryFilterPills, {
+		allTags: TAGS.slice(0, 7),
+		selected: [],
+		onChange: vi.fn(),
+	});
+
+	await expect.element(screen.getByRole('button', { name: 'More' })).toBeVisible();
+});
 
 test('collapsed shows only the first 6 tags alphabetically', async () => {
 	const screen = render(LibraryFilterPills, { allTags: TAGS, selected: [], onChange: vi.fn() });

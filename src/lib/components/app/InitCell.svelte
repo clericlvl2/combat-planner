@@ -1,5 +1,5 @@
 <!--
-  InitCell — initiative value or "-". Tap = roll d20+bonus;
+  InitCell — initiative value or "—". Tap = roll d20+bonus;
   long-press = manual entry (Popover). Re-sort is the parent's job via sortedCombatants. Emits
   roll / setInitiative intent only.
 -->
@@ -36,7 +36,7 @@
 	let timer: ReturnType<typeof setTimeout> | undefined;
 	let longPressed = false;
 
-	const display = $derived(combatant.initiative === UNROLLED ? '-' : String(combatant.initiative));
+	const display = $derived(combatant.initiative === UNROLLED ? '—' : String(combatant.initiative));
 
 	function openManual() {
 		entry = combatant.initiative === UNROLLED ? 0 : (combatant.initiative as number);
@@ -85,7 +85,7 @@
 			class="chip init-pill flex h-[22px] w-full items-center justify-center gap-[5px] rounded-full border border-border bg-secondary px-2.5 text-sm text-muted-foreground tabular-nums group-hover:bg-muted group-hover:text-foreground"
 		>
 			Init
-			<b class="text-foreground">{display}</b>
+			<b class="inline-block w-[2ch] text-center text-foreground">{display}</b>
 		</span>
 	</Button>
 

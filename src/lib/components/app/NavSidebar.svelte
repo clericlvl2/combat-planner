@@ -33,13 +33,20 @@
 	// Swipe-right-from-left-edge gesture (the mobile nav trigger). Touch-only — it never
 	// interferes with mouse/pointer interaction on tablet/desktop, which rely on the burger
 	// button or the inline nav-desktop icons instead.
-	const EDGE_ZONE_PX = 24;
+	// EDGE_ZONE_PX is 80, not the visually-narrower 24 you'd expect: Android gesture navigation
+	// reserves a ~24-48dp back-gesture exclusion strip along the screen edge and swallows any
+	// touch that starts inside it before the page ever sees a touchstart. 80px keeps the gesture
+	// edge-anchored while landing outside that strip on every Android OEM variant.
+	const EDGE_ZONE_PX = 80;
 	const SWIPE_THRESHOLD_PX = 60;
 	let startX: number | null = null;
 	let startY: number | null = null;
 
 	function onTouchStart(e: TouchEvent) {
 		if (open) return;
+		// A horizontal drag starting inside an open overlay (drawer/dialog) should not also pull
+		// the nav in from underneath it.
+		if ((e.target as Element | null)?.closest?.('[data-vaul-drawer],[role="dialog"]')) return;
 		const touch = e.touches[0];
 		if (!touch || touch.clientX > EDGE_ZONE_PX) {
 			startX = null;
@@ -56,7 +63,9 @@
 		if (!touch) return;
 		const dx = touch.clientX - startX;
 		const dy = touch.clientY - startY;
-		if (dx > SWIPE_THRESHOLD_PX && Math.abs(dy) < SWIPE_THRESHOLD_PX) {
+		// Horizontal dominance, not just a small-enough dy: the widened edge zone must not steal
+		// vertical list scrolling that happens to drift slightly sideways.
+		if (dx > SWIPE_THRESHOLD_PX && dx > Math.abs(dy) * 2) {
 			open = true;
 			startX = null;
 			startY = null;

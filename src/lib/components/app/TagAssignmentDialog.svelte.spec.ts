@@ -158,3 +158,33 @@ test('a tag toggled off its last remaining entry vanishes from the chip list imm
 
 	expect(screen.getByRole('button', { name: 'Boss' }).query()).toBeNull();
 });
+
+test('reopening the dialog resets the new-tag input, even if it was left with stale text', async () => {
+	const screen = render(TagAssignmentDialog, {
+		open: true,
+		allTags: [],
+		selected: [],
+		onToggle: vi.fn(),
+		onCreateTag: vi.fn(),
+	});
+
+	await userEvent.fill(screen.getByPlaceholder('New tag…'), 'Boss');
+
+	await screen.rerender({
+		open: false,
+		allTags: [],
+		selected: [],
+		onToggle: vi.fn(),
+		onCreateTag: vi.fn(),
+	});
+
+	await screen.rerender({
+		open: true,
+		allTags: [],
+		selected: [],
+		onToggle: vi.fn(),
+		onCreateTag: vi.fn(),
+	});
+
+	await expect.element(screen.getByPlaceholder('New tag…')).toHaveValue('');
+});

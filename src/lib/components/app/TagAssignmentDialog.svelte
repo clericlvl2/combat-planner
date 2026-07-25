@@ -35,6 +35,13 @@
 
 	let newTag = $state('');
 
+	// (Re)initialize on open, mirroring LibraryEntryFormDialog/CombatantForm. Reset-on-open rather
+	// than reset-on-close so the field does not visibly blank out during vaul's exit animation.
+	$effect(() => {
+		if (!open) return;
+		newTag = '';
+	});
+
 	function submitNewTag(e: Event) {
 		e.preventDefault();
 		const trimmed = newTag.trim();

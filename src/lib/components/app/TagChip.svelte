@@ -19,9 +19,9 @@
 		name: string;
 		removable?: boolean;
 		onRemove?: (name: string) => void;
-		/** Extra chip classes. Drawer call sites pass `touch-none` so a swipe started on a chip
-		    reaches vaul instead of being claimed as a scroll pan; list call sites leave it off so
-		    the page still scrolls when dragged from a chip. */
+		/** Extra chip classes. No `touch-action` override needed (W-029/W-031): a chip has no
+		    native caret/selection gesture, so vaul's shouldDrag already treats a drag started on
+		    one like plain drawer content. */
 		class?: string;
 	} = $props();
 

@@ -47,7 +47,10 @@
 		bind:this={ref}
 		data-slot={dataSlot}
 		class={cn(
-			"touch-none dark:bg-input/30 border-input lg:focus-visible:border-ring lg:focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 disabled:bg-input/50 dark:disabled:bg-input/80 rounded-lg border bg-transparent px-2.5 py-1 text-base transition-colors file:h-6 file:text-sm file:font-medium lg:focus-visible:ring-3 aria-invalid:ring-3 md:text-sm file:text-foreground placeholder:text-muted-foreground w-full min-w-0 outline-none file:inline-flex file:border-0 file:bg-transparent disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
+			// touch-pan-y (not touch-none, W-029/W-031): keeps the browser's vertical pan so a
+			// drawer scrolls under a drag started on the input, while still suppressing the
+			// caret/selection gesture that used to steal the pointer and cancel vaul's drag.
+			"touch-pan-y dark:bg-input/30 border-input lg:focus-visible:border-ring lg:focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 disabled:bg-input/50 dark:disabled:bg-input/80 rounded-lg border bg-transparent px-2.5 py-1 text-base transition-colors file:h-6 file:text-sm file:font-medium lg:focus-visible:ring-3 aria-invalid:ring-3 md:text-sm file:text-foreground placeholder:text-muted-foreground w-full min-w-0 outline-none file:inline-flex file:border-0 file:bg-transparent disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
 			inputVariants({ size }),
 			className
 		)}
@@ -61,7 +64,10 @@
 		bind:this={ref}
 		data-slot={dataSlot}
 		class={cn(
-			"touch-none dark:bg-input/30 border-input lg:focus-visible:border-ring lg:focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 disabled:bg-input/50 dark:disabled:bg-input/80 rounded-lg border bg-transparent px-2.5 py-1 text-base transition-colors file:h-6 file:text-sm file:font-medium lg:focus-visible:ring-3 aria-invalid:ring-3 md:text-sm file:text-foreground placeholder:text-muted-foreground w-full min-w-0 outline-none file:inline-flex file:border-0 file:bg-transparent disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
+			// touch-pan-y (not touch-none, W-029/W-031): keeps the browser's vertical pan so a
+			// drawer scrolls under a drag started on the input, while still suppressing the
+			// caret/selection gesture that used to steal the pointer and cancel vaul's drag.
+			"touch-pan-y dark:bg-input/30 border-input lg:focus-visible:border-ring lg:focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 disabled:bg-input/50 dark:disabled:bg-input/80 rounded-lg border bg-transparent px-2.5 py-1 text-base transition-colors file:h-6 file:text-sm file:font-medium lg:focus-visible:ring-3 aria-invalid:ring-3 md:text-sm file:text-foreground placeholder:text-muted-foreground w-full min-w-0 outline-none file:inline-flex file:border-0 file:bg-transparent disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
 			inputVariants({ size }),
 			className
 		)}

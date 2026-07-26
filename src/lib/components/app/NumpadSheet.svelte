@@ -9,18 +9,16 @@
   Emits commit intent only; all HP math + log append live in the store/domain.
 -->
 <script lang="ts">
-	import { MediaQuery } from 'svelte/reactivity';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
 	import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '$lib/components/ui/collapsible';
-	import { Dialog, DialogContent } from '$lib/components/ui/dialog';
-	import { Drawer, DrawerContent } from '$lib/components/ui/drawer';
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
 	import type { Combatant, HpLogEntry } from '$lib/db/types';
 	import { m } from '$lib/i18n';
 	import { chromeIcon } from '$lib/icons';
 	import { healthStatus } from '$lib/stores/domain/derive';
 	import { healthTextColor } from './labels';
+	import ResponsiveModal from './ResponsiveModal.svelte';
 
 	let {
 		combatant,
@@ -38,7 +36,6 @@
 
 	let entry = $state('');
 	let historyOpen = $state(false);
-	const isDesktop = new MediaQuery('(min-width: 1024px)');
 
 	// Fresh entry on each open (abandons any partial entry — dismiss-with-no-op).
 	$effect(() => {
@@ -96,7 +93,7 @@
 </script>
 
 {#snippet body(c: Combatant)}
-	<div class="flex flex-col gap-3 p-4">
+	<div class="flex flex-col gap-3">
 		<!-- HpSummaryHeader: cur/max + temp buffer — cur HP is the distinctive value here -->
 		<div class="flex items-baseline justify-between gap-2">
 			<span class="truncate font-semibold">{c.name}</span>
@@ -237,22 +234,10 @@
 	</div>
 {/snippet}
 
-{#if isDesktop.current}
-	<Dialog bind:open>
-		<DialogContent class="sm:max-w-md">
-			{#if combatant}
-				{@render body(combatant)}
-			{/if}
-		</DialogContent>
-	</Dialog>
-{:else}
-	<Drawer bind:open>
-		<DrawerContent class="mx-auto max-w-md">
-			<div class="pb-safe">
-				{#if combatant}
-					{@render body(combatant)}
-				{/if}
-			</div>
-		</DrawerContent>
-	</Drawer>
-{/if}
+<ResponsiveModal bind:open size="form">
+	{#snippet children()}
+		{#if combatant}
+			{@render body(combatant)}
+		{/if}
+	{/snippet}
+</ResponsiveModal>

@@ -9,13 +9,11 @@
   accepted behavior under the derived tag model (no snapshot-on-open special-casing).
 -->
 <script lang="ts">
-	import { MediaQuery } from 'svelte/reactivity';
-	import { Dialog, DialogContent, DialogHeader, DialogTitle } from '$lib/components/ui/dialog';
-	import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '$lib/components/ui/drawer';
 	import { Input } from '$lib/components/ui/input';
 	import { ToggleGroup, ToggleGroupItem } from '$lib/components/ui/toggle-group';
 	import { m } from '$lib/i18n';
 	import { modalToggleItemClass, tagAccent } from './labels';
+	import ResponsiveModal from './ResponsiveModal.svelte';
 
 	let {
 		open = $bindable(false),
@@ -30,8 +28,6 @@
 		onToggle: (name: string) => void;
 		onCreateTag: (name: string) => void;
 	} = $props();
-
-	const isDesktop = new MediaQuery('(min-width: 1024px)');
 
 	let newTag = $state('');
 
@@ -62,56 +58,39 @@
 	}
 </script>
 
-{#snippet body()}
-	<form class="flex flex-col gap-3" onsubmit={submitNewTag}>
-		<Input
-			bind:value={newTag}
-			maxlength={30}
-			placeholder={m['library.tags.newTag.placeholder']()}
-			size="action"
-			class="border-[var(--border-strong)] text-[15px] md:text-[15px]"
-		/>
-	</form>
+<ResponsiveModal bind:open title={m['library.tags.assign.title']()} size="compact">
+	{#snippet children()}
+		<form class="flex flex-col gap-3" onsubmit={submitNewTag}>
+			<Input
+				bind:value={newTag}
+				maxlength={30}
+				placeholder={m['library.tags.newTag.placeholder']()}
+				size="action"
+				class="border-[var(--border-strong)] text-[15px] md:text-[15px]"
+			/>
+		</form>
 
-	{#if allTags.length === 0}
-		<p class="pt-3 text-sm text-muted-foreground">{m['library.tags.empty']()}</p>
-	{:else}
-		<ToggleGroup
-			type="multiple"
-			value={selected}
-			onValueChange={handle}
-			variant="outline"
-			class="flex flex-wrap justify-start gap-2 pt-3"
-		>
-			{#each allTags as name (name)}
-				<ToggleGroupItem value={name} aria-label={name} style="--tc: {tagAccent(name)}" class={modalToggleItemClass}>
-					{name}
-				</ToggleGroupItem>
-			{/each}
-		</ToggleGroup>
-	{/if}
-{/snippet}
-
-{#if isDesktop.current}
-	<Dialog bind:open>
-		<DialogContent class="max-w-sm">
-			<DialogHeader>
-				<DialogTitle>{m['library.tags.assign.title']()}</DialogTitle>
-			</DialogHeader>
-
-			{@render body()}
-		</DialogContent>
-	</Dialog>
-{:else}
-	<Drawer bind:open>
-		<DrawerContent class="mx-auto max-w-sm">
-			<DrawerHeader>
-				<DrawerTitle>{m['library.tags.assign.title']()}</DrawerTitle>
-			</DrawerHeader>
-
-			<div class="px-4 pb-safe">
-				{@render body()}
-			</div>
-		</DrawerContent>
-	</Drawer>
-{/if}
+		{#if allTags.length === 0}
+			<p class="pt-3 text-sm text-muted-foreground">{m['library.tags.empty']()}</p>
+		{:else}
+			<ToggleGroup
+				type="multiple"
+				value={selected}
+				onValueChange={handle}
+				variant="outline"
+				class="flex flex-wrap justify-start gap-2 pt-3"
+			>
+				{#each allTags as name (name)}
+					<ToggleGroupItem
+						value={name}
+						aria-label={name}
+						style="--tc: {tagAccent(name)}"
+						class={modalToggleItemClass}
+					>
+						{name}
+					</ToggleGroupItem>
+				{/each}
+			</ToggleGroup>
+		{/if}
+	{/snippet}
+</ResponsiveModal>

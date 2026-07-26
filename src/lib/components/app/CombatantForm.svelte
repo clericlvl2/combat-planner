@@ -8,10 +8,7 @@
   routes it to addCombatant or editCombatant. Max-HP change ⇏ current HP (handled in the store).
 -->
 <script lang="ts">
-    import {MediaQuery} from 'svelte/reactivity';
     import {Button} from '$lib/components/ui/button';
-    import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '$lib/components/ui/dialog';
-    import {Drawer, DrawerContent, DrawerHeader, DrawerTitle} from '$lib/components/ui/drawer';
     import {Input} from '$lib/components/ui/input';
     import {Label} from '$lib/components/ui/label';
     import {Textarea} from '$lib/components/ui/textarea';
@@ -29,6 +26,7 @@
     import EmptyState from './EmptyState.svelte';
     import NumberField from './NumberField.svelte';
     import {typeColor, typeLabel} from './labels';
+    import ResponsiveModal from './ResponsiveModal.svelte';
 
     export interface CombatantFormValues {
         name: string;
@@ -69,7 +67,6 @@
     let md = $state<number | null>(null);
     let note = $state('');
     let initiative = $state<number | null>(null);
-    const isDesktop = new MediaQuery('(min-width: 1024px)');
 
     // Add-from-library picker state (add mode only — gated by `templates !== undefined` in the
     // markup; never read in edit mode).
@@ -174,15 +171,7 @@
     }
 </script>
 
-{#snippet formBody()}
-    <form
-            class="flex min-h-0 flex-1 flex-col gap-3"
-            onsubmit={(e) => {
-			e.preventDefault();
-			submit();
-		}}
-    >
-        <div class="-mx-3 flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto px-3">
+{#snippet formFields()}
             {#if mode === 'add' && templates !== undefined}
                 <!-- Add-from-library tab — always rendered in add mode, even when the library is empty. -->
                 <ToggleGroup
@@ -350,9 +339,15 @@
                     />
                 </div>
             {/if}
-        </div>
+{/snippet}
 
-        <DialogFooter class="mx-0 mb-0 flex-row justify-center gap-2 border-t-0 bg-transparent p-0 pt-1">
+<ResponsiveModal bind:open title={formTitle} size="form" onSubmit={submit}>
+    {#snippet children()}
+        {@render formFields()}
+    {/snippet}
+
+    {#snippet footer()}
+        <div class="flex justify-center gap-2">
             <Button
                     type="button"
                     variant="outline"
@@ -370,32 +365,6 @@
             >
                 {mode === 'add' ? m['forms.action.add']() : m['forms.action.save']()}
             </Button>
-        </DialogFooter>
-    </form>
-{/snippet}
-
-{#if isDesktop.current}
-    <Dialog bind:open>
-        <DialogContent
-                class="flex max-h-[calc(100dvh-2rem)] flex-col rounded-lg border border-[var(--border-strong)] ring-0 sm:max-w-[400px]"
-        >
-            <DialogHeader>
-                <DialogTitle class="text-lg font-semibold">{formTitle}</DialogTitle>
-            </DialogHeader>
-
-            {@render formBody()}
-        </DialogContent>
-    </Dialog>
-{:else}
-    <Drawer bind:open>
-        <DrawerContent class="mx-auto flex max-h-[80vh] max-w-md flex-col">
-            <DrawerHeader>
-                <DrawerTitle class="text-lg font-semibold">{formTitle}</DrawerTitle>
-            </DrawerHeader>
-
-            <div class="flex min-h-0 flex-1 flex-col px-4 pb-safe">
-                {@render formBody()}
-            </div>
-        </DrawerContent>
-    </Drawer>
-{/if}
+        </div>
+    {/snippet}
+</ResponsiveModal>

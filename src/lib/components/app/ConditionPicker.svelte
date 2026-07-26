@@ -9,13 +9,11 @@
   business logic here).
 -->
 <script lang="ts">
-	import { MediaQuery } from 'svelte/reactivity';
-	import { Dialog, DialogContent, DialogHeader, DialogTitle } from '$lib/components/ui/dialog';
-	import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '$lib/components/ui/drawer';
 	import { ToggleGroup, ToggleGroupItem } from '$lib/components/ui/toggle-group';
 	import { type Condition, CONDITIONS } from '$lib/db/types';
 	import { m } from '$lib/i18n';
 	import { conditionAccent, conditionLabel, modalToggleItemClass, sortConditions } from './labels';
+	import ResponsiveModal from './ResponsiveModal.svelte';
 
 	let {
 		open = $bindable(false),
@@ -31,8 +29,6 @@
 		onRemove: (c: Condition) => void;
 	} = $props();
 
-	const isDesktop = new MediaQuery('(min-width: 1024px)');
-
 	function handle(next: string[]) {
 		const set = next as Condition[];
 		for (const c of set) if (!conditions.includes(c)) onAdd(c);
@@ -42,47 +38,25 @@
 	const sorted = $derived(sortConditions([...CONDITIONS]));
 </script>
 
-{#snippet toggles()}
-	<ToggleGroup
-		type="multiple"
-		value={conditions}
-		onValueChange={handle}
-		variant="outline"
-		class="flex flex-wrap justify-start gap-2"
-	>
-		{#each sorted as c (c)}
-			<ToggleGroupItem
-				value={c}
-				aria-label={m['a11y.condition.toggle']({ condition: conditionLabel[c](), name })}
-				style="--tc: {conditionAccent[c]}"
-				class={modalToggleItemClass}
-			>
-				{conditionLabel[c]()}
-			</ToggleGroupItem>
-		{/each}
-	</ToggleGroup>
-{/snippet}
-
-{#if isDesktop.current}
-	<Dialog bind:open>
-		<DialogContent class="max-w-sm">
-			<DialogHeader>
-				<DialogTitle>{m['conditions.add']()}</DialogTitle>
-			</DialogHeader>
-
-			{@render toggles()}
-		</DialogContent>
-	</Dialog>
-{:else}
-	<Drawer bind:open>
-		<DrawerContent class="mx-auto max-w-sm">
-			<DrawerHeader>
-				<DrawerTitle>{m['conditions.add']()}</DrawerTitle>
-			</DrawerHeader>
-
-			<div class="px-4 pb-safe">
-				{@render toggles()}
-			</div>
-		</DrawerContent>
-	</Drawer>
-{/if}
+<ResponsiveModal bind:open title={m['conditions.add']()} size="compact">
+	{#snippet children()}
+		<ToggleGroup
+			type="multiple"
+			value={conditions}
+			onValueChange={handle}
+			variant="outline"
+			class="flex flex-wrap justify-start gap-2"
+		>
+			{#each sorted as c (c)}
+				<ToggleGroupItem
+					value={c}
+					aria-label={m['a11y.condition.toggle']({ condition: conditionLabel[c](), name })}
+					style="--tc: {conditionAccent[c]}"
+					class={modalToggleItemClass}
+				>
+					{conditionLabel[c]()}
+				</ToggleGroupItem>
+			{/each}
+		</ToggleGroup>
+	{/snippet}
+</ResponsiveModal>

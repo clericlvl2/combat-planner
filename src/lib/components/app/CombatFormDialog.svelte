@@ -7,10 +7,7 @@
   test-double implementing the same two methods).
 -->
 <script lang="ts">
-	import { MediaQuery } from 'svelte/reactivity';
 	import { Button } from '$lib/components/ui/button';
-	import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '$lib/components/ui/dialog';
-	import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '$lib/components/ui/drawer';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Textarea } from '$lib/components/ui/textarea';
@@ -19,6 +16,7 @@
 	import type { CombatInput, EditCombatPatch } from '$lib/stores/domain';
 	import { DESCRIPTION_MAX_LENGTH, TITLE_MAX_LENGTH } from '$lib/stores/domain/constants';
 	import ColorSwatchPicker from './ColorSwatchPicker.svelte';
+	import ResponsiveModal from './ResponsiveModal.svelte';
 
 	/** Narrow store surface this dialog needs — lets tests pass a plain spy object. */
 	export interface CombatFormStore {
@@ -40,7 +38,6 @@
 	let title = $state('');
 	let description = $state('');
 	let colorTag = $state<ColorTag>('neutral');
-	const isDesktop = new MediaQuery('(min-width: 1024px)');
 
 	// Field label: uppercase, muted, small caps, normal weight (no font-medium).
 	const fieldLabelClass = 'text-xs font-normal uppercase tracking-wide text-muted-foreground';
@@ -76,14 +73,8 @@
 	}
 </script>
 
-{#snippet formBody()}
-	<form
-		class="flex flex-col gap-3"
-		onsubmit={(e) => {
-			e.preventDefault();
-			submit();
-		}}
-	>
+<ResponsiveModal bind:open title={formTitle} size="form" onSubmit={submit}>
+	{#snippet children()}
 		<div class="form-field-group">
 			<Label for="cf-title" class={fieldLabelClass}>{m['forms.field.title']()}</Label>
 			<Input
@@ -111,8 +102,10 @@
 			<Label class={fieldLabelClass}>{m['forms.field.colorTag']()}</Label>
 			<ColorSwatchPicker bind:value={colorTag} />
 		</div>
+	{/snippet}
 
-		<DialogFooter class="mx-0 mb-0 flex-row justify-center gap-2 border-t-0 bg-transparent p-0 pt-1">
+	{#snippet footer()}
+		<div class="flex justify-center gap-2">
 			<Button
 				type="button"
 				variant="outline"
@@ -122,39 +115,9 @@
 			>
 				{m['forms.action.cancel']()}
 			</Button>
-			<Button
-				type="submit"
-				size="action"
-				class="min-w-0 flex-1 shrink basis-0 font-semibold"
-			>
+			<Button type="submit" size="action" class="min-w-0 flex-1 shrink basis-0 font-semibold">
 				{combat ? m['forms.action.save']() : m['forms.action.create']()}
 			</Button>
-		</DialogFooter>
-	</form>
-{/snippet}
-
-{#if isDesktop.current}
-	<Dialog bind:open>
-		<DialogContent
-			class="rounded-lg border border-[var(--border-strong)] ring-0 sm:max-w-[400px]"
-		>
-			<DialogHeader>
-				<DialogTitle class="text-lg font-semibold">{formTitle}</DialogTitle>
-			</DialogHeader>
-
-			{@render formBody()}
-		</DialogContent>
-	</Dialog>
-{:else}
-	<Drawer bind:open>
-		<DrawerContent class="mx-auto max-w-md">
-			<DrawerHeader>
-				<DrawerTitle class="text-lg font-semibold">{formTitle}</DrawerTitle>
-			</DrawerHeader>
-
-			<div class="px-4 pb-safe">
-				{@render formBody()}
-			</div>
-		</DrawerContent>
-	</Drawer>
-{/if}
+		</div>
+	{/snippet}
+</ResponsiveModal>

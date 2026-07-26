@@ -44,7 +44,12 @@
 </script>
 
 {#snippet shell()}
-	<div class="-mx-3 flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto px-3">
+	<!-- `overflow-y-auto` makes overflow-x compute to `auto` too, so this box clips on both axes.
+	     The negative-margin/padding pairs give focus rings and selected-state rings (`ring-2
+	     ring-offset-2` = 4px outside the element box) room to draw inside the clip rect without
+	     changing the region's outer geometry — `px-3` horizontally, `py-1` vertically. Drop either
+	     and rings on edge-adjacent controls get cut (W-032). -->
+	<div class="-mx-3 -my-1 flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto px-3 py-1">
 		{@render children()}
 	</div>
 	{#if footer}

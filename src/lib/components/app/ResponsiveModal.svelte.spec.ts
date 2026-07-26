@@ -62,6 +62,26 @@ test('the footer is not a descendant of the overflow-y-auto scroll container', a
 	expect(scrollContainer?.contains(footerEl)).toBe(false);
 });
 
+test('the scroll region leaves clip room on both axes for focus/selected rings', async () => {
+	render(ResponsiveModal, { open: true, children: childrenSnippet });
+
+	const scrollContainer = document.querySelector('.overflow-y-auto') as HTMLElement;
+	const classes = scrollContainer.className.split(/\s+/);
+
+	// `overflow-y-auto` clips on both axes, so a `ring-2 ring-offset-2` control flush against an
+	// edge loses 4px of its ring unless the region pads itself by at least that much. Each axis
+	// pairs padding with a cancelling negative margin so the outer geometry is unchanged.
+	// Asserted on the class list, not computed style: no stylesheet is loaded in this browser test
+	// environment, so every computed padding reads 0px regardless of the classes present.
+	for (const [pad, margin] of [
+		['px-3', '-mx-3'],
+		['py-1', '-my-1'],
+	]) {
+		expect(classes).toContain(pad);
+		expect(classes).toContain(margin);
+	}
+});
+
 test('onSubmit fires once on submit and the default is prevented', async () => {
 	const onSubmit = vi.fn();
 	const screen = render(ResponsiveModal, {

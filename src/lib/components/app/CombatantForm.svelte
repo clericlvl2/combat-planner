@@ -10,23 +10,23 @@
 <script lang="ts">
     import {Button} from '$lib/components/ui/button';
     import {Input} from '$lib/components/ui/input';
-    import {Label} from '$lib/components/ui/label';
     import {Textarea} from '$lib/components/ui/textarea';
     import {ToggleGroup, ToggleGroupItem} from '$lib/components/ui/toggle-group';
     import {
         type Combatant,
         type CombatantTemplate,
         type CombatantType,
-        COMBATANT_TYPES,
         UNROLLED,
     } from '$lib/db/types';
     import {m} from '$lib/i18n';
     import {chromeIcon} from '$lib/icons';
     import {NAME_MAX_LENGTH, NOTE_MAX_LENGTH, RANGES} from '$lib/stores/domain/constants';
     import EmptyState from './EmptyState.svelte';
+    import Field from './Field.svelte';
     import NumberField from './NumberField.svelte';
-    import {typeColor, typeLabel} from './labels';
+    import {typeColor} from './labels';
     import ResponsiveModal from './ResponsiveModal.svelte';
+    import TypeToggle from './TypeToggle.svelte';
 
     export interface CombatantFormValues {
         name: string;
@@ -156,10 +156,6 @@
                 : m['forms.field.name.placeholder.enemy'](),
     );
 
-    // Field label: uppercase, muted, small caps.
-    // Mirrors NumberField.svelte's own field-label styling for a consistent look across the form.
-    const fieldLabelClass = 'text-xs font-medium uppercase tracking-wide text-muted-foreground';
-
     const formTitle = $derived(
         mode === 'add' ? m['forms.combatant.add.title']() : m['forms.combatant.edit.title'](),
     );
@@ -251,32 +247,14 @@
                 {/if}
 
                 <!-- Name (optional — empty on save falls back to the type-specific placeholder as the real name) -->
-                <div class="form-field-group">
-                    <Label for="cf-name" class={fieldLabelClass}>{m['forms.field.name']()}</Label>
+                <Field label={m['forms.field.name']()} for="cf-name">
                     <Input id="cf-name" size="action" bind:value={name} maxlength={NAME_MAX_LENGTH} placeholder={namePlaceholder}/>
-                </div>
+                </Field>
 
                 <!-- Type -->
-                <div class="form-field-group">
-                    <Label class={fieldLabelClass}>{m['forms.field.type']()}</Label>
-                    <ToggleGroup
-                            type="single"
-                            value={type}
-                            onValueChange={(v) => v && (type = v as CombatantType)}
-                            class="w-full gap-2"
-                    >
-                        {#each COMBATANT_TYPES as t (t)}
-                            <ToggleGroupItem
-                                    value={t}
-                                    style="--tc: var(--type-{t})"
-                                    class="flex min-h-11 flex-1 items-center justify-start gap-1.5 !rounded-sm border border-border bg-secondary pl-3.5 text-muted-foreground data-[state=on]:border-[var(--tc)] data-[state=on]:bg-[color-mix(in_srgb,var(--tc)_14%,var(--secondary))] data-[state=on]:font-semibold data-[state=on]:text-foreground data-[state=on]:ring-1 data-[state=on]:ring-[var(--tc)]"
-                            >
-                                <span class="size-2 shrink-0 rounded-full bg-[var(--tc)]"></span>
-                                {typeLabel[t]()}
-                            </ToggleGroupItem>
-                        {/each}
-                    </ToggleGroup>
-                </div>
+                <Field label={m['forms.field.type']()}>
+                    <TypeToggle bind:value={type} />
+                </Field>
 
                 <div class="grid grid-cols-2 gap-2">
                     <NumberField
@@ -329,15 +307,14 @@
                     />
                 </div>
 
-                <div class="form-field-group">
-                    <Label for="cf-note" class={fieldLabelClass}>{m['forms.field.note']()}</Label>
+                <Field label={m['forms.field.note']()} for="cf-note">
                     <Textarea
                             id="cf-note"
                             bind:value={note}
                             maxlength={NOTE_MAX_LENGTH}
                             placeholder={m['forms.field.note.placeholder']()}
                     />
-                </div>
+                </Field>
             {/if}
 {/snippet}
 

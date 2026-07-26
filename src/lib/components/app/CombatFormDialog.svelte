@@ -9,13 +9,13 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { type Combat, type ColorTag } from '$lib/db/types';
 	import { m } from '$lib/i18n';
 	import type { CombatInput, EditCombatPatch } from '$lib/stores/domain';
 	import { DESCRIPTION_MAX_LENGTH, TITLE_MAX_LENGTH } from '$lib/stores/domain/constants';
 	import ColorSwatchPicker from './ColorSwatchPicker.svelte';
+	import Field from './Field.svelte';
 	import ResponsiveModal from './ResponsiveModal.svelte';
 
 	/** Narrow store surface this dialog needs — lets tests pass a plain spy object. */
@@ -38,9 +38,6 @@
 	let title = $state('');
 	let description = $state('');
 	let colorTag = $state<ColorTag>('neutral');
-
-	// Field label: uppercase, muted, small caps, normal weight (no font-medium).
-	const fieldLabelClass = 'text-xs font-normal uppercase tracking-wide text-muted-foreground';
 
 	const formTitle = $derived(
 		combat ? m['forms.combat.edit.title']() : m['forms.combat.create.title'](),
@@ -75,8 +72,7 @@
 
 <ResponsiveModal bind:open title={formTitle} size="form" onSubmit={submit}>
 	{#snippet children()}
-		<div class="form-field-group">
-			<Label for="cf-title" class={fieldLabelClass}>{m['forms.field.title']()}</Label>
+		<Field label={m['forms.field.title']()} for="cf-title">
 			<Input
 				id="cf-title"
 				bind:value={title}
@@ -85,10 +81,9 @@
 				size="action"
 				class="border-[var(--border-strong)] text-[15px] md:text-[15px]"
 			/>
-		</div>
+		</Field>
 
-		<div class="form-field-group">
-			<Label for="cf-description" class={fieldLabelClass}>{m['forms.field.description']()}</Label>
+		<Field label={m['forms.field.description']()} for="cf-description">
 			<Textarea
 				id="cf-description"
 				bind:value={description}
@@ -96,12 +91,11 @@
 				placeholder={m['forms.field.description.placeholder']()}
 				class="rounded-sm border-[var(--border-strong)] text-[15px] md:text-[15px]"
 			/>
-		</div>
+		</Field>
 
-		<div class="form-field-group">
-			<Label class={fieldLabelClass}>{m['forms.field.colorTag']()}</Label>
+		<Field label={m['forms.field.colorTag']()}>
 			<ColorSwatchPicker bind:value={colorTag} />
-		</div>
+		</Field>
 	{/snippet}
 
 	{#snippet footer()}

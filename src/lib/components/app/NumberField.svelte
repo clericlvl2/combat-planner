@@ -15,6 +15,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import { m } from '$lib/i18n';
 	import { clamp } from '$lib/stores/domain/clamp';
+	import { fieldLabelClass } from './Field.svelte';
 
 	let {
 		id,
@@ -41,8 +42,6 @@
 	let clamped = $state(false);
 	const digitCap = $derived(Math.max(String(Math.abs(min)).length, String(Math.abs(max)).length));
 
-	// Field label: uppercase, muted, small caps.
-	const fieldLabelClass = 'text-xs font-medium uppercase tracking-wide text-muted-foreground';
 	// No touch-action override here (W-029/W-031): a plain button has no native caret/selection
 	// gesture to fight, so vaul's shouldDrag already reads it like plain drawer content — dragging
 	// the stepper scrolls the form, and closing from scrollTop 0 still works.

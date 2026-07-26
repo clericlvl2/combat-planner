@@ -19,19 +19,18 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
 	import { Textarea } from '$lib/components/ui/textarea';
-	import { ToggleGroup, ToggleGroupItem } from '$lib/components/ui/toggle-group';
-	import { type CombatantTemplate, type CombatantType, COMBATANT_TYPES } from '$lib/db/types';
+	import { type CombatantTemplate, type CombatantType } from '$lib/db/types';
 	import { m } from '$lib/i18n';
 	import type { CombatantTemplateInput } from '$lib/stores/domain/factories';
 	import { type EditTemplatePatch, normalizeTagName } from '$lib/stores/domain/library';
 	import { NAME_MAX_LENGTH, NOTE_MAX_LENGTH, RANGES } from '$lib/stores/domain/constants';
+	import Field from './Field.svelte';
 	import NumberField from './NumberField.svelte';
-	import { typeLabel } from './labels';
 	import ResponsiveModal from './ResponsiveModal.svelte';
 	import TagAssignmentDialog from './TagAssignmentDialog.svelte';
 	import TagChip from './TagChip.svelte';
+	import TypeToggle from './TypeToggle.svelte';
 
 	/** Narrow store surface this dialog needs — lets tests pass a plain spy object. */
 	export interface LibraryEntryFormStore {
@@ -125,9 +124,6 @@
 				: m['forms.field.name.placeholder.enemy'](),
 	);
 
-	// Field label: uppercase, muted, small caps (matches CombatFormDialog/CombatantForm).
-	const fieldLabelClass = 'text-xs font-normal uppercase tracking-wide text-muted-foreground';
-
 	const formTitle = $derived(
 		entry ? m['forms.library.edit.title']() : m['forms.library.create.title'](),
 	);
@@ -160,8 +156,7 @@
 </script>
 
 {#snippet formFields()}
-			<div class="form-field-group">
-				<Label for="lf-name" class={fieldLabelClass}>{m['forms.field.name']()}</Label>
+			<Field label={m['forms.field.name']()} for="lf-name">
 				<Input
 					id="lf-name"
 					bind:value={name}
@@ -170,28 +165,11 @@
 					size="action"
 					class="border-[var(--border-strong)] text-[15px] md:text-[15px]"
 				/>
-			</div>
+			</Field>
 
-			<div class="form-field-group">
-				<Label class={fieldLabelClass}>{m['forms.field.type']()}</Label>
-				<ToggleGroup
-					type="single"
-					value={type}
-					onValueChange={(v) => v && (type = v as CombatantType)}
-					class="w-full gap-2"
-				>
-					{#each COMBATANT_TYPES as t (t)}
-						<ToggleGroupItem
-							value={t}
-							style="--tc: var(--type-{t})"
-							class="flex min-h-11 flex-1 items-center justify-start gap-1.5 !rounded-sm border border-border bg-secondary pl-3.5 text-muted-foreground data-[state=on]:border-[var(--tc)] data-[state=on]:bg-[color-mix(in_srgb,var(--tc)_14%,var(--secondary))] data-[state=on]:font-semibold data-[state=on]:text-foreground data-[state=on]:ring-1 data-[state=on]:ring-[var(--tc)]"
-						>
-							<span class="size-2 shrink-0 rounded-full bg-[var(--tc)]"></span>
-							{typeLabel[t]()}
-						</ToggleGroupItem>
-					{/each}
-				</ToggleGroup>
-			</div>
+			<Field label={m['forms.field.type']()}>
+				<TypeToggle bind:value={type} />
+			</Field>
 
 			<div class="grid grid-cols-2 gap-2">
 				<NumberField
@@ -235,8 +213,7 @@
 				max={RANGES.initiativeBonus.max}
 			/>
 
-			<div class="form-field-group">
-				<Label for="lf-note" class={fieldLabelClass}>{m['forms.field.note']()}</Label>
+			<Field label={m['forms.field.note']()} for="lf-note">
 				<Textarea
 					id="lf-note"
 					bind:value={note}
@@ -244,10 +221,9 @@
 					placeholder={m['forms.field.note.placeholder']()}
 					class="rounded-sm border-[var(--border-strong)] text-[15px] md:text-[15px]"
 				/>
-			</div>
+			</Field>
 
-			<div class="form-field-group">
-				<Label class={fieldLabelClass}>{m['library.tags.field']()}</Label>
+			<Field label={m['library.tags.field']()}>
 				<div class="flex flex-wrap items-center gap-1.5">
 					{#each pendingTags as tagName (tagName)}
 						<TagChip name={tagName} removable onRemove={togglePendingTag} />
@@ -260,7 +236,7 @@
 						{m['library.tags.editTrigger']()}
 					</button>
 				</div>
-			</div>
+			</Field>
 {/snippet}
 
 <ResponsiveModal bind:open title={formTitle} size="form" onSubmit={submit}>

@@ -23,6 +23,7 @@ One line each; never restate rationale here — follow the pointer.
 | ADR-011 | Lucide icons (`lucide-svelte`) | `specs/adr/ADR-011.md` |
 | ADR-012 | 8 token-driven color-tag swatches | `specs/adr/ADR-012.md` |
 | ADR-013 | Dexie `version().upgrade()` migrations, additive-first | `specs/adr/ADR-013.md` |
+| ADR-014 | App-level composition layer (`ResponsiveModal`) owns modal invariants | `specs/adr/ADR-014.md` |
 
 ## Gate
 

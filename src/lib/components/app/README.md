@@ -27,6 +27,9 @@ HealthBar.svelte           health + reverse/alarm bar
 NumberField.svelte         clamping numeric field
 NumpadSheet.svelte         HP entry sheet (damage/heal/set-temp + log)
 ConditionPicker.svelte     condition toggles
+ResponsiveModal.svelte     Dialog/Drawer shell every adaptive modal renders through (ADR-014)
+Field.svelte               shared label + control slot (owns fieldLabelClass)
+TypeToggle.svelte          combatant-type ToggleGroup, shared by CombatantForm + LibraryEntryFormDialog
 ConditionIconList.svelte   first-few + "+K" overflow condition chips
 controller.ts               non-visual combat-screen controller/wiring helper
 labels.ts                   shared label/text helper

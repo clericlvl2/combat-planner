@@ -31,6 +31,7 @@ dark+light themes.
 | Icons | Lucide (`lucide-svelte`) | [ADR-011](ADR-011.md) |
 | Combat color-tag palette | 8 token-driven swatches | [ADR-012](ADR-012.md) |
 | Schema versioning / migrations | Dexie `version().upgrade()` + shared transforms | [ADR-013](ADR-013.md) |
+| Modal composition | `ResponsiveModal` app-level shell — no raw `Dialog`/`Drawer` at call sites | [ADR-014](ADR-014.md) |
 | Lint / format | Biome | [ADR-009](ADR-009.md) |
 | Unit tests | Vitest + vitest-browser-svelte | [ADR-009](ADR-009.md) |
 | E2E tests | Playwright | [ADR-009](ADR-009.md) |
@@ -51,3 +52,4 @@ dark+light themes.
 - [ADR-011](ADR-011.md) — Icons: Lucide (`lucide-svelte`)
 - [ADR-012](ADR-012.md) — Combat color-tag palette: 8 token-driven swatches
 - [ADR-013](ADR-013.md) — Schema versioning & migrations: additive-first, migrate-only-on-shape-break
+- [ADR-014](ADR-014.md) — App-level composition layer owns modal invariants

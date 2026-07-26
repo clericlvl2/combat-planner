@@ -25,7 +25,7 @@
     import Field from './Field.svelte';
     import NumberField from './NumberField.svelte';
     import {typeColor} from './labels';
-    import ResponsiveModal from './ResponsiveModal.svelte';
+    import ResponsiveModal, {drawerScrollGuard} from './ResponsiveModal.svelte';
     import TypeToggle from './TypeToggle.svelte';
 
     export interface CombatantFormValues {
@@ -214,7 +214,9 @@
                                 class="w-full touch-pan-y bg-transparent text-foreground outline-none placeholder:text-[var(--text-faint)]"
                         />
                     </div>
-                    <div class="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto">
+                    <!-- Own scroll container inside the drawer — needs the same at-top swipe-close
+                         guard as ResponsiveModal's scroll region (see its style block). -->
+                    <div use:drawerScrollGuard class="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto">
                         {#each filteredTemplates as t (t.id)}
                             <button
                                     type="button"

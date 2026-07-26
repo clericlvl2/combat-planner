@@ -5,9 +5,24 @@
   that always exists (killing the desktop off-viewport defect), a footer that is sticky by
   construction (outside the scroll region, never nested inside it), the optional `<form>` wrapper
   needed for `type="submit"` footers, the two size tokens, the fixed chrome (border/radius/title
-  type/safe-area padding), and the drawer-only touch policy for text inputs (vaul's own gesture
-  layer needs it; desktop dialogs do not). See specs/adr/ADR-014.md and the W-032 plan.
+  type/safe-area padding), and the drawer-only touch policy (text-input pan axis + the at-top
+  scroll-region guard; vaul's own gesture layer needs both, desktop dialogs neither). See
+  specs/adr/ADR-014.md and the W-032 plan.
 -->
+<script lang="ts" module>
+	/** Marks a drawer scroll container with `data-scroll-at-top` so the touch policy in the style
+	 *  block below can hand the at-top down-swipe to vaul instead of the browser. Exported only
+	 *  for call sites that own an extra scroll container inside a drawer (CombatantForm's
+	 *  template list); the policy itself stays in this file. */
+	export function drawerScrollGuard(node: HTMLElement) {
+		const sync = () =>
+			node.setAttribute('data-scroll-at-top', node.scrollTop < 1 ? 'true' : 'false');
+		sync();
+		node.addEventListener('scroll', sync, { passive: true });
+		return { destroy: () => node.removeEventListener('scroll', sync) };
+	}
+</script>
+
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { MediaQuery } from 'svelte/reactivity';
@@ -49,7 +64,10 @@
 	     ring-offset-2` = 4px outside the element box) room to draw inside the clip rect without
 	     changing the region's outer geometry — `px-3` horizontally, `py-1` vertically. Drop either
 	     and rings on edge-adjacent controls get cut (W-032). -->
-	<div class="-mx-3 -my-1 flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto px-3 py-1">
+	<div
+		use:drawerScrollGuard
+		class="-mx-3 -my-1 flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto px-3 py-1"
+	>
 		{@render children()}
 	</div>
 	{#if footer}
@@ -118,5 +136,20 @@
 	   Input/Textarea components (see plan §Invariants 7 / W-029 / W-031). */
 	:global([data-responsive-modal='drawer'] :is(input, textarea)) {
 		touch-action: pan-y;
+	}
+
+	/* The scroll region is a scroll container BELOW the vaul shell, so the shell's own
+	   `touch-action: none` never enters gesture arbitration for touches inside it: the browser
+	   claims the vertical pan, and at scrollTop 0 a down-swipe scrolls nothing yet still gets
+	   claimed (overscroll) — pointercancel kills vaul's close-drag mid-flight, the sheet snaps
+	   back. Directional values name the SCROLL direction (`pan-down` = finger moving up), so at
+	   top the browser keeps scroll-into-content and nothing else; the close swipe stays with
+	   vaul. Chromium-only value behind @supports — non-Chromium keeps browser-default arbitration
+	   (today's behavior). Scrolled state deliberately has no rule: vaul's shouldDrag already
+	   refuses close-drags there. See the swipe-close report in specs/reports/. */
+	@supports (touch-action: pan-down) {
+		:global([data-responsive-modal='drawer'] [data-scroll-at-top='true']) {
+			touch-action: pan-down;
+		}
 	}
 </style>

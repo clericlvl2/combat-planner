@@ -1,11 +1,12 @@
 # Backlog
 
-next_id: W-032
+next_id: W-033
 
 | ID | Pri | Loop | State | Outcome | Depends | Plan |
 |----|-----|------|-------|---------|---------|------|
 | W-028 | M | large | active | Progressive nav lag + Settings won't open — suspect stuck bits-ui overlay body-lock; needs runtime repro | — | `specs/reports/2026-07-20-nav-lag-overlay-lock.md` |
 | W-031 | M | large | active | Mobile touch pass — tag-input reset, left-edge nav swipe unreachable under Android gesture nav, library-drawer sticky footer, `touch-action: none` on form controls killing drawer scroll | — | `.claude/plans/2026-07-26-drawer-touch-and-nav-swipe-fixes.md` |
+| W-032 | M | large | inbox | App composition layer — `ResponsiveModal` owning the Dialog/Drawer split, scroll region, sticky footer, safe-area padding, sizing and drawer touch policy; migrate all 6 modal call sites; extract `Field`/`TypeToggle`; delete dead vendoring (`sheet`/`progress`/`separator`); ADR-014 | — | `.claude/plans/2026-07-26-responsive-modal-app-layer.md` |
 | W-006 | L | large | inbox | App-data export/import — all-combats + single-combat, fail-safe import (v2) | — | — |
 | W-008 | L | large | inbox | Smooth animations — motion for tap/expand/damage-entry/condition-toggle interactions | — | — |
 | W-019 | M | large | inbox | Icon revision — audit every `lucide-svelte` icon in use, fix each choice or swap for a better-fitting one | — | — |

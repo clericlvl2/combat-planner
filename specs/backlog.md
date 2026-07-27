@@ -1,9 +1,10 @@
 # Backlog
 
-next_id: W-038
+next_id: W-039
 
 | ID | Pri | Loop | State | Outcome | Depends | Plan |
 |----|-----|------|-------|---------|---------|------|
+| W-038 | L | large | ready | Svelte 5 code-style revision — effect discipline, $state.raw store seam, boot path, migration machinery, .svelte format gate | — | `.claude/plans/2026-07-28-svelte-code-style-revision.md` |
 | W-036 | S | small | inbox | `src/app.html` links `/favicon.svg`, which does not exist in `build/` — 404 on every page load | — | — |
 | W-037 | S | small | inbox | InstallBanner sits inside `{#key store.settings.language}`, so a language switch destroys it and discards the stashed `beforeinstallprompt` for the session. Needs a module-level stash outside component lifetime — moving the component out of the key block would break its own localized text | — | — |
 | W-034 | S | small | inbox | Run the W-033 manual PWA device pass against the live deploy — install, airplane-mode reload, offline deep link, update toast on redeploy. Checklist written, never run | — | `specs/reports/2026-07-27-pwa-restoration.md` |

@@ -12,6 +12,7 @@
 <script lang="ts">
     import {goto} from '$app/navigation';
     import {page} from '$app/state';
+    import {flip} from 'svelte/animate';
     import CombatantForm, {type CombatantFormValues} from '$lib/components/app/CombatantForm.svelte';
     import CombatantRow from '$lib/components/app/CombatantRow.svelte';
     import CombatHeader from '$lib/components/app/CombatHeader.svelte';
@@ -24,6 +25,7 @@
     import {MAX_LIBRARY_ENTRIES} from '$lib/db/types';
     import {m} from '$lib/i18n';
     import {chromeIcon} from '$lib/icons';
+    import {DUR, dur, reducedMotion} from '$lib/motion';
     import {store} from '$lib/stores';
     import {canAdvance, isActive, showRoundAndEscalation, sortedCombatants} from '$lib/stores/domain/derive';
 
@@ -50,7 +52,10 @@
 
     $effect(() => {
         if (!combat?.activeCombatantId) return;
-        mainEl?.querySelector('[data-active="true"]')?.scrollIntoView({behavior: 'smooth', block: 'center'});
+        mainEl?.querySelector('[data-active="true"]')?.scrollIntoView({
+            behavior: reducedMotion.current ? 'auto' : 'smooth',
+            block: 'center',
+        });
     });
 
     // page-owned shared surfaces
@@ -196,15 +201,17 @@
                 </EmptyState>
             {:else}
                 {#each display as c (c.id)}
-                    <CombatantRow
-                            combatant={c}
-                            active={isActive(combat, c)}
-                            combatActive={active}
-                            {controller}
-                            onOpenNumpad={openNumpad}
-                            onEdit={openEdit}
-                            onSaveToLibrary={saveToLibrary}
-                    />
+                    <div animate:flip={{duration: dur(DUR.base)}}>
+                        <CombatantRow
+                                combatant={c}
+                                active={isActive(combat, c)}
+                                combatActive={active}
+                                {controller}
+                                onOpenNumpad={openNumpad}
+                                onEdit={openEdit}
+                                onSaveToLibrary={saveToLibrary}
+                        />
+                    </div>
                 {/each}
             {/if}
         </main>

@@ -3,12 +3,15 @@
   the route outlet. Mounted once by the root +layout.svelte. The Combat screen (`/combats/[id]`)
   ships its own full CombatHeader (back/title/overflow — component-inventory.md "Header") as page
   content, so this shell skips the generic AppHeader there to avoid stacking two header bars;
-  NavSidebar (and its swipe-right gesture) stays mounted on every route.
+  NavSidebar (and its swipe-right gesture) stays mounted on every route. InstallBanner (ADR-004)
+  is this shell's other always-mounted, conditionally-visible singleton — the install hint.
 -->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { page } from '$app/state';
+	import { store } from '$lib/stores';
 	import AppHeader from './AppHeader.svelte';
+	import InstallBanner from './InstallBanner.svelte';
 	import NavSidebar from './NavSidebar.svelte';
 
 	let { children }: { children: Snippet } = $props();
@@ -25,6 +28,7 @@
 		<AppHeader onOpenNav={() => (navOpen = true)} />
 	{/if}
 	<NavSidebar bind:open={navOpen} />
+	<InstallBanner {store} />
 	<main class="flex flex-1 flex-col">
 		{#if routeHasOwnHeader}
 			{@render children()}

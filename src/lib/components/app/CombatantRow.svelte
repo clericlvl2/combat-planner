@@ -18,6 +18,7 @@
   type-colored halo (outer box-shadow, no border-color swap) when `active`.
 -->
 <script lang="ts">
+	import { scale } from 'svelte/transition';
 	import { Button } from '$lib/components/ui/button';
 	import { Card } from '$lib/components/ui/card';
 	import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '$lib/components/ui/collapsible';
@@ -32,6 +33,7 @@
 	import type { Combatant } from '$lib/db/types';
 	import { m } from '$lib/i18n';
 	import { chromeIcon } from '$lib/icons';
+	import { DUR, dur } from '$lib/motion';
 	import { NOTE_MAX_LENGTH } from '$lib/stores/domain/constants';
 	import type { CombatController } from './controller';
 	import ConditionIconList from './ConditionIconList.svelte';
@@ -196,6 +198,7 @@
 								{combatant.currentHp}/{combatant.maxHp}
 								{#if combatant.tempHp > 0}
 									<span
+										transition:scale={{ duration: dur(DUR.fast) }}
 										class="absolute -top-1.5 -right-5 inline-flex h-4 w-[var(--badge-width)] shrink-0 items-center justify-center rounded-full bg-combat-blue text-[10px] leading-none font-semibold text-white"
 									>
 										{combatant.tempHp}

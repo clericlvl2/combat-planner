@@ -16,19 +16,14 @@
 	import { chromeIcon } from '$lib/icons';
 	import DesktopNav from './DesktopNav.svelte';
 	import { headerAction } from './header-action.svelte';
+	import { isCurrentNavLink, navLinks } from './nav-links';
 
 	let { onOpenNav }: { onOpenNav: () => void } = $props();
 
-	const links = $derived([
-		{ href: '/combats', label: m['nav.combats'](), icon: chromeIcon.navCombats },
-		{ href: '/settings', label: m['nav.settings'](), icon: chromeIcon.navSettings },
-		{ href: '/about', label: m['nav.about'](), icon: chromeIcon.navAbout },
-	]);
+	const links = $derived(navLinks());
 
 	function isCurrent(href: string) {
-		const path = page.url.pathname;
-		if (href === '/combats') return path === '/' || path.startsWith('/combats');
-		return path.startsWith(href);
+		return isCurrentNavLink(page.url.pathname, href);
 	}
 
 	const title = $derived(links.find((link) => isCurrent(link.href))?.label ?? m['nav.combats']());

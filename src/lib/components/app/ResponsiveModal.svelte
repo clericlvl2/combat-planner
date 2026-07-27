@@ -45,8 +45,9 @@
 		footer,
 	}: {
 		open?: boolean;
-		/** Omitted renders no header (NumpadSheet). */
-		title?: string;
+		/** Required (ADR-014): omitting it left bits-ui with no `DialogTitle`/`DrawerTitle`, so
+		 *  `aria-labelledby` pointed at nothing and the dialog opened with no accessible name. */
+		title: string;
 		size?: 'form' | 'compact';
 		/** Present -> body + footer are wrapped in a single `<form>` so `type="submit"` footer
 		 *  buttons share it with the fields, even though the footer sits outside the scroller. */
@@ -101,11 +102,9 @@
 				SIZE_CLASS[size].desktop,
 			)}
 		>
-			{#if title}
-				<DialogHeader>
-					<DialogTitle class="text-lg font-semibold">{title}</DialogTitle>
-				</DialogHeader>
-			{/if}
+			<DialogHeader>
+				<DialogTitle class="text-lg font-semibold">{title}</DialogTitle>
+			</DialogHeader>
 
 			{@render wrapper()}
 		</DialogContent>
@@ -114,13 +113,11 @@
 	<Drawer bind:open>
 		<DrawerContent
 			data-responsive-modal="drawer"
-			class={cn('mx-auto flex max-h-[80vh] flex-col', SIZE_CLASS[size].mobile)}
+			class={cn('mx-auto flex max-h-[80dvh] flex-col', SIZE_CLASS[size].mobile)}
 		>
-			{#if title}
-				<DrawerHeader>
-					<DrawerTitle class="text-lg font-semibold">{title}</DrawerTitle>
-				</DrawerHeader>
-			{/if}
+			<DrawerHeader>
+				<DrawerTitle class="text-lg font-semibold">{title}</DrawerTitle>
+			</DrawerHeader>
 
 			<div class="flex min-h-0 flex-1 flex-col px-4 pb-safe">
 				{@render wrapper()}

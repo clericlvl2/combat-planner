@@ -42,6 +42,13 @@
 		if (open) entry = '';
 	});
 
+	// Accessible dialog name (ADR-014): NumpadSheet has no visible header text of its own — the
+	// combatant's name in the summary row is the closest thing to a title. Never empty: a stale id
+	// can null `combatant` while `open` stays true, and an empty title is an unnamed dialog.
+	const title = $derived(
+		m['numpad.title']({ name: combatant ? combatant.name : m['setup.addCombatant']() }),
+	);
+
 	const empty = $derived(entry === '');
 	const value = $derived(empty ? 0 : Number(entry));
 	const history = $derived(combatant ? [...combatant.hpLog].reverse() : []);
@@ -214,7 +221,7 @@
 				{:else}
 					<ScrollArea class="max-h-48">
 						<ul class="flex flex-col gap-1.5 pt-2">
-							{#each history as e, i (i)}
+							{#each history as e, i (e.id ?? i)}
 								<li class="flex items-center justify-between gap-2 text-sm text-muted-foreground">
 									<span class="flex items-center gap-1.5">
 										<Badge variant="outline" class={actionBadgeClass[e.type]}>
@@ -239,7 +246,7 @@
 	</div>
 {/snippet}
 
-<ResponsiveModal bind:open size="form">
+<ResponsiveModal bind:open {title} size="form">
 	{#snippet children()}
 		{#if combatant}
 			{@render body(combatant)}

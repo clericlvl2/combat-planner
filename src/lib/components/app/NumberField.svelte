@@ -40,7 +40,15 @@
 	} = $props();
 
 	let clamped = $state(false);
+	let inputEl = $state<HTMLInputElement | null>(null);
 	const digitCap = $derived(Math.max(String(Math.abs(min)).length, String(Math.abs(max)).length));
+
+	// Canonical write-back: the DOM is also written imperatively (onTypedInput/onPaste), so when
+	// commit()/step() clamp back to the value already in state, Svelte's set_value short-circuits
+	// on its cached attribute and the rejected text would otherwise stick in the DOM.
+	function syncDom() {
+		if (inputEl) inputEl.value = value === null ? '' : String(value);
+	}
 
 	// No touch-action override here (W-029/W-031): a plain button has no native caret/selection
 	// gesture to fight, so vaul's shouldDrag already reads it like plain drawer content — dragging
@@ -61,6 +69,7 @@
 	// Typed entry (oninput): sanitize to the allowed set, then cap to digitCap so a keyboard can't
 	// type more digits than the range needs.
 	function onTypedInput(e: Event) {
+		clamped = false;
 		const el = e.currentTarget as HTMLInputElement;
 		const sanitized = sanitize(el.value);
 		const digits = sanitized.replace('-', '');
@@ -82,12 +91,14 @@
 		if (raw === '' || raw === '-') {
 			value = null;
 			clamped = false;
+			syncDom();
 			return;
 		}
 		const n = Number(raw);
 		const c = clamp(n, min, max);
 		clamped = c !== n;
 		value = c;
+		syncDom();
 	}
 
 	function step(delta: number) {
@@ -95,6 +106,42 @@
 		const c = clamp(target, min, max);
 		clamped = c !== target;
 		value = c;
+		syncDom();
+	}
+
+	// Spinbutton keyboard contract (role="spinbutton" requires it): Arrow ±1, PageUp/Down ±10,
+	// Home/End jump to min/max.
+	function onKeydown(e: KeyboardEvent) {
+		switch (e.key) {
+			case 'ArrowUp':
+				e.preventDefault();
+				step(1);
+				return;
+			case 'ArrowDown':
+				e.preventDefault();
+				step(-1);
+				return;
+			case 'PageUp':
+				e.preventDefault();
+				step(10);
+				return;
+			case 'PageDown':
+				e.preventDefault();
+				step(-10);
+				return;
+			case 'Home':
+				e.preventDefault();
+				clamped = false;
+				value = min;
+				syncDom();
+				return;
+			case 'End':
+				e.preventDefault();
+				clamped = false;
+				value = max;
+				syncDom();
+				return;
+		}
 	}
 </script>
 
@@ -116,6 +163,7 @@
 			−
 		</button>
 		<Input
+			bind:ref={inputEl}
 			{id}
 			type="text"
 			inputmode="text"
@@ -123,6 +171,7 @@
 			aria-valuemin={min}
 			aria-valuemax={max}
 			aria-valuenow={value ?? undefined}
+			aria-describedby={clamped ? `${id}-hint` : undefined}
 			size="action"
 			class="flex-1 rounded-none border-0 bg-transparent text-[13px] text-center tabular-nums shadow-none focus-visible:ring-0 dark:bg-transparent"
 			value={value ?? ''}
@@ -132,6 +181,7 @@
 			onchange={commit}
 			oninput={onTypedInput}
 			onpaste={onPaste}
+			onkeydown={onKeydown}
 		/>
 		<button
 			type="button"
@@ -142,4 +192,9 @@
 			+
 		</button>
 	</div>
+	{#if clamped}
+		<p id="{id}-hint" class="text-xs text-destructive">
+			{m['forms.field.clampedTo']({ value: value ?? 0 })}
+		</p>
+	{/if}
 </div>

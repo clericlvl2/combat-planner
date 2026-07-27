@@ -6,8 +6,9 @@ import ResponsiveModal from './ResponsiveModal.svelte';
 
 // The app-level composition layer over ui/dialog and ui/drawer — asserts the invariants it owns:
 // a scroll region always exists, the footer renders as a sibling after it (never nested inside —
-// the whole point, sticky by construction), the optional onSubmit form wrapper, the header being
-// entirely optional, and the two size tokens being the only sizing knob.
+// the whole point, sticky by construction), the optional onSubmit form wrapper, the required
+// `title` always giving the dialog an accessible name, and the two size tokens being the only
+// sizing knob.
 
 afterEach(async () => {
 	cleanup();
@@ -27,7 +28,11 @@ const submitChildrenSnippet = createRawSnippet(() => ({
 }));
 
 test('renders children', async () => {
-	const screen = render(ResponsiveModal, { open: true, children: childrenSnippet });
+	const screen = render(ResponsiveModal, {
+		open: true,
+		title: 'Test modal',
+		children: childrenSnippet,
+	});
 
 	await expect.element(screen.getByText('body content')).toBeVisible();
 });
@@ -35,6 +40,7 @@ test('renders children', async () => {
 test('renders footer when passed', async () => {
 	const screen = render(ResponsiveModal, {
 		open: true,
+		title: 'Test modal',
 		children: childrenSnippet,
 		footer: footerSnippet,
 	});
@@ -43,7 +49,7 @@ test('renders footer when passed', async () => {
 });
 
 test('renders nothing footer-related when footer is not passed', async () => {
-	render(ResponsiveModal, { open: true, children: childrenSnippet });
+	render(ResponsiveModal, { open: true, title: 'Test modal', children: childrenSnippet });
 
 	expect(document.querySelector('[data-testid="footer"]')).toBeNull();
 });
@@ -51,6 +57,7 @@ test('renders nothing footer-related when footer is not passed', async () => {
 test('the footer is not a descendant of the overflow-y-auto scroll container', async () => {
 	const screen = render(ResponsiveModal, {
 		open: true,
+		title: 'Test modal',
 		children: childrenSnippet,
 		footer: footerSnippet,
 	});
@@ -63,7 +70,7 @@ test('the footer is not a descendant of the overflow-y-auto scroll container', a
 });
 
 test('the scroll region leaves clip room on both axes for focus/selected rings', async () => {
-	render(ResponsiveModal, { open: true, children: childrenSnippet });
+	render(ResponsiveModal, { open: true, title: 'Test modal', children: childrenSnippet });
 
 	const scrollContainer = document.querySelector('.overflow-y-auto') as HTMLElement;
 	const classes = scrollContainer.className.split(/\s+/);
@@ -99,11 +106,13 @@ test('onSubmit fires once on submit and the default is prevented', async () => {
 	await expect.element(screen.getByRole('dialog', { name: 'Submit test' })).toBeVisible();
 });
 
-test('no header element when title is omitted', async () => {
-	render(ResponsiveModal, { open: true, children: childrenSnippet });
+// `title` is required (ADR-014): the old "no header when omitted" contract left bits-ui with no
+// DialogTitle/DrawerTitle, so `aria-labelledby` pointed at nothing and a caller could ship an
+// unnamed dialog (NumpadSheet did). Assert the header renders instead.
+test('renders the dialog title', async () => {
+	render(ResponsiveModal, { open: true, title: 'Test modal', children: childrenSnippet });
 
-	expect(document.querySelector('[data-slot="dialog-title"]')).toBeNull();
-	expect(document.querySelector('[data-slot="drawer-title"]')).toBeNull();
+	expect(document.querySelector('[data-slot="dialog-title"]')).not.toBeNull();
 });
 
 test('size="form" renders the desktop sm:max-w-[400px] token', async () => {

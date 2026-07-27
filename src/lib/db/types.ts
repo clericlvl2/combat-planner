@@ -84,6 +84,11 @@ export const NONE = 'none' as const;
 
 /** One read-only HP-change log line. Captured at write time. */
 export interface HpLogEntry {
+	/** Stable identity for list keying (NumpadSheet history) — the (delta, round, resulting hp)
+	    tuple is not provably unique (e.g. two identical heals in the same round). Optional/additive
+	    (ADR-013): entries logged before this field existed have none; `entry()` always sets it for
+	    every new write. */
+	id?: string;
 	/** Maps to i18n numpad.history.action.* labels. */
 	type: 'damage' | 'heal' | 'setTemp' | 'setMax';
 	/** Signed change applied. */

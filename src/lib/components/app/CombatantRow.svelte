@@ -214,9 +214,9 @@
 					<!-- Row 3: AC/PD/MD + Init pill -->
 					<div class="flex items-center gap-3">
 						<span class="flex-1 text-sm text-muted-foreground">
-							AC <b class={statClass}>{combatant.ac}</b> ·
-							PD <b class={statClass}>{combatant.pd}</b> ·
-							MD <b class={statClass}>{combatant.md}</b>
+							{m['forms.field.ac']()} <b class={statClass}>{combatant.ac}</b> ·
+							{m['forms.field.pd']()} <b class={statClass}>{combatant.pd}</b> ·
+							{m['forms.field.md']()} <b class={statClass}>{combatant.md}</b>
 						</span>
 						<InitCell
 							{combatant}
@@ -260,6 +260,7 @@
 							value={combatant.note}
 							maxlength={NOTE_MAX_LENGTH}
 							placeholder={m['forms.note.add']()}
+							aria-label={m['forms.note.add']()}
 							onchange={commitNote}
 						/>
 					{/if}

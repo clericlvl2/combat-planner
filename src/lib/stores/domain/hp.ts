@@ -9,14 +9,24 @@
  */
 import type { Combatant, HpLogEntry } from '../../db/types';
 import { clampCurrentHp, clampMaxHp, clampTempHp } from './clamp';
+import { genId as defaultGenId, type IdGen } from './id';
 
 function entry(
 	type: HpLogEntry['type'],
 	delta: number,
 	c: Combatant,
 	round: number | null,
+	genId: IdGen,
 ): HpLogEntry {
-	return { type, delta, currentHp: c.currentHp, tempHp: c.tempHp, maxHp: c.maxHp, round };
+	return {
+		id: genId(),
+		type,
+		delta,
+		currentHp: c.currentHp,
+		tempHp: c.tempHp,
+		maxHp: c.maxHp,
+		round,
+	};
 }
 
 function withEntry(c: Combatant, e: HpLogEntry): Combatant {
@@ -24,31 +34,51 @@ function withEntry(c: Combatant, e: HpLogEntry): Combatant {
 }
 
 /** Damage drains temp first, remainder off current, floored at −maxHp. */
-export function applyDamage(c: Combatant, n: number, round: number | null): Combatant {
+export function applyDamage(
+	c: Combatant,
+	n: number,
+	round: number | null,
+	genId: IdGen = defaultGenId,
+): Combatant {
 	const absorbed = Math.min(c.tempHp, n);
 	const tempHp = c.tempHp - absorbed;
 	const currentHp = clampCurrentHp(c.currentHp - (n - absorbed), c.maxHp);
 	const next: Combatant = { ...c, tempHp, currentHp };
-	return withEntry(next, entry('damage', -n, next, round));
+	return withEntry(next, entry('damage', -n, next, round, genId));
 }
 
 /** Heal: currentHp = min(cur + n, max(maxHp, cur)); never reduces, never touches temp. */
-export function applyHeal(c: Combatant, n: number, round: number | null): Combatant {
+export function applyHeal(
+	c: Combatant,
+	n: number,
+	round: number | null,
+	genId: IdGen = defaultGenId,
+): Combatant {
 	const currentHp = Math.min(c.currentHp + n, Math.max(c.maxHp, c.currentHp));
 	const next: Combatant = { ...c, currentHp };
-	return withEntry(next, entry('heal', n, next, round));
+	return withEntry(next, entry('heal', n, next, round, genId));
 }
 
 /** Set temp HP replaces the buffer (0 clears); current untouched. */
-export function applySetTemp(c: Combatant, n: number, round: number | null): Combatant {
+export function applySetTemp(
+	c: Combatant,
+	n: number,
+	round: number | null,
+	genId: IdGen = defaultGenId,
+): Combatant {
 	const tempHp = clampTempHp(n);
 	const next: Combatant = { ...c, tempHp };
-	return withEntry(next, entry('setTemp', tempHp - c.tempHp, next, round));
+	return withEntry(next, entry('setTemp', tempHp - c.tempHp, next, round, genId));
 }
 
 /** Max HP edit: does NOT auto-change currentHp. */
-export function applySetMax(c: Combatant, n: number, round: number | null): Combatant {
+export function applySetMax(
+	c: Combatant,
+	n: number,
+	round: number | null,
+	genId: IdGen = defaultGenId,
+): Combatant {
 	const maxHp = clampMaxHp(n);
 	const next: Combatant = { ...c, maxHp };
-	return withEntry(next, entry('setMax', maxHp - c.maxHp, next, round));
+	return withEntry(next, entry('setMax', maxHp - c.maxHp, next, round, genId));
 }

@@ -10,19 +10,12 @@
 	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui/button';
 	import { m } from '$lib/i18n';
-	import { chromeIcon } from '$lib/icons';
+	import { isCurrentNavLink, navLinks } from './nav-links';
 
-	const links = $derived([
-		{ href: '/combats', label: m['nav.combats'](), icon: chromeIcon.navCombats },
-		{ href: '/library', label: m['nav.library'](), icon: chromeIcon.navLibrary },
-		{ href: '/settings', label: m['nav.settings'](), icon: chromeIcon.navSettings },
-		{ href: '/about', label: m['nav.about'](), icon: chromeIcon.navAbout },
-	]);
+	const links = $derived(navLinks());
 
 	function isCurrent(href: string) {
-		const path = page.url.pathname;
-		if (href === '/combats') return path === '/' || path.startsWith('/combats');
-		return path.startsWith(href);
+		return isCurrentNavLink(page.url.pathname, href);
 	}
 </script>
 

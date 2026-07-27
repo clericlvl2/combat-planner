@@ -28,19 +28,28 @@
 	let prevHp = combatant.currentHp;
 	let flashColor = $state<'damage' | 'heal' | null>(null);
 	let flashActive = $state(false);
+	let flashTimer: ReturnType<typeof setTimeout> | undefined;
 
 	$effect(() => {
 		const hp = combatant.currentHp;
-		if (hp !== prevHp) {
-			flashColor = hp < prevHp ? 'damage' : 'heal';
-			flashActive = true;
-			prevHp = hp;
-			const timeout = setTimeout(() => {
-				flashActive = false;
-			}, dur(DUR.base));
-			return () => clearTimeout(timeout);
-		}
+		if (hp === prevHp) return;
+		// Direction is read before `prevHp` moves — order matters.
+		flashColor = hp < prevHp ? 'damage' : 'heal';
+		prevHp = hp;
+		flashActive = true;
+		clearTimeout(flashTimer);
+		flashTimer = setTimeout(() => {
+			flashActive = false;
+		}, dur(DUR.base));
 	});
+
+	// Destroy-only teardown: reads nothing, so it never re-runs. The timer deliberately does NOT
+	// hang off the effect above — the store deep-clones via $state.snapshot() on every write, so
+	// `combatant` is a fresh object after any mutation and that effect re-runs constantly. A
+	// cleanup tied to its re-run would cancel a live flash on an unrelated change (advance turn,
+	// another combatant's edit) and leave the overlay stuck on, since the no-change branch
+	// schedules no replacement.
+	$effect(() => () => clearTimeout(flashTimer));
 	// When carrying temp HP, scale both segments against (maxHp + tempHp) so they sum to
 	// ≤100% inside the overflow-hidden track instead of the temp segment getting clipped.
 	const denom = $derived(combatant.maxHp + (status === 'dead' ? 0 : combatant.tempHp));

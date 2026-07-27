@@ -8,9 +8,9 @@
 	import { needRefresh, updateServiceWorker } from '$lib/pwa/register';
 	import './layout.css';
 
-	// TODO M-phase: AppShell still needs the InstallBanner / ConfirmDialog global singletons —
-	// out of unit 006 Phase 1's scope (AppShell + per-breakpoint nav only). The Toaster singleton
-	// is mounted below (W-003 Phase 3).
+	// TODO M-phase: AppShell still needs the ConfirmDialog global singleton — out of unit 006
+	// Phase 1's scope (AppShell + per-breakpoint nav only). The Toaster singleton is mounted
+	// below (W-003 Phase 3); InstallBanner is mounted inside AppShell.
 	let { children } = $props();
 
 	onMount(async () => {

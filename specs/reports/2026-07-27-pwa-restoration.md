@@ -75,6 +75,44 @@ the user chose the static link. Service-worker **registration** itself stays in 
 runs at hydration in client JS — that's correct as-is and needs no static HTML presence, since
 registration doesn't need to exist before first paint.
 
+## Correction (W-035, 2026-07-27)
+
+**This report's Phase 5 analysis was incomplete, and the gap was ship-blocking.** It attributed
+everything wrong at two-segment depth to a `vite preview` harness artifact. That artifact is real and
+the diagnosis below stands — but at that same depth it camouflaged a genuine **production** bug that
+this report then reasoned its way past, concluding "production is expected to behave correctly".
+
+The shipped bundle registered the worker at a *relative* URL:
+`new e(\`./sw.js\`, { scope: \`./\` })`. SvelteKit's `paths.relative` defaults to true, so Vite `base`
+is `./`, and `vite-plugin-pwa` reads its own `base` off `viteConfig.base` straight into the register
+template. A relative script URL resolves against the **document** URL, so `/` and `/settings` asked
+for `/sw.js` and worked, while `/combats/<id>` asked for `/combats/sw.js`. On a plain static server
+that 404s; on Vercel the catch-all rewrite fires after the filesystem check and returns
+`200 text/html`, killing registration with an unsupported-MIME-type error. Either way: **no service
+worker on the app's primary screen** — no offline, not installable, and a waiting build surfaces no
+update toast at all. Both of W-033's headline goals failed exactly where the DM sits.
+
+Two things let this ship, and both are worth naming:
+
+1. **All three tests entered via `page.goto('/')`** — the one depth at which a relative registration
+   URL is harmless. Depth was never varied, so the bug had no way to show up.
+2. **The scope-narrowing below reasoned rather than measured.** Having correctly identified a
+   preview-only artifact at depth 2, the report treated depth 2 as unobservable and moved the whole
+   question to the manual pass. But the registration bug was observable at depth 2 *online*, where
+   the preview artifact does not apply — `vite preview` rewrites per-request depth correctly for a
+   live navigation. A one-line online assertion at `/combats/<id>` would have caught it.
+
+Fixed under W-035: `base: '/'` and `scope: '/'` as **top-level** `SvelteKitPWA` options in
+`vite.config.ts` (not `kit.base`, which only feeds `navigateFallback` and the manifest transform and
+never reaches the register template). The same `base` also prefixes the injected
+`<link rel="manifest">` href, which carried the identical depth bug. The spec gained an online
+two-segment registration test — verified to fail without the fix — and both offline assertions were
+changed from `expect(body).toBeVisible()` to real rendered-content assertions, since a visible
+`<body>` passes on a shell that never hydrated, which is the exact failure mode being tested for.
+
+The offline depth-2 case remains out of automated scope for the genuine `vite preview` reason
+documented below, and still rests on the W-034 manual pass.
+
 ## Phase 5 in detail
 
 ### `e2e/pwa.e2e.ts`
@@ -128,6 +166,12 @@ symptom, not a real product bug). It is called out explicitly in the manual veri
 below instead, since production is expected to behave correctly (absolute paths at every depth) and
 the manual pass is the way to confirm that expectation against a real deploy.
 
+> **Superseded in part — see the W-035 correction at the top of this report.** The preview artifact
+> described in this section is real, but the conclusion that depth 2 was therefore unobservable was
+> wrong, and it hid a production registration bug at the same depth. The *offline* depth-2 case is
+> still legitimately out of automated scope for the reason above; the *online* one was not, and is
+> now covered.
+
 **Result:** `npx playwright test` — 8/8 passing (`smoke.e2e.ts` × 2 projects, `pwa.e2e.ts` × 3
 tests × 2 projects), run **three times** against three independent fresh
 `npm run build && npm run preview` cycles, no flake observed.
@@ -156,16 +200,21 @@ remotely — this header forces every fetch of `sw.js` to revalidate, so the upd
 - The manifest link is present in the served document and the manifest is fetchable and lists PNG
   icons.
 - The service worker registers and reaches `active` state (which for this build implies precaching
-  completed).
+  completed), from an absolute `/sw.js` — asserted on the registration's own `scriptURL`.
+- The same holds when the app is entered directly at a **two-segment** route (`/combats/<id>`), the
+  deep-link/restored-tab case (W-035).
 - With the worker active and the network cut, a fresh document navigation to a **one-segment**
   in-scope route (root `/` and `/settings`) is served from cache rather than failing with a browser
-  network error.
+  network error, **and the shell actually hydrates** — asserted via the client-side redirect off `/`
+  and the Settings heading, not a merely-visible `<body>`.
 
 **NOT proven by e2e, and resting entirely on the manual pass below:**
 - Offline behavior for **two-segment routes** (`/combats/<id>`) specifically — the actual "resume a
   bookmarked/PWA-launched combat while offline" scenario the feature exists for. Reasoned above to
   be sound in production (absolute asset paths, no depth dependency), but this is inference from a
-  static file diff and a `sirv` cross-check, not a direct on-device confirmation.
+  static file diff and a `sirv` cross-check, not a direct on-device confirmation — and W-035 is a
+  standing reminder that inference at this depth has already been wrong once. The *registration*
+  half of the depth-2 case is now covered automatically; the *offline-serving* half is not.
 - `beforeinstallprompt` and the InstallBanner's real eligibility — Playwright cannot fire this event
   on demand, so the banner's Svelte-level render logic has its own component spec
   (`InstallBanner.svelte.spec.ts`, Phase 3), but whether Android actually offers installation for

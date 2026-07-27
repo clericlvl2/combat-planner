@@ -29,6 +29,17 @@ export default defineConfig({
 		// ADR-004: full-shell precache, prompt-to-reload update flow. Manifest generated here.
 		SvelteKitPWA({
 			registerType: 'prompt',
+			// W-035: pin the registration to absolute URLs. SvelteKit's `paths.relative` defaults to
+			// true, so Vite `base` is './', and vite-plugin-pwa reads its own `base` off `viteConfig.base`
+			// (dist/index.js:805) straight into the register template — `register('./sw.js', ...)`.
+			// That resolves against the *document* URL: fine at '/' and '/settings', but on
+			// '/combats/<id>' (the app's primary screen) it becomes '/combats/sw.js' and registration
+			// dies, taking offline, installability and the update toast with it. The same `base` also
+			// prefixes the injected `<link rel="manifest">` href (dist/index.js:305), so this fixes that
+			// depth bug too. Note this is the *top-level* option, not `kit.base` — the latter only feeds
+			// navigateFallback and the manifest transform, and never reaches the register template.
+			base: '/',
+			scope: '/',
 			// adapter-static (ADR-007) writes index.html during its adapt() step, which runs
 			// *after* this plugin's closeBundle, so workbox globs a client/ tree where the
 			// fallback shell doesn't exist yet. spa + adapterFallback tell the plugin to

@@ -38,7 +38,7 @@ export default defineConfig({
 				spa: true,
 				adapterFallback: 'index.html',
 			},
-			// TODO M-phase: replace placeholder icons with real raster assets (see static/icons/README.md).
+			// TODO M-phase: replace placeholder artwork with real icons (see static/icons/README.md).
 			manifest: {
 				name: 'Combat Planner',
 				short_name: 'Combat Planner',
@@ -56,6 +56,14 @@ export default defineConfig({
 						src: 'icons/icon-maskable.svg',
 						sizes: 'any',
 						type: 'image/svg+xml',
+						purpose: 'maskable',
+					},
+					{ src: 'icons/pwa-192x192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+					{ src: 'icons/pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+					{
+						src: 'icons/pwa-512x512-maskable.png',
+						sizes: '512x512',
+						type: 'image/png',
 						purpose: 'maskable',
 					},
 				],

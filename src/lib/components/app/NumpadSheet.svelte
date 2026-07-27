@@ -201,7 +201,12 @@
 						<span class="text-muted-foreground">{m['numpad.history.count']({ n: history.length })}</span>
 					{/if}
 				</span>
-				<Expand class={['size-4 shrink-0 transition-transform', historyOpen && 'rotate-180']} />
+				<Expand
+					class={[
+						'size-4 shrink-0 transition-transform duration-[var(--dur-fast)] ease-[var(--ease-out)]',
+						historyOpen && 'rotate-180',
+					]}
+				/>
 			</CollapsibleTrigger>
 			<CollapsibleContent>
 				{#if history.length === 0}

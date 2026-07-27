@@ -139,7 +139,10 @@
 								{#snippet child({ props })}
 									<Button {...props} variant="ghost" size="row" aria-label={toggleLabel}>
 										<Chevron
-											class={['size-4 text-muted-foreground transition-transform', open && 'rotate-180']}
+											class={[
+												'size-4 text-muted-foreground transition-transform duration-[var(--dur-fast)] ease-[var(--ease-out)]',
+												open && 'rotate-180',
+											]}
 										/>
 									</Button>
 								{/snippet}

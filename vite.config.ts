@@ -29,6 +29,15 @@ export default defineConfig({
 		// ADR-004: full-shell precache, prompt-to-reload update flow. Manifest generated here.
 		SvelteKitPWA({
 			registerType: 'prompt',
+			// adapter-static (ADR-007) writes index.html during its adapt() step, which runs
+			// *after* this plugin's closeBundle, so workbox globs a client/ tree where the
+			// fallback shell doesn't exist yet. spa + adapterFallback tell the plugin to
+			// synthesize the missing precache entry itself, revisioned off
+			// client/_app/version.json instead of hashing the (absent) file.
+			kit: {
+				spa: true,
+				adapterFallback: 'index.html',
+			},
 			// TODO M-phase: replace placeholder icons with real raster assets (see static/icons/README.md).
 			manifest: {
 				name: 'Combat Planner',
@@ -53,7 +62,12 @@ export default defineConfig({
 			},
 			workbox: {
 				// Full app-shell precache => every feature works offline (ADR-004).
-				globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2,json}'],
+				// Scoped to client/** (the tree that actually exists at glob time - see the
+				// kit.adapterFallback comment above) with the font extensions added back in;
+				// the plugin's own client/** default omits woff/woff2.
+				globPatterns: ['client/**/*.{js,css,ico,png,svg,webp,woff,woff2,json,webmanifest}'],
+				// Client-side deep links resolve offline to the synthesized shell above.
+				navigateFallback: '/index.html',
 			},
 			devOptions: {
 				// Keep the SW out of dev/test so it never interferes with HMR or Vitest.

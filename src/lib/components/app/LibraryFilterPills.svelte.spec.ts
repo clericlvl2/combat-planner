@@ -71,6 +71,11 @@ test('selection persists across expand/collapse', async () => {
 	await screen.getByRole('button', { name: 'Alpha' }).click();
 	expect(onChange).toHaveBeenCalledExactlyOnceWith(['Alpha']);
 
+	// `selected` is a read-only, caller-owned prop (no local fallback state) — the real call site
+	// (routes/library/+page.svelte) re-derives and passes it back down on every onChange, so the
+	// test mirrors that round trip explicitly instead of relying on component-local mutation.
+	await screen.rerender({ allTags: TAGS, selected: ['Alpha'], onChange });
+
 	await screen.getByRole('button', { name: 'More' }).click();
 	await expect
 		.element(screen.getByRole('button', { name: 'Alpha' }))

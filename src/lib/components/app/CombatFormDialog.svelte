@@ -5,18 +5,15 @@
   signal since combats-list has no third state. Calls the store directly (createCombat / editCombat)
   rather than bubbling an onSubmit, per tasks.md Phase 3 — parents pass in the store (or a
   test-double implementing the same two methods).
+
+  This shell only owns identity (`combat`/`open`/`store`) and remounts CombatFormBody via
+  `{#key combat?.id ?? 'new'}` — the form's local state lives entirely in the body so seeding it
+  from `combat` is a plain `$state` initializer, never an effect (Phase 2, 2026-07-28 plan).
 -->
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import { Textarea } from '$lib/components/ui/textarea';
-	import { type Combat, type ColorTag } from '$lib/db/types';
-	import { m } from '$lib/i18n';
+	import { type Combat } from '$lib/db/types';
 	import type { CombatInput, EditCombatPatch } from '$lib/stores/domain';
-	import { DESCRIPTION_MAX_LENGTH, TITLE_MAX_LENGTH } from '$lib/stores/domain/constants';
-	import ColorSwatchPicker from './ColorSwatchPicker.svelte';
-	import Field from './Field.svelte';
-	import ResponsiveModal from './ResponsiveModal.svelte';
+	import CombatFormBody from './CombatFormBody.svelte';
 
 	/** Narrow store surface this dialog needs — lets tests pass a plain spy object. */
 	export interface CombatFormStore {
@@ -34,84 +31,8 @@
 		open?: boolean;
 		store: CombatFormStore;
 	} = $props();
-
-	let title = $state('');
-	let description = $state('');
-	let colorTag = $state<ColorTag>('neutral');
-
-	const formTitle = $derived(
-		combat ? m['forms.combat.edit.title']() : m['forms.combat.create.title'](),
-	);
-
-	// (Re)initialize the form whenever it opens (prefill on edit, blank defaults on create).
-	$effect(() => {
-		if (!open) return;
-		if (combat) {
-			title = combat.title;
-			description = combat.description;
-			colorTag = combat.colorTag;
-		} else {
-			title = '';
-			description = '';
-			colorTag = 'neutral';
-		}
-	});
-
-	function submit() {
-		if (combat) {
-			store.editCombat(combat.id, { title, description, colorTag });
-			open = false;
-			return;
-		}
-		const resolvedTitle = title.trim() ? title : m['combats.defaultTitle']();
-		const created = store.createCombat({ title: resolvedTitle, description, colorTag });
-		if (!created) return;
-		open = false;
-	}
 </script>
 
-<ResponsiveModal bind:open title={formTitle} size="form" onSubmit={submit}>
-	{#snippet children()}
-		<Field label={m['forms.field.title']()} for="cf-title">
-			<Input
-				id="cf-title"
-				bind:value={title}
-				maxlength={TITLE_MAX_LENGTH}
-				placeholder={m['forms.field.title.placeholder']()}
-				size="action"
-				class="border-[var(--border-strong)] text-[15px] md:text-[15px]"
-			/>
-		</Field>
-
-		<Field label={m['forms.field.description']()} for="cf-description">
-			<Textarea
-				id="cf-description"
-				bind:value={description}
-				maxlength={DESCRIPTION_MAX_LENGTH}
-				placeholder={m['forms.field.description.placeholder']()}
-				class="rounded-sm border-[var(--border-strong)] text-[15px] md:text-[15px]"
-			/>
-		</Field>
-
-		<Field label={m['forms.field.colorTag']()}>
-			<ColorSwatchPicker bind:value={colorTag} />
-		</Field>
-	{/snippet}
-
-	{#snippet footer()}
-		<div class="flex justify-center gap-2">
-			<Button
-				type="button"
-				variant="outline"
-				size="action"
-				class="min-w-0 flex-1 shrink basis-0 border-[var(--border-strong)]"
-				onclick={() => (open = false)}
-			>
-				{m['forms.action.cancel']()}
-			</Button>
-			<Button type="submit" size="action" class="min-w-0 flex-1 shrink basis-0 font-semibold">
-				{combat ? m['forms.action.save']() : m['forms.action.create']()}
-			</Button>
-		</div>
-	{/snippet}
-</ResponsiveModal>
+{#key combat?.id ?? 'new'}
+	<CombatFormBody bind:open {combat} {store} />
+{/key}

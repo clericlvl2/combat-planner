@@ -22,12 +22,12 @@
 	import type { Combat } from '$lib/db/types';
 	import { m } from '$lib/i18n';
 	import { chromeIcon } from '$lib/icons';
-	import { RANGES } from '$lib/stores/domain/constants';
 	import { escalationDie, showRoundAndEscalation } from '$lib/stores/domain/derive';
 	import type { CombatController } from './controller';
 	import ConfirmDialog from './ConfirmDialog.svelte';
 	import DesktopNav from './DesktopNav.svelte';
-	import NumberField from './NumberField.svelte';
+	import EscalationEditor from './EscalationEditor.svelte';
+	import RoundEditor from './RoundEditor.svelte';
 
 	let {
 		combat,
@@ -60,24 +60,16 @@
 
 	// round editor
 	let roundOpen = $state(false);
-	let roundEntry = $state<number | null>(null);
-	$effect(() => {
-		if (roundOpen) roundEntry = combat.round;
-	});
-	function saveRound() {
-		if (roundEntry !== null) controller.editRound(roundEntry);
+	function saveRound(value: number) {
+		controller.editRound(value);
 		roundOpen = false;
 	}
 
 	// escalation editor — tap to open (round counter's editor uses the same pattern)
 	let escAnchor = $state<HTMLElement | null>(null);
 	let escOpen = $state(false);
-	let escEntry = $state<number | null>(null);
-	$effect(() => {
-		if (escOpen) escEntry = esc;
-	});
-	function saveEsc() {
-		if (escEntry !== null) controller.setEscalation(escEntry);
+	function saveEsc(value: number) {
+		controller.setEscalation(value);
 		escOpen = false;
 	}
 
@@ -204,16 +196,9 @@
 					<span class="text-base font-semibold tabular-nums">{combat.round}</span>
 				</PopoverTrigger>
 				<PopoverContent class="w-48">
-					<NumberField
-						id="round-edit"
-						label={m['combat.round']({ n: combat.round })}
-						bind:value={roundEntry}
-						min={RANGES.round.min}
-						max={RANGES.round.max}
-					/>
-					<div class="flex justify-end">
-						<Button size="action" class="w-full" onclick={saveRound}>{m['forms.action.save']()}</Button>
-					</div>
+					{#key roundOpen}
+						<RoundEditor round={combat.round} onSave={saveRound} />
+					{/key}
 				</PopoverContent>
 			</Popover>
 
@@ -233,16 +218,9 @@
 					<span class="text-base font-semibold tabular-nums">{esc}</span>
 				</button>
 				<PopoverContent customAnchor={escAnchor} class="w-48">
-					<NumberField
-						id="esc-edit"
-						label={m['combat.escalation']()}
-						bind:value={escEntry}
-						min={RANGES.escalation.min}
-						max={RANGES.escalation.max}
-					/>
-					<div class="flex justify-end">
-						<Button size="action" class="w-full" onclick={saveEsc}>{m['forms.action.save']()}</Button>
-					</div>
+					{#key escOpen}
+						<EscalationEditor {esc} onSave={saveEsc} />
+					{/key}
 				</PopoverContent>
 			</Popover>
 		</div>

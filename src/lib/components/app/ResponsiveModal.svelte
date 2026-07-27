@@ -41,6 +41,7 @@
 		title,
 		size = 'form',
 		onSubmit,
+		onOpenChange,
 		children,
 		footer,
 	}: {
@@ -52,6 +53,10 @@
 		/** Present -> body + footer are wrapped in a single `<form>` so `type="submit"` footer
 		 *  buttons share it with the fields, even though the footer sits outside the scroller. */
 		onSubmit?: () => void;
+		/** Fires on every open/close, including the dismissals that never touch caller code —
+		 *  Escape, backdrop click, vaul's swipe-down. Callers that keep form state alive across
+		 *  closes re-seed from here; `bind:open` alone cannot see who closed the modal. */
+		onOpenChange?: (open: boolean) => void;
 		children: Snippet;
 		footer?: Snippet;
 	} = $props();
@@ -95,7 +100,7 @@
 {/snippet}
 
 {#if isDesktop.current}
-	<Dialog bind:open>
+	<Dialog bind:open {onOpenChange}>
 		<DialogContent
 			class={cn(
 				'flex max-h-[calc(100dvh-2rem)] flex-col rounded-lg border border-[var(--border-strong)] ring-0',
@@ -110,7 +115,7 @@
 		</DialogContent>
 	</Dialog>
 {:else}
-	<Drawer bind:open>
+	<Drawer bind:open {onOpenChange}>
 		<DrawerContent
 			data-responsive-modal="drawer"
 			class={cn('mx-auto flex max-h-[80dvh] flex-col', SIZE_CLASS[size].mobile)}

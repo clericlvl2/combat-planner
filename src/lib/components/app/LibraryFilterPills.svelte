@@ -18,7 +18,7 @@
 
 	let {
 		allTags,
-		selected = $bindable([]),
+		selected = [],
 		onChange,
 	}: { allTags: string[]; selected?: string[]; onChange: (names: string[]) => void } = $props();
 
@@ -41,7 +41,6 @@
 		const next = selected.includes(name)
 			? selected.filter((n) => n !== name)
 			: [...selected, name];
-		selected = next;
 		onChange(next);
 	}
 

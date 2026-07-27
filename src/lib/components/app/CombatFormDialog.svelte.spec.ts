@@ -82,6 +82,25 @@ test('create mode blocks silently and keeps the dialog open when store returns n
 		.toBeVisible();
 });
 
+test('create mode starts blank again after an abandoned session', async () => {
+	const store = { createCombat: vi.fn(), editCombat: vi.fn() };
+	const screen = render(CombatFormDialog, { open: true, store });
+
+	await userEvent.fill(screen.getByLabelText(m['forms.field.title']()), 'Abandoned draft');
+	await screen.getByRole('button', { name: m['forms.action.cancel']() }).click();
+
+	// The {#key} keys on `combat?.id ?? 'new'`, which is the constant 'new' here, and the body
+	// lives outside the content bits-ui tears down — so nothing remounts. Re-seeding on close is
+	// what keeps the next session blank.
+	await screen.rerender({ open: true, store });
+	await expect
+		.element(screen.getByRole('dialog', { name: m['forms.combat.create.title']() }))
+		.toBeVisible();
+
+	await expect.element(screen.getByLabelText(m['forms.field.title']())).toHaveValue('');
+	expect(store.createCombat).not.toHaveBeenCalled();
+});
+
 test('edit mode pre-fills from the existing combat', async () => {
 	const combat = createCombat(
 		{ title: 'Dragon lair', description: 'Final boss', colorTag: 'red' },

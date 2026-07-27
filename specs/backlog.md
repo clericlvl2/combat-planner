@@ -1,9 +1,10 @@
 # Backlog
 
-next_id: W-033
+next_id: W-034
 
 | ID | Pri | Loop | State | Outcome | Depends | Plan |
 |----|-----|------|-------|---------|---------|------|
+| W-033 | L | large | active | PWA never registers in production — no SW, no manifest link, no HTML in precache. App is neither offline-capable nor installable | — | `.claude/plans/2026-07-27-restore-pwa-offline-install.md` |
 | W-028 | M | large | active | Progressive nav lag + Settings won't open — suspect stuck bits-ui overlay body-lock; needs runtime repro | — | `specs/reports/2026-07-20-nav-lag-overlay-lock.md` |
 | W-006 | L | large | inbox | App-data export — whole app state, and library on its own. Export only, no import; no per-combat snapshots | — | — |
 

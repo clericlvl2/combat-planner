@@ -171,3 +171,20 @@
 		box-shadow: none;
 	}
 }
+
+/* Global reduced-motion kill-switch (CSS-driven motion only — see src/lib/motion.ts for the
+ * JS-side mirror that zeroes Svelte transition:/animate: durations, which a media query cannot
+ * reach). Near-zero duration, not `animation: none` — bits-ui's presence layer waits on
+ * getAnimations() before unmounting content; removing the animation outright would change that
+ * code path. This also supersedes the local reduced-motion block in ui/sonner/sonner.svelte,
+ * which stays in place as a harmless duplicate. */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+}

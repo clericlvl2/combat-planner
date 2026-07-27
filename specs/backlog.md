@@ -4,7 +4,6 @@ next_id: W-038
 
 | ID | Pri | Loop | State | Outcome | Depends | Plan |
 |----|-----|------|-------|---------|---------|------|
-| W-035 | S | small | active | Service worker registers at relative `./sw.js` — resolves to `/combats/sw.js` on the app's primary route, so no SW, no offline, no install, no update toast where the DM actually sits. Harden the e2e spec that missed it | — | — |
 | W-036 | S | small | inbox | `src/app.html` links `/favicon.svg`, which does not exist in `build/` — 404 on every page load | — | — |
 | W-037 | S | small | inbox | InstallBanner sits inside `{#key store.settings.language}`, so a language switch destroys it and discards the stashed `beforeinstallprompt` for the session. Needs a module-level stash outside component lifetime — moving the component out of the key block would break its own localized text | — | — |
 | W-034 | S | small | inbox | Run the W-033 manual PWA device pass against the live deploy — install, airplane-mode reload, offline deep link, update toast on redeploy. Checklist written, never run | — | `specs/reports/2026-07-27-pwa-restoration.md` |

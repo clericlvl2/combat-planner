@@ -1,7 +1,7 @@
 <!--
   CombatList — vertical list of `CombatRow`, sorted by
   `listOrder`, wrapped with `svelte-dnd-action`'s `dragHandleZone` (ADR-006) so drag-to-reorder
-  only initiates from each row's `GripVertical` handle (marked with the paired `dragHandle`
+  only initiates from each row's `chromeIcon.drag` handle (marked with the paired `dragHandle`
   action in `CombatRow`), not the whole card. On drop (finalize) the new order is handed to
   `reorderCombats` so it persists via the store → Dexie ("drag to reorder; order survives
   reload"). Row callbacks and the active search query are passed straight through from this

@@ -71,7 +71,7 @@
 	};
 
 	const Backspace = chromeIcon.backspace;
-	const ClearIcon = chromeIcon.close;
+	const ClearIcon = chromeIcon.clear;
 	const Expand = chromeIcon.expand;
 
 	function push(d: string) {

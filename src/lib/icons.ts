@@ -2,38 +2,33 @@
  * Centralized Lucide glyph map (ADR-011). One file so a later glyph swap is a single edit.
  * Two groups: combatant `type` and UI `chrome` (conditions are text-only tags, no icons — see
  * ConditionPicker/ConditionIconList).
- *
- * TODO M-phase (ADR-011): the chrome glyphs still open (Glyph gaps: clear) are pinned here
- * pending their formal addition to ADR-011. `menu` /
- * `navCombats` / `navSettings` / `navAbout` (unit 006 Phase 1, AppHeader/NavSidebar) fill the
- * "menu/burger, settings/about nav icons" gap — Combats keeps its crossed-swords glyph.
  */
 import {
-	Ban,
-	BookOpen,
+	BookPlus,
 	ChevronDown,
 	ChevronLeft,
-	ChevronRight,
+	ChevronsRight,
+	CircleAlert,
 	Copy,
-	Dices,
+	Delete,
 	EllipsisVertical,
+	EyeOff,
+	GripHorizontal,
 	Info,
+	LibraryBig,
 	type Icon as LucideIcon,
-	Menu,
+	PanelLeft,
 	Pencil,
 	Play,
 	Plus,
-	Redo2,
+	Redo,
 	Search,
 	Settings,
-	Share2,
 	Shield,
 	Skull,
 	Swords,
 	Trash2,
-	TriangleAlert,
-	Undo2,
-	Upload,
+	Undo,
 	User,
 	Users,
 	X,
@@ -49,32 +44,31 @@ export const typeIcon: Record<CombatantType, IconComponent> = {
 	ally: Shield,
 };
 
-/** UI chrome glyphs (ADR-011 firm set + the still-open glyph gaps). */
+/** UI chrome glyphs (ADR-011 firm set). */
 export const chromeIcon = {
 	back: ChevronLeft,
-	undo: Undo2,
-	redo: Redo2,
-	advance: ChevronRight,
+	undo: Undo,
+	redo: Redo,
+	advance: ChevronsRight,
 	overflow: EllipsisVertical,
 	add: Plus,
-	import: Upload,
-	export: Share2,
-	roll: Dices,
-	// Open glyph gaps (pending ADR-011):
 	edit: Pencil,
 	remove: Trash2,
 	duplicate: Copy,
-	disable: Ban,
+	disable: EyeOff,
 	close: X,
+	clear: X,
 	expand: ChevronDown,
-	backspace: ChevronLeft,
-	menu: Menu,
+	backspace: Delete,
+	menu: PanelLeft,
 	navCombats: Swords,
 	navSettings: Settings,
 	navAbout: Info,
-	navLibrary: BookOpen,
+	navLibrary: LibraryBig,
+	saveToLibrary: BookPlus,
+	drag: GripHorizontal,
 	start: Play,
 	search: Search,
-	alert: TriangleAlert,
+	alert: CircleAlert,
 	roster: Users,
 } satisfies Record<string, IconComponent>;

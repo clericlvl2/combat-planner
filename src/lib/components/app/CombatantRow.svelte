@@ -100,7 +100,7 @@
 	const Duplicate = chromeIcon.duplicate;
 	const Disable = chromeIcon.disable;
 	const Remove = chromeIcon.remove;
-	const SaveToLibrary = chromeIcon.navLibrary;
+	const SaveToLibrary = chromeIcon.saveToLibrary;
 
 	/** "+ Condition" / "+ Note" triggers — same chip box as the condition tags (Badge), just
 	 *  dashed to read as an affordance rather than a value: chip gap, normal weight,

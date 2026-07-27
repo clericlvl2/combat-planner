@@ -1,7 +1,7 @@
 <!--
   CombatRow — one Combats-home list row: the
   whole `Card` is the open target and the whole-card hover surface; a leading
-  drag-handle (`GripVertical`, marked with svelte-dnd-action's `dragHandle` — ADR-006) and
+  drag-handle (`chromeIcon.drag`, marked with svelte-dnd-action's `dragHandle` — ADR-006) and
   the trailing `⋮` (`CombatRowMenu`, Edit/Delete only) are both excluded from the open target via
   `data-no-open` + a `closest()` guard in the card's click handler. Title/description render the
   active search query highlighted via `<mark>` segments. Delete is gated behind the reused
@@ -9,10 +9,10 @@
 -->
 <script lang="ts">
 	import { dragHandle } from 'svelte-dnd-action';
-	import { GripVertical } from '@lucide/svelte';
 	import { Card } from '$lib/components/ui/card';
 	import type { Combat } from '$lib/db/types';
 	import { m } from '$lib/i18n';
+	import { chromeIcon } from '$lib/icons';
 	import ColorTagDot from './ColorTagDot.svelte';
 	import CombatRowMenu from './CombatRowMenu.svelte';
 	import ConfirmDialog from './ConfirmDialog.svelte';
@@ -32,6 +32,8 @@
 	} = $props();
 
 	let deleteOpen = $state(false);
+
+	const Grip = chromeIcon.drag;
 
 	const menuLabel = $derived(m['a11y.combatRowMenu']({ title: combat.title }));
 	const gripLabel = $derived(m['a11y.reorder']({ title: combat.title }));
@@ -94,7 +96,7 @@
 	onkeydown={handleCardKeydown}
 >
 	<span use:dragHandle data-no-open aria-label={gripLabel} class="flex shrink-0 items-center">
-		<GripVertical class="size-4 text-muted-foreground" aria-hidden="true" />
+		<Grip class="size-4 text-muted-foreground" aria-hidden="true" />
 	</span>
 	<span class="flex min-w-0 flex-1 items-center gap-3 p-1">
 		<ColorTagDot colorTag={combat.colorTag} letter={titleInitial} />

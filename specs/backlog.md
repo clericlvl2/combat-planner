@@ -6,7 +6,7 @@ next_id: W-033
 |----|-----|------|-------|---------|---------|------|
 | W-028 | M | large | active | Progressive nav lag + Settings won't open — suspect stuck bits-ui overlay body-lock; needs runtime repro | — | `specs/reports/2026-07-20-nav-lag-overlay-lock.md` |
 | W-006 | L | large | inbox | App-data export/import — all-combats + single-combat, fail-safe import (v2) | — | — |
-| W-019 | M | large | inbox | Icon revision — audit every `lucide-svelte` icon in use, fix each choice or swap for a better-fitting one | — | — |
+| W-019 | M | large | active | Icon revision — audit every `lucide-svelte` icon in use, fix each choice or swap for a better-fitting one | — | `.claude/plans/2026-07-27-icon-revision.md` |
 
 **Fields**
 

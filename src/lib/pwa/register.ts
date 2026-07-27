@@ -1,15 +1,22 @@
+/// <reference types="vite-plugin-pwa/svelte" />
 /**
- * Service-worker registration seam (ADR-004) — PLACEHOLDER, wired in a later milestone.
+ * Service-worker registration seam (ADR-004).
  *
  * The PWA plugin is configured with `registerType: 'prompt'` (vite.config.ts), so a
  * waiting service worker must surface the locked "Update available — reload" toast
  * (i18n toasts.update.*) and reload to activate — data in IndexedDB survives.
  *
- * Implementation will use the plugin's Svelte virtual module:
- *   import { useRegisterSW } from 'virtual:pwa-register/svelte';
- * driving UpdateToast + the InstallBanner via
- * `beforeinstallprompt` (persist `installHintDismissed`).
+ * Thin wrapper over the plugin's Svelte virtual module — `needRefresh` (a Svelte store)
+ * and `updateServiceWorker` are re-exported as-is so `+layout.svelte` owns all UI. No
+ * network beacons or telemetry (ADR-010): `useRegisterSW` is called with no options, so
+ * it neither pings nor periodically checks a remote endpoint beyond fetching this app's
+ * own `sw.js` for updates.
  *
- * TODO M-phase: register the SW and wire the update/install UI (no network beacons — ADR-010).
+ * The manifest `<link>` itself is static in `src/app.html`, not injected from here — see
+ * the comment there for why `<svelte:head>` can't reach the adapter-static SPA fallback.
  */
-export {};
+import { useRegisterSW } from 'virtual:pwa-register/svelte';
+
+const { needRefresh, updateServiceWorker } = useRegisterSW();
+
+export { needRefresh, updateServiceWorker };

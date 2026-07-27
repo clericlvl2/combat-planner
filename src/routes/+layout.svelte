@@ -3,7 +3,9 @@
 	import AppShell from '$lib/components/app/AppShell.svelte';
 	import { applyTheme } from '$lib/theme';
 	import { store } from '$lib/stores';
-	import { Toaster } from '$lib/components/ui/sonner';
+	import { Toaster, toast } from '$lib/components/ui/sonner';
+	import { m } from '$lib/i18n';
+	import { needRefresh, updateServiceWorker } from '$lib/pwa/register';
 	import './layout.css';
 
 	// TODO M-phase: AppShell still needs the InstallBanner / ConfirmDialog global singletons —
@@ -20,6 +22,24 @@
 	$effect(() => {
 		const cleanup = applyTheme(store.settings.theme);
 		return cleanup;
+	});
+
+	// Update-available toast (ADR-004, registerType: 'prompt'). `$needRefresh` is the
+	// plugin's own Svelte store, so this effect only reruns when the store's value actually
+	// flips (false -> true, once per waiting worker) — not on every unrelated re-render, and
+	// deliberately kept outside the `{#key store.settings.language}` subtree below so a
+	// language switch can never re-fire it. Non-expiring (`duration: Infinity`): the user
+	// must be able to act whenever they notice it.
+	$effect(() => {
+		if ($needRefresh) {
+			toast(m['toasts.update.message'](), {
+				duration: Number.POSITIVE_INFINITY,
+				action: {
+					label: m['toasts.update.action'](),
+					onClick: () => updateServiceWorker(true),
+				},
+			});
+		}
 	});
 </script>
 

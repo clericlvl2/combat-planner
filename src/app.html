@@ -6,6 +6,11 @@
 		<!-- Default (dark) theme-color; updated dynamically at runtime by src/lib/theme.ts. -->
 		<meta name="theme-color" content="#101317" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.svg" />
+		<!-- Static, not injected via <svelte:head> (ADR-004): ADR-007 keeps `prerender = false`
+		     on every route, so adapter-static's SPA fallback (this shell) is rendered with
+		     SvelteKit's forced `ssr: false` — <svelte:head> content from +layout.svelte never
+		     reaches the fallback's static HTML, only the client bundle at hydration. -->
+		<link rel="manifest" href="%sveltekit.assets%/manifest.webmanifest" />
 		<!-- TODO M-phase: set <html lang>/<dir> client-side from the active locale (ADR-005). -->
 		%sveltekit.head%
 	</head>

@@ -82,7 +82,7 @@
 		onclick={tap}
 	>
 		<span
-			class="chip init-pill flex h-[22px] w-full items-center justify-center gap-[5px] rounded-full border border-border bg-secondary px-2.5 text-sm text-muted-foreground tabular-nums group-hover:bg-muted group-hover:text-foreground"
+			class="chip init-pill flex h-[22px] w-full items-center justify-center gap-[5px] rounded-full border border-border bg-secondary px-2.5 text-sm text-muted-foreground tabular-nums transition-transform duration-[var(--dur-fast)] ease-[var(--ease-out)] group-hover:bg-muted group-hover:text-foreground group-active:translate-y-px"
 		>
 			Init
 			<b class="inline-block w-[2ch] text-center text-foreground">{display}</b>

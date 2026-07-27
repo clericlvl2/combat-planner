@@ -104,7 +104,7 @@
 	 *  dashed to read as an affordance rather than a value: chip gap, normal weight,
 	 *  `--border`-token border color. */
 	const tagTriggerClass =
-		'inline-flex h-[22px] items-center gap-[5px] rounded-full border border-dashed border-border px-2.5 py-0.5 text-sm text-muted-foreground hover:border-foreground hover:text-foreground';
+		'inline-flex h-[22px] items-center gap-[5px] rounded-full border border-dashed border-border px-2.5 py-0.5 text-sm text-muted-foreground transition-transform duration-[var(--dur-fast)] ease-[var(--ease-out)] hover:border-foreground hover:text-foreground active:translate-y-px';
 
 	/** Def-stat value styling (Row 3) — `<b>`-default (bold) weight against the muted label text,
 	 *  text color `var(--text)` with no explicit font-weight override. */
@@ -187,7 +187,7 @@
 					     health bar filling the rest, both inside one rounded hover/press area. -->
 					<button
 						type="button"
-						class="flex min-h-10 w-full cursor-pointer items-center gap-3 rounded-md px-1 py-1 hover:bg-muted lg:min-h-8"
+						class="flex min-h-10 w-full cursor-pointer items-center gap-3 rounded-md px-1 py-1 transition-transform duration-[var(--dur-fast)] ease-[var(--ease-out)] hover:bg-muted active:translate-y-px lg:min-h-8"
 						aria-label={hpLabel}
 						onclick={() => onOpenNumpad(combatant.id)}
 					>

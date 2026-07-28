@@ -1,11 +1,12 @@
 # Backlog
 
-next_id: W-041
+next_id: W-042
 
 | ID | Pri | Loop | State | Outcome | Depends | Plan |
 |----|-----|------|-------|---------|---------|------|
 | W-039 | M | large | inbox | Split `CombatHeader.svelte` (two divergent popover implementations) and `CombatantFormBody.svelte` (four props encoding two axes). Both flagged by the W-038 audit, deferred as out of scope there | — | — |
 | W-040 | M | large | inbox | `hpLog` grows unbounded inside persisted undo snapshots (`domain/hp.ts`) — every snapshot carries the full log, so a long combat compounds. Needs a history-retention decision, not a style fix | — | — |
+| W-041 | M | large | inbox | Boot flash on first open still visible. `src/app.html`'s pre-paint script now sets `data-theme` + `color-scheme` (kills the unstyled white/black token flash), but a blank-shell → app transition remains: ADR-007 keeps `ssr = false` / `prerender = false`, so the served HTML is an empty SPA shell and nothing paints until the JS bundle hydrates. Fixing it means revisiting the render strategy (prerendered shell, or a static skeleton in the shell body) — not a CSS change | — | `.claude/plans/2026-07-28-fix-theme-boot-flash.md` |
 | W-036 | S | small | inbox | `src/app.html` links `/favicon.svg`, which does not exist in `build/` — 404 on every page load | — | — |
 | W-037 | S | small | inbox | InstallBanner sits inside `{#key store.settings.language}`, so a language switch destroys it and discards the stashed `beforeinstallprompt` for the session. Needs a module-level stash outside component lifetime — moving the component out of the key block would break its own localized text | — | — |
 | W-034 | S | small | inbox | Run the W-033 manual PWA device pass against the live deploy — install, airplane-mode reload, offline deep link, update toast on redeploy. Checklist written, never run | — | `specs/reports/2026-07-27-pwa-restoration.md` |

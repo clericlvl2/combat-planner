@@ -1,7 +1,4 @@
 {
-	"worktree": {
-		"baseRef": "head"
-	},
 	"hooks": {
 		"Stop": [
 			{
@@ -14,5 +11,19 @@
 				]
 			}
 		]
+	},
+	"worktree": {
+		"baseRef": "head"
+	},
+	"extraKnownMarketplaces": {
+		"svelte": {
+			"source": {
+				"source": "github",
+				"repo": "sveltejs/ai-tools"
+			}
+		}
+	},
+	"enabledPlugins": {
+		"svelte@svelte": true
 	}
 }

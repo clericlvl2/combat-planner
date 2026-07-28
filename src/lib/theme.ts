@@ -10,6 +10,14 @@ import type { Theme } from '$lib/db/types';
 const DARK_THEME_COLOR = '#101317';
 const LIGHT_THEME_COLOR = '#f4f5f7';
 
+/**
+ * localStorage key holding a mirror of `settings.theme`. Dexie stays the source of truth; this
+ * mirror exists purely so the pre-paint boot script in `src/app.html` (which cannot await Dexie,
+ * and cannot import this module) can set `data-theme` before the first paint. Keep the literal in
+ * app.html in sync with this constant.
+ */
+export const THEME_STORAGE_KEY = 'cp-theme';
+
 function setThemeColorMeta(isDark: boolean) {
 	const meta = document.querySelector('meta[name="theme-color"]');
 	meta?.setAttribute('content', isDark ? DARK_THEME_COLOR : LIGHT_THEME_COLOR);
@@ -28,6 +36,15 @@ function applyIsDark(isDark: boolean) {
  * no-op for `dark`/`light`) — call it before re-invoking on theme change.
  */
 export function applyTheme(theme: Theme): () => void {
+	// Mirror the SETTING, not the resolved value — `system` must re-resolve against the live media
+	// query at next boot rather than replay a stale resolution. Best-effort: private mode and
+	// storage-disabled profiles throw here, and the boot script degrades to its own fallback.
+	try {
+		localStorage.setItem(THEME_STORAGE_KEY, theme);
+	} catch {
+		// Boot hint only — never a hard failure.
+	}
+
 	const media = window.matchMedia('(prefers-color-scheme: dark)');
 	const resolve = () => theme === 'dark' || (theme === 'system' && media.matches);
 

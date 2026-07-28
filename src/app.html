@@ -12,6 +12,29 @@
 		     reaches the fallback's static HTML, only the client bundle at hydration. -->
 		<link rel="manifest" href="%sveltekit.assets%/manifest.webmanifest" />
 		<!-- TODO M-phase: set <html lang>/<dir> client-side from the active locale (ADR-005). -->
+		<!-- Theme boot (pre-paint). Every color token in tokens.css is scoped under
+		     [data-theme="dark"|"light"]; without the attribute set before the first paint the page
+		     renders with unresolved custom properties (white bg / black text) until hydration runs
+		     applyTheme(). Reads the localStorage mirror of settings.theme written by
+		     src/lib/theme.ts (THEME_STORAGE_KEY) — Dexie is async and unreachable here. Must stay
+		     inline and synchronous; a deferred or external script paints too late.
+		     `colorScheme` is set alongside it because the app stylesheet is a render-blocking
+		     <link>: until it loads there is no `background` rule at all, so the browser paints its
+		     default canvas — white, regardless of data-theme. Declaring the color scheme inline
+		     makes that default canvas dark, which is what removes the white-to-dark flip without
+		     duplicating any --bg token hex into this shell. -->
+		<script>
+			try {
+				const t = localStorage.getItem('cp-theme') || 'system';
+				const dark =
+					t === 'dark' || (t !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+				document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+				document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+			} catch (e) {
+				document.documentElement.dataset.theme = 'dark';
+				document.documentElement.style.colorScheme = 'dark';
+			}
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

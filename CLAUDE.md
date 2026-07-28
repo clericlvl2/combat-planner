@@ -33,8 +33,8 @@ Canonical check sequence — run before considering any change done:
 npm run gate
 ```
 
-(expands to `lint && check && test:unit -- --run && build`). CI runs the same gate. Never weaken
-or skip a gate step to unblock a commit.
+(expands to `lint && check && check:i18n && test:unit -- --run && build`). CI runs the same gate.
+Never weaken or skip a gate step to unblock a commit.
 
 ## Store seam invariant
 

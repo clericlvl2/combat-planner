@@ -1,0 +1,5 @@
+src/lib/paraglide
+src/lib/components/ui
+build
+.svelte-kit
+node_modules

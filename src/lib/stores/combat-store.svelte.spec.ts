@@ -1,3 +1,4 @@
+import { flushSync } from 'svelte';
 import { describe, expect, it } from 'vitest';
 import type { PersistenceDb } from '../db/persistence';
 import type { Combat, CombatantTemplate, Settings } from '../db/types';
@@ -309,5 +310,47 @@ describe('CombatStore library delegation (ADR-002 seam) — thin methods only', 
 
 		store.toggleTemplateTag(id, 'undead');
 		expect(store.libraryEntries[0].tags).toEqual([]);
+	});
+});
+
+// Phase 5 (ADR-002): `combats`/`libraryEntries`/`settings` moved to `$state.raw`, replaced
+// wholesale rather than deep-mutated. These pin the two failure modes that conversion risks:
+// a live `$state` proxy leaking past the seam (DataCloneError) and `#mutate`'s `.with()`
+// replacement silently failing to notify readers.
+describe('CombatStore $state.raw seam (Phase 5)', () => {
+	it('a #mutate write is observed by a reactive reader', async () => {
+		const db = fakeDb();
+		const store = new CombatStore(db);
+		await store.hydrate(() => 'gen');
+		const combatId = store.combats[0].id;
+		store.addCombatant(combatId, { name: 'Ogre', maxHp: 40 }, () => 'ogre');
+
+		const seen: number[] = [];
+		const cleanup = $effect.root(() => {
+			$effect(() => {
+				seen.push(store.getCombat(combatId)?.combatants[0].currentHp ?? -1);
+			});
+		});
+		flushSync();
+		expect(seen).toEqual([40]);
+
+		store.dealDamage(combatId, 'ogre', 15);
+		flushSync();
+		expect(seen).toEqual([40, 25]);
+
+		cleanup();
+	});
+
+	it('a persisted combat payload is structured-cloneable (no live $state proxy leaks through)', async () => {
+		const db = fakeDb();
+		const store = new CombatStore(db);
+		await store.hydrate(() => 'gen');
+		const combatId = store.combats[0].id;
+		store.addCombatant(combatId, { name: 'Ogre', maxHp: 40 }, () => 'ogre');
+		store.dealDamage(combatId, 'ogre', 15);
+
+		const combat = store.getCombat(combatId) as Combat;
+		expect(() => structuredClone(combat)).not.toThrow();
+		expect(structuredClone(combat)).toEqual(combat);
 	});
 });

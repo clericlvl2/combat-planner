@@ -38,9 +38,12 @@ or skip a gate step to unblock a commit.
 
 ## Store seam invariant
 
-Call `$state.snapshot()` on runes-backed state before passing it to pure domain functions or to
-Dexie — raw `$state` proxies throw `DataCloneError` on persist. This is the single most common
-footgun in this codebase; check it first when a Dexie write throws.
+Store state (`combats`, `libraryEntries`, `settings`) is `$state.raw` and is always **replaced,
+never mutated** — every transition and edit produces a new value and assigns it back, so it
+reaches pure domain functions and Dexie unproxied, no `$state.snapshot()` needed. Snapshot only
+values arriving from elsewhere, e.g. a caller-supplied patch built from a component's own
+`$state` — those can still be live proxies and will throw `DataCloneError` on persist if handed
+to Dexie unsnapshotted. Check this first when a Dexie write throws.
 
 ## Paraglide rule
 

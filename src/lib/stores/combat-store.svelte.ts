@@ -33,10 +33,10 @@ import { redo as undoRedo, undo as undoUndo } from './domain/undo';
 export class CombatStore {
 	readonly #db: PersistenceDb;
 
-	settings = $state<Settings>(createSettings());
-	combats = $state<Combat[]>([]);
+	settings = $state.raw<Settings>(createSettings());
+	combats = $state.raw<Combat[]>([]);
 	/** The combatant library — no tag state; the tag list is derived at consumers (ADR-002). */
-	libraryEntries = $state<CombatantTemplate[]>([]);
+	libraryEntries = $state.raw<CombatantTemplate[]>([]);
 	/** False until the first hydrate resolves; gates the UI boot (M2+). */
 	ready = $state(false);
 	/**
@@ -114,12 +114,10 @@ export class CombatStore {
 	#mutate(combatId: string, fn: (c: Combat) => Combat): void {
 		const idx = this.combats.findIndex((c) => c.id === combatId);
 		if (idx === -1) return;
-		// Detach a plain snapshot before handing state to the pure domain — Svelte's `$state`
-		// proxies are not structured-cloneable (undo.ts) nor IndexedDB-serializable (ADR-003).
-		const current = $state.snapshot(this.combats[idx]) as Combat;
+		const current = this.combats[idx];
 		const next = fn(current);
 		if (next === current) return; // no-op transition, skip the write
-		this.combats[idx] = next;
+		this.combats = this.combats.with(idx, next);
 		// TODO M-phase (ADR-003): debounce/batch writes per action burst.
 		void persistCombat(this.#db, next);
 	}
@@ -185,7 +183,7 @@ export class CombatStore {
 
 	/** Patch title/description/colorTag on an existing combat; no-op if the id is unknown. */
 	editCombat(id: string, patch: App.EditCombatPatch): void {
-		const snapshot = $state.snapshot(this.combats) as Combat[];
+		const snapshot = this.combats;
 		const edited = App.editCombat(snapshot, id, patch);
 		if (edited === snapshot) return; // unknown id — no-op
 		this.combats = edited;
@@ -200,13 +198,13 @@ export class CombatStore {
 	}
 
 	reorderCombats(orderedIds: string[]): void {
-		const reordered = App.reorderCombats($state.snapshot(this.combats) as Combat[], orderedIds);
+		const reordered = App.reorderCombats(this.combats, orderedIds);
 		this.combats = reordered;
 		void persistCombats(this.#db, reordered);
 	}
 
 	updateSettings(patch: Partial<Omit<Settings, 'id'>>): void {
-		const next = { ...($state.snapshot(this.settings) as Settings), ...patch };
+		const next = { ...this.settings, ...patch };
 		this.settings = next;
 		void persistSettings(this.#db, next);
 	}
@@ -216,7 +214,9 @@ export class CombatStore {
 	/** Create a template; returns it (or null at the `MAX_LIBRARY_ENTRIES` cap). Not undoable. */
 	addTemplate(input: CombatantTemplateInput, genId?: IdGen): CombatantTemplate | null {
 		const { list, created } = Library.addTemplateToList(
-			$state.snapshot(this.libraryEntries) as CombatantTemplate[],
+			this.libraryEntries,
+			// `input` is caller-supplied and may still be a component's live `$state` proxy — detach
+			// it before it reaches persistence (ADR-003).
 			$state.snapshot(input) as CombatantTemplateInput,
 			genId,
 		);
@@ -228,10 +228,12 @@ export class CombatStore {
 
 	/** Patch fields on an existing template; no-op if the id is unknown. */
 	editTemplate(id: string, patch: Library.EditTemplatePatch): void {
-		const snapshot = $state.snapshot(this.libraryEntries) as CombatantTemplate[];
+		const snapshot = this.libraryEntries;
 		const edited = Library.editTemplateInList(
 			snapshot,
 			id,
+			// `patch` is caller-supplied and may still be a component's live `$state` proxy — detach
+			// it before it reaches persistence (ADR-003).
 			$state.snapshot(patch) as Library.EditTemplatePatch,
 		);
 		if (edited === snapshot) return; // unknown id — no-op
@@ -242,8 +244,7 @@ export class CombatStore {
 
 	/** Delete a template (confirm-gated upstream; not undoable). */
 	removeTemplate(id: string): void {
-		const snapshot = $state.snapshot(this.libraryEntries) as CombatantTemplate[];
-		this.libraryEntries = Library.removeTemplateFromList(snapshot, id);
+		this.libraryEntries = Library.removeTemplateFromList(this.libraryEntries, id);
 		void removeLibraryEntryRow(this.#db, id);
 	}
 
@@ -254,12 +255,12 @@ export class CombatStore {
 	createTemplateFromCombatant(combatId: string, combatantId: string): CombatantTemplate | null {
 		const combatant = this.getCombat(combatId)?.combatants.find((c) => c.id === combatantId);
 		if (!combatant) return null;
-		return this.addTemplate(Library.templateInputFromCombatant($state.snapshot(combatant)));
+		return this.addTemplate(Library.templateInputFromCombatant(combatant));
 	}
 
 	/** Add/remove a tag on one template (case-insensitive canonicalization); no-op on unknown id. */
 	toggleTemplateTag(templateId: string, name: string): void {
-		const snapshot = $state.snapshot(this.libraryEntries) as CombatantTemplate[];
+		const snapshot = this.libraryEntries;
 		const toggled = Library.toggleTemplateTag(snapshot, templateId, name);
 		if (toggled === snapshot) return; // unknown id — no-op
 		this.libraryEntries = toggled;

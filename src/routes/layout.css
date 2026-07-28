@@ -149,6 +149,14 @@
 }
 
 @layer base {
+	/* Reserve the classic-scrollbar gutter on every route so short (non-scrolling) and tall
+	 * (scrolling) pages lay out at the same content width — without it the scrollbar appearing
+	 * per-route re-centers `.content-container` and the page visibly shifts on navigation.
+	 * No-op where scrollbars overlay (macOS trackpad, mobile). bits-ui's body scroll lock
+	 * detects `stable` and skips its own padding-right compensation, so modals don't double-shift. */
+	html {
+		scrollbar-gutter: stable;
+	}
 	* {
 		@apply border-border outline-ring/50;
 	}

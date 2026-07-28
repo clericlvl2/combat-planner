@@ -103,11 +103,6 @@
     }
 
     $effect(() => {
-        window.addEventListener('popstate', handlePopState);
-        return () => window.removeEventListener('popstate', handlePopState);
-    });
-
-    $effect(() => {
         const overlayOpen = addOpen || editOpen || numpadOpen;
         if (overlayOpen && !overlayHistoryPushed) {
             history.pushState({overlay: true}, '');
@@ -167,6 +162,8 @@
         });
     }
 </script>
+
+<svelte:window onpopstate={handlePopState} />
 
 {#if !store.ready}
     <p class="p-4 text-muted-foreground">…</p>

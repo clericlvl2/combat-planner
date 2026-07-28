@@ -25,6 +25,7 @@
     import NumberField from './NumberField.svelte';
     import {typeColor} from './labels';
     import ResponsiveModal, {drawerScrollGuard} from './ResponsiveModal.svelte';
+    import SearchField from './SearchField.svelte';
     import TypeToggle from './TypeToggle.svelte';
 
     let {
@@ -208,19 +209,14 @@
                     </EmptyState>
                 {:else}
                     <!-- Name-only picker (tag search stays a /library-page-only feature). -->
-                    <div class="flex h-10 flex-none items-center gap-2 rounded-sm border border-[var(--border-strong)] bg-secondary px-3 text-sm text-[var(--text-faint)]">
-                        <span aria-hidden="true" class="text-[16px] leading-none">&#8981;</span>
-                        <input
-                                type="search"
-                                bind:value={templateQuery}
-                                placeholder={m['library.picker.search.placeholder']()}
-                                aria-label={m['library.picker.search.placeholder']()}
-                                class="w-full touch-pan-y bg-transparent text-foreground outline-none placeholder:text-[var(--text-faint)]"
-                        />
-                    </div>
+                    <SearchField
+                            bind:value={templateQuery}
+                            placeholder={m['library.picker.search.placeholder']()}
+                            ariaLabel={m['library.picker.search.placeholder']()}
+                    />
                     <!-- Own scroll container inside the drawer — needs the same at-top swipe-close
                          guard as ResponsiveModal's scroll region (see its style block). -->
-                    <div use:drawerScrollGuard class="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto">
+                    <div {@attach drawerScrollGuard} class="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto">
                         {#each filteredTemplates as t (t.id)}
                             <button
                                     type="button"

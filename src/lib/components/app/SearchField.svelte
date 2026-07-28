@@ -8,18 +8,21 @@
 -->
 <script lang="ts">
 	import { m } from '$lib/i18n';
+	import { chromeIcon } from '$lib/icons';
 
 	let {
 		value = $bindable(''),
 		placeholder = m['combats.search.placeholder'](),
 		ariaLabel = m['combats.search.placeholder'](),
 	}: { value?: string; placeholder?: string; ariaLabel?: string } = $props();
+
+	const Search = chromeIcon.search;
 </script>
 
 <div
 	class="flex h-10 flex-none items-center gap-2 rounded-sm border border-[var(--border-strong)] bg-secondary px-3 text-sm text-[var(--text-faint)]"
 >
-	<span aria-hidden="true" class="text-[16px] leading-none">&#8981;</span>
+	<Search class="size-4 shrink-0" aria-hidden="true" />
 	<input
 		type="search"
 		bind:value

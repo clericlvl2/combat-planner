@@ -62,7 +62,6 @@
 
 	let open = $state(false);
 	let noteEditing = $state(false);
-	let noteEl = $state<HTMLTextAreaElement | null>(null);
 	let conditionsOpen = $state(false);
 
 	const toggleLabel = $derived(
@@ -77,18 +76,9 @@
 	const showNoteEditor = $derived(combatant.note !== '' || noteEditing);
 	// --halo is always defined (even when inactive) so the box-shadow can transition smoothly on
 	// BOTH turn-enter and turn-leave; the shadow itself only paints while `active`.
-	const haloStyle = $derived(
-		`--halo: color-mix(in srgb, ${typeAccent[combatant.type]} var(--halo-alpha), transparent)`,
+	const haloValue = $derived(
+		`color-mix(in srgb, ${typeAccent[combatant.type]} var(--halo-alpha), transparent)`,
 	);
-
-	$effect(() => {
-		if (noteEditing) noteEl?.focus();
-	});
-
-	// Collapsing without having typed a note resets to just the chip on next expand.
-	$effect(() => {
-		if (!open) noteEditing = false;
-	});
 
 	function commitNote(e: Event) {
 		controller.edit(combatant.id, { note: (e.currentTarget as HTMLTextAreaElement).value });
@@ -120,11 +110,16 @@
 		combatant.disabled && 'opacity-50',
 	]}
 	data-active={active}
-	style={haloStyle}
+	style="--halo: {haloValue}"
 >
 	<div class="flex items-stretch">
 		<div class="min-w-0 flex-1 p-[var(--card-pad)]">
-			<Collapsible bind:open>
+			<Collapsible
+				bind:open
+				onOpenChange={(v) => {
+					if (!v) noteEditing = false;
+				}}
+			>
 				<div class="flex flex-col">
 					<!-- Row 1: active-turn dot + name + trailing controls cluster (expand chevron, overflow menu) -->
 					<div class="flex items-center gap-2">
@@ -256,7 +251,9 @@
 					{#if showNoteEditor}
 						<Textarea
 							id="note-{combatant.id}"
-							bind:ref={noteEl}
+							{@attach (node) => {
+								if (noteEditing) node.focus();
+							}}
 							value={combatant.note}
 							maxlength={NOTE_MAX_LENGTH}
 							placeholder={m['forms.note.add']()}

@@ -23,7 +23,6 @@
 	}: { allTags: string[]; selected?: string[]; onChange: (names: string[]) => void } = $props();
 
 	let expanded = $state(false);
-	let scrollEl = $state<HTMLDivElement | null>(null);
 	let fadeLeft = $state(false);
 	let fadeRight = $state(false);
 
@@ -44,21 +43,18 @@
 		onChange(next);
 	}
 
-	function updateFade() {
-		const el = scrollEl;
-		if (!el) {
-			fadeLeft = false;
-			fadeRight = false;
-			return;
-		}
+	function updateFade(el: HTMLDivElement) {
 		fadeLeft = el.scrollLeft > 0;
 		fadeRight = el.scrollLeft < el.scrollWidth - el.clientWidth - 1;
 	}
 
-	$effect(() => {
+	function scrollGuard(el: HTMLDivElement) {
 		visibleTags;
-		updateFade();
-	});
+		updateFade(el);
+		const observer = new ResizeObserver(() => updateFade(el));
+		observer.observe(el);
+		return () => observer.disconnect();
+	}
 
 	const fadeStyle = $derived(
 		`mask-image: linear-gradient(to right, transparent 0, #000 ${fadeLeft ? '1rem' : '0px'}, #000 calc(100% - ${fadeRight ? '1rem' : '0px'}), transparent 100%)`,
@@ -68,8 +64,8 @@
 {#if allTags.length > 0}
 	<div class="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-1.5">
 		<div
-			bind:this={scrollEl}
-			onscroll={updateFade}
+			{@attach scrollGuard}
+			onscroll={(e) => updateFade(e.currentTarget)}
 			style={expanded ? undefined : fadeStyle}
 			class={[
 				'gap-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',

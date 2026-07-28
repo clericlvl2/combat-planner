@@ -7,7 +7,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import type { IconComponent } from '$lib/icons';
-	import { cn } from '$lib/utils';
 
 	let {
 		icon,
@@ -28,7 +27,7 @@
 
 <Button
 	size="fab"
-	class={cn('fixed right-4 bottom-safe shadow-lg', className)}
+	class={['fixed right-4 bottom-safe shadow-lg', className]}
 	{disabled}
 	aria-label={label}
 	{onclick}

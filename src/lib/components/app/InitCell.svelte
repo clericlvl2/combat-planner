@@ -62,6 +62,8 @@
 		if (entry !== null) onSetInitiative(combatant.id, entry);
 		open = false;
 	}
+
+	$effect(() => () => clearTimeout(timer));
 </script>
 
 <Popover bind:open>

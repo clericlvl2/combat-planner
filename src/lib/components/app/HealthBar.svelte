@@ -5,7 +5,7 @@
   color-alone: a role=img a11y label carries name + band + cur/max.
 -->
 <script lang="ts">
-	import type { Combatant } from '$lib/db/types';
+	import type { Combatant, HpLogEntry } from '$lib/db/types';
 	import { m } from '$lib/i18n';
 	import { DUR, dur } from '$lib/motion';
 	import { healthStatus } from '$lib/stores/domain/derive';
@@ -15,41 +15,46 @@
 
 	const status = $derived(healthStatus(combatant));
 
-	// Transient direction flash — derived from the component's own prop, never persisted, never
-	// fed back to the store. `prevHp` is a plain (non-reactive) local so the effect can diff
-	// against the last-seen value instead of re-triggering on every render.
+	// Transient direction flash — driven by `{#key}` remounting the overlay below plus a CSS-only
+	// fade (see the style block), so there is no timer and no effect. Direction comes from the last
+	// hpLog entry's own `type` rather than a diff against a remembered HP: the log already records
+	// what happened, and a remembered baseline is exactly the `state_referenced_locally` bug this
+	// replaces.
 	//
-	// `flashColor` holds the *last* direction and is never reset to null — an idle color class at
-	// `opacity-0` paints nothing, but keeping it applied means the fade-out has a color left to fade
-	// from instead of going transparent the instant the timeout fires. `flashActive` is the only
-	// thing that toggles, driving the opacity. The clear timeout and the overlay's own
-	// `transition-opacity` below are deliberately paired to the same `DUR.base` duration so the
-	// timeout can't fire before the fade-in finishes — if you change one, change the other.
-	let prevHp = combatant.currentHp;
-	let flashColor = $state<'damage' | 'heal' | null>(null);
-	let flashActive = $state(false);
-	let flashTimer: ReturnType<typeof setTimeout> | undefined;
+	// `{@const}` compiles to a derived, so this function must be idempotent — its body re-runs
+	// whenever the `combatant` prop changes identity, which the store's #mutate does on every edit
+	// to this combatant, not just HP ones. Returning a fresh answer on a re-run would unmount the
+	// flash span mid-animation. Keying the memo on the entry id makes repeat calls return the same
+	// value. Entries logged before `id` existed have none, and degrade to no flash.
+	let seenId: string | undefined;
+	let seenDir: FlashDirection = null;
+	let primed = false;
 
-	$effect(() => {
-		const hp = combatant.currentHp;
-		if (hp === prevHp) return;
-		// Direction is read before `prevHp` moves — order matters.
-		flashColor = hp < prevHp ? 'damage' : 'heal';
-		prevHp = hp;
-		flashActive = true;
-		clearTimeout(flashTimer);
-		flashTimer = setTimeout(() => {
-			flashActive = false;
-		}, dur(DUR.base));
-	});
+	type FlashDirection = 'damage' | 'heal' | null;
 
-	// Destroy-only teardown: reads nothing, so it never re-runs. The timer deliberately does NOT
-	// hang off the effect above — the store deep-clones via $state.snapshot() on every write, so
-	// `combatant` is a fresh object after any mutation and that effect re-runs constantly. A
-	// cleanup tied to its re-run would cancel a live flash on an unrelated change (advance turn,
-	// another combatant's edit) and leave the overlay stuck on, since the no-change branch
-	// schedules no replacement.
-	$effect(() => () => clearTimeout(flashTimer));
+	function flashFor(entry: HpLogEntry | undefined): FlashDirection {
+		// `primed` must gate the memo hit, not just the direction: a combatant starts with an empty
+		// hpLog, so the first call passes `undefined` — and `undefined === seenId` would take the
+		// memo path and leave `primed` false, swallowing that combatant's first real hit.
+		if (primed && entry?.id === seenId) return seenDir;
+		const first = !primed;
+		primed = true;
+		seenId = entry?.id;
+		// Whatever the log already held at mount is not news — flashing it would fire on every
+		// page load.
+		seenDir =
+			first || !entry
+				? null
+				: entry.type === 'damage'
+					? 'damage'
+					: entry.type === 'heal'
+						? 'heal'
+						: null;
+		return seenDir;
+	}
+
+	const lastEntry = $derived(combatant.hpLog.at(-1));
+
 	// When carrying temp HP, scale both segments against (maxHp + tempHp) so they sum to
 	// ≤100% inside the overflow-hidden track instead of the temp segment getting clipped.
 	const denom = $derived(combatant.maxHp + (status === 'dead' ? 0 : combatant.tempHp));
@@ -78,22 +83,46 @@
 			healthColor[status],
 			status === 'dead' && 'ml-auto',
 		]}
-		style="width: {fill}%"
+		style:width="{fill}%"
 	>
-		<span
-			aria-hidden="true"
-			class={[
-				'pointer-events-none absolute inset-0 transition-opacity duration-[var(--dur-base)] ease-[var(--ease-out)]',
-				flashColor === 'damage' && 'bg-combat-red',
-				flashColor === 'heal' && 'bg-combat-green',
-				flashActive ? 'opacity-70' : 'opacity-0',
-			]}
-		></span>
+		{#key lastEntry?.id ?? 'none'}
+			{@const dir = flashFor(lastEntry)}
+			{#if dir}
+				<span
+					aria-hidden="true"
+					class={[
+						'pointer-events-none absolute inset-0 animate-health-flash',
+						dir === 'damage' ? 'bg-combat-red' : 'bg-combat-green',
+					]}
+					style:animation-duration="{dur(DUR.base)}ms"
+				></span>
+			{/if}
+		{/key}
 	</div>
 	{#if tempFill > 0}
 		<div
 			class="h-full shrink-0 bg-combat-blue transition-[width] duration-[var(--dur-base)] ease-[var(--ease-out)]"
-			style="width: {tempFill}%"
+			style:width="{tempFill}%"
 		></div>
 	{/if}
 </div>
+
+<style>
+	/* Direction flash — plays once per {#key} remount (see script); fades from the same opacity
+	 * the old JS timer held for parity, duration set dynamically via style:animation-duration so
+	 * it still respects reduced-motion (dur() collapses to 0ms). */
+	@keyframes health-flash {
+		from {
+			opacity: 0.7;
+		}
+		to {
+			opacity: 0;
+		}
+	}
+
+	.animate-health-flash {
+		animation-name: health-flash;
+		animation-timing-function: var(--ease-out);
+		animation-fill-mode: forwards;
+	}
+</style>

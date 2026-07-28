@@ -12,14 +12,14 @@
 <script lang="ts" module>
 	/** Marks a drawer scroll container with `data-scroll-at-top` so the touch policy in the style
 	 *  block below can hand the at-top down-swipe to vaul instead of the browser. Exported only
-	 *  for call sites that own an extra scroll container inside a drawer (CombatantForm's
+	 *  for call sites that own an extra scroll container inside a drawer (CombatantFormBody's
 	 *  template list); the policy itself stays in this file. */
 	export function drawerScrollGuard(node: HTMLElement) {
 		const sync = () =>
 			node.setAttribute('data-scroll-at-top', node.scrollTop < 1 ? 'true' : 'false');
 		sync();
 		node.addEventListener('scroll', sync, { passive: true });
-		return { destroy: () => node.removeEventListener('scroll', sync) };
+		return () => node.removeEventListener('scroll', sync);
 	}
 </script>
 
@@ -64,14 +64,15 @@
 	const isDesktop = new MediaQuery('(min-width: 1024px)');
 </script>
 
-{#snippet shell()}
+{#snippet shell(isDrawer = false)}
 	<!-- `overflow-y-auto` makes overflow-x compute to `auto` too, so this box clips on both axes.
 	     The negative-margin/padding pairs give focus rings and selected-state rings (`ring-2
 	     ring-offset-2` = 4px outside the element box) room to draw inside the clip rect without
 	     changing the region's outer geometry — `px-3` horizontally, `py-1` vertically. Drop either
-	     and rings on edge-adjacent controls get cut (W-032). -->
+	     and rings on edge-adjacent controls get cut (W-032). `drawerScrollGuard` only makes sense
+	     on the drawer branch — the desktop Dialog never consults `data-scroll-at-top`. -->
 	<div
-		use:drawerScrollGuard
+		{@attach isDrawer ? drawerScrollGuard : () => {}}
 		class="-mx-3 -my-1 flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto px-3 py-1"
 	>
 		{@render children()}
@@ -81,7 +82,7 @@
 	{/if}
 {/snippet}
 
-{#snippet wrapper()}
+{#snippet wrapper(isDrawer = false)}
 	{#if onSubmit}
 		<form
 			class="flex min-h-0 flex-1 flex-col gap-3"
@@ -90,11 +91,11 @@
 				onSubmit();
 			}}
 		>
-			{@render shell()}
+			{@render shell(isDrawer)}
 		</form>
 	{:else}
 		<div class="flex min-h-0 flex-1 flex-col gap-3">
-			{@render shell()}
+			{@render shell(isDrawer)}
 		</div>
 	{/if}
 {/snippet}
@@ -125,7 +126,7 @@
 			</DrawerHeader>
 
 			<div class="flex min-h-0 flex-1 flex-col px-4 pb-safe">
-				{@render wrapper()}
+				{@render wrapper(true)}
 			</div>
 		</DrawerContent>
 	</Drawer>

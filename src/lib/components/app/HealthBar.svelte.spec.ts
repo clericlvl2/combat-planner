@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { render } from 'vitest-browser-svelte';
-import type { Combatant } from '$lib/db/types';
+import type { Combatant, HpLogEntry } from '$lib/db/types';
 import { createCombatant } from '$lib/stores/domain/factories';
 import HealthBar from './HealthBar.svelte';
 
@@ -76,5 +76,72 @@ describe('HealthBar', () => {
 		expect(bar.getAttribute('aria-label')).toBe('Ogre: Dead, -250 of 100 HP');
 		expect(bar.children).toHaveLength(1);
 		expect(widthPercent(bar.children[0])).toBe(100);
+	});
+});
+
+// The direction flash is driven by the last hpLog entry rather than a remembered HP baseline, and
+// is read through `{@const}` — which is a derived, so its body re-runs whenever the `combatant`
+// prop changes identity. The store hands out a fresh object on every edit to a combatant, so these
+// pin the two ways that bit: a swallowed first hit, and a flash torn down by an unrelated edit.
+describe('HealthBar damage/heal flash', () => {
+	function log(over: Partial<HpLogEntry> = {}): HpLogEntry {
+		return {
+			id: 'e1',
+			type: 'damage',
+			delta: -10,
+			currentHp: 90,
+			tempHp: 0,
+			maxHp: 100,
+			round: null,
+			...over,
+		};
+	}
+
+	function flash(screen: { getByRole: (r: string) => { element: () => Element } }): Element | null {
+		return screen.getByRole('img').element().querySelector('.animate-health-flash');
+	}
+
+	it('does not flash on mount, even when the log already holds a hit', async () => {
+		const screen = render(HealthBar, {
+			combatant: combatant({ currentHp: 90, hpLog: [log()] }),
+		});
+
+		expect(flash(screen)).toBeNull();
+	});
+
+	it("flashes red on a fresh combatant's very first hit", async () => {
+		const screen = render(HealthBar, { combatant: combatant({ currentHp: 100, hpLog: [] }) });
+		expect(flash(screen)).toBeNull();
+
+		await screen.rerender({ combatant: combatant({ currentHp: 90, hpLog: [log()] }) });
+
+		expect(flash(screen)?.className).toContain('bg-combat-red');
+	});
+
+	it('flashes green on a heal', async () => {
+		const screen = render(HealthBar, { combatant: combatant({ currentHp: 90, hpLog: [log()] }) });
+
+		await screen.rerender({
+			combatant: combatant({
+				currentHp: 100,
+				hpLog: [log(), log({ id: 'e2', type: 'heal', delta: 10, currentHp: 100 })],
+			}),
+		});
+
+		expect(flash(screen)?.className).toContain('bg-combat-green');
+	});
+
+	it('survives an unrelated edit that only changes the combatant object identity', async () => {
+		const screen = render(HealthBar, { combatant: combatant({ currentHp: 100, hpLog: [] }) });
+		await screen.rerender({ combatant: combatant({ currentHp: 90, hpLog: [log()] }) });
+		expect(flash(screen)).not.toBeNull();
+
+		// Same HP, same log — only the surrounding record changed, as it does when the DM renames
+		// the combatant or toggles a condition mid-fade.
+		await screen.rerender({
+			combatant: combatant({ name: 'Ogre Chief', currentHp: 90, hpLog: [log()] }),
+		});
+
+		expect(flash(screen)).not.toBeNull();
 	});
 });

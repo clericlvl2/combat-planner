@@ -1,6 +1,4 @@
 import { redirect } from '@sveltejs/kit';
-import { db } from '$lib/db';
-import { SETTINGS_ID } from '$lib/db/types';
 import { store } from '$lib/stores';
 
 /**
@@ -9,18 +7,25 @@ import { store } from '$lib/stores';
  * the Combats home list. `store.hydrate()` already runs `App.firstLaunch` (the seam this leans
  * on — no first-launch logic duplicated here); this load only needs to know, before hydrating,
  * whether the flag was still unset so it can tell the freshly-seeded combat apart from an
- * ordinary one. `+layout.svelte`'s `onMount` hydrate runs after client-side load functions
- * resolve, so this load awaits its own `store.hydrate()` rather than racing it. If seeding
- * unexpectedly yields no combat, this deterministically falls through to `/combats` rather than
- * a broken/empty combat page; a genuine `store.hydrate()`/Dexie failure is left to propagate so
- * the `+error.svelte` boundary can surface it.
+ * ordinary one. It reads that via `store.peekFirstLaunch()` (normalize/migrate path, ADR-003/013)
+ * rather than a raw Dexie read. `+layout.svelte`'s `onMount` also calls `store.hydrate()`; the
+ * store memoizes the in-flight promise so the two callers share one Dexie read rather than
+ * racing/duplicating it. If seeding unexpectedly yields no combat, this deterministically falls
+ * through to `/combats` rather than a broken/empty combat page. `store.hydrate()` itself never
+ * rejects (a failure sets `store.hydrateError` instead — see the store), and this load
+ * deliberately does not re-throw it: `AppShell` owns the hydrate-failure UI for every route.
+ * Throwing here would render `+error.svelte` *inside* that same AppShell, whose error branch
+ * short-circuits `children()` — so the boundary's output would never be seen, and the two would
+ * disagree about which one is showing.
  */
 export const load = async () => {
-	const priorSettings = await db.settings.get(SETTINGS_ID);
-	const wasFirstLaunch = !priorSettings?.firstLaunchDone;
+	const wasFirstLaunch = await store.peekFirstLaunch();
 
-	if (!store.ready) {
-		await store.hydrate();
+	await store.hydrate();
+	if (store.hydrateError) {
+		// AppShell renders the failure; redirecting into a route that cannot load data would only
+		// swap one broken screen for another.
+		return;
 	}
 
 	if (wasFirstLaunch) {

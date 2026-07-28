@@ -96,6 +96,105 @@ describe('CombatStore (ADR-002 seam)', () => {
 	});
 });
 
+// Phase 4 (boot path): re-entrancy guard, failure containment, and the first-launch peek that
+// must not duplicate `hydrate()`'s full load.
+describe('CombatStore boot path (hydrate/hydrateError/peekFirstLaunch)', () => {
+	it('hydrate called twice (concurrently) performs one Dexie load', async () => {
+		const db = fakeDb();
+		let toArrayCalls = 0;
+		const originalToArray = db.combats.toArray.bind(db.combats);
+		db.combats.toArray = async () => {
+			toArrayCalls += 1;
+			return originalToArray();
+		};
+		const store = new CombatStore(db);
+
+		await Promise.all([store.hydrate(() => 'a'), store.hydrate(() => 'b')]);
+
+		expect(toArrayCalls).toBe(1);
+		expect(store.ready).toBe(true);
+		expect(store.combats).toHaveLength(1);
+
+		// A later call, once already ready, is also a no-op — not a second load.
+		await store.hydrate(() => 'c');
+		expect(toArrayCalls).toBe(1);
+	});
+
+	it('a failing loadAppData sets hydrateError instead of rejecting out of hydrate()', async () => {
+		const db = fakeDb();
+		const failure = new Error('Dexie unavailable');
+		db.settings.get = async () => {
+			throw failure;
+		};
+		const store = new CombatStore(db);
+
+		await expect(store.hydrate()).resolves.toBeUndefined();
+
+		expect(store.ready).toBe(false);
+		expect(store.hydrateError).toBe(failure);
+	});
+
+	it('a retry after a failed hydrate can succeed once the underlying failure clears', async () => {
+		const db = fakeDb();
+		let shouldFail = true;
+		const originalGet = db.settings.get.bind(db.settings);
+		db.settings.get = async (id) => {
+			if (shouldFail) throw new Error('Dexie unavailable');
+			return originalGet(id);
+		};
+		const store = new CombatStore(db);
+
+		await store.hydrate();
+		expect(store.ready).toBe(false);
+		expect(store.hydrateError).not.toBeNull();
+
+		shouldFail = false;
+		await store.hydrate();
+		expect(store.ready).toBe(true);
+		expect(store.hydrateError).toBeNull();
+	});
+
+	it('peekFirstLaunch answers from live state once ready, without a second full load', async () => {
+		const db = fakeDb();
+		let toArrayCalls = 0;
+		const originalToArray = db.combats.toArray.bind(db.combats);
+		db.combats.toArray = async () => {
+			toArrayCalls += 1;
+			return originalToArray();
+		};
+		const store = new CombatStore(db);
+		await store.hydrate(() => 'gen');
+		expect(toArrayCalls).toBe(1);
+
+		const wasFirstLaunch = await store.peekFirstLaunch();
+
+		expect(wasFirstLaunch).toBe(false); // hydrate() already ran first-launch
+		expect(toArrayCalls).toBe(1); // no extra combats read
+	});
+
+	it('peekFirstLaunch reads only the settings row before hydrate has run', async () => {
+		const db = fakeDb();
+		let combatsRead = 0;
+		let libraryRead = 0;
+		db.combats.toArray = async () => {
+			combatsRead += 1;
+			return [];
+		};
+		db.libraryEntries.toArray = async () => {
+			libraryRead += 1;
+			return [];
+		};
+		const store = new CombatStore(db);
+
+		const wasFirstLaunch = await store.peekFirstLaunch();
+
+		expect(wasFirstLaunch).toBe(true); // no settings row yet -> firstLaunchDone defaults false
+		expect(combatsRead).toBe(0);
+		expect(libraryRead).toBe(0);
+		expect(store.ready).toBe(false); // peeking must not itself hydrate
+	});
+});
+
 describe('CombatStore library delegation (ADR-002 seam) — thin methods only', () => {
 	it('hydrate loads library entries alongside combats', async () => {
 		const db = fakeDb();

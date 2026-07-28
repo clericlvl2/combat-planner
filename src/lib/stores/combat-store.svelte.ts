@@ -17,6 +17,7 @@ import {
 	removeLibraryEntryRow,
 } from '../db/persistence';
 import type { Combat, CombatantTemplate, Condition, Settings } from '../db/types';
+import { SETTINGS_ID } from '../db/types';
 import * as App from './domain/app';
 import {
 	type CombatantInput,
@@ -38,6 +39,17 @@ export class CombatStore {
 	libraryEntries = $state<CombatantTemplate[]>([]);
 	/** False until the first hydrate resolves; gates the UI boot (M2+). */
 	ready = $state(false);
+	/**
+	 * Set when a hydrate attempt fails (e.g. Dexie unavailable). `hydrate()` never rejects out of
+	 * this field — it is the seam `AppShell` reads to render the `apperror.*` UI on ANY route,
+	 * including deep links that never run `+page.ts`'s `load` (only `/` does).
+	 */
+	hydrateError = $state<Error | null>(null);
+	/** In-flight hydrate promise, memoized so concurrent callers (`+page.ts`'s `load` and
+	 *  `+layout.svelte`'s `onMount`) share one Dexie read instead of hydrating twice. Cleared once
+	 *  settled (success or failure) so a later call — e.g. a user-triggered retry after a failure —
+	 *  starts a fresh attempt rather than latching onto a dead promise. */
+	#hydrating: Promise<void> | null = null;
 
 	constructor(database: PersistenceDb = db) {
 		this.#db = database;
@@ -47,21 +59,53 @@ export class CombatStore {
 		return this.combats.find((c) => c.id === id);
 	}
 
-	/** Boot: load + normalize/migrate from Dexie, then run first-launch. */
+	/**
+	 * Boot: load + normalize/migrate from Dexie, then run first-launch. Safe under concurrent
+	 * callers (memoized) and never rejects — a failure sets `hydrateError` instead, so an `await`
+	 * from `onMount` cannot produce an uncaught rejection. Callers that need the failure to
+	 * propagate (the `/` root `load`) should check `hydrateError` after awaiting and throw it
+	 * themselves.
+	 */
 	async hydrate(genId?: IdGen): Promise<void> {
-		const [data, libraryEntries] = await Promise.all([
-			loadAppData(this.#db),
-			loadLibraryEntries(this.#db),
-		]);
-		const { combats, settings, opened } = App.firstLaunch(data.combats, data.settings, genId);
-		this.combats = combats;
-		this.settings = settings;
-		this.libraryEntries = libraryEntries;
-		this.ready = true;
-		if (opened) {
-			// First launch mutated state — persist the new combat + flag.
-			await Promise.all([persistCombat(this.#db, opened), persistSettings(this.#db, settings)]);
+		if (this.ready) return;
+		if (this.#hydrating) return this.#hydrating;
+		this.#hydrating = this.#doHydrate(genId).finally(() => {
+			this.#hydrating = null;
+		});
+		return this.#hydrating;
+	}
+
+	async #doHydrate(genId?: IdGen): Promise<void> {
+		try {
+			const [data, libraryEntries] = await Promise.all([
+				loadAppData(this.#db),
+				loadLibraryEntries(this.#db),
+			]);
+			const { combats, settings, opened } = App.firstLaunch(data.combats, data.settings, genId);
+			this.combats = combats;
+			this.settings = settings;
+			this.libraryEntries = libraryEntries;
+			this.hydrateError = null;
+			this.ready = true;
+			if (opened) {
+				// First launch mutated state — persist the new combat + flag.
+				await Promise.all([persistCombat(this.#db, opened), persistSettings(this.#db, settings)]);
+			}
+		} catch (err) {
+			this.hydrateError = err instanceof Error ? err : new Error(String(err));
 		}
+	}
+
+	/**
+	 * Whether first-launch has NOT run yet, read via the same normalize path as `hydrate()`
+	 * (ADR-003/013) without a second full load: once `ready`, this answers from live state; before
+	 * that it reads only the settings row (no combats/library fetch) and normalizes it the same
+	 * way `normalizeSettings` would.
+	 */
+	async peekFirstLaunch(): Promise<boolean> {
+		if (this.ready) return !this.settings.firstLaunchDone;
+		const raw = await this.#db.settings.get(SETTINGS_ID);
+		return !createSettings(raw ?? {}).firstLaunchDone;
 	}
 
 	// ── per-combat mutation core ──────────────────────────────────────────────

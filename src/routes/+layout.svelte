@@ -4,7 +4,7 @@
 	import { applyTheme } from '$lib/theme';
 	import { store } from '$lib/stores';
 	import { Toaster, toast } from '$lib/components/ui/sonner';
-	import { m } from '$lib/i18n';
+	import { m, setLocale } from '$lib/i18n';
 	import { needRefresh, updateServiceWorker } from '$lib/pwa/register';
 	import './layout.css';
 
@@ -14,7 +14,14 @@
 	let { children } = $props();
 
 	onMount(async () => {
+		// `store.hydrate()` never rejects — a failure sets `store.hydrateError`, which `AppShell`
+		// renders on every route (deep links never run `+page.ts`'s `load`, so this is the only
+		// boundary they get). Once hydrate settles, push the persisted locale (Dexie) into
+		// Paraglide's own runtime (localStorage) — the two owners are otherwise only reconciled
+		// when the Settings select fires, so a fresh device/reload would show English until a
+		// Settings visit.
 		await store.hydrate();
+		setLocale(store.settings.language, { reload: false });
 	});
 
 	// Theme-boot fix: resolve+apply the theme at the app root (not the Settings page) so
@@ -47,9 +54,13 @@
   Keying the subtree on the active locale forces every `m[...]()` call-site to re-render
   when the language changes (Settings calls `setLocale(..., { reload: false })`), without a full
   page reload — Paraglide's `getLocale()`/`m[...]()` aren't themselves reactive to Svelte, so this
-  keyed block is the reactive seam that makes the switch apply instantly.
+  keyed block is the reactive seam that makes the switch apply instantly. Gated on `store.ready`:
+  while booting, the key is the constant `false`, so hydrate flipping `store.settings.language`
+  from the `createSettings()` default to the persisted locale does not itself remount every page.
+  Once `ready` is true the key tracks `store.settings.language` directly, so only a real
+  user-initiated switch (Settings) remounts the tree afterward.
 -->
-{#key store.settings.language}
+{#key store.ready && store.settings.language}
 	<AppShell>
 		{@render children()}
 	</AppShell>

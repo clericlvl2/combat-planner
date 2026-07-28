@@ -1,8 +1,13 @@
 <!--
-  App-level error boundary — catches a thrown error from any route `load` (incl. the
-  `/` root load) or from `store.hydrate()`/Dexie access during `+layout.svelte`'s `onMount`.
-  Renders inside `+layout.svelte`'s AppShell, so the chrome (header/nav) stays present; this
-  file only supplies the outlet content, matching the EmptyState pattern already used on
+  App-level error boundary — catches a thrown error from any route `load`, and nothing else.
+  Hydrate failures deliberately do not come here: `store.hydrate()` never rejects (it sets
+  `store.hydrateError` instead), and `AppShell` reads that flag to render the `apperror.*` UI
+  inline on every route, including the deep links that skip `/`'s load entirely. That split is
+  load-bearing rather than incidental — this file renders as AppShell's `children()`, and
+  AppShell's error branch short-circuits `children()`, so anything shown here while
+  `store.hydrateError` is set would never reach the screen.
+  Renders inside `+layout.svelte`'s AppShell, so the chrome (header/nav) stays present;
+  this file only supplies the outlet content, matching the EmptyState pattern already used on
   Combats home / the Combat screen.
 -->
 <script lang="ts">
@@ -27,8 +32,8 @@
 
 <!-- role="alert" + the live region announce the boundary as soon as SvelteKit populates
      page.error/page.status (the values that trigger this file being rendered at all) — a
-     thrown `/` load or store.hydrate()/Dexie error lands here instead of the framework's
-     unstyled default page. -->
+     thrown `/` load error (including a re-thrown `store.hydrateError`) lands here instead of
+     the framework's unstyled default page. -->
 <div role="alert" aria-live="assertive" data-error-status={page.status} class="contents">
 	<EmptyState
 		icon={Alert}

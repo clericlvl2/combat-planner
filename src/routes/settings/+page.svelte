@@ -6,7 +6,7 @@
 <script lang="ts">
 	import { Select, SelectContent, SelectItem, SelectTrigger } from '$lib/components/ui/select';
 	import type { Locale, Theme } from '$lib/db/types';
-	import { getLocale, locales, m, setLocale } from '$lib/i18n';
+	import { locales, m, setLocale } from '$lib/i18n';
 	import { store } from '$lib/stores';
 
 	// Bracket-indexing `m` with a runtime key isn't type-safe (see labels.ts) — pin each locale to
@@ -20,12 +20,9 @@
 		ru: m['settings.language.ru'],
 	};
 
-	let selectedLocale = $state(getLocale() as Locale);
-
 	function onLanguageChange(next: string) {
 		if (!next) return;
 		const locale = next as Locale;
-		selectedLocale = locale;
 		// Applies immediately (no reload), persists via both the Paraglide runtime and our
 		// own Settings record (kept in sync — Settings.language also travels with export/import).
 		setLocale(locale, { reload: false });
@@ -53,9 +50,9 @@
 		<h2 class="my-2 text-xs font-medium tracking-wider text-muted-foreground uppercase">
 			{m['settings.language']()}
 		</h2>
-		<Select type="single" value={selectedLocale} onValueChange={onLanguageChange}>
+		<Select type="single" value={store.settings.language} onValueChange={onLanguageChange}>
 			<SelectTrigger size="action" class="w-full justify-between" aria-label={m['settings.language']()}>
-				{languageLabel[selectedLocale]()}
+				{languageLabel[store.settings.language]()}
 			</SelectTrigger>
 			<SelectContent>
 				{#each locales as loc (loc)}

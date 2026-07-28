@@ -130,6 +130,14 @@
 
     function openLibrary() {
         addOpen = false;
+        // Consume the overlay's pushed history entry synchronously, before navigating away —
+        // otherwise the reactive effect below fires `history.back()` after `goto` has already
+        // started (bouncing the user off `/library`) or never runs at all because this component
+        // is destroyed first, leaking a dead history entry.
+        if (overlayHistoryPushed) {
+            overlayHistoryPushed = false;
+            history.back();
+        }
         goto('/library');
     }
 
@@ -186,7 +194,7 @@
                 canAdvance={canAdv}
         />
 
-        <main
+        <div
                 bind:this={mainEl}
                 class="content-container flex w-full flex-1 flex-col gap-2 p-3 {active ? 'pt-2' : ''}"
         >
@@ -211,7 +219,7 @@
                     </div>
                 {/each}
             {/if}
-        </main>
+        </div>
 
         {#if active}
             <!-- Active: Advance FAB (disabled at the r99 → r100 wrap) — mobile only;

@@ -13,7 +13,9 @@
 		sideOffset = 4,
 		portalProps,
 		children,
-		preventScroll = true,
+		// See dropdown-menu-content.svelte — locking body scroll hides the page scrollbar while
+		// the listbox is open. Flipped off (stock shadcn ships `true`) to match the other poppers.
+		preventScroll = false,
 		...restProps
 	}: WithoutChild<SelectPrimitive.ContentProps> & {
 		portalProps?: WithoutChildrenOrChild<ComponentProps<typeof SelectPortal>>;

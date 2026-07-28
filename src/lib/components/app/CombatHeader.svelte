@@ -148,11 +148,7 @@
 					</Button>
 				{/snippet}
 			</DropdownMenuTrigger>
-			<!-- `preventScroll={false}` opts out of bits-ui's default body scroll lock, which sets
-			     `overflow: hidden` on the body — that propagates to the viewport and makes the
-			     scrollbar vanish for as long as the menu is open. The menu stays anchored while
-			     the page scrolls (floating-ui autoUpdate; the header is not sticky). -->
-			<DropdownMenuContent align="end" class="w-56" preventScroll={false}>
+			<DropdownMenuContent align="end" class="w-56">
 				<DropdownMenuItem disabled={!canUndo} onSelect={controller.undo}>
 					<Undo class="size-4" />
 					{m['combat.undo']()}

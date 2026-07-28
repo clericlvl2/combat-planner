@@ -6,7 +6,6 @@
   2026-07-28 plan).
 -->
 <script lang="ts">
-	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
 	import {
 		Collapsible,
@@ -47,14 +46,6 @@
 		heal: m['numpad.history.action.heal'],
 		setTemp: m['numpad.history.action.setTemp'],
 		setMax: m['numpad.history.action.setMax'],
-	};
-
-	/** Damage = red, heal = green, setTemp = blue, setMax = neutral — matches the commit buttons. */
-	const actionBadgeClass: Record<HpLogEntry['type'], string> = {
-		damage: 'border-destructive/30 text-destructive',
-		heal: 'border-health-full/30 text-health-full',
-		setTemp: 'border-combat-blue/30 text-combat-blue',
-		setMax: '',
 	};
 
 	/** Diff-value text color per entry type (HpLogEntryRow — colour-coded left column). */
@@ -215,22 +206,35 @@
 			{#if history.length === 0}
 				<p class="py-2 text-sm text-muted-foreground">{m['numpad.history.empty']()}</p>
 			{:else}
+				<!-- Three fixed columns — round · signed delta + action · resulting HP — so the
+				     numbers line up down the list instead of drifting with each label's width.
+				     The round column is a fixed width and the delta a fixed 4ch, which is what
+				     keeps the action labels flush; the trailing column is right-aligned. Units
+				     are dropped throughout (the whole sheet is HP) — with them, a localized row
+				     wrapped onto two lines on a phone. -->
 				<ScrollArea class="max-h-48">
-					<ul class="flex flex-col gap-1.5 pt-2">
+					<ul class="flex flex-col gap-1 pt-2">
 						{#each history as e, i (e.id ?? i)}
-							<li class="flex items-center justify-between gap-2 text-sm text-muted-foreground">
-								<span class="flex items-center gap-1.5">
-									<Badge variant="outline" class={actionBadgeClass[e.type]}>
-										{actionLabel[e.type]()}
-									</Badge>
-									<span class={['tabular-nums', actionDiffClass[e.type]]}>
+							<li
+								class="grid grid-cols-[2.25rem_1fr_auto] items-center gap-2 text-sm text-muted-foreground"
+							>
+								<span class="text-[11px] tabular-nums opacity-60">
+									{#if e.round !== null}{m['numpad.history.round']({ n: e.round })}{/if}
+								</span>
+								<span class="flex min-w-0 items-center gap-1.5">
+									<span
+										class={[
+											'w-[4ch] shrink-0 text-right font-semibold tabular-nums',
+											actionDiffClass[e.type],
+										]}
+									>
 										{e.delta > 0 ? `+${e.delta}` : e.delta}
 									</span>
+									<span class="truncate">{actionLabel[e.type]()}</span>
 								</span>
-								<span class="tabular-nums">
-									{m['numpad.summary.hp']({ cur: e.currentHp, max: e.maxHp })}
-									{#if e.tempHp > 0}· {m['numpad.summary.temp']({ temp: e.tempHp })}{/if}
-									{#if e.round !== null}· {m['numpad.history.round']({ n: e.round })}{/if}
+								<span class="text-right tabular-nums">
+									{e.currentHp}/{e.maxHp}
+									{#if e.tempHp > 0}<span class="text-combat-blue">+{e.tempHp}</span>{/if}
 								</span>
 							</li>
 						{/each}

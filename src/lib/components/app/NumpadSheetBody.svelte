@@ -192,7 +192,9 @@
 			<span class="flex items-center gap-1.5">
 				{m['numpad.history.title']()}
 				{#if history.length > 0}
-					<span class="text-muted-foreground">{m['numpad.history.count']({ n: history.length })}</span>
+					<span class="text-muted-foreground"
+						>{m['numpad.history.count']({ n: history.length })}</span
+					>
 				{/if}
 			</span>
 			<Expand

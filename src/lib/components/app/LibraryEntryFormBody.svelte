@@ -63,7 +63,9 @@
 			const key = t.toLowerCase();
 			if (!seen.has(key)) seen.set(key, t);
 		}
-		return [...seen.values()].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+		return [...seen.values()].sort((a, b) =>
+			a.localeCompare(b, undefined, { sensitivity: 'base' }),
+		);
 	});
 
 	function togglePendingTag(name: string) {
@@ -147,87 +149,87 @@
 </script>
 
 {#snippet formFields()}
-			<Field label={m['forms.field.name']()} for="lf-name">
-				<Input
-					id="lf-name"
-					bind:value={name}
-					maxlength={NAME_MAX_LENGTH}
-					placeholder={namePlaceholder}
-					size="action"
-					class="border-[var(--border-strong)] text-[15px] md:text-[15px]"
-				/>
-			</Field>
+	<Field label={m['forms.field.name']()} for="lf-name">
+		<Input
+			id="lf-name"
+			bind:value={name}
+			maxlength={NAME_MAX_LENGTH}
+			placeholder={namePlaceholder}
+			size="action"
+			class="border-[var(--border-strong)] text-[15px] md:text-[15px]"
+		/>
+	</Field>
 
-			<Field label={m['forms.field.type']()}>
-				<TypeToggle bind:value={type} />
-			</Field>
+	<Field label={m['forms.field.type']()}>
+		<TypeToggle bind:value={type} />
+	</Field>
 
-			<div class="grid grid-cols-2 gap-2">
-				<NumberField
-					id="lf-maxhp"
-					label={m['forms.field.maxHp']()}
-					bind:value={maxHp}
-					min={RANGES.maxHp.min}
-					max={RANGES.maxHp.max}
-				/>
-				<NumberField
-					id="lf-ac"
-					label={m['forms.field.ac']()}
-					bind:value={ac}
-					min={RANGES.ac.min}
-					max={RANGES.ac.max}
-				/>
-			</div>
+	<div class="grid grid-cols-2 gap-2">
+		<NumberField
+			id="lf-maxhp"
+			label={m['forms.field.maxHp']()}
+			bind:value={maxHp}
+			min={RANGES.maxHp.min}
+			max={RANGES.maxHp.max}
+		/>
+		<NumberField
+			id="lf-ac"
+			label={m['forms.field.ac']()}
+			bind:value={ac}
+			min={RANGES.ac.min}
+			max={RANGES.ac.max}
+		/>
+	</div>
 
-			<div class="grid grid-cols-2 gap-2">
-				<NumberField
-					id="lf-pd"
-					label={m['forms.field.pd']()}
-					bind:value={pd}
-					min={RANGES.pd.min}
-					max={RANGES.pd.max}
-				/>
-				<NumberField
-					id="lf-md"
-					label={m['forms.field.md']()}
-					bind:value={md}
-					min={RANGES.md.min}
-					max={RANGES.md.max}
-				/>
-			</div>
+	<div class="grid grid-cols-2 gap-2">
+		<NumberField
+			id="lf-pd"
+			label={m['forms.field.pd']()}
+			bind:value={pd}
+			min={RANGES.pd.min}
+			max={RANGES.pd.max}
+		/>
+		<NumberField
+			id="lf-md"
+			label={m['forms.field.md']()}
+			bind:value={md}
+			min={RANGES.md.min}
+			max={RANGES.md.max}
+		/>
+	</div>
 
-			<NumberField
-				id="lf-initbonus"
-				label={m['forms.field.initBonus']()}
-				bind:value={initiativeBonus}
-				min={RANGES.initiativeBonus.min}
-				max={RANGES.initiativeBonus.max}
-			/>
+	<NumberField
+		id="lf-initbonus"
+		label={m['forms.field.initBonus']()}
+		bind:value={initiativeBonus}
+		min={RANGES.initiativeBonus.min}
+		max={RANGES.initiativeBonus.max}
+	/>
 
-			<Field label={m['forms.field.note']()} for="lf-note">
-				<Textarea
-					id="lf-note"
-					bind:value={note}
-					maxlength={NOTE_MAX_LENGTH}
-					placeholder={m['forms.field.note.placeholder']()}
-					class="rounded-sm border-[var(--border-strong)] text-[15px] md:text-[15px]"
-				/>
-			</Field>
+	<Field label={m['forms.field.note']()} for="lf-note">
+		<Textarea
+			id="lf-note"
+			bind:value={note}
+			maxlength={NOTE_MAX_LENGTH}
+			placeholder={m['forms.field.note.placeholder']()}
+			class="rounded-sm border-[var(--border-strong)] text-[15px] md:text-[15px]"
+		/>
+	</Field>
 
-			<Field label={m['library.tags.field']()}>
-				<div class="flex flex-wrap items-center gap-1.5">
-					{#each pendingTags as tagName (tagName)}
-						<TagChip name={tagName} removable onRemove={togglePendingTag} />
-					{/each}
-					<button
-						type="button"
-						class="inline-flex h-[22px] items-center gap-[5px] rounded-full border border-dashed border-border px-2.5 py-0.5 text-sm text-muted-foreground hover:border-foreground hover:text-foreground"
-						onclick={() => (tagsOpen = true)}
-					>
-						{m['library.tags.editTrigger']()}
-					</button>
-				</div>
-			</Field>
+	<Field label={m['library.tags.field']()}>
+		<div class="flex flex-wrap items-center gap-1.5">
+			{#each pendingTags as tagName (tagName)}
+				<TagChip name={tagName} removable onRemove={togglePendingTag} />
+			{/each}
+			<button
+				type="button"
+				class="inline-flex h-[22px] items-center gap-[5px] rounded-full border border-dashed border-border px-2.5 py-0.5 text-sm text-muted-foreground hover:border-foreground hover:text-foreground"
+				onclick={() => (tagsOpen = true)}
+			>
+				{m['library.tags.editTrigger']()}
+			</button>
+		</div>
+	</Field>
 {/snippet}
 
 <ResponsiveModal

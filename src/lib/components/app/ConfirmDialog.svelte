@@ -36,7 +36,9 @@
 			<AlertDialogTitle class="text-lg font-semibold">{title}</AlertDialogTitle>
 			<AlertDialogDescription>{body}</AlertDialogDescription>
 		</AlertDialogHeader>
-		<AlertDialogFooter class="mx-0 mb-0 flex-row gap-2 rounded-b-none border-t-0 bg-transparent p-0">
+		<AlertDialogFooter
+			class="mx-0 mb-0 flex-row gap-2 rounded-b-none border-t-0 bg-transparent p-0"
+		>
 			<AlertDialogCancel size="action" class="flex-1">{m['dialogs.cancel']()}</AlertDialogCancel>
 			<AlertDialogAction
 				variant="destructive"

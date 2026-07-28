@@ -28,18 +28,14 @@
 
 	const quickTags = $derived.by(() => {
 		const quick = allTags.slice(0, QUICK_COUNT);
-		const overflowSelected = allTags
-			.slice(QUICK_COUNT)
-			.filter((name) => selected.includes(name));
+		const overflowSelected = allTags.slice(QUICK_COUNT).filter((name) => selected.includes(name));
 		return [...quick, ...overflowSelected];
 	});
 
 	const visibleTags = $derived(expanded ? allTags : quickTags);
 
 	function toggle(name: string) {
-		const next = selected.includes(name)
-			? selected.filter((n) => n !== name)
-			: [...selected, name];
+		const next = selected.includes(name) ? selected.filter((n) => n !== name) : [...selected, name];
 		onChange(next);
 	}
 

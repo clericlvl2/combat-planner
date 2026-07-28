@@ -10,7 +10,11 @@
 
 	// Credits — handles/URLs are proper nouns, kept in code; only the role labels are localized.
 	const CREDITS = [
-		{ label: m['about.credits.developer'], handle: 'clericlvl2', url: 'https://github.com/clericlvl2' },
+		{
+			label: m['about.credits.developer'],
+			handle: 'clericlvl2',
+			url: 'https://github.com/clericlvl2',
+		},
 		{ label: m['about.credits.design'], handle: 'xomnsn', url: 'https://github.com/xomnsn' },
 	];
 </script>

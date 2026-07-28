@@ -11,7 +11,13 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui/button';
-	import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle } from '$lib/components/ui/drawer';
+	import {
+		Drawer,
+		DrawerClose,
+		DrawerContent,
+		DrawerHeader,
+		DrawerTitle,
+	} from '$lib/components/ui/drawer';
 	import { m } from '$lib/i18n';
 	import { chromeIcon } from '$lib/icons';
 

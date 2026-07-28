@@ -51,7 +51,11 @@
 			{m['settings.language']()}
 		</h2>
 		<Select type="single" value={store.settings.language} onValueChange={onLanguageChange}>
-			<SelectTrigger size="action" class="w-full justify-between" aria-label={m['settings.language']()}>
+			<SelectTrigger
+				size="action"
+				class="w-full justify-between"
+				aria-label={m['settings.language']()}
+			>
 				{languageLabel[store.settings.language]()}
 			</SelectTrigger>
 			<SelectContent>
@@ -69,7 +73,11 @@
 			{m['settings.group.appearance']()}
 		</h2>
 		<Select type="single" value={store.settings.theme} onValueChange={onThemeChange}>
-			<SelectTrigger size="action" class="w-full justify-between" aria-label={m['settings.theme']()}>
+			<SelectTrigger
+				size="action"
+				class="w-full justify-between"
+				aria-label={m['settings.theme']()}
+			>
 				{themeLabel[store.settings.theme]()}
 			</SelectTrigger>
 			<SelectContent>

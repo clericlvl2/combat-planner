@@ -10,266 +10,285 @@
   carries; rows/header emit intent only.
 -->
 <script lang="ts">
-    import {goto} from '$app/navigation';
-    import {page} from '$app/state';
-    import {flip} from 'svelte/animate';
-    import CombatantForm, {type CombatantFormValues} from '$lib/components/app/CombatantForm.svelte';
-    import CombatantRow from '$lib/components/app/CombatantRow.svelte';
-    import CombatHeader from '$lib/components/app/CombatHeader.svelte';
-    import {makeController} from '$lib/components/app/controller';
-    import EmptyState from '$lib/components/app/EmptyState.svelte';
-    import FAB from '$lib/components/app/FAB.svelte';
-    import NumpadSheet from '$lib/components/app/NumpadSheet.svelte';
-    import {Button} from '$lib/components/ui/button';
-    import {toast} from '$lib/components/ui/sonner';
-    import {MAX_LIBRARY_ENTRIES} from '$lib/db/types';
-    import {m} from '$lib/i18n';
-    import {chromeIcon} from '$lib/icons';
-    import {DUR, dur, reducedMotion} from '$lib/motion';
-    import {store} from '$lib/stores';
-    import {canAdvance, isActive, showRoundAndEscalation, sortedCombatants} from '$lib/stores/domain/derive';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
+	import { flip } from 'svelte/animate';
+	import CombatantForm, {
+		type CombatantFormValues,
+	} from '$lib/components/app/CombatantForm.svelte';
+	import CombatantRow from '$lib/components/app/CombatantRow.svelte';
+	import CombatHeader from '$lib/components/app/CombatHeader.svelte';
+	import { makeController } from '$lib/components/app/controller';
+	import EmptyState from '$lib/components/app/EmptyState.svelte';
+	import FAB from '$lib/components/app/FAB.svelte';
+	import NumpadSheet from '$lib/components/app/NumpadSheet.svelte';
+	import { Button } from '$lib/components/ui/button';
+	import { toast } from '$lib/components/ui/sonner';
+	import { MAX_LIBRARY_ENTRIES } from '$lib/db/types';
+	import { m } from '$lib/i18n';
+	import { chromeIcon } from '$lib/icons';
+	import { DUR, dur, reducedMotion } from '$lib/motion';
+	import { store } from '$lib/stores';
+	import {
+		canAdvance,
+		isActive,
+		showRoundAndEscalation,
+		sortedCombatants,
+	} from '$lib/stores/domain/derive';
 
-    const id = $derived(page.params.id ?? '');
-    const combat = $derived(store.getCombat(id));
-    const controller = $derived(makeController(store, id));
+	const id = $derived(page.params.id ?? '');
+	const combat = $derived(store.getCombat(id));
+	const controller = $derived(makeController(store, id));
 
-    const active = $derived(combat ? showRoundAndEscalation(combat) : false);
-    // Setup: raw add-order, no live autosort (rolls/edits update the number, not the position).
-    // Active: sorted order, so the turn pointer and re-sort logic apply live.
-    const display = $derived(combat ? (active ? sortedCombatants(combat) : combat.combatants) : []);
-    const canAdv = $derived(combat ? canAdvance(combat) : false);
+	const active = $derived(combat ? showRoundAndEscalation(combat) : false);
+	// Setup: raw add-order, no live autosort (rolls/edits update the number, not the position).
+	// Active: sorted order, so the turn pointer and re-sort logic apply live.
+	const display = $derived(combat ? (active ? sortedCombatants(combat) : combat.combatants) : []);
+	const canAdv = $derived(combat ? canAdvance(combat) : false);
 
-    const Add = chromeIcon.add;
-    const Advance = chromeIcon.advance;
-    const Start = chromeIcon.start;
-    const Search = chromeIcon.search;
-    const Roster = chromeIcon.roster;
+	const Add = chromeIcon.add;
+	const Advance = chromeIcon.advance;
+	const Start = chromeIcon.start;
+	const Search = chromeIcon.search;
+	const Roster = chromeIcon.roster;
 
-    // Auto-scroll-on-advance — scrolls the newly active row into view on every advance
-    // (including the round-wrap advance); no store/controller intent, CombatantRow already marks
-    // its Card `data-active`.
-    let mainEl = $state<HTMLElement | null>(null);
+	// Auto-scroll-on-advance — scrolls the newly active row into view on every advance
+	// (including the round-wrap advance); no store/controller intent, CombatantRow already marks
+	// its Card `data-active`.
+	let mainEl = $state<HTMLElement | null>(null);
 
-    $effect(() => {
-        if (!combat?.activeCombatantId) return;
-        mainEl?.querySelector('[data-active="true"]')?.scrollIntoView({
-            behavior: reducedMotion.current ? 'auto' : 'smooth',
-            block: 'center',
-        });
-    });
+	$effect(() => {
+		if (!combat?.activeCombatantId) return;
+		mainEl?.querySelector('[data-active="true"]')?.scrollIntoView({
+			behavior: reducedMotion.current ? 'auto' : 'smooth',
+			block: 'center',
+		});
+	});
 
-    // page-owned shared surfaces
-    let numpadId = $state<string | null>(null);
-    let numpadOpen = $state(false);
-    const numpadCombatant = $derived(
-        combat && numpadId ? (combat.combatants.find((c) => c.id === numpadId) ?? null) : null,
-    );
+	// page-owned shared surfaces
+	let numpadId = $state<string | null>(null);
+	let numpadOpen = $state(false);
+	const numpadCombatant = $derived(
+		combat && numpadId ? (combat.combatants.find((c) => c.id === numpadId) ?? null) : null,
+	);
 
-    function openNumpad(cid: string) {
-        numpadId = cid;
-        numpadOpen = true;
-    }
+	function openNumpad(cid: string) {
+		numpadId = cid;
+		numpadOpen = true;
+	}
 
-    let addOpen = $state(false);
-    let editOpen = $state(false);
-    let editId = $state<string | null>(null);
-    const editCombatant = $derived(
-        combat && editId ? (combat.combatants.find((c) => c.id === editId) ?? null) : null,
-    );
+	let addOpen = $state(false);
+	let editOpen = $state(false);
+	let editId = $state<string | null>(null);
+	const editCombatant = $derived(
+		combat && editId ? (combat.combatants.find((c) => c.id === editId) ?? null) : null,
+	);
 
-    function openEdit(cid: string) {
-        editId = cid;
-        editOpen = true;
-    }
+	function openEdit(cid: string) {
+		editId = cid;
+		editOpen = true;
+	}
 
-    // Browser Back closes the top-most open transient overlay (numpad, then edit, then
-    // add) and stays on the combat page; only Back with no overlay open leaves the page. A
-    // history entry is pushed while any overlay is open; a normal (non-Back) close consumes that
-    // entry via history.back() so it never pollutes forward-history navigation.
-    let overlayHistoryPushed = false;
-    let poppedByBrowser = false;
+	// Browser Back closes the top-most open transient overlay (numpad, then edit, then
+	// add) and stays on the combat page; only Back with no overlay open leaves the page. A
+	// history entry is pushed while any overlay is open; a normal (non-Back) close consumes that
+	// entry via history.back() so it never pollutes forward-history navigation.
+	let overlayHistoryPushed = false;
+	let poppedByBrowser = false;
 
-    function closeTopOverlay() {
-        if (numpadOpen) numpadOpen = false;
-        else if (editOpen) editOpen = false;
-        else if (addOpen) addOpen = false;
-    }
+	function closeTopOverlay() {
+		if (numpadOpen) numpadOpen = false;
+		else if (editOpen) editOpen = false;
+		else if (addOpen) addOpen = false;
+	}
 
-    function handlePopState() {
-        if (!overlayHistoryPushed) return;
-        overlayHistoryPushed = false;
-        poppedByBrowser = true;
-        closeTopOverlay();
-    }
+	function handlePopState() {
+		if (!overlayHistoryPushed) return;
+		overlayHistoryPushed = false;
+		poppedByBrowser = true;
+		closeTopOverlay();
+	}
 
-    $effect(() => {
-        const overlayOpen = addOpen || editOpen || numpadOpen;
-        if (overlayOpen && !overlayHistoryPushed) {
-            history.pushState({overlay: true}, '');
-            overlayHistoryPushed = true;
-        } else if (!overlayOpen && overlayHistoryPushed && !poppedByBrowser) {
-            overlayHistoryPushed = false;
-            history.back();
-        }
-        poppedByBrowser = false;
-    });
+	$effect(() => {
+		const overlayOpen = addOpen || editOpen || numpadOpen;
+		if (overlayOpen && !overlayHistoryPushed) {
+			history.pushState({ overlay: true }, '');
+			overlayHistoryPushed = true;
+		} else if (!overlayOpen && overlayHistoryPushed && !poppedByBrowser) {
+			overlayHistoryPushed = false;
+			history.back();
+		}
+		poppedByBrowser = false;
+	});
 
-    function submitAdd(v: CombatantFormValues) {
-        controller.addCombatant({
-            name: v.name,
-            type: v.type,
-            initiativeBonus: v.initiativeBonus ?? undefined,
-            initiative: v.initiative ?? undefined,
-            maxHp: v.maxHp ?? undefined,
-            ac: v.ac ?? undefined,
-            pd: v.pd ?? undefined,
-            md: v.md ?? undefined,
-            note: v.note,
-        });
-    }
+	function submitAdd(v: CombatantFormValues) {
+		controller.addCombatant({
+			name: v.name,
+			type: v.type,
+			initiativeBonus: v.initiativeBonus ?? undefined,
+			initiative: v.initiative ?? undefined,
+			maxHp: v.maxHp ?? undefined,
+			ac: v.ac ?? undefined,
+			pd: v.pd ?? undefined,
+			md: v.md ?? undefined,
+			note: v.note,
+		});
+	}
 
-    function openLibrary() {
-        addOpen = false;
-        // Consume the overlay's pushed history entry synchronously, before navigating away —
-        // otherwise the reactive effect below fires `history.back()` after `goto` has already
-        // started (bouncing the user off `/library`) or never runs at all because this component
-        // is destroyed first, leaking a dead history entry.
-        if (overlayHistoryPushed) {
-            overlayHistoryPushed = false;
-            history.back();
-        }
-        goto('/library');
-    }
+	function openLibrary() {
+		addOpen = false;
+		// Consume the overlay's pushed history entry synchronously, before navigating away —
+		// otherwise the reactive effect below fires `history.back()` after `goto` has already
+		// started (bouncing the user off `/library`) or never runs at all because this component
+		// is destroyed first, leaking a dead history entry.
+		if (overlayHistoryPushed) {
+			overlayHistoryPushed = false;
+			history.back();
+		}
+		goto('/library');
+	}
 
-    function saveToLibrary(cid: string) {
-        const result = controller.saveToLibrary(cid);
-        if (result) {
-            toast.success(m['toasts.library.saved'](), {
-                action: {
-                    label: m['toasts.library.goToLibrary'](),
-                    onClick: () => goto('/library'),
-                },
-            });
-        } else {
-            toast.error(m['toasts.library.capReached']({max: MAX_LIBRARY_ENTRIES}));
-        }
-    }
+	function saveToLibrary(cid: string) {
+		const result = controller.saveToLibrary(cid);
+		if (result) {
+			toast.success(m['toasts.library.saved'](), {
+				action: {
+					label: m['toasts.library.goToLibrary'](),
+					onClick: () => goto('/library'),
+				},
+			});
+		} else {
+			toast.error(m['toasts.library.capReached']({ max: MAX_LIBRARY_ENTRIES }));
+		}
+	}
 
-    function submitEdit(v: CombatantFormValues) {
-        if (!editId) return;
-        controller.edit(editId, {
-            name: v.name,
-            type: v.type,
-            initiativeBonus: v.initiativeBonus ?? undefined,
-            ac: v.ac ?? undefined,
-            pd: v.pd ?? undefined,
-            md: v.md ?? undefined,
-            note: v.note,
-            maxHp: v.maxHp ?? undefined,
-            initiative: v.initiative ?? undefined,
-        });
-    }
+	function submitEdit(v: CombatantFormValues) {
+		if (!editId) return;
+		controller.edit(editId, {
+			name: v.name,
+			type: v.type,
+			initiativeBonus: v.initiativeBonus ?? undefined,
+			ac: v.ac ?? undefined,
+			pd: v.pd ?? undefined,
+			md: v.md ?? undefined,
+			note: v.note,
+			maxHp: v.maxHp ?? undefined,
+			initiative: v.initiative ?? undefined,
+		});
+	}
 </script>
 
 <svelte:window onpopstate={handlePopState} />
 
 {#if !store.ready}
-    <p class="p-4 text-muted-foreground">…</p>
+	<p class="p-4 text-muted-foreground">…</p>
 {:else if !combat}
-    <div class="flex min-h-dvh flex-col">
-        <EmptyState icon={Search} title={m['combat.notFound.title']()} description={m['combat.notFound.description']()}>
-            <Button size="action" aria-label={m['combat.notFound.back']()} onclick={() => goto('/combats')}>
-                {m['combat.notFound.back']()}
-            </Button>
-        </EmptyState>
-    </div>
+	<div class="flex min-h-dvh flex-col">
+		<EmptyState
+			icon={Search}
+			title={m['combat.notFound.title']()}
+			description={m['combat.notFound.description']()}
+		>
+			<Button
+				size="action"
+				aria-label={m['combat.notFound.back']()}
+				onclick={() => goto('/combats')}
+			>
+				{m['combat.notFound.back']()}
+			</Button>
+		</EmptyState>
+	</div>
 {:else}
-    <div class="mx-auto flex min-h-dvh w-full flex-col pb-56 lg:pb-8">
-        <CombatHeader
-                {combat}
-                {controller}
-                onAdd={() => (addOpen = true)}
-                onStart={controller.start}
-                onAdvance={controller.advance}
-                canAdvance={canAdv}
-        />
+	<div class="mx-auto flex min-h-dvh w-full flex-col pb-56 lg:pb-8">
+		<CombatHeader
+			{combat}
+			{controller}
+			onAdd={() => (addOpen = true)}
+			onStart={controller.start}
+			onAdvance={controller.advance}
+			canAdvance={canAdv}
+		/>
 
-        <div
-                bind:this={mainEl}
-                class="content-container flex w-full flex-1 flex-col gap-2 p-3 {active ? 'pt-2' : ''}"
-        >
-            {#if display.length === 0}
-                <EmptyState icon={Roster} title={m['setup.empty.title']()} description={m['setup.empty.description']()}>
-                    <Button size="action" class="hidden lg:inline-flex" onclick={() => (addOpen = true)}>
-                        {m['setup.empty.cta']()}
-                    </Button>
-                </EmptyState>
-            {:else}
-                {#each display as c (c.id)}
-                    <div animate:flip={{duration: dur(DUR.base)}}>
-                        <CombatantRow
-                                combatant={c}
-                                active={isActive(combat, c)}
-                                combatActive={active}
-                                {controller}
-                                onOpenNumpad={openNumpad}
-                                onEdit={openEdit}
-                                onSaveToLibrary={saveToLibrary}
-                        />
-                    </div>
-                {/each}
-            {/if}
-        </div>
+		<div
+			bind:this={mainEl}
+			class="content-container flex w-full flex-1 flex-col gap-2 p-3 {active ? 'pt-2' : ''}"
+		>
+			{#if display.length === 0}
+				<EmptyState
+					icon={Roster}
+					title={m['setup.empty.title']()}
+					description={m['setup.empty.description']()}
+				>
+					<Button size="action" class="hidden lg:inline-flex" onclick={() => (addOpen = true)}>
+						{m['setup.empty.cta']()}
+					</Button>
+				</EmptyState>
+			{:else}
+				{#each display as c (c.id)}
+					<div animate:flip={{ duration: dur(DUR.base) }}>
+						<CombatantRow
+							combatant={c}
+							active={isActive(combat, c)}
+							combatActive={active}
+							{controller}
+							onOpenNumpad={openNumpad}
+							onEdit={openEdit}
+							onSaveToLibrary={saveToLibrary}
+						/>
+					</div>
+				{/each}
+			{/if}
+		</div>
 
-        {#if active}
-            <!-- Active: Advance FAB (disabled at the r99 → r100 wrap) — mobile only;
+		{#if active}
+			<!-- Active: Advance FAB (disabled at the r99 → r100 wrap) — mobile only;
                  desktop (≥1024px) swaps it for CombatHeader's header-advance icon roundel. -->
-            <FAB
-                    icon={Advance}
-                    label={m['active.advance']()}
-                    disabled={!canAdv}
-                    onclick={controller.advance}
-                    class="lg:hidden max-lg:focus-visible:ring-0 max-lg:focus-visible:border-transparent"
-            />
-        {:else}
-            <!-- Setup: mobile FAB stack (Add always; Start once the roster isn't empty), matching
+			<FAB
+				icon={Advance}
+				label={m['active.advance']()}
+				disabled={!canAdv}
+				onclick={controller.advance}
+				class="lg:hidden max-lg:focus-visible:ring-0 max-lg:focus-visible:border-transparent"
+			/>
+		{:else}
+			<!-- Setup: mobile FAB stack (Add always; Start once the roster isn't empty), matching
                  the desktop header-add/header-start pair in CombatHeader — Start FAB
                  borrows the existing chevron glyph (no dedicated play/start icon ships yet). -->
-            <Button
-                    size="fab"
-                    class="fixed right-4 bottom-safe shadow-lg lg:hidden max-lg:focus-visible:ring-0 max-lg:focus-visible:border-transparent"
-                    aria-label={m['setup.addCombatant']()}
-                    onclick={() => (addOpen = true)}
-            >
-                <Add class="size-5"/>
-            </Button>
-            {#if combat.combatants.length > 0}
-                <!-- Start FAB reads as a primary action (default variant = bg-primary), not a
+			<Button
+				size="fab"
+				class="fixed right-4 bottom-safe shadow-lg lg:hidden max-lg:focus-visible:ring-0 max-lg:focus-visible:border-transparent"
+				aria-label={m['setup.addCombatant']()}
+				onclick={() => (addOpen = true)}
+			>
+				<Add class="size-5" />
+			</Button>
+			{#if combat.combatants.length > 0}
+				<!-- Start FAB reads as a primary action (default variant = bg-primary), not a
                      pale ghost/secondary roundel. Uses the play glyph (mirrors the desktop
                      header-start icon-roundel). -->
-                <FAB
-                        icon={Start}
-                        label={m['setup.start']()}
-                        onclick={controller.start}
-                        class="bottom-safe-stack lg:hidden max-lg:focus-visible:ring-0 max-lg:focus-visible:border-transparent"
-                />
-            {/if}
-        {/if}
-    </div>
+				<FAB
+					icon={Start}
+					label={m['setup.start']()}
+					onclick={controller.start}
+					class="bottom-safe-stack lg:hidden max-lg:focus-visible:ring-0 max-lg:focus-visible:border-transparent"
+				/>
+			{/if}
+		{/if}
+	</div>
 
-    <NumpadSheet
-            combatant={numpadCombatant}
-            bind:open={numpadOpen}
-            onDamage={controller.damage}
-            onRestore={controller.restore}
-            onSetTempHp={controller.setTempHp}
-    />
-    <CombatantForm
-            mode="add"
-            bind:open={addOpen}
-            onSubmit={submitAdd}
-            templates={store.libraryEntries}
-            onOpenLibrary={openLibrary}
-    />
-    <CombatantForm mode="edit" combatant={editCombatant} bind:open={editOpen} onSubmit={submitEdit}/>
+	<NumpadSheet
+		combatant={numpadCombatant}
+		bind:open={numpadOpen}
+		onDamage={controller.damage}
+		onRestore={controller.restore}
+		onSetTempHp={controller.setTempHp}
+	/>
+	<CombatantForm
+		mode="add"
+		bind:open={addOpen}
+		onSubmit={submitAdd}
+		templates={store.libraryEntries}
+		onOpenLibrary={openLibrary}
+	/>
+	<CombatantForm mode="edit" combatant={editCombatant} bind:open={editOpen} onSubmit={submitEdit} />
 {/if}

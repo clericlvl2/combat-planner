@@ -70,7 +70,9 @@
 		<p class="min-w-0 flex-1 text-sm">{m['toasts.install.message']()}</p>
 		<div class="flex items-center gap-2">
 			<Button size="action" onclick={onInstall}>{m['toasts.install.action']()}</Button>
-			<Button size="action" variant="ghost" onclick={onDismiss}>{m['toasts.install.dismiss']()}</Button>
+			<Button size="action" variant="ghost" onclick={onDismiss}
+				>{m['toasts.install.dismiss']()}</Button
+			>
 		</div>
 	</div>
 {/if}

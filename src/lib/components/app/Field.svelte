@@ -7,7 +7,8 @@
   input with an id to point at.
 -->
 <script lang="ts" module>
-	export const fieldLabelClass = 'text-xs font-medium uppercase tracking-wide text-muted-foreground';
+	export const fieldLabelClass =
+		'text-xs font-medium uppercase tracking-wide text-muted-foreground';
 </script>
 
 <script lang="ts">

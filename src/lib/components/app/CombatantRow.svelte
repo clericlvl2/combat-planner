@@ -21,7 +21,11 @@
 	import { scale } from 'svelte/transition';
 	import { Button } from '$lib/components/ui/button';
 	import { Card } from '$lib/components/ui/card';
-	import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '$lib/components/ui/collapsible';
+	import {
+		Collapsible,
+		CollapsibleContent,
+		CollapsibleTrigger,
+	} from '$lib/components/ui/collapsible';
 	import {
 		DropdownMenu,
 		DropdownMenuContent,
@@ -171,7 +175,10 @@
 										{combatant.disabled ? m['forms.action.enable']() : m['forms.action.disable']()}
 									</DropdownMenuItem>
 									<DropdownMenuSeparator />
-									<DropdownMenuItem variant="destructive" onSelect={() => controller.remove(combatant.id)}>
+									<DropdownMenuItem
+										variant="destructive"
+										onSelect={() => controller.remove(combatant.id)}
+									>
 										<Remove class="size-4" />
 										{m['forms.action.remove']()}
 									</DropdownMenuItem>

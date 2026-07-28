@@ -83,7 +83,11 @@
 		e.preventDefault();
 		const el = e.currentTarget as HTMLInputElement;
 		const pasted = e.clipboardData?.getData('text') ?? '';
-		el.value = sanitize(el.value.slice(0, el.selectionStart ?? 0) + pasted + el.value.slice(el.selectionEnd ?? el.value.length));
+		el.value = sanitize(
+			el.value.slice(0, el.selectionStart ?? 0) +
+				pasted +
+				el.value.slice(el.selectionEnd ?? el.value.length),
+		);
 	}
 
 	function commit(e: Event) {

@@ -91,7 +91,11 @@
 		</span>
 	</Button>
 
-	<PopoverContent customAnchor={anchor} class="w-56" aria-label={m['a11y.initCell.manual']({ name: combatant.name })}>
+	<PopoverContent
+		customAnchor={anchor}
+		class="w-56"
+		aria-label={m['a11y.initCell.manual']({ name: combatant.name })}
+	>
 		<NumberField
 			id="init-{combatant.id}"
 			label={m['forms.field.initValue']()}

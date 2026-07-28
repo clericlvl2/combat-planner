@@ -12,40 +12,40 @@
   from `combatant` is a plain `$state` initializer, never an effect (Phase 2, 2026-07-28 plan).
 -->
 <script lang="ts">
-    import type {Combatant, CombatantTemplate, CombatantType} from '$lib/db/types';
-    import CombatantFormBody from './CombatantFormBody.svelte';
+	import type { Combatant, CombatantTemplate, CombatantType } from '$lib/db/types';
+	import CombatantFormBody from './CombatantFormBody.svelte';
 
-    export interface CombatantFormValues {
-        name: string;
-        type: CombatantType;
-        initiativeBonus: number | null;
-        maxHp: number | null;
-        ac: number | null;
-        pd: number | null;
-        md: number | null;
-        note: string;
-        initiative: number | null;
-    }
+	export interface CombatantFormValues {
+		name: string;
+		type: CombatantType;
+		initiativeBonus: number | null;
+		maxHp: number | null;
+		ac: number | null;
+		pd: number | null;
+		md: number | null;
+		note: string;
+		initiative: number | null;
+	}
 
-    let {
-        mode,
-        combatant = null,
-        open = $bindable(false),
-        onSubmit,
-        templates,
-        onOpenLibrary,
-    }: {
-        mode: 'add' | 'edit';
-        combatant?: Combatant | null;
-        open?: boolean;
-        onSubmit: (values: CombatantFormValues) => void;
-        // `undefined` (prop not passed, as in edit mode) means "library feature not wired here";
-        // an array (possibly empty) enables the add-mode "New"/"From library" tab.
-        templates?: CombatantTemplate[];
-        onOpenLibrary?: () => void;
-    } = $props();
+	let {
+		mode,
+		combatant = null,
+		open = $bindable(false),
+		onSubmit,
+		templates,
+		onOpenLibrary,
+	}: {
+		mode: 'add' | 'edit';
+		combatant?: Combatant | null;
+		open?: boolean;
+		onSubmit: (values: CombatantFormValues) => void;
+		// `undefined` (prop not passed, as in edit mode) means "library feature not wired here";
+		// an array (possibly empty) enables the add-mode "New"/"From library" tab.
+		templates?: CombatantTemplate[];
+		onOpenLibrary?: () => void;
+	} = $props();
 </script>
 
 {#key combatant?.id ?? 'new'}
-    <CombatantFormBody bind:open {mode} {combatant} {onSubmit} {templates} {onOpenLibrary} />
+	<CombatantFormBody bind:open {mode} {combatant} {onSubmit} {templates} {onOpenLibrary} />
 {/key}

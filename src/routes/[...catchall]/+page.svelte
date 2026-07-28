@@ -5,19 +5,23 @@
   no-route-match only — thrown errors still surface the `+error.svelte` boundary.
 -->
 <script lang="ts">
-    import {goto} from '$app/navigation';
-    import EmptyState from '$lib/components/app/EmptyState.svelte';
-    import {Button} from '$lib/components/ui/button';
-    import {m} from '$lib/i18n';
-    import {chromeIcon} from '$lib/icons';
+	import { goto } from '$app/navigation';
+	import EmptyState from '$lib/components/app/EmptyState.svelte';
+	import { Button } from '$lib/components/ui/button';
+	import { m } from '$lib/i18n';
+	import { chromeIcon } from '$lib/icons';
 
-    const Search = chromeIcon.search;
+	const Search = chromeIcon.search;
 </script>
 
 <div class="flex min-h-dvh flex-col">
-    <EmptyState icon={Search} title={m['route.notFound.title']()} description={m['route.notFound.description']()}>
-        <Button size="action" aria-label={m['route.notFound.back']()} onclick={() => goto('/combats')}>
-            {m['route.notFound.back']()}
-        </Button>
-    </EmptyState>
+	<EmptyState
+		icon={Search}
+		title={m['route.notFound.title']()}
+		description={m['route.notFound.description']()}
+	>
+		<Button size="action" aria-label={m['route.notFound.back']()} onclick={() => goto('/combats')}>
+			{m['route.notFound.back']()}
+		</Button>
+	</EmptyState>
 </div>

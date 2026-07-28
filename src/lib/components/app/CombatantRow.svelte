@@ -254,7 +254,9 @@
 					{/if}
 				</div>
 
-				<CollapsibleContent class="flex flex-col gap-2 pt-3">
+				<!-- Padding is conditional: with no note editor the content renders empty, and an
+				     unconditional `pt-3` would grow the card by 12px on expand with nothing to show. -->
+				<CollapsibleContent class={['flex flex-col', showNoteEditor && 'gap-2 pt-3']}>
 					{#if showNoteEditor}
 						<Textarea
 							id="note-{combatant.id}"

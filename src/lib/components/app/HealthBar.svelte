@@ -78,11 +78,7 @@
 
 <div class="flex h-2 w-full overflow-hidden rounded-full bg-muted" role="img" aria-label={label}>
 	<div
-		class={[
-			'relative h-full shrink-0 transition-[width] duration-[var(--dur-base)] ease-[var(--ease-out)]',
-			healthColor[status],
-			status === 'dead' && 'ml-auto',
-		]}
+		class={['relative h-full shrink-0', healthColor[status], status === 'dead' && 'ml-auto']}
 		style:width="{fill}%"
 	>
 		{#key lastEntry?.id ?? 'none'}
@@ -100,10 +96,7 @@
 		{/key}
 	</div>
 	{#if tempFill > 0}
-		<div
-			class="h-full shrink-0 bg-combat-blue transition-[width] duration-[var(--dur-base)] ease-[var(--ease-out)]"
-			style:width="{tempFill}%"
-		></div>
+		<div class="h-full shrink-0 bg-combat-blue" style:width="{tempFill}%"></div>
 	{/if}
 </div>
 

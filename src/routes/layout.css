@@ -197,35 +197,27 @@
 	}
 }
 
-/* Collapsible expand/collapse height animation — authored once, globally, off the vendor
+/* Collapsible expand animation — authored once, globally, off the vendor
  * `data-slot="collapsible-content"` hook (collapsible-content.svelte is a bare passthrough that
  * only emits the hook) so every Collapsible in the app (CombatantRow, NumpadSheet history) gets
- * the animation with no per-component code and no vendor edit. `--bits-collapsible-content-height`
- * is published by bits-ui's CollapsibleContentState onto the content element. Must be `animation`,
- * not `transition` — the presence layer detects animations before unmounting closed content. */
-@keyframes collapsible-down {
+ * the animation with no per-component code and no vendor edit.
+ *
+ * Opacity + transform only, deliberately: this used to animate height between 0 and
+ * `--bits-collapsible-content-height`, which relayouts the whole roster list every frame and
+ * stutters on long lists. Height now snaps and only the fade is animated, keeping the per-frame
+ * work off layout. Collapse is not animated — with no animation on the closed state the presence
+ * layer unmounts the content immediately, the cheapest possible exit. */
+@keyframes collapsible-fade-in {
 	from {
-		height: 0;
+		opacity: 0;
+		transform: translateY(-4px);
 	}
 	to {
-		height: var(--bits-collapsible-content-height);
-	}
-}
-@keyframes collapsible-up {
-	from {
-		height: var(--bits-collapsible-content-height);
-	}
-	to {
-		height: 0;
+		opacity: 1;
+		transform: none;
 	}
 }
 
-[data-slot="collapsible-content"] {
-	overflow: hidden;
-}
 [data-slot="collapsible-content"][data-state="open"] {
-	animation: collapsible-down var(--dur-base) var(--ease-out);
-}
-[data-slot="collapsible-content"][data-state="closed"] {
-	animation: collapsible-up var(--dur-base) var(--ease-out);
+	animation: collapsible-fade-in var(--dur-base) var(--ease-out);
 }

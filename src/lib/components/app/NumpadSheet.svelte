@@ -3,7 +3,7 @@
   Renders as a bottom Drawer on mobile and a centered modal Dialog on desktop (≥1024px), switched
   via the `svelte/reactivity` MediaQuery.
   Summary header (cur/max + temp so the buffer is visible) · entry display · digit pad · the three
-  commit actions (Deal Damage / Restore HP / Set Temp HP) · a read-only History of this combatant's
+  commit actions (Damage / Heal / Temp HP) · a read-only History of this combatant's
   hpLog (newest first). Empty entry → commits disabled (no-op). Commit closes the sheet; the change
   rides the combat's Undo history (no toast). History is view-only — no undo control here.
   Emits commit intent only; all HP math + log append live in the store/domain.
@@ -40,7 +40,7 @@
 	);
 </script>
 
-<ResponsiveModal bind:open {title} size="form">
+<ResponsiveModal bind:open {title} hideTitle size="form">
 	{#snippet children()}
 		{#if combatant}
 			{#key open}

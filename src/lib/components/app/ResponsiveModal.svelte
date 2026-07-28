@@ -39,6 +39,7 @@
 	let {
 		open = $bindable(false),
 		title,
+		hideTitle = false,
 		size = 'form',
 		onSubmit,
 		onOpenChange,
@@ -49,6 +50,10 @@
 		/** Required (ADR-014): omitting it left bits-ui with no `DialogTitle`/`DrawerTitle`, so
 		 *  `aria-labelledby` pointed at nothing and the dialog opened with no accessible name. */
 		title: string;
+		/** Hides the header visually while keeping the DialogTitle/DrawerTitle in the a11y tree —
+		 *  the accessible-name invariant (ADR-014) holds, only the visible chrome goes away. For
+		 *  surfaces whose body already names itself (NumpadSheet's summary row). */
+		hideTitle?: boolean;
 		size?: 'form' | 'compact';
 		/** Present -> body + footer are wrapped in a single `<form>` so `type="submit"` footer
 		 *  buttons share it with the fields, even though the footer sits outside the scroller. */
@@ -108,7 +113,7 @@
 				SIZE_CLASS[size].desktop,
 			)}
 		>
-			<DialogHeader>
+			<DialogHeader class={hideTitle ? 'sr-only' : undefined}>
 				<DialogTitle class="text-lg font-semibold">{title}</DialogTitle>
 			</DialogHeader>
 
@@ -116,16 +121,20 @@
 		</DialogContent>
 	</Dialog>
 {:else}
-	<Drawer bind:open {onOpenChange}>
+	<!-- `repositionInputs={false}`: vaul lifts the sheet itself when a field takes focus, on top of
+	     the browser already shrinking the layout viewport for the on-screen keyboard. The two
+	     adjustments stack, pushing the header off the top of the screen and leaving a tall blank
+	     band under the content (seen on the tag drawer). The browser's own handling is enough. -->
+	<Drawer bind:open {onOpenChange} repositionInputs={false}>
 		<DrawerContent
 			data-responsive-modal="drawer"
 			class={cn('mx-auto flex max-h-[80dvh] flex-col', SIZE_CLASS[size].mobile)}
 		>
-			<DrawerHeader>
+			<DrawerHeader class={hideTitle ? 'sr-only' : undefined}>
 				<DrawerTitle class="text-lg font-semibold">{title}</DrawerTitle>
 			</DrawerHeader>
 
-			<div class="flex min-h-0 flex-1 flex-col px-4 pb-safe">
+			<div class={cn('flex min-h-0 flex-1 flex-col px-4 pb-safe', hideTitle && 'pt-4')}>
 				{@render wrapper(true)}
 			</div>
 		</DrawerContent>

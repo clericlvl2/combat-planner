@@ -71,7 +71,7 @@
 		bind:ref={anchor}
 		variant="ghost"
 		class={cn(
-			'group h-auto w-[4.5rem] cursor-pointer rounded-full bg-transparent p-1.5 hover:bg-transparent dark:hover:bg-transparent',
+			'group h-auto w-[5rem] cursor-pointer rounded-full bg-transparent p-1.5 hover:bg-transparent dark:hover:bg-transparent',
 			className,
 		)}
 		disabled={!editable}
@@ -84,7 +84,7 @@
 		onclick={tap}
 	>
 		<span
-			class="chip init-pill flex h-[22px] w-full items-center justify-center gap-[5px] rounded-full border border-border bg-secondary px-2.5 text-sm text-muted-foreground tabular-nums transition-[transform,background-color,color] duration-[var(--dur-base)] ease-[var(--ease-out)] group-hover:bg-secondary group-hover:text-foreground group-active:translate-y-px"
+			class="chip init-pill flex h-[26px] w-full items-center justify-center gap-[5px] rounded-full border border-border bg-secondary px-2.5 text-sm text-muted-foreground tabular-nums group-hover:bg-secondary group-hover:text-foreground"
 		>
 			{m['forms.field.initShort']()}
 			<b class="inline-block w-[2ch] text-center text-foreground">{display}</b>

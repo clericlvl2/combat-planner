@@ -11,7 +11,7 @@ function makeCombatant(): Combatant {
 }
 
 describe('NumpadSheet', () => {
-	it('fires onDamage with the entered number on Deal Damage', async () => {
+	it('fires onDamage with the entered number on Damage', async () => {
 		const onDamage = vi.fn();
 		const onRestore = vi.fn();
 		const onSetTempHp = vi.fn();
@@ -25,14 +25,14 @@ describe('NumpadSheet', () => {
 
 		await userEvent.click(screen.getByRole('button', { name: 'Digit 5' }));
 		await userEvent.click(screen.getByRole('button', { name: 'Digit 3' }));
-		await userEvent.click(screen.getByRole('button', { name: 'Deal Damage' }));
+		await userEvent.click(screen.getByRole('button', { name: 'Damage' }));
 
 		expect(onDamage).toHaveBeenCalledExactlyOnceWith('ogre', 53);
 		expect(onRestore).not.toHaveBeenCalled();
 		expect(onSetTempHp).not.toHaveBeenCalled();
 	});
 
-	it('fires onRestore with the entered number on Restore HP', async () => {
+	it('fires onRestore with the entered number on Heal', async () => {
 		const onDamage = vi.fn();
 		const onRestore = vi.fn();
 		const onSetTempHp = vi.fn();
@@ -45,14 +45,14 @@ describe('NumpadSheet', () => {
 		});
 
 		await userEvent.click(screen.getByRole('button', { name: 'Digit 7' }));
-		await userEvent.click(screen.getByRole('button', { name: 'Restore HP' }));
+		await userEvent.click(screen.getByRole('button', { name: 'Heal' }));
 
 		expect(onRestore).toHaveBeenCalledExactlyOnceWith('ogre', 7);
 		expect(onDamage).not.toHaveBeenCalled();
 		expect(onSetTempHp).not.toHaveBeenCalled();
 	});
 
-	it('fires onSetTempHp with the entered number on Set Temp HP', async () => {
+	it('fires onSetTempHp with the entered number on Temp HP', async () => {
 		const onDamage = vi.fn();
 		const onRestore = vi.fn();
 		const onSetTempHp = vi.fn();
@@ -66,7 +66,7 @@ describe('NumpadSheet', () => {
 
 		await userEvent.click(screen.getByRole('button', { name: 'Digit 1' }));
 		await userEvent.click(screen.getByRole('button', { name: 'Digit 0' }));
-		await userEvent.click(screen.getByRole('button', { name: 'Set Temp HP' }));
+		await userEvent.click(screen.getByRole('button', { name: 'Temp HP' }));
 
 		expect(onSetTempHp).toHaveBeenCalledExactlyOnceWith('ogre', 10);
 		expect(onDamage).not.toHaveBeenCalled();
@@ -85,9 +85,9 @@ describe('NumpadSheet', () => {
 			onSetTempHp,
 		});
 
-		const dealDamage = screen.getByRole('button', { name: 'Deal Damage' });
-		const restoreHp = screen.getByRole('button', { name: 'Restore HP' });
-		const setTempHp = screen.getByRole('button', { name: 'Set Temp HP' });
+		const dealDamage = screen.getByRole('button', { name: 'Damage' });
+		const restoreHp = screen.getByRole('button', { name: 'Heal' });
+		const setTempHp = screen.getByRole('button', { name: 'Temp HP' });
 
 		await expect.element(dealDamage).toBeDisabled();
 		await expect.element(restoreHp).toBeDisabled();

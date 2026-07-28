@@ -57,6 +57,8 @@
 	const Add = chromeIcon.add;
 	const Advance = chromeIcon.advance;
 	const Start = chromeIcon.start;
+	const Restart = chromeIcon.restart;
+	const Erase = chromeIcon.erase;
 
 	// round editor
 	let roundOpen = $state(false);
@@ -163,10 +165,12 @@
 						{m['combat.menu.add']()}
 					</DropdownMenuItem>
 					<DropdownMenuItem onSelect={() => (restartOpen = true)}>
+						<Restart class="size-4" />
 						{m['combat.menu.restart']()}
 					</DropdownMenuItem>
 				{/if}
 				<DropdownMenuItem onSelect={() => (clearOpen = true)}>
+					<Erase class="size-4" />
 					{m['combat.menu.clear']()}
 				</DropdownMenuItem>
 			</DropdownMenuContent>

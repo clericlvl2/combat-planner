@@ -1,9 +1,10 @@
 # Backlog
 
-next_id: W-042
+next_id: W-043
 
 | ID | Pri | Loop | State | Outcome | Depends | Plan |
 |----|-----|------|-------|---------|---------|------|
+| W-042 | S | small | done | Mobile UI pass from device review: numpad header removed (title now sr-only), numpad commit labels shortened in all 6 locales, drawer no longer double-adjusts for the on-screen keyboard (`repositionInputs={false}`), Restart/Clear menu items got icons, ru `initShort` → Иниц, init pill slightly larger with no press animation | — | — |
 | W-039 | M | large | inbox | Split `CombatHeader.svelte` (two divergent popover implementations) and `CombatantFormBody.svelte` (four props encoding two axes). Both flagged by the W-038 audit, deferred as out of scope there | — | — |
 | W-040 | M | large | inbox | `hpLog` grows unbounded inside persisted undo snapshots (`domain/hp.ts`) — every snapshot carries the full log, so a long combat compounds. Needs a history-retention decision, not a style fix | — | — |
 | W-041 | M | large | inbox | Boot flash on first open still visible. `src/app.html`'s pre-paint script now sets `data-theme` + `color-scheme` (kills the unstyled white/black token flash), but a blank-shell → app transition remains: ADR-007 keeps `ssr = false` / `prerender = false`, so the served HTML is an empty SPA shell and nothing paints until the JS bundle hydrates. Fixing it means revisiting the render strategy (prerendered shell, or a static skeleton in the shell body) — not a CSS change | — | `.claude/plans/2026-07-28-fix-theme-boot-flash.md` |

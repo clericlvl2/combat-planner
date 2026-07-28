@@ -24,7 +24,7 @@
 	const Icon = $derived(icon);
 </script>
 
-<div class="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
+<div class="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center lg:pb-32">
 	{#if Icon}
 		<div class="grid size-14 place-items-center rounded-2xl border bg-secondary">
 			<Icon class="size-7 {iconClass ?? 'text-muted-foreground'}" />

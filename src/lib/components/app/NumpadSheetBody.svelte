@@ -162,7 +162,13 @@
 				{d}
 			</Button>
 		{/each}
-		<Button variant="ghost" size="action" aria-label={m['a11y.numpad.clear']()} onclick={clear}>
+		<Button
+			variant="outline"
+			size="action"
+			class="bg-transparent dark:bg-transparent"
+			aria-label={m['a11y.numpad.clear']()}
+			onclick={clear}
+		>
 			<ClearIcon class="size-5" />
 		</Button>
 		<Button
@@ -175,8 +181,9 @@
 			0
 		</Button>
 		<Button
-			variant="ghost"
+			variant="outline"
 			size="action"
+			class="bg-transparent dark:bg-transparent"
 			aria-label={m['a11y.numpad.backspace']()}
 			onclick={backspace}
 		>
@@ -185,7 +192,7 @@
 	</div>
 
 	<!-- HpLogSection (read-only, newest first) -->
-	<Collapsible bind:open={historyOpen} class="border-t border-border pt-2">
+	<Collapsible bind:open={historyOpen} class="pt-2">
 		<CollapsibleTrigger
 			class="flex w-full items-center justify-between text-sm font-medium text-muted-foreground"
 		>

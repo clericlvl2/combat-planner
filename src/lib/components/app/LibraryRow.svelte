@@ -49,7 +49,7 @@
 
 	/** "+Tags" trigger — same dashed-pill affordance chip as CombatantRow's tagTriggerClass. */
 	const tagTriggerClass =
-		'inline-flex h-[22px] items-center gap-[5px] rounded-full border border-dashed border-border px-2.5 py-0.5 text-sm text-muted-foreground hover:border-foreground hover:text-foreground';
+		'inline-flex h-[22px] items-center gap-[5px] rounded-full border border-dashed border-border px-2.5 py-0.5 text-sm text-muted-foreground transition-colors duration-[var(--dur-base)] ease-[var(--ease-out)] hover:border-foreground hover:text-foreground';
 </script>
 
 <Card

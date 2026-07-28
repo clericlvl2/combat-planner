@@ -50,7 +50,7 @@
 				{#if removable}
 					<button
 						type="button"
-						class="-mr-1 inline-flex items-center rounded-full transition-transform duration-[var(--dur-fast)] ease-[var(--ease-out)] hover:text-foreground active:translate-y-px"
+						class="-mr-1 inline-flex items-center rounded-full transition-[transform,color] duration-[var(--dur-base)] ease-[var(--ease-out)] hover:text-foreground active:translate-y-px"
 						aria-label={m['forms.action.remove']()}
 						onclick={() => onRemove?.(c)}
 					>

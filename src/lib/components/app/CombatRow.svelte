@@ -91,7 +91,7 @@
 	role="button"
 	tabindex={0}
 	aria-label={displayTitle}
-	class="flex-row items-center gap-3 overflow-hidden rounded-xl border border-[var(--border)] p-3 ring-0 cursor-pointer hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+	class="flex-row items-center gap-3 overflow-hidden rounded-xl border border-[var(--border)] p-3 ring-0 cursor-pointer transition-colors duration-[var(--dur-base)] ease-[var(--ease-out)] hover:bg-secondary focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
 	onclick={handleCardClick}
 	onkeydown={handleCardKeydown}
 >

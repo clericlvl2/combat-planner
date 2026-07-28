@@ -4,6 +4,7 @@
  */
 import { type Combat, type Combatant, UNROLLED } from '../../db/types';
 import { clampEscalation } from './clamp';
+import { RANGES } from './constants';
 
 export type HealthStatus = 'full' | 'wounded' | 'bloodied' | 'dead';
 
@@ -78,12 +79,13 @@ export function nextEnabledTurn(combat: Combat): NextTurn | null {
 }
 
 /**
- * canAdvance: Active, non-empty, at least one enabled combatant, and NOT the round-99 →
- * round-100 wrap. Advancing within round 99 (not yet on the last enabled combatant) still works.
+ * canAdvance: Active, non-empty, at least one enabled combatant, and NOT the round-cap →
+ * round-cap+1 wrap. Advancing within the last round (not yet on the last enabled combatant)
+ * still works.
  */
 export function canAdvance(combat: Combat): boolean {
 	if (combat.state !== 'active' || combat.combatants.length === 0) return false;
 	const next = nextEnabledTurn(combat);
 	if (!next) return false; // all disabled
-	return !(combat.round >= 99 && next.wrapped); // r99→100 wrap block
+	return !(combat.round >= RANGES.round.max && next.wrapped); // round-cap wrap block
 }

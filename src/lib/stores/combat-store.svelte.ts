@@ -5,6 +5,7 @@
  * in ./domain/derive, wrapped in `$derived` by components in M2+.
  */
 import { db } from '../db';
+import { normalizeSettings } from '../db/migrations';
 import {
 	loadAppData,
 	loadLibraryEntries,
@@ -17,7 +18,7 @@ import {
 	removeLibraryEntryRow,
 } from '../db/persistence';
 import type { Combat, CombatantTemplate, Condition, Settings } from '../db/types';
-import { SETTINGS_ID } from '../db/types';
+import { DATA_VERSION, SETTINGS_ID } from '../db/types';
 import * as App from './domain/app';
 import {
 	type CombatantInput,
@@ -77,10 +78,18 @@ export class CombatStore {
 
 	async #doHydrate(genId?: IdGen): Promise<void> {
 		try {
-			const [data, libraryEntries] = await Promise.all([
+			const [data, libraryEntries, rawSettings] = await Promise.all([
 				loadAppData(this.#db),
 				loadLibraryEntries(this.#db),
+				// `loadAppData`'s normalized result always reads `DATA_VERSION` (migrate() stamps
+				// it), so the ORIGINAL stored version has to be read separately to detect a
+				// forward migration and write the bumped version back (ADR-013). This is a second
+				// read of the same single row `loadAppData` reads internally, kept deliberately:
+				// it is one indexed get on one tiny row, issued in the same Promise.all, and the
+				// alternative is widening loadAppData's return type across every call site.
+				this.#db.settings.get(SETTINGS_ID),
 			]);
+			const migratedForward = (rawSettings?.dataVersion ?? 1) < DATA_VERSION;
 			const { combats, settings, opened } = App.firstLaunch(data.combats, data.settings, genId);
 			this.combats = combats;
 			this.settings = settings;
@@ -90,6 +99,10 @@ export class CombatStore {
 			if (opened) {
 				// First launch mutated state — persist the new combat + flag.
 				await Promise.all([persistCombat(this.#db, opened), persistSettings(this.#db, settings)]);
+			} else if (migratedForward) {
+				// A forward migration ran but first-launch didn't — nothing else would ever
+				// persist the bumped `dataVersion`, so the same migration would re-run every boot.
+				await Promise.all([persistSettings(this.#db, settings), persistCombats(this.#db, combats)]);
 			}
 		} catch (err) {
 			this.hydrateError = err instanceof Error ? err : new Error(String(err));
@@ -97,15 +110,14 @@ export class CombatStore {
 	}
 
 	/**
-	 * Whether first-launch has NOT run yet, read via the same normalize path as `hydrate()`
+	 * Whether first-launch has NOT run yet, read via the same `normalizeSettings` `hydrate()` uses
 	 * (ADR-003/013) without a second full load: once `ready`, this answers from live state; before
-	 * that it reads only the settings row (no combats/library fetch) and normalizes it the same
-	 * way `normalizeSettings` would.
+	 * that it reads only the settings row (no combats/library fetch).
 	 */
 	async peekFirstLaunch(): Promise<boolean> {
 		if (this.ready) return !this.settings.firstLaunchDone;
 		const raw = await this.#db.settings.get(SETTINGS_ID);
-		return !createSettings(raw ?? {}).firstLaunchDone;
+		return !normalizeSettings(raw).firstLaunchDone;
 	}
 
 	// ── per-combat mutation core ──────────────────────────────────────────────

@@ -173,6 +173,43 @@ describe('CombatStore boot path (hydrate/hydrateError/peekFirstLaunch)', () => {
 		expect(toArrayCalls).toBe(1); // no extra combats read
 	});
 
+	// Phase 6 (ADR-013): a forward migration must persist the bumped `dataVersion` on its OWN
+	// (no first-launch to piggyback on) — otherwise every boot re-runs the v1→v2 transform, and
+	// the non-idempotency bug it used to have (Phase 6 item 1) would silently re-zero escalation.
+	it('a v1 payload with a live escalationOverride keeps its escalation across two cold boots', async () => {
+		const db = fakeDb();
+		const settings: Settings = {
+			id: 'settings',
+			language: 'en',
+			theme: 'system',
+			firstLaunchDone: true,
+			installHintDismissed: false,
+			dataVersion: 1,
+		};
+		await db.settings.put(settings);
+		const legacyCombat = {
+			id: 'c',
+			title: 'Legacy',
+			escalationOverride: 3,
+			combatants: [],
+		} as unknown as Combat;
+		await db.combats.put(legacyCombat);
+
+		const first = new CombatStore(db);
+		await first.hydrate();
+		expect(first.settings.dataVersion).toBe(2);
+		expect(first.getCombat('c')?.escalation).toBe(3);
+		await Promise.resolve();
+		expect(db._combats.get('c')?.escalation).toBe(3);
+
+		// A second cold boot (fresh store instance, same underlying db) must not re-derive the
+		// escalation from a no-longer-present legacy key and zero it out.
+		const second = new CombatStore(db);
+		await second.hydrate();
+		expect(second.settings.dataVersion).toBe(2);
+		expect(second.getCombat('c')?.escalation).toBe(3);
+	});
+
 	it('peekFirstLaunch reads only the settings row before hydrate has run', async () => {
 		const db = fakeDb();
 		let combatsRead = 0;

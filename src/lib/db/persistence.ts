@@ -56,7 +56,10 @@ export async function loadAppData(db: PersistenceDb): Promise<AppData> {
  */
 export async function loadLibraryEntries(db: PersistenceDb): Promise<CombatantTemplate[]> {
 	const entries = await db.libraryEntries.toArray();
-	return entries.map(normalizeCombatantTemplate);
+	// NOT a bare `.map(normalizeCombatantTemplate)` — Phase 6 (ADR-013) added an injectable
+	// `genId` 2nd param; `Array.map`'s callback signature would otherwise hand it the numeric
+	// index instead of an `IdGen`.
+	return entries.map((entry) => normalizeCombatantTemplate(entry));
 }
 
 /** Persist one library entry row (called on every mutation — the single writer, ADR-002/003). */

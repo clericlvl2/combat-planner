@@ -10,7 +10,9 @@
  */
 
 import { clampEscalation } from '../stores/domain/clamp';
+import { COMBATANT_DEFAULTS } from '../stores/domain/constants';
 import { createSettings } from '../stores/domain/factories';
+import { genId as defaultGenId, type IdGen } from '../stores/domain/id';
 import {
 	type AppData,
 	type Combat,
@@ -18,7 +20,9 @@ import {
 	type CombatantTemplate,
 	type CombatSnapshot,
 	DATA_VERSION,
+	NONE,
 	type Settings,
+	UNROLLED,
 } from './types';
 
 /** Thrown when an import/DB file is from a NEWER data version than this build. */
@@ -55,28 +59,40 @@ function migrateCombatantV2(raw: RawCombatant): RawCombatant {
 }
 
 /** A v1 combat carried `escalationOverride: number | 'none'`; v2 replaces it with a plain,
- *  always-set `escalation: number` (escalation die is stored, not auto-derived). */
+ *  always-set `escalation: number` (escalation die is stored, not auto-derived). Only folds the
+ *  legacy key when PRESENT — re-running this transform on already-v2 data (idempotency, ADR-013)
+ *  must leave a live `escalation` untouched rather than zeroing it. */
 function migrateCombatV2(raw: RawCombat): RawCombat {
 	const { escalationOverride, ...rest } = raw as RawCombat & {
 		escalationOverride?: number | 'none';
 	};
 	const escalation =
-		escalationOverride === undefined || escalationOverride === 'none'
-			? 0
-			: clampEscalation(escalationOverride);
+		'escalationOverride' in raw
+			? escalationOverride === undefined || escalationOverride === 'none'
+				? 0
+				: clampEscalation(escalationOverride)
+			: (rest.escalation ?? 0);
 	return {
 		...rest,
 		escalation,
 		combatants: rest.combatants?.map(migrateCombatantV2),
 		undoStack: rest.undoStack?.map((entry) => ({
 			...entry,
-			snapshot: migrateCombatV2(entry.snapshot) as CombatSnapshot,
+			snapshot: migrateSnapshotV2(entry.snapshot),
 		})),
 		redoStack: rest.redoStack?.map((entry) => ({
 			...entry,
-			snapshot: migrateCombatV2(entry.snapshot) as CombatSnapshot,
+			snapshot: migrateSnapshotV2(entry.snapshot),
 		})),
 	};
+}
+
+/** Recurse the v2 transform into an undo/redo snapshot, but OMIT `undoStack`/`redoStack` — a
+ *  `CombatSnapshot` has neither by definition (`db/types.ts`), so setting them (even to
+ *  `undefined`) stamps phantom keys that don't belong on the type. */
+function migrateSnapshotV2(raw: RawCombat): CombatSnapshot {
+	const { undoStack: _undoStack, redoStack: _redoStack, ...snapshot } = migrateCombatV2(raw);
+	return snapshot as CombatSnapshot;
 }
 
 /**
@@ -93,7 +109,9 @@ export const transforms: Record<number, Transform> = {
  * BEFORE read-time defaulting; refuse a newer file (ADR-013). One runner, two callers.
  */
 export function migrate(data: RawAppData): RawAppData {
-	const fileVersion = data.dataVersion ?? DATA_VERSION;
+	// A missing version (absent settings row, hand-edited import file) is the OLDEST shipped
+	// shape, not already-current — defaulting to DATA_VERSION here would skip every transform.
+	const fileVersion = data.dataVersion ?? 1;
 	if (fileVersion > DATA_VERSION) throw new NewerDataVersionError(fileVersion);
 	let migrated = data;
 	for (let v = fileVersion + 1; v <= DATA_VERSION; v += 1) {
@@ -103,40 +121,47 @@ export function migrate(data: RawAppData): RawAppData {
 	return { ...migrated, dataVersion: DATA_VERSION };
 }
 
-function normalizeCombatant(raw: RawCombatant): Combatant {
+function normalizeCombatant(raw: RawCombatant, genId: IdGen = defaultGenId): Combatant {
 	return {
-		id: raw.id ?? crypto.randomUUID(),
+		id: raw.id ?? genId(),
 		name: raw.name ?? '',
 		type: raw.type ?? 'enemy',
 		addOrder: raw.addOrder ?? 0,
-		initiative: raw.initiative ?? '-',
-		initiativeBonus: raw.initiativeBonus ?? 0,
-		maxHp: raw.maxHp ?? 1,
-		currentHp: raw.currentHp ?? raw.maxHp ?? 1,
+		initiative: raw.initiative ?? UNROLLED,
+		initiativeBonus: raw.initiativeBonus ?? COMBATANT_DEFAULTS.initiativeBonus,
+		maxHp: raw.maxHp ?? COMBATANT_DEFAULTS.maxHp,
+		currentHp: raw.currentHp ?? raw.maxHp ?? COMBATANT_DEFAULTS.maxHp,
 		tempHp: raw.tempHp ?? 0,
-		ac: raw.ac ?? 10,
-		pd: raw.pd ?? 10,
-		md: raw.md ?? 10,
+		ac: raw.ac ?? COMBATANT_DEFAULTS.ac,
+		pd: raw.pd ?? COMBATANT_DEFAULTS.pd,
+		md: raw.md ?? COMBATANT_DEFAULTS.md,
 		note: raw.note ?? '',
 		conditions: raw.conditions ?? [],
-		hpLog: raw.hpLog ?? [],
+		// `id` on `HpLogEntry` is additive (ADR-013) — entries logged before it existed get one
+		// here so list keying (NumpadSheet history, `HealthBar`'s flash) has a stable identity.
+		// Backfilled at read time and deliberately not written back: this is normalization, not a
+		// versioned transform, so it does not trip `hydrate()`'s forward-migration write. A legacy
+		// entry therefore draws a fresh id each boot, which is harmless — the ids are only ever
+		// used for keying within one session, and nothing persists a reference to one. The next
+		// real write to the combat, from any HP edit, stamps them permanently.
+		hpLog: (raw.hpLog ?? []).map((e) => (e.id ? e : { ...e, id: genId() })),
 		disabled: raw.disabled ?? false,
 	};
 }
 
-export function normalizeCombat(raw: RawCombat): Combat {
+export function normalizeCombat(raw: RawCombat, genId: IdGen = defaultGenId): Combat {
 	const now = Date.now();
 	return {
-		id: raw.id ?? crypto.randomUUID(),
+		id: raw.id ?? genId(),
 		title: raw.title ?? '',
 		description: raw.description ?? '',
 		colorTag: raw.colorTag ?? 'neutral',
 		listOrder: raw.listOrder ?? 0,
 		state: raw.state ?? 'setup',
-		combatants: (raw.combatants ?? []).map(normalizeCombatant),
+		combatants: (raw.combatants ?? []).map((c) => normalizeCombatant(c, genId)),
 		round: raw.round ?? 1,
 		escalation: raw.escalation ?? 0,
-		activeCombatantId: raw.activeCombatantId ?? 'none',
+		activeCombatantId: raw.activeCombatantId ?? NONE,
 		undoStack: raw.undoStack ?? [],
 		redoStack: raw.redoStack ?? [],
 		createdAt: raw.createdAt ?? now,
@@ -149,17 +174,20 @@ export function normalizeCombat(raw: RawCombat): Combat {
  * `libraryEntries` is outside `AppData`, per the export exclusion; called directly from the
  * persistence loader). `tags` defaults to `[]`, same additive style as `normalizeCombatant`.
  */
-export function normalizeCombatantTemplate(raw: RawCombatantTemplate): CombatantTemplate {
+export function normalizeCombatantTemplate(
+	raw: RawCombatantTemplate,
+	genId: IdGen = defaultGenId,
+): CombatantTemplate {
 	const now = Date.now();
 	return {
-		id: raw.id ?? crypto.randomUUID(),
+		id: raw.id ?? genId(),
 		name: raw.name ?? '',
 		type: raw.type ?? 'enemy',
-		initiativeBonus: raw.initiativeBonus ?? 0,
-		maxHp: raw.maxHp ?? 1,
-		ac: raw.ac ?? 10,
-		pd: raw.pd ?? 10,
-		md: raw.md ?? 10,
+		initiativeBonus: raw.initiativeBonus ?? COMBATANT_DEFAULTS.initiativeBonus,
+		maxHp: raw.maxHp ?? COMBATANT_DEFAULTS.maxHp,
+		ac: raw.ac ?? COMBATANT_DEFAULTS.ac,
+		pd: raw.pd ?? COMBATANT_DEFAULTS.pd,
+		md: raw.md ?? COMBATANT_DEFAULTS.md,
 		note: raw.note ?? '',
 		tags: raw.tags ?? [],
 		createdAt: raw.createdAt ?? now,
@@ -167,8 +195,12 @@ export function normalizeCombatantTemplate(raw: RawCombatantTemplate): Combatant
 	};
 }
 
-function normalizeSettings(raw: Partial<Settings> | undefined): Settings {
-	return createSettings(raw ?? {});
+/** Settings normalizer — exported so the store's `peekFirstLaunch()` (a partial, settings-only
+ *  read before `hydrate()` has run) shares this exact defaulting instead of replicating it. */
+export function normalizeSettings(raw: Partial<Settings> | undefined): Settings {
+	// `createSettings` spreads `overrides` AFTER its own `dataVersion: DATA_VERSION` default, so a
+	// stored `raw.dataVersion` from an older file would otherwise survive normalization untouched.
+	return { ...createSettings(raw ?? {}), dataVersion: DATA_VERSION };
 }
 
 /**
@@ -176,11 +208,11 @@ function normalizeSettings(raw: Partial<Settings> | undefined): Settings {
  * shape-incompatible transforms FIRST — while legacy field names are still present — THEN coerce
  * into a valid AppData with all additive fields defaulted. Shared by load + import (ADR-013).
  */
-export function normalizeAppData(raw: RawAppData): AppData {
+export function normalizeAppData(raw: RawAppData, genId: IdGen = defaultGenId): AppData {
 	const migrated = migrate(raw);
 	return {
 		dataVersion: migrated.dataVersion ?? DATA_VERSION,
 		settings: normalizeSettings(migrated.settings),
-		combats: (migrated.combats ?? []).map(normalizeCombat),
+		combats: (migrated.combats ?? []).map((c) => normalizeCombat(c, genId)),
 	};
 }

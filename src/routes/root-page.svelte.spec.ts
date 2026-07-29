@@ -19,7 +19,7 @@ const store = {
 vi.mock('$lib/stores', () => ({ store }));
 
 vi.mock('$lib/components/app/CombatsHome.svelte', () => ({
-	default: class {},
+	default: () => {},
 }));
 
 // Regression test for the consume-once `firstLaunchCombatId` leak: if `/` is navigated away from
@@ -36,4 +36,23 @@ test('consumes the first-launch signal even when the component unmounts before h
 
 	expect(consumeFirstLaunchCombatId).toHaveBeenCalledTimes(1);
 	expect(goto).not.toHaveBeenCalled();
+});
+
+// Regression test for the seeded-combat redirect failure: if `goto` rejects (a navigation
+// error, an interrupted transition, etc.), the `…` placeholder must not be left up forever —
+// the component should fall through to the same degrade path used when no combat was seeded.
+test('degrades to the Combats home when the seeded-combat redirect fails', async () => {
+	goto.mockRejectedValueOnce(new Error('navigation failed'));
+
+	const screen = render((await import('./+page.svelte')).default);
+
+	await expect.element(screen.getByText('…')).toBeInTheDocument();
+
+	resolveHydrate?.();
+	await Promise.resolve();
+	await Promise.resolve();
+	await Promise.resolve();
+	await Promise.resolve();
+
+	await expect.element(screen.getByText('…')).not.toBeInTheDocument();
 });

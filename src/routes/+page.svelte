@@ -25,6 +25,11 @@
   Not re-throwing `hydrateError`: `AppShell` owns the hydrate-failure UI for every route and
   replaces this component's children outright when it is set, so there is nothing useful to render
   here in that case.
+
+  If the seeded-combat redirect itself fails (a rejected `goto`, e.g. a navigation error or an
+  interrupted transition), the `return` never runs, so the code falls through to the same
+  deterministic `showHome = true` degrade used when no combat was seeded — never leaving the user
+  stranded on the `…` placeholder.
 -->
 <script lang="ts">
 	import { onMount } from 'svelte';
@@ -44,12 +49,21 @@
 			if (store.hydrateError) return;
 
 			if (seededId) {
-				await goto(`/combats/${seededId}`, { replaceState: true });
-				return;
+				try {
+					await goto(`/combats/${seededId}`, { replaceState: true });
+					return;
+				} catch {
+					// Redirect to the seeded combat failed: fall through to the same
+					// deterministic degrade as "no combat seeded" rather than stalling
+					// forever on the `…` placeholder.
+				}
 			}
 
-			// First-launch seeding yielded no combat (unexpected, but not an error), or first
-			// launch already ran: degrade to the Combats home deterministically.
+			if (cancelled) return;
+
+			// First-launch seeding yielded no combat (unexpected, but not an error), first
+			// launch already ran, or the redirect to the seeded combat failed: degrade to
+			// the Combats home deterministically rather than stalling on the placeholder.
 			showHome = true;
 		})();
 

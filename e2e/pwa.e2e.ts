@@ -76,14 +76,14 @@ test('offline: a root reload and a full navigation to a deep route both serve th
 	await context.setOffline(true);
 
 	// Root reload — a fresh, un-controlled navigation to "/" — the base case the precached
-	// shell + navigateFallback exist for. Asserting the client-side redirect landed, not merely
-	// that <body> is visible: a shell that was served but never hydrated has a visible body too,
-	// which is the exact failure this test exists to catch (W-035). Only the hydrated client
-	// router can turn "/" into a combat URL. The destination is the list, not the detail route the
-	// first-launch assertion above lands on: a combat already exists by now, so "/" resolves to
-	// /combats rather than auto-creating and jumping into one.
+	// shell + navigateFallback exist for. "/" now renders CombatsHome in place (W-041, boot-flash
+	// fix) rather than redirecting to "/combats", so a URL assertion can no longer prove hydration
+	// happened at all — the precached shell ships an empty <body>, so a shell that was served but
+	// never hydrated has a visible body too, which is the exact failure this test exists to catch
+	// (W-035). Assert the route's client-rendered `sr-only` `h1` instead, same idiom as the
+	// /settings assertion below: it cannot exist unless the shell booted.
 	await page.goto('/');
-	await expect(page).toHaveURL(/\/combats\/?$/);
+	await expect(page.getByRole('heading', { level: 1 })).toHaveText('Combats');
 
 	// A second, distinct in-scope route reached by a full (non-SPA) navigation, standing in for
 	// "open a bookmarked/PWA-launched deep link while offline": /settings, not a /combats/<id>

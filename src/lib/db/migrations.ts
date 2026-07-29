@@ -195,8 +195,9 @@ export function normalizeCombatantTemplate(
 	};
 }
 
-/** Settings normalizer — exported so the store's `peekFirstLaunch()` (a partial, settings-only
- *  read before `hydrate()` has run) shares this exact defaulting instead of replicating it. */
+/** Settings normalizer, used by `migrate()` below to default/coerce loaded settings. Exported
+ *  (no external consumer currently) for reuse if another caller ever needs this exact
+ *  defaulting outside a full `migrate()` pass. */
 export function normalizeSettings(raw: Partial<Settings> | undefined): Settings {
 	// `createSettings` spreads `overrides` AFTER its own `dataVersion: DATA_VERSION` default, so a
 	// stored `raw.dataVersion` from an older file would otherwise survive normalization untouched.

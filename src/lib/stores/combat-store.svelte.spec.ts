@@ -97,9 +97,9 @@ describe('CombatStore (ADR-002 seam)', () => {
 	});
 });
 
-// Phase 4 (boot path): re-entrancy guard, failure containment, and the first-launch peek that
-// must not duplicate `hydrate()`'s full load.
-describe('CombatStore boot path (hydrate/hydrateError/peekFirstLaunch)', () => {
+// Phase 4 (boot path): re-entrancy guard, failure containment, and the first-launch id `/`'s
+// root page reads post-hydrate (W-041, boot-flash fix).
+describe('CombatStore boot path (hydrate/hydrateError/firstLaunchCombatId)', () => {
 	it('hydrate called twice (concurrently) performs one Dexie load', async () => {
 		const db = fakeDb();
 		let toArrayCalls = 0;
@@ -155,22 +155,37 @@ describe('CombatStore boot path (hydrate/hydrateError/peekFirstLaunch)', () => {
 		expect(store.hydrateError).toBeNull();
 	});
 
-	it('peekFirstLaunch answers from live state once ready, without a second full load', async () => {
+	it('firstLaunchCombatId is set to the seeded combat on a first-launch hydrate', async () => {
 		const db = fakeDb();
-		let toArrayCalls = 0;
-		const originalToArray = db.combats.toArray.bind(db.combats);
-		db.combats.toArray = async () => {
-			toArrayCalls += 1;
-			return originalToArray();
-		};
 		const store = new CombatStore(db);
 		await store.hydrate(() => 'gen');
-		expect(toArrayCalls).toBe(1);
 
-		const wasFirstLaunch = await store.peekFirstLaunch();
+		expect(store.firstLaunchCombatId).toBe(store.combats[0].id);
+	});
 
-		expect(wasFirstLaunch).toBe(false); // hydrate() already ran first-launch
-		expect(toArrayCalls).toBe(1); // no extra combats read
+	it('consumeFirstLaunchCombatId returns the seeded id once, then null on a later read', async () => {
+		const db = fakeDb();
+		const store = new CombatStore(db);
+		await store.hydrate(() => 'gen');
+
+		expect(store.consumeFirstLaunchCombatId()).toBe(store.combats[0].id);
+		expect(store.consumeFirstLaunchCombatId()).toBeNull();
+	});
+
+	it('firstLaunchCombatId stays null when first-launch had already run', async () => {
+		const db = fakeDb();
+		await db.settings.put({
+			id: 'settings',
+			language: 'en',
+			theme: 'system',
+			firstLaunchDone: true,
+			installHintDismissed: false,
+			dataVersion: 2,
+		});
+		const store = new CombatStore(db);
+		await store.hydrate(() => 'gen');
+
+		expect(store.firstLaunchCombatId).toBeNull();
 	});
 
 	// Phase 6 (ADR-013): a forward migration must persist the bumped `dataVersion` on its OWN
@@ -208,28 +223,6 @@ describe('CombatStore boot path (hydrate/hydrateError/peekFirstLaunch)', () => {
 		await second.hydrate();
 		expect(second.settings.dataVersion).toBe(2);
 		expect(second.getCombat('c')?.escalation).toBe(3);
-	});
-
-	it('peekFirstLaunch reads only the settings row before hydrate has run', async () => {
-		const db = fakeDb();
-		let combatsRead = 0;
-		let libraryRead = 0;
-		db.combats.toArray = async () => {
-			combatsRead += 1;
-			return [];
-		};
-		db.libraryEntries.toArray = async () => {
-			libraryRead += 1;
-			return [];
-		};
-		const store = new CombatStore(db);
-
-		const wasFirstLaunch = await store.peekFirstLaunch();
-
-		expect(wasFirstLaunch).toBe(true); // no settings row yet -> firstLaunchDone defaults false
-		expect(combatsRead).toBe(0);
-		expect(libraryRead).toBe(0);
-		expect(store.ready).toBe(false); // peeking must not itself hydrate
 	});
 });
 

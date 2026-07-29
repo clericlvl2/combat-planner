@@ -3,7 +3,6 @@
 	import AppShell from '$lib/components/app/AppShell.svelte';
 	import { applyTheme } from '$lib/theme';
 	import { store } from '$lib/stores';
-	import { Toaster, toast } from '$lib/components/ui/sonner';
 	import { m, setLocale } from '$lib/i18n';
 	import { needRefresh, updateServiceWorker } from '$lib/pwa/register';
 	import './layout.css';
@@ -12,6 +11,16 @@
 	// Phase 1's scope (AppShell + per-breakpoint nav only). The Toaster singleton is mounted
 	// below (W-003 Phase 3); InstallBanner is mounted inside AppShell.
 	let { children } = $props();
+
+	// Lazy-mounted after first paint (W-041 Phase 5) — sonner's JS chunk plus `sonner.css` are the
+	// only layout-exclusive boot bytes (ResponsiveModal already pulls in bits-ui/vaul on every
+	// route via CombatFormDialog, so those aren't deferrable here). Safe because `svelte-sonner`'s
+	// `toastState` (toast-state.svelte.js) is a module-level singleton independent of `<Toaster>`'s
+	// lifetime: `create()`/`addToast()` push straight into `$state([])` on that singleton, so a
+	// toast fired before this component mounts is simply queued and renders the moment it does.
+	// The update-available toast below (`$effect` on `$needRefresh`) dynamically imports `toast`
+	// itself rather than relying on this variable, so it never races the assignment below.
+	let Toaster = $state<typeof import('$lib/components/ui/sonner').Toaster>();
 
 	onMount(async () => {
 		// Boot skeleton teardown (src/app.html) — must be the *first* statement, before the
@@ -24,6 +33,13 @@
 			.__cpBootTimer);
 		document.getElementById('boot-skeleton')?.remove();
 		document.getElementById('boot-failed')?.remove();
+
+		// Fire-and-forget, independent of the hydrate await below — the sonner chunk has no
+		// dependency on Dexie and no toast can fire before `window.load` (Phase 4), so there is no
+		// urgency; this just keeps it off the critical boot path.
+		import('$lib/components/ui/sonner').then(({ Toaster: loaded }) => {
+			Toaster = loaded;
+		});
 
 		// `store.hydrate()` never rejects — a failure sets `store.hydrateError`, which `AppShell`
 		// renders on every route (deep links never run `+page.ts`'s `load`, so this is the only
@@ -50,12 +66,14 @@
 	// must be able to act whenever they notice it.
 	$effect(() => {
 		if ($needRefresh) {
-			toast(m['toasts.update.message'](), {
-				duration: Number.POSITIVE_INFINITY,
-				action: {
-					label: m['toasts.update.action'](),
-					onClick: () => updateServiceWorker(true),
-				},
+			import('$lib/components/ui/sonner').then(({ toast }) => {
+				toast(m['toasts.update.message'](), {
+					duration: Number.POSITIVE_INFINITY,
+					action: {
+						label: m['toasts.update.action'](),
+						onClick: () => updateServiceWorker(true),
+					},
+				});
 			});
 		}
 	});
@@ -78,4 +96,6 @@
 	</AppShell>
 {/key}
 
-<Toaster theme={store.settings.theme} />
+{#if Toaster}
+	<Toaster theme={store.settings.theme} />
+{/if}

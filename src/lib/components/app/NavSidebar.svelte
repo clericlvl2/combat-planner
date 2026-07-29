@@ -11,17 +11,30 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui/button';
-	import {
-		Drawer,
-		DrawerClose,
-		DrawerContent,
-		DrawerHeader,
-		DrawerTitle,
-	} from '$lib/components/ui/drawer';
 	import { m } from '$lib/i18n';
 	import { chromeIcon } from '$lib/icons';
 
 	let { open = $bindable(false) }: { open?: boolean } = $props();
+
+	// The Drawer (vaul) is lazy-mounted (W-041 Phase 5) — the gesture listener below stays eager
+	// so the edge-swipe never misses a touch, but the drawer markup/module itself only loads once
+	// a swipe or an open request is actually in flight. `loadDrawer` is idempotent (checked via
+	// `drawerModule`, not a separate flag) so calling it from both the touch handler and the
+	// `open` effect below never double-fetches.
+	let drawerModule = $state<typeof import('$lib/components/ui/drawer')>();
+
+	function loadDrawer() {
+		if (drawerModule) return;
+		import('$lib/components/ui/drawer').then((mod) => {
+			drawerModule = mod;
+		});
+	}
+
+	// Covers the non-swipe path — AppHeader's burger button sets `open` directly (tablet mode),
+	// never touching `onTouchStart`, so the drawer must load there too.
+	$effect(() => {
+		if (open) loadDrawer();
+	});
 
 	const links = $derived([
 		{ href: '/combats', label: m['nav.combats'](), icon: chromeIcon.navCombats },
@@ -61,6 +74,11 @@
 		}
 		startX = touch.clientX;
 		startY = touch.clientY;
+		// Kick the Drawer chunk off on touchstart, not on `open = true` below — the fetch/parse is
+		// then already in flight by the time the swipe crosses SWIPE_THRESHOLD_PX, instead of only
+		// starting once the gesture already decided to open (which would show a stutter on the
+		// very first swipe of a session).
+		loadDrawer();
 	}
 
 	function onTouchMove(e: TouchEvent) {
@@ -86,37 +104,44 @@
 
 <svelte:window ontouchstart={onTouchStart} ontouchmove={onTouchMove} ontouchend={onTouchEnd} />
 
-<Drawer bind:open direction="left" shouldScaleBackground={false}>
-	<DrawerContent class="!w-64 gap-0 p-0 !rounded-none [&>[data-vaul-handle]]:!hidden">
-		<DrawerHeader class="border-b border-border">
-			<DrawerTitle class="text-lg font-semibold">{m['about.appName']()}</DrawerTitle>
-		</DrawerHeader>
-		<DrawerClose>
-			{#snippet child({ props })}
-				{@const CloseIcon = chromeIcon.close}
-				<Button variant="ghost" size="icon" class="absolute top-3 right-3" {...props}>
-					<CloseIcon class="size-4" />
-					<span class="sr-only">{m['a11y.close']()}</span>
-				</Button>
-			{/snippet}
-		</DrawerClose>
-		<nav class="flex flex-col gap-1 p-2" aria-label={m['nav.primary']()}>
-			{#each links as link (link.href)}
-				{@const current = isCurrent(link.href)}
-				{@const Icon = link.icon}
-				<a
-					href={link.href}
-					class={[
-						'flex min-h-11 items-center gap-3 rounded-md px-3 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none',
-						current ? 'bg-secondary text-secondary-foreground' : 'text-foreground hover:bg-muted',
-					]}
-					aria-current={current ? 'page' : undefined}
-					onclick={() => (open = false)}
-				>
-					<Icon class="size-5" aria-hidden="true" />
-					{link.label}
-				</a>
-			{/each}
-		</nav>
-	</DrawerContent>
-</Drawer>
+{#if drawerModule}
+	{@const Drawer = drawerModule.Drawer}
+	{@const DrawerContent = drawerModule.DrawerContent}
+	{@const DrawerHeader = drawerModule.DrawerHeader}
+	{@const DrawerTitle = drawerModule.DrawerTitle}
+	{@const DrawerClose = drawerModule.DrawerClose}
+	<Drawer bind:open direction="left" shouldScaleBackground={false}>
+		<DrawerContent class="!w-64 gap-0 p-0 !rounded-none [&>[data-vaul-handle]]:!hidden">
+			<DrawerHeader class="border-b border-border">
+				<DrawerTitle class="text-lg font-semibold">{m['about.appName']()}</DrawerTitle>
+			</DrawerHeader>
+			<DrawerClose>
+				{#snippet child({ props })}
+					{@const CloseIcon = chromeIcon.close}
+					<Button variant="ghost" size="icon" class="absolute top-3 right-3" {...props}>
+						<CloseIcon class="size-4" />
+						<span class="sr-only">{m['a11y.close']()}</span>
+					</Button>
+				{/snippet}
+			</DrawerClose>
+			<nav class="flex flex-col gap-1 p-2" aria-label={m['nav.primary']()}>
+				{#each links as link (link.href)}
+					{@const current = isCurrent(link.href)}
+					{@const Icon = link.icon}
+					<a
+						href={link.href}
+						class={[
+							'flex min-h-11 items-center gap-3 rounded-md px-3 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none',
+							current ? 'bg-secondary text-secondary-foreground' : 'text-foreground hover:bg-muted',
+						]}
+						aria-current={current ? 'page' : undefined}
+						onclick={() => (open = false)}
+					>
+						<Icon class="size-5" aria-hidden="true" />
+						{link.label}
+					</a>
+				{/each}
+			</nav>
+		</DrawerContent>
+	</Drawer>
+{/if}

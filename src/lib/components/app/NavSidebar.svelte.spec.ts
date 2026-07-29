@@ -5,6 +5,13 @@ import NavSidebar from './NavSidebar.svelte';
 
 // The mobile/tablet nav overlay — links to Combats/Settings/About, each with a visible
 // label + icon (no color-alone signifier).
+//
+// The Drawer (vaul) is lazy-loaded (W-041 Phase 5) — a touchstart in the edge zone, or `open:
+// true`, kicks off a dynamic `import()` before the drawer markup exists in the DOM. Every
+// assertion below that expects the nav content to appear already goes through
+// `expect.element(...)` locators, which retry until the assertion passes rather than checking
+// the DOM once synchronously — so they still correctly wait out that import, with no change
+// needed to the assertions themselves.
 
 afterEach(() => {
 	cleanup();

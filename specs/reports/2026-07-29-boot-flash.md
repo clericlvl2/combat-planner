@@ -1,8 +1,9 @@
 # Investigation: boot flash on first open and F5 (W-041)
 
-**Status:** investigation complete, no code changed. Supersedes the cause analysis in the W-041
-backlog row, which named a fix that does not work.
-**Date:** 2026-07-29
+**Status:** investigation complete; all six phases of the plan shipped. The "After — Phase 6" table
+below records the post-fix numbers against the original baseline. Supersedes the cause analysis in
+the W-041 backlog row, which named a fix that does not work.
+**Date:** 2026-07-29 (investigation), 2026-07-30 (fix landed)
 **Plan:** `.claude/plans/2026-07-29-fix-boot-flash.md`
 
 ## Headline
@@ -33,6 +34,14 @@ not committed.
 | F5 on `/combats/<id>` | 44 ms | 92 ms | 136 ms | 0 | 48 ms |
 
 Two results that contradict working assumptions and change priorities:
+
+- **CLS is 0 in every baseline scenario.** The `<p class="p-4 text-muted-foreground">…</p>`
+  placeholder was assumed to cause layout shift. It does not measurably. Replacing it with
+  dimension-matched skeletons is a polish item, not a Core Web Vitals fix. (Post-fix, cold `/`
+  measures 0.036 — see the delta notes under the "After" table for why.)
+- **Warm F5 is already fast** (~100 ms FCP) because the service worker serves everything from Cache
+  Storage, bypassing the network entirely. Bundle size is therefore *not* what makes F5 flash — the
+  render sequence is.
 
 ### After — Phase 6 (all phases applied)
 
@@ -72,13 +81,6 @@ Deltas against the baseline above:
   painting immediately), not a timing regression these numbers were ever going to show. FCP moved
   a few ms in both directions across runs, consistent with CDP-throttling jitter, not a real
   change.
-
-- **CLS is 0 in every scenario.** The `<p class="p-4 text-muted-foreground">…</p>` placeholder was
-  assumed to cause layout shift. It does not measurably. Replacing it with dimension-matched
-  skeletons is a polish item, not a Core Web Vitals fix.
-- **Warm F5 is already fast** (~100 ms FCP) because the service worker serves everything from Cache
-  Storage, bypassing the network entirely. Bundle size is therefore *not* what makes F5 flash — the
-  render sequence is.
 
 The desktop "black lines at the top" symptom **could not be reproduced headless**, but the
 mechanism is now identified — see root cause 5. The original theory (`AppHeader.svelte:34` being

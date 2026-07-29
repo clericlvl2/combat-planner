@@ -29,8 +29,9 @@
 		// so removing the skeleton here is atomic with that paint. Placed after the `await` instead,
 		// both headers would sit in the DOM for the whole IndexedDB round-trip. Clearing the timer
 		// cancels app.html's bounded failure state, which only fires if this line never runs.
-		clearTimeout((window as unknown as { __cpBootTimer?: ReturnType<typeof setTimeout> })
-			.__cpBootTimer);
+		clearTimeout(
+			(window as unknown as { __cpBootTimer?: ReturnType<typeof setTimeout> }).__cpBootTimer,
+		);
 		document.getElementById('boot-skeleton')?.remove();
 		document.getElementById('boot-failed')?.remove();
 

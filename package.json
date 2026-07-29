@@ -18,6 +18,7 @@
 		"test:unit": "vitest",
 		"test:e2e": "playwright test",
 		"test": "npm run test:unit -- --run && npm run test:e2e",
+		"capture:boot": "npm run build && node scripts/capture-boot.mjs",
 		"gate": "npm run lint && npm run check && npm run check:i18n && npm run test:unit -- --run && npm run build"
 	},
 	"devDependencies": {

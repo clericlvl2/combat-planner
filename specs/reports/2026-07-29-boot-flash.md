@@ -34,6 +34,45 @@ not committed.
 
 Two results that contradict working assumptions and change priorities:
 
+### After — Phase 6 (all phases applied)
+
+Captured with the now-committed `scripts/capture-boot.mjs` against the same real `build/`
+output, served by `scripts/serve-build.mjs` (the two-line static server this phase adds to
+replace `vite preview` in the e2e config — see Phase 6 below). Same conditions: headless
+Chromium 1440×900, `colorScheme: dark`, CPU throttled 4×, network Fast 3G. "Blank window" is
+reported as equal to first-paint here — nothing paints before it, by definition — rather than
+independently re-derived from screenshot polling; see the script's header comment for why that
+turned out to be a noisier measurement of the same instant, not a different one.
+
+| Scenario | first-paint | FCP | LCP | CLS | blank window |
+|---|---:|---:|---:|---:|---:|
+| Cold `/` (no SW, empty IndexedDB) | 1744 ms | 3616 ms | 4712 ms | 0.036 | 1744 ms |
+| F5 on `/` (SW warm) | 40 ms | 144 ms | 192 ms | 0.000 | 40 ms |
+| F5 on `/combats` | 44 ms | 108 ms | 132 ms | 0.000 | 44 ms |
+| F5 on `/combats/<id>` | 44 ms | 100 ms | 140 ms | 0.000 | 44 ms |
+
+Deltas against the baseline above:
+
+- **Cold `/` first-paint/blank-window: 2104/2160 ms → 1744 ms (−17%/−19%).** Phase 3 unblocking
+  `/` (no more double Dexie await before anything paints) plus Phase 2's static skeleton account
+  for this — the skeleton itself now paints at first-paint, before Dexie or the redirect decision
+  resolve.
+- **Cold `/` FCP: 4264 ms → 3616 ms (−15%).** Faster, but still the dominant cost on this path —
+  Phase 5's boot-graph shrink and the still-open Dexie-behind-a-facade item (out of scope, filed
+  separately) are the remaining levers, not this phase.
+- **Cold `/` CLS: 0 → 0.036.** Small but no longer exactly zero. The redirect from the list to the
+  seeded combat now happens after first paint (Phase 3's suppressed intermediate-list-paint design
+  still lets the skeleton-to-content transition register a minor shift) where the pre-Phase-3 flow
+  painted nothing until everything had already settled. Not a regression target for this phase;
+  noted for whoever picks up the CLS placeholder-polish item already flagged out of scope.
+- **Warm F5 scenarios (`/`, `/combats`, `/combats/<id>`): first-paint/blank-window unchanged
+  within measurement noise (~40-52 ms before, ~40-44 ms after).** Expected, and consistent with
+  the report's own finding that warm F5 was already fast pre-fix (everything served from Cache
+  Storage) — the symptom Phase 2 fixes is *qualitative* (a hard blank-to-content cut versus chrome
+  painting immediately), not a timing regression these numbers were ever going to show. FCP moved
+  a few ms in both directions across runs, consistent with CDP-throttling jitter, not a real
+  change.
+
 - **CLS is 0 in every scenario.** The `<p class="p-4 text-muted-foreground">…</p>` placeholder was
   assumed to cause layout shift. It does not measurably. Replacing it with dimension-matched
   skeletons is a polish item, not a Core Web Vitals fix.

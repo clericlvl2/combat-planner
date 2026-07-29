@@ -70,6 +70,7 @@ function fireInstallPrompt() {
 
 test('stays hidden until beforeinstallprompt fires', async () => {
 	const store = new CombatStore(fakeDb());
+	await store.hydrate();
 	const screen = render(InstallBanner, { store });
 
 	await expect
@@ -79,6 +80,7 @@ test('stays hidden until beforeinstallprompt fires', async () => {
 
 test('renders the install hint once beforeinstallprompt fires', async () => {
 	const store = new CombatStore(fakeDb());
+	await store.hydrate();
 	const screen = render(InstallBanner, { store });
 
 	const { event } = fireInstallPrompt();
@@ -96,6 +98,7 @@ test('renders the install hint once beforeinstallprompt fires', async () => {
 test('never renders in standalone display mode, even after the event fires', async () => {
 	mockStandalone(true);
 	const store = new CombatStore(fakeDb());
+	await store.hydrate();
 	const screen = render(InstallBanner, { store });
 
 	fireInstallPrompt();
@@ -108,6 +111,7 @@ test('never renders in standalone display mode, even after the event fires', asy
 test('never renders once installHintDismissed is already true', async () => {
 	mockStandalone(false);
 	const store = new CombatStore(fakeDb());
+	await store.hydrate();
 	store.updateSettings({ installHintDismissed: true });
 	const screen = render(InstallBanner, { store });
 
@@ -120,6 +124,7 @@ test('never renders once installHintDismissed is already true', async () => {
 
 test('dismiss persists installHintDismissed and hides the banner for good', async () => {
 	const store = new CombatStore(fakeDb());
+	await store.hydrate();
 	const screen = render(InstallBanner, { store });
 	fireInstallPrompt();
 
@@ -141,6 +146,7 @@ test('dismiss persists installHintDismissed and hides the banner for good', asyn
 
 test('install calls prompt() on the stashed event and does not linger afterward', async () => {
 	const store = new CombatStore(fakeDb());
+	await store.hydrate();
 	const screen = render(InstallBanner, { store });
 	const { promptFn } = fireInstallPrompt();
 

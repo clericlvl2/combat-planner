@@ -25,6 +25,9 @@ function setThemeColorMeta(isDark: boolean) {
 
 function applyIsDark(isDark: boolean) {
 	document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+	// Keep in sync with app.html's pre-paint script, which sets both together — otherwise
+	// `data-theme` and `colorScheme` disagree from mount onward and after every theme change.
+	document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
 	setThemeColorMeta(isDark);
 }
 

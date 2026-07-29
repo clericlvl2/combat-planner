@@ -26,6 +26,10 @@
 	export interface InstallBannerStore {
 		settings: Pick<Settings, 'installHintDismissed'>;
 		updateSettings(patch: Partial<Omit<Settings, 'id'>>): void;
+		/** Gates the banner off pre-hydrate. `installHintDismissed` has no localStorage mirror, so
+		 * a user who already dismissed the hint would otherwise see the full-width strip painted
+		 * pre-hydrate and then removed the instant hydrate lands — the "black lines" flash. */
+		ready: boolean;
 	}
 
 	let { store }: { store: InstallBannerStore } = $props();
@@ -44,7 +48,7 @@
 	}
 
 	const visible = $derived(
-		deferredPrompt !== null && !store.settings.installHintDismissed && !standalone,
+		store.ready && deferredPrompt !== null && !store.settings.installHintDismissed && !standalone,
 	);
 
 	async function onInstall() {

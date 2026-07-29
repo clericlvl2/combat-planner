@@ -19,13 +19,9 @@ import {
 } from '../db/persistence';
 import type { Combat, CombatantTemplate, Condition, Settings } from '../db/types';
 import { DATA_VERSION, SETTINGS_ID } from '../db/types';
+import { createBootSettings } from './boot-settings';
 import * as App from './domain/app';
-import {
-	type CombatantInput,
-	type CombatantTemplateInput,
-	type CombatInput,
-	createSettings,
-} from './domain/factories';
+import type { CombatantInput, CombatantTemplateInput, CombatInput } from './domain/factories';
 import type { D20Roll, IdGen } from './domain/id';
 import * as Library from './domain/library';
 import * as T from './domain/transitions';
@@ -34,7 +30,10 @@ import { redo as undoRedo, undo as undoUndo } from './domain/undo';
 export class CombatStore {
 	readonly #db: PersistenceDb;
 
-	settings = $state.raw<Settings>(createSettings());
+	/** Seeded from the boot-time localStorage mirrors (Phase 1, boot-flash fix) so this initial
+	 *  value already agrees with what `app.html`'s pre-paint script and the persisted locale show,
+	 *  instead of flashing English/`system` for the hydrate window. */
+	settings = $state.raw<Settings>(createBootSettings());
 	combats = $state.raw<Combat[]>([]);
 	/** The combatant library — no tag state; the tag list is derived at consumers (ADR-002). */
 	libraryEntries = $state.raw<CombatantTemplate[]>([]);

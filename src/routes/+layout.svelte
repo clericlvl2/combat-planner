@@ -54,13 +54,14 @@
   Keying the subtree on the active locale forces every `m[...]()` call-site to re-render
   when the language changes (Settings calls `setLocale(..., { reload: false })`), without a full
   page reload — Paraglide's `getLocale()`/`m[...]()` aren't themselves reactive to Svelte, so this
-  keyed block is the reactive seam that makes the switch apply instantly. Gated on `store.ready`:
-  while booting, the key is the constant `false`, so hydrate flipping `store.settings.language`
-  from the `createSettings()` default to the persisted locale does not itself remount every page.
-  Once `ready` is true the key tracks `store.settings.language` directly, so only a real
-  user-initiated switch (Settings) remounts the tree afterward.
+  keyed block is the reactive seam that makes the switch apply instantly. Keyed directly on
+  `store.settings.language`, not gated on `store.ready`: the store's initial value is now seeded
+  from Paraglide's own localStorage mirror (`createBootSettings`, boot-settings.ts), so it already
+  agrees with the persisted locale hydrate loads — hydrate no longer flips this key, so the
+  `AppShell` subtree survives boot instead of being torn down and recreated the instant it
+  resolves. Only a real user-initiated switch (Settings) remounts the tree afterward.
 -->
-{#key store.ready && store.settings.language}
+{#key store.settings.language}
 	<AppShell>
 		{@render children()}
 	</AppShell>

@@ -11,6 +11,13 @@
   orphaned continuation: if the user has already navigated away by the time `hydrate()` resolves,
   the redirect must not fire and yank them back.
 
+  `store.consumeFirstLaunchCombatId()` is called unconditionally right after `hydrate()` resolves,
+  before the `cancelled`/`hydrateError` guards. It is a consume-once signal valid only for the boot
+  that produced it (see its doc comment in the store); leaving it unconsumed on an early return
+  would strand it on the store, to be wrongly picked up by a later, unrelated visit to `/` in the
+  same session. So it is always consumed here — its value is simply discarded when the boot was
+  cancelled or errored.
+
   `replaceState: true` is required: `goto` defaults to push, but the behaviour being replaced (a
   `redirect()` thrown from the initial `load`) ran with SvelteKit's boot-time `replace_state: true`.
   Without it, Back from the seeded combat would land on `/` instead of leaving the app.
@@ -32,10 +39,10 @@
 
 		(async () => {
 			await store.hydrate();
+			const seededId = store.consumeFirstLaunchCombatId();
 			if (cancelled) return;
 			if (store.hydrateError) return;
 
-			const seededId = store.consumeFirstLaunchCombatId();
 			if (seededId) {
 				await goto(`/combats/${seededId}`, { replaceState: true });
 				return;

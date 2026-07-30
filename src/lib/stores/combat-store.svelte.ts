@@ -215,7 +215,29 @@ export class CombatStore {
 		void persistCombats(this.#db, reordered);
 	}
 
+	/**
+	 * `this.settings` starts as `createBootSettings()`'s localStorage-seeded defaults (see the
+	 * `settings` field doc) until `hydrate()` resolves — a pre-ready call would spread the patch
+	 * over those defaults and persist `firstLaunchDone: false` and a stale `dataVersion` over the
+	 * real Dexie row (W-052). Queue the write behind `hydrate()` so it applies to the
+	 * actually-hydrated settings instead of discarding the caller's intent; every current call
+	 * site (`InstallBanner`, the settings route) already gates its UI on `store.ready` and never
+	 * reads `store.settings` synchronously right after calling this, so resolving asynchronously
+	 * here is safe. `hydrate()` never rejects — a failed attempt sets `hydrateError` and leaves
+	 * `ready` false, so the continuation re-checks `ready` and drops the write rather than
+	 * applying the patch over the still-unhydrated boot defaults.
+	 */
 	updateSettings(patch: Partial<Omit<Settings, 'id'>>): void {
+		if (!this.ready) {
+			void this.hydrate().then(() => {
+				if (this.ready) this.#applySettingsPatch(patch);
+			});
+			return;
+		}
+		this.#applySettingsPatch(patch);
+	}
+
+	#applySettingsPatch(patch: Partial<Omit<Settings, 'id'>>): void {
 		const next = { ...this.settings, ...patch };
 		this.settings = next;
 		void persistSettings(this.#db, next);

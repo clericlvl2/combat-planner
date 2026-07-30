@@ -11,6 +11,7 @@ import { createCombatantTemplate } from './domain/factories';
 function fakeDb(): PersistenceDb & {
 	_combats: Map<string, Combat>;
 	_libraryEntries: Map<string, CombatantTemplate>;
+	_settings: Map<string, Settings>;
 } {
 	const combats = new Map<string, Combat>();
 	const settings = new Map<string, Settings>();
@@ -18,6 +19,7 @@ function fakeDb(): PersistenceDb & {
 	return {
 		_combats: combats,
 		_libraryEntries: libraryEntries,
+		_settings: settings,
 		combats: {
 			toArray: async () => [...combats.values()],
 			put: async (c) => combats.set(c.id, structuredClone(c)),
@@ -237,6 +239,87 @@ describe('CombatStore boot path (hydrate/hydrateError/seeded first-launch id)', 
 		await second.hydrate();
 		expect(second.settings.dataVersion).toBe(2);
 		expect(second.getCombat('c')?.escalation).toBe(3);
+	});
+
+	// W-052: `updateSettings` called before `hydrate()` resolves used to spread the patch over
+	// `createBootSettings()`'s localStorage-seeded defaults (which start `firstLaunchDone: false`)
+	// instead of the real Dexie row, so the persisted write clobbered `firstLaunchDone` back to
+	// `false`. The fix queues the write behind `hydrate()`.
+	//
+	// Asserting only after `hydrate()` resolves doesn't discriminate: hydrate replaces
+	// `this.settings` wholesale with the loaded row regardless of the bug, and a `db.settings.get`
+	// read (in `loadAppData` and in `hydrate` itself) would race any clobbering write made from the
+	// `updateSettings` continuation. So this holds `db.settings.get` pending with a deferred
+	// promise, fires `updateSettings` while `hydrate()` is still in flight, and inspects the raw
+	// underlying `_settings` map — bypassing the overridden `get` — before letting hydrate resolve.
+	it('a pre-hydrate updateSettings does not persist anything until hydrate resolves, then applies on top', async () => {
+		const db = fakeDb();
+		db._settings.set('settings', {
+			id: 'settings',
+			language: 'en',
+			theme: 'light',
+			firstLaunchDone: true,
+			installHintDismissed: false,
+			dataVersion: 2,
+		});
+		// `settings.get` is called twice per hydrate (loadAppData's internal read, plus hydrate's
+		// own separate read for the pre-migration version) — queue a resolver per call and resolve
+		// them all together once the test is ready to let hydrate proceed.
+		const pendingResolvers: Array<(s: Settings | undefined) => void> = [];
+		const originalGet = db.settings.get.bind(db.settings);
+		db.settings.get = () => new Promise((resolve) => pendingResolvers.push(resolve));
+		const store = new CombatStore(db);
+
+		store.hydrate(); // intentionally not awaited — hydrate is stuck pending `settings.get`
+		expect(store.ready).toBe(false);
+		store.updateSettings({ theme: 'dark' });
+		// Flush whatever microtasks `updateSettings` can run before hydrate settles.
+		await Promise.resolve();
+		await Promise.resolve();
+
+		// Without the fix, this write already landed here — over the boot defaults.
+		expect(db._settings.get('settings')?.firstLaunchDone).toBe(true);
+		expect(db._settings.get('settings')?.theme).toBe('light');
+
+		const resolved = await originalGet('settings');
+		for (const resolve of pendingResolvers) resolve(resolved);
+		await store.hydrate();
+		await Promise.resolve();
+		await Promise.resolve();
+
+		expect(store.settings.firstLaunchDone).toBe(true);
+		expect(store.settings.theme).toBe('dark');
+		expect(db._settings.get('settings')?.firstLaunchDone).toBe(true);
+		expect(db._settings.get('settings')?.theme).toBe('dark');
+	});
+
+	// The failure twin: `hydrate()` never rejects — a failed attempt sets `hydrateError` and
+	// leaves `ready` false. The queued continuation must re-check `ready` and drop the write
+	// rather than persisting the patch over the still-unhydrated boot defaults.
+	it('a pre-hydrate updateSettings persists nothing when hydrate fails', async () => {
+		const db = fakeDb();
+		db._settings.set('settings', {
+			id: 'settings',
+			language: 'en',
+			theme: 'light',
+			firstLaunchDone: true,
+			installHintDismissed: false,
+			dataVersion: 2,
+		});
+		db.settings.get = async () => {
+			throw new Error('Dexie unavailable');
+		};
+		const store = new CombatStore(db);
+
+		store.updateSettings({ theme: 'dark' });
+		await Promise.resolve();
+		await Promise.resolve();
+		await Promise.resolve();
+
+		expect(store.ready).toBe(false);
+		expect(store.hydrateError).not.toBeNull();
+		expect(db._settings.get('settings')?.firstLaunchDone).toBe(true);
+		expect(db._settings.get('settings')?.theme).toBe('light');
 	});
 });
 

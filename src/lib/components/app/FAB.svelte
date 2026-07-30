@@ -14,12 +14,14 @@
 		onclick,
 		disabled = false,
 		class: className,
+		'aria-busy': ariaBusy,
 	}: {
 		icon: IconComponent;
 		label: string;
 		onclick: () => void;
 		disabled?: boolean;
 		class?: string;
+		'aria-busy'?: boolean;
 	} = $props();
 
 	const Icon = $derived(icon);
@@ -30,6 +32,7 @@
 	class={['fixed right-4 bottom-safe shadow-lg', className]}
 	{disabled}
 	aria-label={label}
+	aria-busy={ariaBusy}
 	{onclick}
 >
 	<Icon class="size-6" />

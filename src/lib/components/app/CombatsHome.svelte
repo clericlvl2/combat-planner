@@ -7,10 +7,16 @@
   Extracted verbatim from `/combats`'s `+page.svelte` (W-041, boot-flash fix) so both `/` and
   `/combats` can render the same subtree without a route-to-route duplicate. No `$app/state`
   coupling — only `goto` from `$app/navigation` — so mounting it from either route is safe.
+
+  CombatFormDialog is lazy (W-046 Phase 2): it is never reachable without a click (FAB, header
+  create button, empty-state CTA, or row-menu Edit), so its bits-ui/vaul chunk set only loads on
+  first intent. `loadForm()` is idempotent against `formModule` itself, mirrors NavSidebar's
+  `loadDrawer()` shape, and `open` only flips true after the module is assigned and a `tick()` has
+  run so the sheet still animates open rather than appearing already-open.
 -->
 <script lang="ts">
+	import { tick } from 'svelte';
 	import { goto } from '$app/navigation';
-	import CombatFormDialog from '$lib/components/app/CombatFormDialog.svelte';
 	import CombatList from '$lib/components/app/CombatList.svelte';
 	import EmptyState from '$lib/components/app/EmptyState.svelte';
 	import FAB from '$lib/components/app/FAB.svelte';
@@ -28,6 +34,27 @@
 	let editId = $state<string | null>(null);
 	const editCombat = $derived(editId ? (store.getCombat(editId) ?? null) : null);
 
+	let formModule = $state<typeof import('$lib/components/app/CombatFormDialog.svelte')>();
+	let formPending = $state(false);
+
+	function loadForm() {
+		if (formModule) {
+			formOpen = true;
+			return;
+		}
+		formPending = true;
+		import('$lib/components/app/CombatFormDialog.svelte')
+			.then(async (mod) => {
+				formModule = mod;
+				await tick();
+				formOpen = true;
+				formPending = false;
+			})
+			.catch(() => {
+				formPending = false;
+			});
+	}
+
 	// Real-time title-or-description filter, view-local only (never persisted, ADR-002).
 	let query = $state('');
 	const filteredCombats = $derived.by(() => {
@@ -40,11 +67,11 @@
 
 	function openCreate() {
 		editId = null;
-		formOpen = true;
+		loadForm();
 	}
 	function openEdit(id: string) {
 		editId = id;
-		formOpen = true;
+		loadForm();
 	}
 	function openCombat(id: string) {
 		goto(`/combats/${id}`);
@@ -66,6 +93,7 @@
 		variant="ghost"
 		size="chrome"
 		aria-label={m['combats.create']()}
+		aria-busy={formPending}
 		title={m['combats.create']()}
 		onclick={openCreate}
 	>
@@ -83,12 +111,23 @@
 		title={m['combats.empty.title']()}
 		description={m['combats.empty.description']()}
 	>
-		<Button size="action" class="hidden lg:inline-flex" onclick={openCreate}>
+		<Button
+			size="action"
+			class="hidden lg:inline-flex"
+			aria-busy={formPending}
+			onclick={openCreate}
+		>
 			<Add class="size-5" />
 			{m['combats.empty.cta']()}
 		</Button>
 	</EmptyState>
-	<FAB icon={Add} label={m['combats.create']()} onclick={openCreate} class="lg:hidden" />
+	<FAB
+		icon={Add}
+		label={m['combats.create']()}
+		onclick={openCreate}
+		class="lg:hidden"
+		aria-busy={formPending}
+	/>
 {:else}
 	<div class="flex flex-col gap-2 pt-3 pb-24">
 		<SearchField bind:value={query} />
@@ -102,7 +141,16 @@
 		/>
 	</div>
 
-	<FAB icon={Add} label={m['combats.create']()} onclick={openCreate} class="lg:hidden" />
+	<FAB
+		icon={Add}
+		label={m['combats.create']()}
+		onclick={openCreate}
+		class="lg:hidden"
+		aria-busy={formPending}
+	/>
 {/if}
 
-<CombatFormDialog combat={editCombat} bind:open={formOpen} {store} />
+{#if formModule}
+	{@const Form = formModule.default}
+	<Form combat={editCombat} bind:open={formOpen} {store} />
+{/if}

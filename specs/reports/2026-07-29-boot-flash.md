@@ -122,10 +122,9 @@ numbers below, but the confound is real and is named here rather than assumed aw
   currently land there), not an artifact of the old rig's raw-byte transfer.
   **What this does not show:** whether Phase 3 (bits-ui/vaul pulled into `/`'s node graph) actually
   regressed LCP against the pre-W-041 baseline. That baseline (LCP 4264 ms) was measured on the old
-  uncompressed rig and has never been re-measured with brotli, so comparing it to this table's
-  ~1982 ms is not a valid comparison — proportional rescaling does not recover it either. Settling
-  that would need `7dd4fa2` (pre-W-041) re-measured on this rig; not done here, and W-046 remains
-  the next lever regardless of how that question resolves.
+  uncompressed rig and comparing it to this table's ~1982 ms is not a valid comparison —
+  proportional rescaling does not recover it either. **Now settled by direct measurement — see
+  "The LCP regression, settled" below.**
 - These are the current honest-transport, honest-server numbers; the bundle itself is unchanged
   (W-046 is still open), so the underlying byte-for-byte cost this table measures against will
   move again once that lands.
@@ -147,8 +146,12 @@ Deltas against the baseline above:
 - **Cold `/` FCP: 4264 ms → 3616 ms (−15%).** Faster, but still the dominant cost on this path —
   Phase 5's boot-graph shrink and the still-open Dexie-behind-a-facade item (out of scope, filed
   separately) are the remaining levers, not this phase.
-- **Cold `/` LCP: 4264 ms → 4712 ms (+10.5%) — a regression, and the one number this unit made
-  worse.** Expected in direction if not in size: pre-fix, the first thing painted at all was the
+- **Cold `/` LCP: 4264 ms → 4712 ms (+10.5%) — read as a regression here. It is not one; both
+  numbers come from the uncompressed rig and the comparison was never valid. See "The LCP
+  regression, settled" below, which measures the same pair on one rig and finds +3%, inside
+  run-to-run noise.** The reasoning below about *why* the two numbers decouple still holds and is
+  confirmed there; only the "+448 ms of real extra work" conclusion is withdrawn.
+  Expected in direction if not in size: pre-fix, the first thing painted at all was the
   settled page, so first-paint, FCP and LCP collapsed onto the same 4264 ms instant. Post-fix the
   skeleton paints at 1744 ms and the real largest element arrives later, on its own schedule, so LCP
   becomes a separate and later event. The +448 ms on top of that is real extra work on the critical
@@ -268,6 +271,42 @@ bars. The only real fixes cost more than they buy — reserving 52 px on every r
 `AppHeader` during the undecided first-launch window trades the shift for a 52 px blank bar during
 boot, which is the class of flash this whole unit exists to remove. The backlog row tracking this
 (W-050) is deleted rather than done.
+
+### The LCP regression, settled
+
+Two earlier revisions of this report claimed Phase 3 regressed cold-`/` LCP, first as fact
+(+10.5%) and then as an open question. Both readings compared 4264 ms measured on the original
+uncompressed rig against a number measured on the current one. Settled by measuring both trees on
+one rig: `7dd4fa2` (the true pre-W-041 commit) in a scratch worktree with `scripts/serve-build.mjs`
+copied verbatim from `main` and verified identical by `diff`, so both were served with brotli,
+`Cache-Control: immutable`, and startup precompression. Playwright Chromium, fresh context per run,
+HTTP cache cleared and disabled, no service worker, **Fast 4G** (1 179 648 B/s down, 131 072 B/s up,
+85 ms latency), CPU 4×. Three runs each, alternated between trees to spread machine drift.
+
+Note the rig differs from the Fast 3G one used everywhere above — these numbers are internally
+comparable and must not be read against the tables above.
+
+| Tree | first-paint | FCP | LCP | CLS | shifts | requests | encoded bytes |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| `7dd4fa2` (pre-W-041), median | 304 ms | 920 ms | 920 ms | 0.0000 | 0 | 35 | 203 977 |
+| `37e8341` (post), median | 300 ms | **736 ms** | 948 ms | 0.0401 | 1 | 38 | 222 054 |
+
+**Verdict: no LCP regression.** +28 ms / +3.0%, smaller than the spread within the baseline's own
+three first-paint runs (300–336 ms). The claimed 4264 → 1982 ms movement was entirely a rig
+artifact. Both remaining differences are real and reproducible across all three runs:
+
+- **FCP improved 184 ms, and FCP and LCP decoupled.** On the baseline they are the same instant
+  (920/920): the page was blank until the app painted its real content, so the first paint *was*
+  the largest. That is the intended outcome of this unit, and it confirms the decoupling reasoning
+  in the Phase 6 deltas above while withdrawing that section's regression conclusion.
+- **CLS 0 → 0.0401, one shift, identical across runs.** The baseline's perfect zero is not a better
+  result: it painted nothing before the redirect settled, so there was no earlier frame to shift
+  against. Painting sooner is what exposes the pre-redirect frame, and the shift is the same
+  `AppHeader` unmount analysed above (0.0401 here vs 0.0357 on the Fast 3G rig — same single
+  source, different viewport/throttle). So this unit did not leave CLS untouched: it created this
+  0.036–0.040 as the price of the earlier paint. The decision not to fix it is unchanged.
+- Payload grew 3 requests / +18 077 encoded bytes, consistent with the lazy-loading split and
+  proportionate to the 28 ms.
 
 The desktop "black lines at the top" symptom **could not be reproduced headless**, but the
 mechanism is now identified — see root cause 5. The original theory (`AppHeader.svelte:34` being

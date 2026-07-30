@@ -77,26 +77,31 @@ same conditions, re-run twice for stability:
 | F5 on `/combats` | 36 ms | 96 ms | 120 ms | 0.000 | 36 ms |
 | F5 on `/combats/<id>` | 32 ms | 84 ms | 128 ms | 0.000 | 32 ms |
 
-Deltas against the Phase 6 table above (rig change only — no app code changed between the two):
+Deltas against the Phase 6 table above are **not rig-only.** Commit `e8f17bf` landed between the
+Phase 6 table and this re-measurement: it deleted `#boot-skeleton` outright, removed its teardown
+from `+layout.svelte`, and changed `/`'s `showHome` to initialise from `store.ready`. That commit's
+own frame-sampling evidence (see the "Correction" section above) is that the skeleton had **zero
+visible frames on cold boot** on Fast 4G, Slow 3G, or with a reveal delay, and was removed 5–8 ms
+before first paint on every profile — so its deletion is not expected to move the cold-boot
+numbers below, but the confound is real and is named here rather than assumed away.
 
 - **Cold `/`: first-paint 1744→676 ms, FCP 3616→1560 ms, LCP 4712→2012 ms.** All three roughly
   halve to less-than-halve; the cold path is transfer-bound on Fast 3G, and the raw-bytes rig was
-  overstating it by the ~3.6× the report's headline already named. CLS is unchanged at 0.036 — it
-  is a layout property of the placeholder markup, not of transfer time, so it was never expected
-  to move.
+  overstating it by the ~3.6× the report's headline already named. CLS is unchanged at 0.036.
 - **Warm F5 scenarios (`/`, `/combats`, `/combats/<id>`): unchanged within measurement noise**
   (32–48 ms first-paint/blank-window, same as Phase 6's 40–44 ms). Expected: warm F5 is served
   from Cache Storage by the service worker, never hits this HTTP server's compression or cache
   headers at all.
-- **The cold-`/` LCP regression the Phase 6 delta notes attribute to Phase 3 (bits-ui/vaul
-  pulled into `/`'s node graph, W-046 still open) does not disappear under honest transport — it
-  is still present and by the same relative shape.** First-paint and FCP fell in near-lockstep
-  with LCP (all ~2.1-2.3× faster), so the gap between FCP and LCP that the regression note is
-  about — the "separate and later event" once the skeleton unblocks first paint — is structural,
-  not a transfer-size artifact: LCP is bytes-on-the-wire for `CombatsHome`'s bundle (which pulls
-  bits-ui/vaul) landing after the skeleton's first paint, and compression scales all three
-  milestones together rather than closing that gap. W-046 (route-level dialog deferral) remains
-  the next lever, not superseded by this measurement.
+- **What this does show:** the FCP→LCP gap survives compression — first-paint, FCP, and LCP all
+  fell by a similar ~2.1–2.3× factor rather than LCP closing in on FCP, so whatever separates them
+  is structural (more bytes on the wire after the first-contentful paint, for whichever elements
+  currently land there), not an artifact of the old rig's raw-byte transfer.
+  **What this does not show:** whether Phase 3 (bits-ui/vaul pulled into `/`'s node graph) actually
+  regressed LCP against the pre-W-041 baseline. That baseline (LCP 4264 ms) was measured on the old
+  uncompressed rig and has never been re-measured with brotli, so comparing it to this table's 2012
+  ms is not a valid comparison — proportional rescaling does not recover it either. Settling that
+  would need `7dd4fa2` (pre-W-041) re-measured on this rig; not done here, and W-046 remains the
+  next lever regardless of how that question resolves.
 - These are the current honest-transport numbers; the bundle itself is unchanged (W-046 is still
   open), so the underlying byte-for-byte cost this table measures against will move again once
   that lands.

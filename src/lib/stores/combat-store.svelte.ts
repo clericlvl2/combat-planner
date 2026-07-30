@@ -6,6 +6,7 @@
  */
 import { db } from '../db';
 import {
+	type DbLoader,
 	loadAppData,
 	loadLibraryEntries,
 	type PersistenceDb,
@@ -27,7 +28,13 @@ import * as T from './domain/transitions';
 import { redo as undoRedo, undo as undoUndo } from './domain/undo';
 
 export class CombatStore {
-	readonly #db: PersistenceDb;
+	#loadDb: DbLoader;
+	/** Memoized handle from `#loadDb`, cleared on rejection so a later hydrate retry re-attempts
+	 *  the load instead of latching onto a dead promise. */
+	#dbPromise: Promise<PersistenceDb> | null = null;
+	/** FIFO write chain — every persist op enqueues onto this so writes drain in strict submission
+	 *  order regardless of when their underlying db handle resolves (W-044). */
+	#writes: Promise<unknown> = Promise.resolve();
 
 	/** Seeded from the boot-time localStorage mirrors (Phase 1, boot-flash fix) so this initial
 	 *  value already agrees with what `app.html`'s pre-paint script and the persisted locale show,
@@ -50,12 +57,38 @@ export class CombatStore {
 	 *  starts a fresh attempt rather than latching onto a dead promise. */
 	#hydrating: Promise<string | null> | null = null;
 
-	constructor(database: PersistenceDb = db) {
-		this.#db = database;
+	constructor(database: PersistenceDb | DbLoader = db) {
+		// `PersistenceDb` is an object with three object properties and can never satisfy
+		// `typeof === 'function'`, so this discriminator is sound for every call site.
+		this.#loadDb = typeof database === 'function' ? database : () => Promise.resolve(database);
 	}
 
 	getCombat(id: string): Combat | undefined {
 		return this.combats.find((c) => c.id === id);
+	}
+
+	/** Memoize the db handle per instance; the memo self-clears on rejection so a later hydrate
+	 *  retry (e.g. after an offline chunk-load failure) gets a fresh attempt. */
+	#resolveDb(): Promise<PersistenceDb> {
+		if (!this.#dbPromise) {
+			this.#dbPromise = this.#loadDb().catch((err) => {
+				this.#dbPromise = null;
+				throw err;
+			});
+		}
+		return this.#dbPromise;
+	}
+
+	/** Queue one Dexie write. Returns the op's own promise; the chain survives its failure. */
+	#enqueue(op: (db: PersistenceDb) => Promise<unknown>): Promise<unknown> {
+		const next = this.#writes.then(() => {
+			// A hydrate that failed leaves state at boot defaults — dropping the op is what stops
+			// this write landing on top of a persisted row (W-052's lesson, applied to writes).
+			if (this.hydrateError) return;
+			return this.#resolveDb().then(op);
+		});
+		this.#writes = next.catch(() => {});
+		return next;
 	}
 
 	/**
@@ -87,16 +120,17 @@ export class CombatStore {
 
 	async #doHydrate(genId?: IdGen): Promise<string | null> {
 		try {
+			const db = await this.#resolveDb();
 			const [data, libraryEntries, rawSettings] = await Promise.all([
-				loadAppData(this.#db),
-				loadLibraryEntries(this.#db),
+				loadAppData(db),
+				loadLibraryEntries(db),
 				// `loadAppData`'s normalized result always reads `DATA_VERSION` (migrate() stamps
 				// it), so the ORIGINAL stored version has to be read separately to detect a
 				// forward migration and write the bumped version back (ADR-013). This is a second
 				// read of the same single row `loadAppData` reads internally, kept deliberately:
 				// it is one indexed get on one tiny row, issued in the same Promise.all, and the
 				// alternative is widening loadAppData's return type across every call site.
-				this.#db.settings.get(SETTINGS_ID),
+				db.settings.get(SETTINGS_ID),
 			]);
 			const migratedForward = (rawSettings?.dataVersion ?? 1) < DATA_VERSION;
 			const { combats, settings, opened } = App.firstLaunch(data.combats, data.settings, genId);
@@ -106,12 +140,20 @@ export class CombatStore {
 			this.hydrateError = null;
 			this.ready = true;
 			if (opened) {
-				// First launch mutated state — persist the new combat + flag.
-				await Promise.all([persistCombat(this.#db, opened), persistSettings(this.#db, settings)]);
+				// First launch mutated state — persist the new combat + flag. These share the same
+				// write chain as user-triggered writes (W-044) so a write enqueued while this
+				// hydrate was in flight cannot land ahead of it and get clobbered.
+				await Promise.all([
+					this.#enqueue((d) => persistCombat(d, opened)),
+					this.#enqueue((d) => persistSettings(d, settings)),
+				]);
 			} else if (migratedForward) {
 				// A forward migration ran but first-launch didn't — nothing else would ever
 				// persist the bumped `dataVersion`, so the same migration would re-run every boot.
-				await Promise.all([persistSettings(this.#db, settings), persistCombats(this.#db, combats)]);
+				await Promise.all([
+					this.#enqueue((d) => persistSettings(d, settings)),
+					this.#enqueue((d) => persistCombats(d, combats)),
+				]);
 			}
 			return opened?.id ?? null;
 		} catch (err) {
@@ -131,7 +173,7 @@ export class CombatStore {
 		if (next === current) return; // no-op transition, skip the write
 		this.combats = this.combats.with(idx, next);
 		// TODO M-phase (ADR-003): debounce/batch writes per action burst.
-		void persistCombat(this.#db, next);
+		void this.#enqueue((db) => persistCombat(db, next));
 	}
 
 	// HP
@@ -189,7 +231,7 @@ export class CombatStore {
 		const { combats, created } = App.createCombatInList(this.combats, input, genId);
 		if (!created) return null;
 		this.combats = combats;
-		void persistCombat(this.#db, created);
+		void this.#enqueue((db) => persistCombat(db, created));
 		return created;
 	}
 
@@ -200,19 +242,19 @@ export class CombatStore {
 		if (edited === snapshot) return; // unknown id — no-op
 		this.combats = edited;
 		const next = edited.find((c) => c.id === id);
-		if (next) void persistCombat(this.#db, next);
+		if (next) void this.#enqueue((db) => persistCombat(db, next));
 	}
 
 	/** Delete a combat (confirm-gated upstream; not undoable). */
 	deleteCombat(id: string): void {
 		this.combats = App.deleteCombat(this.combats, id);
-		void removeCombatRow(this.#db, id);
+		void this.#enqueue((db) => removeCombatRow(db, id));
 	}
 
 	reorderCombats(orderedIds: string[]): void {
 		const reordered = App.reorderCombats(this.combats, orderedIds);
 		this.combats = reordered;
-		void persistCombats(this.#db, reordered);
+		void this.#enqueue((db) => persistCombats(db, reordered));
 	}
 
 	/**
@@ -240,7 +282,7 @@ export class CombatStore {
 	#applySettingsPatch(patch: Partial<Omit<Settings, 'id'>>): void {
 		const next = { ...this.settings, ...patch };
 		this.settings = next;
-		void persistSettings(this.#db, next);
+		void this.#enqueue((db) => persistSettings(db, next));
 	}
 
 	// ── library ──────────────────────────────────────────────────────────────
@@ -256,7 +298,7 @@ export class CombatStore {
 		);
 		if (!created) return null;
 		this.libraryEntries = list;
-		void persistLibraryEntry(this.#db, created);
+		void this.#enqueue((db) => persistLibraryEntry(db, created));
 		return created;
 	}
 
@@ -273,13 +315,13 @@ export class CombatStore {
 		if (edited === snapshot) return; // unknown id — no-op
 		this.libraryEntries = edited;
 		const next = edited.find((t) => t.id === id);
-		if (next) void persistLibraryEntry(this.#db, next);
+		if (next) void this.#enqueue((db) => persistLibraryEntry(db, next));
 	}
 
 	/** Delete a template (confirm-gated upstream; not undoable). */
 	removeTemplate(id: string): void {
 		this.libraryEntries = Library.removeTemplateFromList(this.libraryEntries, id);
-		void removeLibraryEntryRow(this.#db, id);
+		void this.#enqueue((db) => removeLibraryEntryRow(db, id));
 	}
 
 	/**
@@ -299,7 +341,7 @@ export class CombatStore {
 		if (toggled === snapshot) return; // unknown id — no-op
 		this.libraryEntries = toggled;
 		const next = toggled.find((t) => t.id === templateId);
-		if (next) void persistLibraryEntry(this.#db, next);
+		if (next) void this.#enqueue((db) => persistLibraryEntry(db, next));
 	}
 }
 

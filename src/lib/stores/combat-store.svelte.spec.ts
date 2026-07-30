@@ -6,6 +6,19 @@ import { MAX_LIBRARY_ENTRIES } from '../db/types';
 import { CombatStore } from './combat-store.svelte';
 import { createCombatantTemplate } from './domain/factories';
 
+/**
+ * Drain the store's write queue (W-044). `#enqueue`'s FIFO chain (`#writes.then(() =>
+ * #resolveDb().then(op))`) costs at least one microtask beyond the promise it's chained off —
+ * serializing writes through a promise chain is the whole point of the row, so "the write landed
+ * synchronously at the call site" was never a contract worth pinning. A macrotask boundary (rather
+ * than a fixed `await Promise.resolve()` count) drains every microtask the chain can possibly have
+ * scheduled, so this helper doesn't encode a new magic number that a future queue depth could
+ * silently outrun.
+ */
+function flushWrites(): Promise<void> {
+	return new Promise((resolve) => setTimeout(resolve, 0));
+}
+
 // Light integration smoke for the reactive seam (ADR-002): state + persist-on-mutation wiring.
 // The transition math itself is pinned by the pure domain tests (transitions.spec.ts, etc).
 function fakeDb(): PersistenceDb & {
@@ -59,7 +72,7 @@ describe('CombatStore (ADR-002 seam)', () => {
 		expect(store.getCombat(combatId)?.combatants[0].currentHp).toBe(25);
 
 		// persisted to the (fake) DB
-		await Promise.resolve();
+		await flushWrites();
 		expect(db._combats.get(combatId)?.combatants[0].currentHp).toBe(25);
 	});
 
@@ -86,7 +99,7 @@ describe('CombatStore (ADR-002 seam)', () => {
 		expect(combat?.description).toBe('New desc');
 		expect(combat?.colorTag).toBe('blue');
 
-		await Promise.resolve();
+		await flushWrites();
 		expect(db._combats.get(id)?.title).toBe('Renamed');
 	});
 
@@ -323,6 +336,64 @@ describe('CombatStore boot path (hydrate/hydrateError/seeded first-launch id)', 
 	});
 });
 
+// W-044: the write queue's ordering guarantee. Asserting only after `hydrate()` resolves would be
+// hollow here — `hydrate()` replaces `this.combats` wholesale, so a naive (unqueued) test could
+// pass by accident. This records `put` call order directly to pin submission order, not just the
+// final value.
+describe('CombatStore write ordering across an async db handle (W-044)', () => {
+	it('two synchronous dealDamage calls persist their combat row in click order, not reversed', async () => {
+		const db = fakeDb();
+		const putOrder: number[] = [];
+		const originalPut = db.combats.put.bind(db.combats);
+		// The FIRST click's underlying write is deliberately the slow one (a macrotask, not just a
+		// microtask) — without the FIFO chain, the second (fast) click's write could resolve and
+		// land first, then get clobbered when the slow first-click write lands after it. With the
+		// chain, click two's `#resolveDb().then(op)` cannot even start until click one's whole write
+		// (including this delay) has settled, so submission order survives regardless of latency.
+		let delayNextHp90Write = true;
+		db.combats.put = async (c) => {
+			const hp = c.combatants[0]?.currentHp;
+			if (hp === 90 && delayNextHp90Write) {
+				delayNextHp90Write = false;
+				await new Promise((resolve) => setTimeout(resolve, 20));
+			}
+			if (hp !== undefined) putOrder.push(hp);
+			return originalPut(c);
+		};
+		// A deferred loader — the db handle resolves a few microtasks after it's requested — so the
+		// write chain has to serialize across a genuinely async resolution, not just a same-tick one.
+		let loadCalls = 0;
+		const loader = async () => {
+			loadCalls += 1;
+			for (let i = 0; i < 3; i++) await Promise.resolve();
+			return db;
+		};
+		const store = new CombatStore(loader);
+		await store.hydrate();
+		expect(loadCalls).toBe(1); // memoized — hydrate already resolved the one handle in use below
+
+		const combatId = store.combats[0].id;
+		store.addCombatant(combatId, { name: 'Ogre', maxHp: 100 }, () => 'ogre');
+		await flushWrites();
+
+		// Fire two writes back to back, synchronously — no await between them.
+		store.dealDamage(combatId, 'ogre', 10);
+		store.dealDamage(combatId, 'ogre', 5);
+
+		expect(store.getCombat(combatId)?.combatants[0].currentHp).toBe(85);
+
+		// Drain the write chain, including the artificial 20ms delay on the first click's write.
+		await new Promise((resolve) => setTimeout(resolve, 50));
+
+		expect(db._combats.get(combatId)?.combatants[0].currentHp).toBe(85);
+		expect(putOrder.at(-1)).toBe(85);
+		// The part that actually pins ordering: the two writes must have arrived in click order
+		// (90 before 85), not reversed.
+		const relevant = putOrder.filter((hp) => hp === 90 || hp === 85);
+		expect(relevant).toEqual([90, 85]);
+	});
+});
+
 describe('CombatStore library delegation (ADR-002 seam) — thin methods only', () => {
 	it('hydrate loads library entries alongside combats', async () => {
 		const db = fakeDb();
@@ -338,7 +409,7 @@ describe('CombatStore library delegation (ADR-002 seam) — thin methods only', 
 		const created = store.addTemplate({ name: 'Orc' }, () => 'o1');
 		expect(created?.name).toBe('Orc');
 		expect(store.libraryEntries).toHaveLength(1);
-		await Promise.resolve();
+		await flushWrites();
 		expect(db._libraryEntries.get('o1')?.name).toBe('Orc');
 	});
 
@@ -368,7 +439,7 @@ describe('CombatStore library delegation (ADR-002 seam) — thin methods only', 
 		const created = store.addTemplate({ name: 'Orc' }, () => 'o1');
 		store.editTemplate((created as CombatantTemplate).id, { name: 'Orc Renamed' });
 		expect(store.libraryEntries[0].name).toBe('Orc Renamed');
-		await Promise.resolve();
+		await flushWrites();
 		expect(db._libraryEntries.get('o1')?.name).toBe('Orc Renamed');
 	});
 
@@ -411,14 +482,14 @@ describe('CombatStore library delegation (ADR-002 seam) — thin methods only', 
 		const addTags = $state(['Undead']);
 		const created = store.addTemplate({ name: 'Orc', tags: addTags }, () => 'o1');
 		expect(created?.name).toBe('Orc');
-		await Promise.resolve();
+		await flushWrites();
 		const persisted = db._libraryEntries.get('o1');
 		expect(Array.isArray(persisted?.tags)).toBe(true);
 		expect(persisted?.tags).toEqual(['Undead']);
 
 		const editTags = $state(['Boss']);
 		store.editTemplate('o1', { tags: editTags });
-		await Promise.resolve();
+		await flushWrites();
 		const editedPersisted = db._libraryEntries.get('o1');
 		expect(Array.isArray(editedPersisted?.tags)).toBe(true);
 		expect(editedPersisted?.tags).toEqual(['Boss']);
@@ -432,7 +503,7 @@ describe('CombatStore library delegation (ADR-002 seam) — thin methods only', 
 
 		store.toggleTemplateTag(id, 'Undead');
 		expect(store.libraryEntries[0].tags).toEqual(['Undead']);
-		await Promise.resolve();
+		await flushWrites();
 		expect(db._libraryEntries.get('o1')?.tags).toEqual(['Undead']);
 
 		store.toggleTemplateTag(id, 'undead');

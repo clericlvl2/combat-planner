@@ -16,6 +16,10 @@ import {
 	type Settings,
 } from './types';
 
+/** Lazily resolves the Dexie instance (W-044): a store constructor arg can be either the
+ *  already-open `PersistenceDb` or a loader that produces one. */
+export type DbLoader = () => Promise<PersistenceDb>;
+
 /** The minimal surface this module needs from Dexie — keeps the seam mockable. */
 export interface PersistenceDb {
 	combats: {

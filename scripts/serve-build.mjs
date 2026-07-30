@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 // Serves the adapter-static `build/` output, replicating vercel.json's routing so e2e/capture
 // runs exercise the real deployed artifact rather than `vite preview`'s shell (relative asset
 // paths, no SPA rewrite) — see specs/reports/2026-07-29-boot-flash.md, "out-of-scope findings".
@@ -19,14 +20,24 @@
 //     `entry/`, `nodes/` — is content-hashed, e.g. `BBrfdo3k.js`, `0.CgrFEE3m.css`: the hash
 //     changes iff the content does, so it is safe to cache forever).
 //
+// Compression happens once at startup, not per request. Vercel's edge serves precompressed
+// bytes, not brotli-quality-11-on-demand — brotliCompressSync on a large JS chunk costs
+// 70-140ms of synchronous, single-threaded latency, which is itself a rig artifact big enough
+// to distort cold-boot measurements (see specs/reports/2026-07-29-boot-flash.md, W-051's second
+// correction). So the whole build directory is walked once when the server starts, every
+// compressible file is compressed for both `br` and `gzip`, and the buffers are held in memory
+// keyed by resolved path + encoding; every request is then served from that cache the way a CDN
+// would, with `createReadStream` as the fallback only when the client offers no encoding this
+// server negotiates.
+//
 // No external dependencies — node:http/node:fs/node:path/node:zlib only, same convention as
 // scripts/check-i18n-parity.mjs.
 
-import { brotliCompressSync, gzipSync } from 'node:zlib';
-import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs';
+import { createReadStream, existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { brotliCompressSync, gzipSync } from 'node:zlib';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const BUILD_DIR = path.join(__dirname, '..', 'build');
@@ -91,6 +102,34 @@ function compress(buffer, encoding) {
 	return buffer;
 }
 
+/** Recursively lists every file under `dir`, as absolute paths. */
+function listFiles(dir) {
+	const files = [];
+	for (const entry of readdirSync(dir, { withFileTypes: true })) {
+		const entryPath = path.join(dir, entry.name);
+		if (entry.isDirectory()) files.push(...listFiles(entryPath));
+		else if (entry.isFile()) files.push(entryPath);
+	}
+	return files;
+}
+
+/**
+ * Walks `buildDir` once and pre-compresses every compressible file for both `br` and `gzip`,
+ * keyed by `${absolutePath}:${encoding}`. Run at server startup so no request ever pays
+ * brotli/gzip's synchronous CPU cost — see the header comment for why that cost is itself a
+ * measurement distortion.
+ */
+function precompress(buildDir) {
+	const cache = new Map();
+	for (const filePath of listFiles(buildDir)) {
+		if (!isCompressible(filePath)) continue;
+		const raw = readFileSync(filePath);
+		cache.set(`${filePath}:br`, compress(raw, 'br'));
+		cache.set(`${filePath}:gzip`, compress(raw, 'gzip'));
+	}
+	return cache;
+}
+
 /** Hashed SvelteKit build output — safe to cache forever; a new build emits new filenames. */
 function isImmutableAsset(pathname) {
 	return pathname.startsWith('/_app/immutable/');
@@ -105,6 +144,7 @@ function resolveStaticPath(buildDir, pathname) {
 
 export function createServer(buildDir = BUILD_DIR) {
 	const indexHtml = path.join(buildDir, 'index.html');
+	const compressedCache = precompress(buildDir);
 
 	return http.createServer((req, res) => {
 		const url = new URL(req.url ?? '/', 'http://localhost');
@@ -134,11 +174,13 @@ export function createServer(buildDir = BUILD_DIR) {
 			const encoding = pickEncoding(req.headers['accept-encoding']);
 			headers.Vary = 'Accept-Encoding';
 			if (encoding) {
-				headers['Content-Encoding'] = encoding;
-				const body = compress(readFileSync(filePath), encoding);
-				res.writeHead(200, headers);
-				res.end(body);
-				return;
+				const body = compressedCache.get(`${filePath}:${encoding}`);
+				if (body) {
+					headers['Content-Encoding'] = encoding;
+					res.writeHead(200, headers);
+					res.end(body);
+					return;
+				}
 			}
 		}
 

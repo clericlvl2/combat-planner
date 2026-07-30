@@ -67,15 +67,39 @@ so every scenario transferred the full ~509 KB raw shell instead of the ~140 KB 
 actually serves — Fast-3G's 1.6 Mbps cap turned that gap into real wall-clock time on the cold
 row. W-051 added brotli/gzip negotiation (matching Vercel's edge) and
 `Cache-Control: public, max-age=31536000, immutable` on `/_app/immutable/**` (matching
-SvelteKit's content-hashed build output) to `serve-build.mjs`, with no routing change. Same rig,
-same conditions, re-run twice for stability:
+SvelteKit's content-hashed build output) to `serve-build.mjs`, with no routing change.
+
+**Correction: the first re-measurement was itself distorted, by a second rig artifact of the
+same kind it was filed to remove.** That first pass compressed each response synchronously,
+per request, at `zlib`'s default brotli quality (11) — measured at ~125 ms of blocking,
+single-threaded latency for a single ~113 KB JS chunk (`DLwKZWrU.js`), on top of blocking every
+other concurrent request behind it. Vercel's edge does not brotli-per-request; it serves
+precompressed bytes. So the first re-measurement's 676/1560/2012 ms figures were
+honest-transport-*size* with an unmeasured server-side compression penalty layered on top — not
+the honest numbers this row exists to produce. Fixed by pre-compressing the whole `build/`
+directory once at server startup (`br` and `gzip`, held in memory, served by lookup) instead of
+per request; the same 113 KB chunk now serves in ~3 ms end-to-end (curl `time_total`), matching
+disk-read-plus-memory-copy rather than compression latency. Response bytes were verified to
+decode byte-for-byte identical to the source file (`brotliDecompressSync` round-trip on the
+served response). Same rig, same conditions, re-run twice for stability:
 
 | Scenario | first-paint | FCP | LCP | CLS | blank window |
 |---|---:|---:|---:|---:|---:|
-| Cold `/` (no SW, empty IndexedDB) | 676 ms | 1560 ms | 2012 ms | 0.036 | 676 ms |
-| F5 on `/` (SW warm) | 48 ms | 148 ms | 200 ms | 0.000 | 48 ms |
-| F5 on `/combats` | 36 ms | 96 ms | 120 ms | 0.000 | 36 ms |
-| F5 on `/combats/<id>` | 32 ms | 84 ms | 128 ms | 0.000 | 32 ms |
+| Cold `/` (no SW, empty IndexedDB) | 672 ms | 1536 ms | 1982 ms | 0.036 | 672 ms |
+| F5 on `/` (SW warm) | 38 ms | 148 ms | 202 ms | 0.000 | 38 ms |
+| F5 on `/combats` | 32 ms | 98 ms | 122 ms | 0.000 | 32 ms |
+| F5 on `/combats/<id>` | 30 ms | 80 ms | 126 ms | 0.000 | 30 ms |
+
+(Cold-`/` figures are the mean of the two stability runs — 672/1532–1540/1976–1988 ms; the
+spread is single-digit-ms noise. Warm-F5 figures likewise averaged across the two runs.) These
+are within a few ms of the per-request-compression pass above (676/1560/2012 ms) — the compression
+penalty turned out not to be the dominant cost on this rig's cold path (the network throttle and
+CPU throttle already dominate it), but it was still real, unmeasured, and exactly the kind of
+distortion this row exists to remove, so it is fixed and the correction is recorded rather than
+silently folded into a single "final" table. The e2e suite itself is a cleaner demonstration of
+the fix: the same 16 Playwright specs that took 24–31 s wall-clock with per-request compression
+complete in ~12 s with precompression, because that suite fires many concurrent requests against
+a single-threaded server that no longer blocks on brotli quality 11.
 
 Deltas against the Phase 6 table above are **not rig-only.** Commit `e8f17bf` landed between the
 Phase 6 table and this re-measurement: it deleted `#boot-skeleton` outright, removed its teardown
@@ -85,26 +109,26 @@ visible frames on cold boot** on Fast 4G, Slow 3G, or with a reveal delay, and w
 before first paint on every profile — so its deletion is not expected to move the cold-boot
 numbers below, but the confound is real and is named here rather than assumed away.
 
-- **Cold `/`: first-paint 1744→676 ms, FCP 3616→1560 ms, LCP 4712→2012 ms.** All three roughly
+- **Cold `/`: first-paint 1744→672 ms, FCP 3616→1536 ms, LCP 4712→1982 ms.** All three roughly
   halve to less-than-halve; the cold path is transfer-bound on Fast 3G, and the raw-bytes rig was
   overstating it by the ~3.6× the report's headline already named. CLS is unchanged at 0.036.
 - **Warm F5 scenarios (`/`, `/combats`, `/combats/<id>`): unchanged within measurement noise**
-  (32–48 ms first-paint/blank-window, same as Phase 6's 40–44 ms). Expected: warm F5 is served
-  from Cache Storage by the service worker, never hits this HTTP server's compression or cache
-  headers at all.
+  (30–48 ms first-paint/blank-window across both compression passes and Phase 6's 40–44 ms).
+  Expected: warm F5 is served from Cache Storage by the service worker, never hits this HTTP
+  server's compression or cache headers at all.
 - **What this does show:** the FCP→LCP gap survives compression — first-paint, FCP, and LCP all
-  fell by a similar ~2.1–2.3× factor rather than LCP closing in on FCP, so whatever separates them
+  fell by a similar ~2.1–2.4× factor rather than LCP closing in on FCP, so whatever separates them
   is structural (more bytes on the wire after the first-contentful paint, for whichever elements
   currently land there), not an artifact of the old rig's raw-byte transfer.
   **What this does not show:** whether Phase 3 (bits-ui/vaul pulled into `/`'s node graph) actually
   regressed LCP against the pre-W-041 baseline. That baseline (LCP 4264 ms) was measured on the old
-  uncompressed rig and has never been re-measured with brotli, so comparing it to this table's 2012
-  ms is not a valid comparison — proportional rescaling does not recover it either. Settling that
-  would need `7dd4fa2` (pre-W-041) re-measured on this rig; not done here, and W-046 remains the
-  next lever regardless of how that question resolves.
-- These are the current honest-transport numbers; the bundle itself is unchanged (W-046 is still
-  open), so the underlying byte-for-byte cost this table measures against will move again once
-  that lands.
+  uncompressed rig and has never been re-measured with brotli, so comparing it to this table's
+  ~1982 ms is not a valid comparison — proportional rescaling does not recover it either. Settling
+  that would need `7dd4fa2` (pre-W-041) re-measured on this rig; not done here, and W-046 remains
+  the next lever regardless of how that question resolves.
+- These are the current honest-transport, honest-server numbers; the bundle itself is unchanged
+  (W-046 is still open), so the underlying byte-for-byte cost this table measures against will
+  move again once that lands.
 
 Note what the cold row is: an empty IndexedDB is **the first launch ever for that install**, and
 `App.firstLaunch` (`src/lib/stores/domain/app.ts:79`) gates on `settings.firstLaunchDone`, so it

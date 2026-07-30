@@ -44,23 +44,11 @@ export class CombatStore {
 	 * including deep links that never run `+page.ts`'s `load` (only `/` does).
 	 */
 	hydrateError = $state<Error | null>(null);
-	/** The id of the combat auto-created by this hydrate's first-launch run, or `null` if
-	 *  first-launch had already run (or unexpectedly yielded no combat). Set once per hydrate
-	 *  (W-041, boot-flash fix) so `/`'s root page can make its first-launch redirect decision
-	 *  post-hydrate instead of duplicating `App.firstLaunch`'s own pre-hydrate peek.
-	 *
-	 *  Consume-once: it is a one-shot signal valid only for the boot that produced it, not a
-	 *  durable "did first-launch seed a combat" flag. `hydrate()` no-ops once `ready` is true, so
-	 *  without consuming this a later same-session visit to `/` (typed URL, link, history nav)
-	 *  would read the stale id and get redirected back into that combat forever, making the
-	 *  combats list unreachable through `/` for the rest of the session. Read it via
-	 *  `consumeFirstLaunchCombatId()`, not directly. */
-	firstLaunchCombatId = $state<string | null>(null);
 	/** In-flight hydrate promise, memoized so concurrent callers (`/`'s root page and
 	 *  `+layout.svelte`'s `onMount`) share one Dexie read instead of hydrating twice. Cleared once
 	 *  settled (success or failure) so a later call — e.g. a user-triggered retry after a failure —
 	 *  starts a fresh attempt rather than latching onto a dead promise. */
-	#hydrating: Promise<void> | null = null;
+	#hydrating: Promise<string | null> | null = null;
 
 	constructor(database: PersistenceDb = db) {
 		this.#db = database;
@@ -70,24 +58,26 @@ export class CombatStore {
 		return this.combats.find((c) => c.id === id);
 	}
 
-	/** Read and clear `firstLaunchCombatId` in one step (consume-once). Returns the seeded combat
-	 *  id on the boot that produced it, `null` on every read after (including later same-session
-	 *  visits to `/` once `hydrate()` has already resolved once). */
-	consumeFirstLaunchCombatId(): string | null {
-		const id = this.firstLaunchCombatId;
-		this.firstLaunchCombatId = null;
-		return id;
-	}
-
 	/**
 	 * Boot: load + normalize/migrate from Dexie, then run first-launch. Safe under concurrent
 	 * callers (memoized) and never rejects — a failure sets `hydrateError` instead, so an `await`
 	 * from `onMount` cannot produce an uncaught rejection. Callers that need the failure to
-	 * propagate (the `/` root `load`) should check `hydrateError` after awaiting and throw it
-	 * themselves.
+	 * propagate should check `hydrateError` after awaiting and throw it themselves.
+	 *
+	 * Resolves to the id of the combat this hydrate's first-launch run auto-created, or `null` when
+	 * first-launch had already run, unexpectedly yielded no combat, or the hydrate failed. `/`'s
+	 * root page uses it to make its first-launch redirect decision post-hydrate (W-041, boot-flash
+	 * fix) instead of duplicating `App.firstLaunch`'s own pre-hydrate peek.
+	 *
+	 * The seeded id is a return value rather than store state deliberately. It is valid only for
+	 * the boot that produced it, and `hydrate()` is called from `+layout.svelte` on EVERY route —
+	 * so as a shared field it would be produced on routes that never read it (a first launch
+	 * entered at `/settings`, say) and left stranded, then wrongly picked up by the first later
+	 * visit to `/` in the same session. As a return value it reaches exactly the caller whose boot
+	 * produced it, and the `ready` no-op below returns `null` to every call after.
 	 */
-	async hydrate(genId?: IdGen): Promise<void> {
-		if (this.ready) return;
+	async hydrate(genId?: IdGen): Promise<string | null> {
+		if (this.ready) return null;
 		if (this.#hydrating) return this.#hydrating;
 		this.#hydrating = this.#doHydrate(genId).finally(() => {
 			this.#hydrating = null;
@@ -95,7 +85,7 @@ export class CombatStore {
 		return this.#hydrating;
 	}
 
-	async #doHydrate(genId?: IdGen): Promise<void> {
+	async #doHydrate(genId?: IdGen): Promise<string | null> {
 		try {
 			const [data, libraryEntries, rawSettings] = await Promise.all([
 				loadAppData(this.#db),
@@ -114,7 +104,6 @@ export class CombatStore {
 			this.settings = settings;
 			this.libraryEntries = libraryEntries;
 			this.hydrateError = null;
-			this.firstLaunchCombatId = opened?.id ?? null;
 			this.ready = true;
 			if (opened) {
 				// First launch mutated state — persist the new combat + flag.
@@ -124,8 +113,10 @@ export class CombatStore {
 				// persist the bumped `dataVersion`, so the same migration would re-run every boot.
 				await Promise.all([persistSettings(this.#db, settings), persistCombats(this.#db, combats)]);
 			}
+			return opened?.id ?? null;
 		} catch (err) {
 			this.hydrateError = err instanceof Error ? err : new Error(String(err));
+			return null;
 		}
 	}
 

@@ -36,9 +36,11 @@ not committed.
 Two results that contradict working assumptions and change priorities:
 
 - **CLS is 0 in every baseline scenario.** The `<p class="p-4 text-muted-foreground">…</p>`
-  placeholder was assumed to cause layout shift. It does not measurably. Replacing it with
-  dimension-matched skeletons is a polish item, not a Core Web Vitals fix. (Post-fix, cold `/`
-  measures 0.036 — see the delta notes under the "After" table for why.)
+  placeholder was assumed to cause layout shift. It does not measurably *on this path*, because
+  pre-fix nothing painted until everything had settled — there was no intermediate state to shift
+  away from. Once the fix makes the placeholder actually visible, it does shift (0.036 post-fix,
+  see the "After" deltas), so replacing it with dimension-matched skeletons is a Core Web Vitals
+  fix after all, not the polish item this baseline made it look like.
 - **Warm F5 is already fast** (~100 ms FCP) because the service worker serves everything from Cache
   Storage, bypassing the network entirely. Bundle size is therefore *not* what makes F5 flash — the
   render sequence is.
@@ -69,11 +71,23 @@ Deltas against the baseline above:
 - **Cold `/` FCP: 4264 ms → 3616 ms (−15%).** Faster, but still the dominant cost on this path —
   Phase 5's boot-graph shrink and the still-open Dexie-behind-a-facade item (out of scope, filed
   separately) are the remaining levers, not this phase.
-- **Cold `/` CLS: 0 → 0.036.** Small but no longer exactly zero. The redirect from the list to the
-  seeded combat now happens after first paint (Phase 3's suppressed intermediate-list-paint design
-  still lets the skeleton-to-content transition register a minor shift) where the pre-Phase-3 flow
-  painted nothing until everything had already settled. Not a regression target for this phase;
-  noted for whoever picks up the CLS placeholder-polish item already flagged out of scope.
+- **Cold `/` LCP: 4264 ms → 4712 ms (+10.5%) — a regression, and the one number this unit made
+  worse.** Expected in direction if not in size: pre-fix, the first thing painted at all was the
+  settled page, so first-paint, FCP and LCP collapsed onto the same 4264 ms instant. Post-fix the
+  skeleton paints at 1744 ms and the real largest element arrives later, on its own schedule, so LCP
+  becomes a separate and later event. The +448 ms on top of that is real extra work on the critical
+  path, not just re-labelling: Phase 3 moved `CombatsHome` into `/`'s own bundle, which pulls
+  bits-ui and vaul into the root node graph. Phase 5 took only the layout-level shrink (sonner,
+  NavSidebar's Drawer); the route-level dialog deferral that would offset this is filed as W-046 and
+  is the first thing to do before re-measuring.
+- **Cold `/` CLS: 0 → 0.036.** The `#boot-skeleton` is `position: fixed; inset: 0`, so neither its
+  paint nor its removal can shift anything — it is out of flow, and it is not the cause. The shift
+  is the in-flow `<p>…</p>` placeholder giving way to real content, which pre-fix never got a frame
+  of its own to be measured in (see the baseline note above). That placeholder is on `/combats`,
+  `/library` and `/settings` too, on the same route-component pattern, and none of those were
+  measured — so 0.036 is a lower bound on the app, not a `/`-only artifact. Giving the placeholder
+  the dimensions of the content it stands in for is therefore the actual CLS fix, not the optional
+  polish item the baseline section originally filed it as.
 - **Warm F5 scenarios (`/`, `/combats`, `/combats/<id>`): first-paint/blank-window unchanged
   within measurement noise (~40-52 ms before, ~40-44 ms after).** Expected, and consistent with
   the report's own finding that warm F5 was already fast pre-fix (everything served from Cache

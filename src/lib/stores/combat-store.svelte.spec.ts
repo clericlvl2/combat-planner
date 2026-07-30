@@ -99,7 +99,7 @@ describe('CombatStore (ADR-002 seam)', () => {
 
 // Phase 4 (boot path): re-entrancy guard, failure containment, and the first-launch id `/`'s
 // root page reads post-hydrate (W-041, boot-flash fix).
-describe('CombatStore boot path (hydrate/hydrateError/firstLaunchCombatId)', () => {
+describe('CombatStore boot path (hydrate/hydrateError/seeded first-launch id)', () => {
 	it('hydrate called twice (concurrently) performs one Dexie load', async () => {
 		const db = fakeDb();
 		let toArrayCalls = 0;
@@ -129,7 +129,7 @@ describe('CombatStore boot path (hydrate/hydrateError/firstLaunchCombatId)', () 
 		};
 		const store = new CombatStore(db);
 
-		await expect(store.hydrate()).resolves.toBeUndefined();
+		await expect(store.hydrate()).resolves.toBeNull();
 
 		expect(store.ready).toBe(false);
 		expect(store.hydrateError).toBe(failure);
@@ -155,24 +155,39 @@ describe('CombatStore boot path (hydrate/hydrateError/firstLaunchCombatId)', () 
 		expect(store.hydrateError).toBeNull();
 	});
 
-	it('firstLaunchCombatId is set to the seeded combat on a first-launch hydrate', async () => {
+	it('hydrate resolves to the seeded combat id on a first-launch hydrate', async () => {
+		const db = fakeDb();
+		const store = new CombatStore(db);
+
+		const seeded = await store.hydrate(() => 'gen');
+
+		expect(seeded).toBe(store.combats[0].id);
+	});
+
+	// The seeded id is valid only for the boot that produced it. `hydrate()` no-ops once `ready` is
+	// true, and that no-op must resolve to null — otherwise a later same-session visit to `/` would
+	// redirect back into the seeded combat forever, making the combats list unreachable through `/`.
+	it('a later hydrate, once already ready, resolves to null rather than the seeded id', async () => {
 		const db = fakeDb();
 		const store = new CombatStore(db);
 		await store.hydrate(() => 'gen');
 
-		expect(store.firstLaunchCombatId).toBe(store.combats[0].id);
+		await expect(store.hydrate(() => 'gen2')).resolves.toBeNull();
 	});
 
-	it('consumeFirstLaunchCombatId returns the seeded id once, then null on a later read', async () => {
+	// Concurrent callers share the memoized promise, so both see the same seeded id — `/`'s root
+	// page must not lose the redirect just because `+layout.svelte` started the hydrate first.
+	it('concurrent hydrate callers both resolve to the same seeded id', async () => {
 		const db = fakeDb();
 		const store = new CombatStore(db);
-		await store.hydrate(() => 'gen');
 
-		expect(store.consumeFirstLaunchCombatId()).toBe(store.combats[0].id);
-		expect(store.consumeFirstLaunchCombatId()).toBeNull();
+		const [a, b] = await Promise.all([store.hydrate(() => 'gen'), store.hydrate(() => 'gen2')]);
+
+		expect(a).toBe(store.combats[0].id);
+		expect(b).toBe(a);
 	});
 
-	it('firstLaunchCombatId stays null when first-launch had already run', async () => {
+	it('hydrate resolves to null when first-launch had already run', async () => {
 		const db = fakeDb();
 		await db.settings.put({
 			id: 'settings',
@@ -183,9 +198,8 @@ describe('CombatStore boot path (hydrate/hydrateError/firstLaunchCombatId)', () 
 			dataVersion: 2,
 		});
 		const store = new CombatStore(db);
-		await store.hydrate(() => 'gen');
 
-		expect(store.firstLaunchCombatId).toBeNull();
+		await expect(store.hydrate(() => 'gen')).resolves.toBeNull();
 	});
 
 	// Phase 6 (ADR-013): a forward migration must persist the bumped `dataVersion` on its OWN

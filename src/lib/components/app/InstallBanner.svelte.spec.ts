@@ -78,6 +78,32 @@ test('stays hidden until beforeinstallprompt fires', async () => {
 		.not.toBeInTheDocument();
 });
 
+// W-041 Phase 1: the banner is gated on `store.ready`, so it cannot occupy layout during the
+// pre-hydrate boot window (the desktop "black lines at the top of the screen" symptom — a banner
+// strip painting against unhydrated settings, then vanishing). Every other spec here hydrates
+// first, which makes `ready` true and would silently pass with the gate removed; this is the only
+// case that actually exercises it.
+test('stays hidden before hydrate even when beforeinstallprompt has fired, then appears once ready', async () => {
+	mockStandalone(false);
+	const store = new CombatStore(fakeDb());
+	expect(store.ready).toBe(false);
+	const screen = render(InstallBanner, { store });
+
+	fireInstallPrompt();
+
+	await expect
+		.element(screen.getByRole('button', { name: m['toasts.install.action']() }))
+		.not.toBeInTheDocument();
+
+	// Same store, same stashed prompt — only `ready` changes, so the banner appearing here proves
+	// the gate above was what suppressed it, not the event or the dismissed flag.
+	await store.hydrate();
+
+	await expect
+		.element(screen.getByRole('button', { name: m['toasts.install.action']() }))
+		.toBeVisible();
+});
+
 test('renders the install hint once beforeinstallprompt fires', async () => {
 	const store = new CombatStore(fakeDb());
 	await store.hydrate();

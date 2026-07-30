@@ -73,11 +73,19 @@
 		     the timer and removes both elements from +layout.svelte's `onMount` well before it ever
 		     fires. There is no framework JS by definition here, so the copy below is hardcoded
 		     English rather than routed through Paraglide (ADR-005) — a deliberate, narrow i18n
-		     exception. -->
+		     exception.
+
+		     Hidden via an INLINE `display: none` (flipped to `flex` by the timer below), never via
+		     the `hidden` attribute. `hidden` resolves to `display: none` in the UA stylesheet, which
+		     an inline `display` declaration outranks; the only thing that would then hide this
+		     element is Tailwind preflight's `[hidden]:where(:not([hidden=until-found])){display:none
+		     !important}` — a rule that lives in the render-blocking app stylesheet. That stylesheet
+		     is precisely what is missing in the failure this element exists for, so `hidden` would
+		     paint an unstyled full-viewport error screen at 0ms over everything, on exactly the boot
+		     it is supposed to rescue. -->
 		<div
 			id="boot-failed"
-			hidden
-			style="position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center; background: var(--bg); color: var(--text);"
+			style="position: fixed; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center; background: var(--bg); color: var(--text);"
 		>
 			<p style="margin: 0; font: 600 16px/1.4 system-ui, sans-serif;">Couldn't load the app</p>
 			<p
@@ -106,7 +114,8 @@
 				var skeleton = document.getElementById('boot-skeleton');
 				if (skeleton) skeleton.remove();
 				var failed = document.getElementById('boot-failed');
-				if (failed) failed.hidden = false;
+				// Inline display, not `hidden` — see the #boot-failed comment above.
+				if (failed) failed.style.display = 'flex';
 			}, 15000);
 		</script>
 	</body>

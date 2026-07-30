@@ -7,15 +7,58 @@
   active search query highlighted via `<mark>` segments. Delete is gated behind the reused
   `ConfirmDialog`; confirming calls `onDelete` — no Undo affordance is offered here.
 -->
+<script module lang="ts">
+	// Module-level (not per-instance): `NavSidebar`'s holder is fine as an instance field because
+	// it is a singleton, but a 30-row combat list would otherwise fire 30 imports. One holder + one
+	// in-flight promise per lazy module, shared by every `CombatRow` instance, so N rows still cost
+	// one fetch. Both loaders clear their in-flight promise on rejection so a later click retries,
+	// and never assign the module on failure — the caller sees `false` and leaves `open` alone.
+	let confirmModule = $state<typeof import('./ConfirmDialog.svelte')>();
+	let confirmPromise: Promise<boolean> | undefined;
+
+	function loadConfirm(): Promise<boolean> {
+		if (confirmModule) return Promise.resolve(true);
+		if (confirmPromise) return confirmPromise;
+		confirmPromise = import('./ConfirmDialog.svelte')
+			.then((mod) => {
+				confirmModule = mod;
+				return true;
+			})
+			.catch(() => {
+				confirmPromise = undefined;
+				return false;
+			});
+		return confirmPromise;
+	}
+
+	let menuModule = $state<typeof import('./CombatRowMenu.svelte')>();
+	let menuPromise: Promise<boolean> | undefined;
+
+	function loadMenu(): Promise<boolean> {
+		if (menuModule) return Promise.resolve(true);
+		if (menuPromise) return menuPromise;
+		menuPromise = import('./CombatRowMenu.svelte')
+			.then((mod) => {
+				menuModule = mod;
+				return true;
+			})
+			.catch(() => {
+				menuPromise = undefined;
+				return false;
+			});
+		return menuPromise;
+	}
+</script>
+
 <script lang="ts">
+	import { tick } from 'svelte';
 	import { dragHandle } from 'svelte-dnd-action';
+	import { Button } from '$lib/components/ui/button';
 	import { Card } from '$lib/components/ui/card';
 	import type { Combat } from '$lib/db/types';
 	import { m } from '$lib/i18n';
 	import { chromeIcon } from '$lib/icons';
 	import ColorTagDot from './ColorTagDot.svelte';
-	import CombatRowMenu from './CombatRowMenu.svelte';
-	import ConfirmDialog from './ConfirmDialog.svelte';
 
 	let {
 		combat,
@@ -32,8 +75,41 @@
 	} = $props();
 
 	let deleteOpen = $state(false);
+	let menuOpen = $state(false);
+	let menuPending = $state(false);
 
 	const Grip = chromeIcon.drag;
+	const Overflow = chromeIcon.overflow;
+
+	// Delete is gated behind the confirm dialog's module resolving; on failure `loadConfirm`
+	// resolves `false` and nothing opens, so the menu item stays usable for a retry.
+	async function handleDeleteRequest() {
+		if (await loadConfirm()) {
+			await tick();
+			deleteOpen = true;
+		}
+	}
+
+	// Warm-on-intent for the row-menu chunk: fire-and-forget, called from pointerenter/focusin/
+	// touchstart on the placeholder trigger below. `loadMenu` is idempotent against `menuModule`
+	// itself, so calling it again from `activateMenu` never double-fetches.
+	function warmMenu() {
+		if (menuModule || menuPending) return;
+		menuPending = true;
+		loadMenu().finally(() => {
+			menuPending = false;
+		});
+	}
+
+	async function activateMenu() {
+		menuPending = true;
+		const ok = await loadMenu();
+		menuPending = false;
+		if (ok) {
+			await tick();
+			menuOpen = true;
+		}
+	}
 
 	const menuLabel = $derived(m['a11y.combatRowMenu']({ title: combat.title }));
 	const gripLabel = $derived(m['a11y.reorder']({ title: combat.title }));
@@ -119,21 +195,41 @@
 	</span>
 
 	<span data-no-open>
-		<CombatRowMenu
-			{menuLabel}
-			onEdit={() => onEdit(combat.id)}
-			onDelete={() => (deleteOpen = true)}
-		/>
+		{#if menuModule}
+			{@const Menu = menuModule.default}
+			<Menu
+				{menuLabel}
+				bind:open={menuOpen}
+				onEdit={() => onEdit(combat.id)}
+				onDelete={handleDeleteRequest}
+			/>
+		{:else}
+			<Button
+				variant="ghost"
+				size="chrome"
+				aria-label={menuLabel}
+				aria-busy={menuPending}
+				onpointerenter={warmMenu}
+				onfocusin={warmMenu}
+				ontouchstart={warmMenu}
+				onclick={activateMenu}
+			>
+				<Overflow class="size-4" />
+			</Button>
+		{/if}
 	</span>
 </Card>
 
-<ConfirmDialog
-	bind:open={deleteOpen}
-	title={m['dialogs.deleteCombat.title']()}
-	body={deleteBody}
-	confirmLabel={m['dialogs.deleteCombat.confirm']()}
-	onConfirm={() => {
-		onDelete(combat.id);
-		deleteOpen = false;
-	}}
-/>
+{#if confirmModule}
+	{@const Confirm = confirmModule.default}
+	<Confirm
+		bind:open={deleteOpen}
+		title={m['dialogs.deleteCombat.title']()}
+		body={deleteBody}
+		confirmLabel={m['dialogs.deleteCombat.confirm']()}
+		onConfirm={() => {
+			onDelete(combat.id);
+			deleteOpen = false;
+		}}
+	/>
+{/if}

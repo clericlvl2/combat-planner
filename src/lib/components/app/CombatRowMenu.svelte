@@ -18,10 +18,12 @@
 		menuLabel,
 		onEdit,
 		onDelete,
+		open = $bindable(false),
 	}: {
 		menuLabel: string;
 		onEdit: () => void;
 		onDelete: () => void;
+		open?: boolean;
 	} = $props();
 
 	const Overflow = chromeIcon.overflow;
@@ -29,7 +31,7 @@
 	const Remove = chromeIcon.remove;
 </script>
 
-<DropdownMenu>
+<DropdownMenu bind:open>
 	<DropdownMenuTrigger>
 		{#snippet child({ props })}
 			<Button {...props} variant="ghost" size="chrome" aria-label={menuLabel}>

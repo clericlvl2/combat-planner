@@ -611,3 +611,82 @@ factory records the first import of the specifier and re-exports `importActual`,
 that the chunk would not have been fetched yet. It now fails on the eager-import mutation (probe
 called at render) and separately on a loader that resolves without assigning the module (dialog
 never appears) — two distinct failures, restored source passes.
+
+## Non-blocking boot shell (W-053) — measured, then closed
+
+W-053 proposed the last non-bundle lever on the cold blank window: a self-contained ~1 KB inline
+shell (no `var()`, no external asset) plus a non-blocking app stylesheet, so the first frame would
+arrive at ~1 RTT instead of waiting on the render-blocking `<link>`. W-046 had just made it the sole
+owner of the 672 ms cold first-paint, since deferring 55 KB gz of route JS moved that number by
+nothing. It was priced by prototype before being built, and the prototype closed it.
+
+Three copies of the real `build/` output, served by a copy of `scripts/serve-build.mjs` (brotli +
+`immutable` + startup precompression), scratchpad only, nothing committed:
+
+- **A** — shipped `index.html`, unmodified.
+- **B** — the stylesheet half only: `<link rel="preload" as="style" onload="this.rel='stylesheet'">`
+  with a `<noscript>` fallback and an inline FOUC gate (`#cp-mount{visibility:hidden}`, removed on
+  stylesheet load). No shell markup.
+- **C** — B plus the row's shell: fixed overlay, hardcoded `#101317`, one CSS-keyframe spinner,
+  ~340 B, removed at reveal.
+
+Medians, 7 cold runs per cell (5 on Slow 3G), CPU 4×, fresh context each run:
+
+| variant | profile | first-paint | FCP | LCP | CLS | reveal |
+|---|---|---:|---:|---:|---:|---:|
+| A | Fast 4G | 300 | 600 | 940 | 0.036 | — |
+| B | Fast 4G | 316 | 712 | 1104 | 0.036 | 314 |
+| C | Fast 4G | **132** | 624 | 992 | 0.036 | 313 |
+| A | Fast 3G | 680 | 1240 | 1980 | 0.036 | — |
+| B | Fast 3G | 684 | 1236 | 1980 | 0.036 | 679 |
+| C | Fast 3G | **184** | 1232 | 1984 | 0.036 | 540 |
+| A | Slow 3G | 6432 | 11492 | 18196 | 0.036 | — |
+| B | Slow 3G | 6436 | 11500 | 18228 | 0.036 | 6435 |
+| C | Slow 3G | **2056** | 11776 | 18536 | 0.036 | 4838 |
+| A | F5 `/` (SW warm) | 32 | 84 | 108 | 0.000 | — |
+| C | F5 `/` (SW warm) | 32 | 88 | 112 | 0.000 | 30 |
+
+**The stylesheet half is worth exactly zero, for a structural reason worth recording:
+`rel=stylesheet` blocks *painting*, never *downloading*.** The 76.8 KB sheet (11 KB brotli) already
+arrives in parallel with the modulepreloads and lands well before the ~96 KB gz module graph
+finishes, so app FCP is JS-bound, not CSS-bound. Un-blocking it relocates the same wait: every B-vs-A
+delta is inside the run spread or against us, and on SW-warm it is a small real regression
+(32 → 44 ms first-paint) from the preload→stylesheet swap plus the reveal script.
+
+**The shell half moves first-paint and nothing else.** C beats A by 168 / 496 / 4376 ms on
+first-paint — the row's premise is mechanically correct, a hex-hardcoded overlay does paint at ~1
+RTT. But FCP moves +24 / −8 / +284 ms and LCP +52 / +4 / +340. Not one millisecond of the wait for
+the actual app is removed; the wait is merely occupied by a spinner.
+
+**And it re-creates the flash, worse than the version already deleted.** Reveal fires on stylesheet
+load, which is far earlier than app content, so the shell is torn down into a *second* blank window:
+
+| profile | shell visible for | second blank window (reveal → FCP) |
+|---|--:|--:|
+| Fast 4G | 181 ms | 311 ms |
+| Fast 3G | 356 ms | 692 ms |
+| Slow 3G | 2782 ms | 6938 ms |
+
+Four visual states — blank → spinner → blank → app. The only way to collapse that is to hold the
+shell until the app mounts, which is byte-for-byte the deleted `#boot-skeleton` design whose warm-F5
+failure (two structural paints 48 ms apart, i.e. the originally reported flash) is measured in the
+Phase 2 correction above. Both branches are closed.
+
+Two further costs, either of which would be enough on its own:
+
+- **A new failure mode that only this change creates.** Today a stylesheet that 404s still paints —
+  the browser unblocks on the error and the app renders unstyled but usable. Under B/C, `onload`
+  never fires, so the FOUC gate is never lifted and a fully-booted app stays `visibility:hidden`
+  forever, with `#boot-failed` hidden behind its 15 s timer on a boot that did not fail. Fixing that
+  needs `onerror` plus an independent timeout reveal: more inline boot logic, guarding only against
+  a regression this change introduces.
+- **Guard conflict.** `e2e/boot.e2e.ts`'s "the boot shell paints no app chrome of its own" passes
+  variant C only on a technicality — the spinner has no text, so `body.innerText` is empty — while
+  violating what that test's header comment says it exists to prevent.
+
+**Closed as measured, not worth doing.** The 672/680 ms cold first-paint is HTML arrival plus
+stylesheet RTT; it is not recoverable by CSS scheduling, and the row is deleted rather than deferred
+so nobody re-derives the skeleton a third time. Also note the common case was never in play: post
+install every boot is SW-warm at 32 ms first-paint / 84 ms FCP, unchanged by the full W-053 shape.
+Where the cold-launch time actually lives is the `nodes/6` static import named in the W-046 section
+above — a bundle row, filed as W-054, not a boot-shell row.

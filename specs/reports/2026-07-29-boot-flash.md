@@ -506,3 +506,108 @@ navigations are served from Cache Storage, not the network.
   `nav-links.ts` exists to centralise — the exact drift its doc comment warns about.
 - ADR-011 names `lucide-svelte`; the installed package is `@lucide/svelte`.
 - W-036 (`/favicon.svg` 404) still open and sits in the critical window.
+
+## Route-dialog deferral (W-046) — measured
+
+Follow-on to the "Boot bundle" section above, which named the route components as where bits-ui and
+vaul actually enter `/`. Three action-gated `import()`s landed (`CombatFormDialog` in
+`CombatsHome`, `ConfirmDialog` and `CombatRowMenu` in `CombatRow`); plan
+`.claude/plans/2026-07-30-defer-route-dialogs.md`. Both builds below were produced and measured on
+the same machine in the same session — the "before" column is a **fresh rebuild of `0915b21`**, not
+the number transcribed from the plan, because chunk hashes and the rig's absolute numbers both
+drift. The rebuild reproduced the plan's recorded 160,557 B gz exactly, which is the reason to
+trust the byte column.
+
+### Bytes — `/`'s route node (`nodes/2`) static import closure, gzip -9
+
+| chunk (before) | gz | fate |
+|---|---:|---|
+| `chunks/JGMOmK8P.js` | 18,414 | bits-ui core — **left the closure** |
+| `chunks/BZqckEuG.js` | 14,188 | vaul + `ui/drawer` (+ `drawer.css`) — **left the closure** |
+| `chunks/BWV2qdrs.js` | 12,116 | bits floating layer — **left the closure** |
+| `chunks/CNuM-YkV.js` | 9,767 | `alert-dialog` + `dropdown-menu` — **left the closure** |
+| `chunks/CvBjnW7z.js` | 823 | bits-ui utils — **left the closure** |
+
+| metric | before (`0915b21`) | after (`d601982`) | delta |
+|---|---:|---:|---:|
+| `nodes/2` static closure, JS gz | **160,557** | **105,429** | **−55,128 (−34.3 %)** |
+| `nodes/2` static closure, JS raw | 494,996 | 302,506 | −192,490 |
+| files in that closure | 19 | 14 | −5 |
+| stylesheets in that closure, gz | 1,086 | **0** | −1,086 |
+| `build/index.html` modulepreload tags | 17 | 17 | 0 |
+| `build/index.html` modulepreload payload, gz | 96,423 | 96,784 | +361 |
+| `build/index.html` render-blocking stylesheets | 1 | 1 | 0 |
+
+−55.1 KB gz, against a bar of ≥ 45 KB and a plan estimate of 54–56 KB. Marker greps over the 14
+remaining files find no `vaul`, `bits-floating`, `aria-haspopup`, `data-vaul-drawer`, `alertdialog`
+or `dropdown-menu` — and the same greps *do* hit elsewhere in the build (`chunks/BXzhsKNv.js`,
+`chunks/BWV2qdrs2.js`, `chunks/BoJiwfnM2.js`, plus `nodes/6` and `nodes/8`), so the greps are
+working, not silently matching nothing.
+
+Two things in that table are not wins and should not be read as any:
+
+- **The modulepreload payload grew 361 B gz** while the tag count stayed at 17. Nothing dialog-shaped
+  entered it; the set churned identity (three chunks re-split) and re-gzipped slightly larger. The
+  `vaul` / `data-vaul-drawer` strings that grep finds in `nodes/0` are NavSidebar's own CSS
+  selectors, one occurrence each, present identically before the change — not the vaul runtime.
+- **`assets/SearchField.UmVke63C.css` appears to vanish.** It did not. The content hash is unchanged
+  and the file is now `assets/ResponsiveModal.UmVke63C.css`: those bytes were always
+  `ResponsiveModal`'s two `touch-action` rules, and Vite had merely named the asset after another
+  module in the old mixed chunk. `SearchField.svelte` has no `<style>` block at all. The sheet now
+  loads with the drawer that needs it, which is correct, not a dropped stylesheet.
+
+### Rig — Fast 3G (1.6 Mbps / 750 Kbps / 150 ms RTT, CPU 4×), `scripts/capture-boot.mjs`
+
+Seven runs per build, per scenario; median with (min–max). This rig is **Fast 3G**, not Fast 4G.
+
+| scenario | first-paint | FCP | LCP | CLS |
+|---|---:|---:|---:|---:|
+| Cold `/` — before | 672 (656–672) | 1548 (1540–1600) | 1992 (1884–2032) | 0.036 |
+| Cold `/` — after | 672 (668–680) | **1228 (1220–1248)** | 1960 (1948–1980) | 0.036 |
+| F5 `/` — before | 48 (44–56) | 176 (168–196) | 236 (228–268) | 0.000 |
+| F5 `/` — after | 36 (36–48) | 120 (112–132) | 164 (152–176) | 0.000 |
+| F5 `/combats` — before | 36 (32–44) | 112 (104–152) | 148 (128–192) | 0.000 |
+| F5 `/combats` — after | **32 (32–40)** | **80 (76–88)** | **100 (96–108)** | 0.000 |
+| F5 `/combats/<id>` — before | 44 (32–60) | 96 (84–124) | 148 (132–184) | 0.000 |
+| F5 `/combats/<id>` — after | 28 (28–36) | 92 (84–96) | 136 (124–144) | 0.000 |
+
+**What moved.** Cold `/` FCP −320 ms, and it is the cleanest signal in the table: the before and
+after ranges do not overlap at all (1540–1600 vs 1220–1248). `F5 /combats`, the plan's headline
+because it is the one scenario with no redirect, improved on every column and regressed on none:
+FCP −32 ms, LCP −48 ms, ranges disjoint on both. CLS is 0.036 cold / 0.000 warm in both builds —
+the placeholder `⋮` trigger is geometrically identical to the real one, as intended.
+
+**What did not move, and why.** Cold `/` **first-paint is flat at 672 ms** — 672 before, 672 after,
+overlapping ranges. The plan's acceptance bar asked first-paint to *improve*, and it did not; that
+half of the bar is **not met**. The bar was mis-specified rather than the change being at fault:
+since W-041 Phase 2 the first painted frame is the static skeleton in `app.html`, which is gated on
+the render-blocking stylesheet and paints *before* any route chunk is requested. No amount of route
+JS deferral can move it — that number is W-053's to move, and W-053 exists precisely because this
+is the last non-bundle lever on the cold blank window.
+
+Cold `/` **LCP is flat** (1992 → 1960 median, inside the before build's own 1884–2032 spread), which
+the plan predicted and accepted as a pass. The reason is structural: cold `/` redirects into
+`/combats/<seeded id>` (`nodes/6`), and `nodes/6` still statically imports the same bits-ui, vaul
+and floating chunks via `CombatHeader`→`ConfirmDialog` and `CombatantForm`→`ResponsiveModal`. The
+bytes are deferred out of `/` and then pulled straight back in by the redirect target. Deferring
+those two is the follow-up that would convert this row's byte win into a cold-launch LCP win; it is
+not in W-046 and there is no row for it yet.
+
+`F5 /combats/<id>` was expected *unchanged* (out of scope — a change there would mean something
+leaked). It came out mildly better instead (LCP 148 → 136, first-paint 44 → 28, though that column's
+before-spread is 32–60 and swamps the delta). Nothing leaked: `nodes/6` shares chunks with
+`nodes/2`, and the re-split that dropped `nodes/2` to 14 files also made two of those shared chunks
+smaller. It is a side effect of rechunking, not a measured improvement to that route.
+
+### Test
+
+`src/lib/components/app/CombatsHome.svelte.spec.ts` is the one test the row added. Worth recording
+how the first version of it was wrong, because the mistake is reusable: it asserted only that
+`getByRole('dialog')` was absent on first render and present after the create tap — and it **passed
+against a deliberately un-deferred build** with a plain static `import` of `CombatFormDialog`. A
+closed bits-ui dialog renders nothing to the DOM, so DOM absence cannot tell "module never loaded"
+apart from "dialog not open". The shipped version probes the module graph instead: a `vi.mock`
+factory records the first import of the specifier and re-exports `importActual`, so the assertion is
+that the chunk would not have been fetched yet. It now fails on the eager-import mutation (probe
+called at render) and separately on a loader that resolves without assigning the module (dialog
+never appears) — two distinct failures, restored source passes.

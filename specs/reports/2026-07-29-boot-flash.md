@@ -36,11 +36,9 @@ not committed.
 Two results that contradict working assumptions and change priorities:
 
 - **CLS is 0 in every baseline scenario.** The `<p class="p-4 text-muted-foreground">…</p>`
-  placeholder was assumed to cause layout shift. It does not measurably *on this path*, because
-  pre-fix nothing painted until everything had settled — there was no intermediate state to shift
-  away from. Once the fix makes the placeholder actually visible, it does shift (0.036 post-fix,
-  see the "After" deltas), so replacing it with dimension-matched skeletons is a Core Web Vitals
-  fix after all, not the polish item this baseline made it look like.
+  placeholder was assumed to cause layout shift. It does not — see the CLS investigation below,
+  which identifies the real (and unrelated) shifter. Placeholder sizing is a polish item, exactly
+  as this baseline suggested.
 - **Warm F5 is already fast** (~100 ms FCP) because the service worker serves everything from Cache
   Storage, bypassing the network entirely. Bundle size is therefore *not* what makes F5 flash — the
   render sequence is.
@@ -88,14 +86,9 @@ Deltas against the baseline above:
   bits-ui and vaul into the root node graph. Phase 5 took only the layout-level shrink (sonner,
   NavSidebar's Drawer); the route-level dialog deferral that would offset this is filed as W-046 and
   is the first thing to do before re-measuring.
-- **Cold `/` CLS: 0 → 0.036.** The `#boot-skeleton` is `position: fixed; inset: 0`, so neither its
-  paint nor its removal can shift anything — it is out of flow, and it is not the cause. The shift
-  is the in-flow `<p>…</p>` placeholder giving way to real content, which pre-fix never got a frame
-  of its own to be measured in (see the baseline note above). That placeholder is on `/combats`,
-  `/library` and `/settings` too, on the same route-component pattern, and none of those were
-  measured — so 0.036 is a lower bound on the app, not a `/`-only artifact. Giving the placeholder
-  the dimensions of the content it stands in for is therefore the actual CLS fix, not the optional
-  polish item the baseline section originally filed it as.
+- **Cold `/` CLS: 0 → 0.036.** Cause identified by measurement — see "What the 0.036 actually is"
+  below. It is neither the skeleton nor the placeholder, both of which were asserted here in earlier
+  revisions of this report and both of which were wrong.
 - **Warm F5 scenarios (`/`, `/combats`, `/combats/<id>`): first-paint/blank-window unchanged
   within measurement noise (~40-52 ms before, ~40-44 ms after).** Consistent with warm F5 already
   being fast pre-fix (everything served from Cache Storage). FCP moved a few ms in both directions
@@ -153,6 +146,58 @@ Two further facts this exposed, both of which narrow what the skeleton can ever 
   `color-scheme` declaration, and only from it. Shortening the window itself means either shrinking
   what blocks first paint (W-044, W-046) or making the app stylesheet non-blocking behind a
   self-contained inline shell (W-053).
+
+### What the 0.036 actually is
+
+Two explanations were asserted in this report before anyone measured, and both were wrong: first
+the `#boot-skeleton` overlay (impossible — `position: fixed; inset: 0`, out of flow), then the
+in-flow `…` placeholder. The second was disproved by doing it: the placeholders on `/`,
+`CombatsHome`, `/library` and `/combats/[id]` were dimension-matched to their real content and
+cold-`/` CLS stayed at exactly 0.036.
+
+Resolved by capturing `layout-shift` entries with their `sources` array, which names the shifting
+nodes. Cold `/`, first launch, three runs — one single entry, byte-identical every time:
+
+```
+[~4706 ms] value = 0.03573
+  <main class="flex flex-1 flex-col">
+    previousRect = { x: 0, y: 52, w: 1425, h: 848 }
+    currentRect  = { x: 0, y: 0,  w: 1425, h: 900 }
+```
+
+`<main>` jumps up by 52 px — `h-13`, one `AppHeader`. `AppShell.svelte` derives
+`routeHasOwnHeader = page.route.id === '/combats/[id]'` and renders `AppHeader` as an in-flow
+sibling *above* `<main>` on every other route. So when `/`'s first-launch `onMount` runs
+`goto('/combats/<seededId>')`, `routeHasOwnHeader` flips true, `AppHeader` unmounts, and everything
+below it slides up one header height. `/combats/[id]` renders its own `CombatHeader` *inside*
+`<main>`, so the header appears not to move while the content under it jumps.
+
+Independently confirmed by geometry — `/combats/[id]` is the only route where `<main>` starts at
+`y = 0`:
+
+| route | `<main>` | `<header>` | header inside `<main>` |
+|---|---|---|---|
+| `/combats`, `/library`, `/settings` | y=52 h=848 | y=0 h=52 | no |
+| `/combats/<id>` | **y=0 h=900** | y=0 h=52 | **yes** |
+
+The arithmetic closes exactly, which rules out coincidence: impact fraction
+`(900 × 1425) / (900 × 1440) = 0.98958`, distance fraction `52 / max(1440, 900) = 0.036111`,
+product `0.035735` against Chrome's reported `0.03573`.
+
+Scope, three runs each: cold `/` first launch **0.0357**; cold `/` steady state (`firstLaunchDone`
+true, combats seeded) **0.0000, zero entries**; cold `/library`, `/settings`, `/combats` **0.0000,
+zero entries**. So the earlier claim in this report that 0.036 was "a lower bound on the app" is
+**dead** — the floor is 0.000 on every route and on every launch after the first. This is a
+once-per-install event, at ~4.7 s, during a navigation the user initiated by opening the app.
+
+**Deliberately not fixed.** 0.036 is 36% of the "good" threshold, occurs once per install, and field
+CLS is a p75 across page loads, so a single first-launch event is statistically invisible. The header
+seam it comes from is also intentional: `/combats/[id]` owns its header so the app does not stack two
+bars. The only real fixes cost more than they buy — reserving 52 px on every route means refactoring
+`AppShell` so `/combats/[id]` renders `CombatHeader` into a shell-owned slot, and suppressing
+`AppHeader` during the undecided first-launch window trades the shift for a 52 px blank bar during
+boot, which is the class of flash this whole unit exists to remove. The backlog row tracking this
+(W-050) is deleted rather than done.
 
 The desktop "black lines at the top" symptom **could not be reproduced headless**, but the
 mechanism is now identified — see root cause 5. The original theory (`AppHeader.svelte:34` being

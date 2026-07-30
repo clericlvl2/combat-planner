@@ -44,10 +44,11 @@
 		     after a deploy, or a deep-link F5 whose modules 404 to this SPA fallback), the page
 		     would otherwise sit on an empty canvas forever — a plausible but permanently dead app,
 		     worse than an error. This timer swaps in a reload prompt; a normal boot cancels the
-		     timer and removes this element from +layout.svelte's `onMount` well before it ever
-		     fires. There is no framework JS by definition here, so the copy below is hardcoded
-		     English rather than routed through Paraglide (ADR-005) — a deliberate, narrow i18n
-		     exception.
+		     timer and removes this element from a top-level statement near the top of
+		     +routes/+layout.svelte's <script> (W-049) — the earliest point that is genuine proof
+		     the whole module graph fetched, parsed, and ran, well before this timer ever fires.
+		     There is no framework JS by definition here, so the copy below is hardcoded English
+		     rather than routed through Paraglide (ADR-005) — a deliberate, narrow i18n exception.
 
 		     Hidden via an INLINE `display: none` (flipped to `flex` by the timer below), never via
 		     the `hidden` attribute. `hidden` resolves to `display: none` in the UA stylesheet, which
@@ -77,14 +78,20 @@
 		</div>
 
 		<script>
-			// Bounded failure timer — see #boot-failed comment above. Cleared by the root layout's
-			// onMount on a normal boot, before it ever fires. 15000ms is a floor derived from
-			// measurement, not an arbitrary pick: a cold `/` load hit FCP at 4264ms under only
-			// 4x CPU throttling on Fast 3G (see specs/reports/2026-07-29-boot-flash.md), a
-			// mid-tier profile, not a worst case. This timeout must stay comfortably above that
-			// measured cold-boot FCP so a slow-but-healthy boot on a weaker device or network is
-			// never mistaken for a dead bundle.
-			window.__cpBootTimer = setTimeout(function () {
+			// Bounded failure timer — see #boot-failed comment above. Cleared by a top-level
+			// statement in +layout.svelte (W-049) on a normal boot, before it ever fires.
+			//
+			// 15000ms kept, re-justified against current numbers (W-049): the original 4264ms
+			// cold-FCP floor (specs/reports/2026-07-29-boot-flash.md) predates response
+			// compression (W-051) and is no longer representative — the same rig now measures a
+			// cold `/` first paint of 672ms / FCP of 1536ms on Fast 3G (1.6Mbps/150ms RTT, CPU
+			// 4x), and a 6480ms first paint on Slow 3G. Both are still well inside 15000ms (>2x
+			// margin even against the Slow 3G number), and the teardown point above clears
+			// earlier than either paint metric on a healthy boot regardless of network, so
+			// there's no measurement here that would justify lowering it: only a
+			// weaker-than-Slow-3G device or network could need it higher, and this rig doesn't
+			// measure one, so 15000ms stays as the floor.
+			window.__cpBootTimer = setTimeout(() => {
 				var failed = document.getElementById('boot-failed');
 				// Inline display, not `hidden` — see the #boot-failed comment above.
 				if (failed) failed.style.display = 'flex';

@@ -196,6 +196,7 @@
 	"toasts.library.saved": "Guardado en la biblioteca.",
 	"toasts.library.goToLibrary": "Ir a la biblioteca",
 	"toasts.library.capReached": "La biblioteca está llena (máximo {max} plantillas).",
+	"toasts.nav.loadFailed": "No se pudo cargar el menú. Inténtalo de nuevo.",
 	"appError.title": "Algo salió mal",
 	"appError.body": "Esta página encontró un error inesperado. Recarga la aplicación o vuelve a tus combates.",
 	"appError.reload": "Recargar",

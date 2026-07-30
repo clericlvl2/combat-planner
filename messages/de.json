@@ -196,6 +196,7 @@
 	"toasts.library.saved": "In der Bibliothek gespeichert.",
 	"toasts.library.goToLibrary": "Zur Bibliothek",
 	"toasts.library.capReached": "Die Bibliothek ist voll (max. {max} Vorlagen).",
+	"toasts.nav.loadFailed": "Menü konnte nicht geladen werden. Bitte erneut versuchen.",
 	"appError.title": "Etwas ist schiefgelaufen",
 	"appError.body": "Auf dieser Seite ist ein unerwarteter Fehler aufgetreten. Lade die App neu oder kehre zu deinen Kämpfen zurück.",
 	"appError.reload": "Neu laden",

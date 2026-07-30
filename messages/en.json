@@ -196,6 +196,7 @@
 	"toasts.library.saved": "Saved to library.",
 	"toasts.library.goToLibrary": "Go to library",
 	"toasts.library.capReached": "Library is full ({max} templates max).",
+	"toasts.nav.loadFailed": "Couldn't load the menu. Try again.",
 	"appError.title": "Something went wrong",
 	"appError.body": "This page hit an unexpected error. Reload the app or return to your combats.",
 	"appError.reload": "Reload",

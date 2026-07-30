@@ -13,6 +13,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { m } from '$lib/i18n';
 	import { chromeIcon } from '$lib/icons';
+	import { loadDrawerChunk } from './nav-drawer-loader';
 
 	let { open = $bindable(false) }: { open?: boolean } = $props();
 
@@ -23,11 +24,23 @@
 	// `open` effect below never double-fetches.
 	let drawerModule = $state<typeof import('$lib/components/ui/drawer')>();
 
+	// A failed chunk fetch (offline, stale precache after a deploy) must not leave `open = true`
+	// with nothing mounted — the `{#if drawerModule}` block below never renders and the user gets
+	// a dead UI with no way out. `drawerModule` is deliberately left unset on failure (not some
+	// separate error flag), so the next `open` toggle just retries the same idempotent check
+	// above; the toast below only tells the user why the drawer didn't open.
 	function loadDrawer() {
 		if (drawerModule) return;
-		import('$lib/components/ui/drawer').then((mod) => {
-			drawerModule = mod;
-		});
+		loadDrawerChunk()
+			.then((mod) => {
+				drawerModule = mod;
+			})
+			.catch(() => {
+				open = false;
+				import('$lib/components/ui/sonner').then(({ toast }) => {
+					toast(m['toasts.nav.loadFailed']());
+				});
+			});
 	}
 
 	// Covers the non-swipe path — AppHeader's burger button sets `open` directly (tablet mode),

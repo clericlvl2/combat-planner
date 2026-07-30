@@ -12,6 +12,20 @@
 	// below (W-003 Phase 3); InstallBanner is mounted inside AppShell.
 	let { children } = $props();
 
+	// Boot-shell teardown (src/app.html), W-049 — a top-level module statement, not inside
+	// `onMount`. Reaching this line already proves the entire module graph this file depends on
+	// (SvelteKit's client runtime, this component, every static import above) fetched, parsed, and
+	// evaluated top-to-bottom without throwing — that is "first evidence of life", and it happens
+	// strictly earlier than `onMount` firing, since Svelte only calls `onMount` once this module
+	// has finished evaluating and the component tree has mounted. A boot that is genuinely dead
+	// (a stale-precache 404 on this chunk, or a parse/evaluation error anywhere earlier in the
+	// graph) never reaches this statement, so it never clears the timer and `#boot-failed` still
+	// surfaces for it — the same guarantee the old `onMount`-based teardown made, just earlier.
+	clearTimeout(
+		(window as unknown as { __cpBootTimer?: ReturnType<typeof setTimeout> }).__cpBootTimer,
+	);
+	document.getElementById('boot-failed')?.remove();
+
 	// Lazy-mounted after first paint (W-041 Phase 5) — sonner's JS chunk plus `sonner.css` are the
 	// only layout-exclusive boot bytes (ResponsiveModal already pulls in bits-ui/vaul on every
 	// route via CombatFormDialog, so those aren't deferrable here). Safe because `svelte-sonner`'s
@@ -23,16 +37,6 @@
 	let Toaster = $state<typeof import('$lib/components/ui/sonner').Toaster>();
 
 	onMount(async () => {
-		// Boot-shell teardown (src/app.html) — must be the *first* statement, before the `await`
-		// below, and specifically before anything that can throw or suspend: reaching this line is
-		// the app's only proof-of-life, and clearing the timer is what cancels the bounded failure
-		// screen. Left until after the `await`, a slow IndexedDB round-trip on a weak device could
-		// let the 15s timer fire over a perfectly healthy boot.
-		clearTimeout(
-			(window as unknown as { __cpBootTimer?: ReturnType<typeof setTimeout> }).__cpBootTimer,
-		);
-		document.getElementById('boot-failed')?.remove();
-
 		// Fire-and-forget, independent of the hydrate await below — the sonner chunk has no
 		// dependency on Dexie and no toast can fire before `window.load` (Phase 4), so there is no
 		// urgency; this just keeps it off the critical boot path.

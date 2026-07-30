@@ -196,6 +196,7 @@
 	"toasts.library.saved": "Enregistré dans la bibliothèque.",
 	"toasts.library.goToLibrary": "Aller à la bibliothèque",
 	"toasts.library.capReached": "La bibliothèque est pleine ({max} modèles max).",
+	"toasts.nav.loadFailed": "Impossible de charger le menu. Réessayez.",
 	"appError.title": "Une erreur est survenue",
 	"appError.body": "Cette page a rencontré une erreur inattendue. Rechargez l'application ou retournez à vos combats.",
 	"appError.reload": "Recharger",

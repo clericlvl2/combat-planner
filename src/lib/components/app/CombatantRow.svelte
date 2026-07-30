@@ -17,7 +17,34 @@
   the page-owned numpad/edit dialogs (no business logic here). Active-turn highlight is a
   type-colored halo (outer box-shadow, no border-color swap) when `active`.
 -->
+<script module lang="ts">
+	// Module-level (not per-instance): the roster renders N simultaneous CombatantRow instances,
+	// so an instance-scoped holder would fire N imports the first time any row's "+ Condition" is
+	// tapped. ConditionPicker reaches ResponsiveModal (bits-ui dialog + vaul drawer) — the same
+	// chunk set CombatantForm/NumpadSheet defer in the route's +page.svelte (W-054) — so it must
+	// stay out of the row's static import too, or the route's eager closure never actually drops.
+	// `.catch` clears the in-flight promise so a later tap retries, and never sets `open`.
+	let conditionPickerModule = $state<typeof import('./ConditionPicker.svelte')>();
+	let conditionPickerPromise: Promise<boolean> | undefined;
+
+	function loadConditionPicker(): Promise<boolean> {
+		if (conditionPickerModule) return Promise.resolve(true);
+		if (conditionPickerPromise) return conditionPickerPromise;
+		conditionPickerPromise = import('./ConditionPicker.svelte')
+			.then((mod) => {
+				conditionPickerModule = mod;
+				return true;
+			})
+			.catch(() => {
+				conditionPickerPromise = undefined;
+				return false;
+			});
+		return conditionPickerPromise;
+	}
+</script>
+
 <script lang="ts">
+	import { tick } from 'svelte';
 	import { scale } from 'svelte/transition';
 	import { Button } from '$lib/components/ui/button';
 	import { Card } from '$lib/components/ui/card';
@@ -41,7 +68,6 @@
 	import { NOTE_MAX_LENGTH } from '$lib/stores/domain/constants';
 	import type { CombatController } from './controller';
 	import ConditionIconList from './ConditionIconList.svelte';
-	import ConditionPicker from './ConditionPicker.svelte';
 	import HealthBar from './HealthBar.svelte';
 	import InitCell from './InitCell.svelte';
 	import { typeAccent, typeColor } from './labels';
@@ -67,6 +93,17 @@
 	let open = $state(false);
 	let noteEditing = $state(false);
 	let conditionsOpen = $state(false);
+	let conditionsPending = $state(false);
+
+	async function requestConditions() {
+		conditionsPending = true;
+		const ok = await loadConditionPicker();
+		conditionsPending = false;
+		if (ok) {
+			await tick();
+			conditionsOpen = true;
+		}
+	}
 
 	const toggleLabel = $derived(
 		open
@@ -236,7 +273,12 @@
 							onRemove={(c) => controller.removeCondition(combatant.id, c)}
 						/>
 						{#if open}
-							<button type="button" class={tagTriggerClass} onclick={() => (conditionsOpen = true)}>
+							<button
+								type="button"
+								class={tagTriggerClass}
+								aria-busy={conditionsPending}
+								onclick={requestConditions}
+							>
 								+ {m['conditions.addShort']()}
 							</button>
 							{#if !showNoteEditor}
@@ -273,13 +315,16 @@
 				</CollapsibleContent>
 			</Collapsible>
 
-			<ConditionPicker
-				bind:open={conditionsOpen}
-				conditions={combatant.conditions}
-				name={combatant.name}
-				onAdd={(c) => controller.addCondition(combatant.id, c)}
-				onRemove={(c) => controller.removeCondition(combatant.id, c)}
-			/>
+			{#if conditionPickerModule}
+				{@const Picker = conditionPickerModule.default}
+				<Picker
+					bind:open={conditionsOpen}
+					conditions={combatant.conditions}
+					name={combatant.name}
+					onAdd={(c) => controller.addCondition(combatant.id, c)}
+					onRemove={(c) => controller.removeCondition(combatant.id, c)}
+				/>
+			{/if}
 		</div>
 	</div>
 </Card>

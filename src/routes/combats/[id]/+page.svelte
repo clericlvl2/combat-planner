@@ -10,18 +10,16 @@
   carries; rows/header emit intent only.
 -->
 <script lang="ts">
+	import { tick } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { flip } from 'svelte/animate';
-	import CombatantForm, {
-		type CombatantFormValues,
-	} from '$lib/components/app/CombatantForm.svelte';
+	import type { CombatantFormValues } from '$lib/components/app/CombatantForm.svelte';
 	import CombatantRow from '$lib/components/app/CombatantRow.svelte';
 	import CombatHeader from '$lib/components/app/CombatHeader.svelte';
 	import { makeController } from '$lib/components/app/controller';
 	import EmptyState from '$lib/components/app/EmptyState.svelte';
 	import FAB from '$lib/components/app/FAB.svelte';
-	import NumpadSheet from '$lib/components/app/NumpadSheet.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { toast } from '$lib/components/ui/sonner';
 	import { MAX_LIBRARY_ENTRIES } from '$lib/db/types';
@@ -65,16 +63,47 @@
 		});
 	});
 
-	// page-owned shared surfaces
+	// page-owned shared surfaces — NumpadSheet and CombatantForm both reach ResponsiveModal
+	// (bits-ui dialog + vaul drawer), so both are lazy (W-054): this route (`nodes/6`) is the
+	// first-launch redirect target from `/`, and eagerly importing either here would pull those
+	// chunks straight back into the route's static closure that W-046 removed from `/`. This page
+	// mounts once per navigation, so an instance-scoped holder is correct (no module-level memo
+	// needed — contrast `CombatRow`'s N-simultaneous-instances case). `.catch` clears the in-flight
+	// promise so a later tap retries, and never sets `open` — the affordance stays usable.
 	let numpadId = $state<string | null>(null);
 	let numpadOpen = $state(false);
 	const numpadCombatant = $derived(
 		combat && numpadId ? (combat.combatants.find((c) => c.id === numpadId) ?? null) : null,
 	);
 
-	function openNumpad(cid: string) {
+	let numpadModule = $state<typeof import('$lib/components/app/NumpadSheet.svelte')>();
+	let numpadPromise: Promise<boolean> | undefined;
+	let numpadPending = $state(false);
+
+	function loadNumpad(): Promise<boolean> {
+		if (numpadModule) return Promise.resolve(true);
+		if (numpadPromise) return numpadPromise;
+		numpadPending = true;
+		numpadPromise = import('$lib/components/app/NumpadSheet.svelte')
+			.then((mod) => {
+				numpadModule = mod;
+				numpadPending = false;
+				return true;
+			})
+			.catch(() => {
+				numpadPromise = undefined;
+				numpadPending = false;
+				return false;
+			});
+		return numpadPromise;
+	}
+
+	async function openNumpad(cid: string) {
 		numpadId = cid;
-		numpadOpen = true;
+		if (await loadNumpad()) {
+			await tick();
+			numpadOpen = true;
+		}
 	}
 
 	let addOpen = $state(false);
@@ -84,9 +113,41 @@
 		combat && editId ? (combat.combatants.find((c) => c.id === editId) ?? null) : null,
 	);
 
-	function openEdit(cid: string) {
+	let formModule = $state<typeof import('$lib/components/app/CombatantForm.svelte')>();
+	let formPromise: Promise<boolean> | undefined;
+	let formPending = $state(false);
+
+	function loadCombatantForm(): Promise<boolean> {
+		if (formModule) return Promise.resolve(true);
+		if (formPromise) return formPromise;
+		formPending = true;
+		formPromise = import('$lib/components/app/CombatantForm.svelte')
+			.then((mod) => {
+				formModule = mod;
+				formPending = false;
+				return true;
+			})
+			.catch(() => {
+				formPromise = undefined;
+				formPending = false;
+				return false;
+			});
+		return formPromise;
+	}
+
+	async function openAdd() {
+		if (await loadCombatantForm()) {
+			await tick();
+			addOpen = true;
+		}
+	}
+
+	async function openEdit(cid: string) {
 		editId = cid;
-		editOpen = true;
+		if (await loadCombatantForm()) {
+			await tick();
+			editOpen = true;
+		}
 	}
 
 	// Browser Back closes the top-most open transient overlay (numpad, then edit, then
@@ -203,7 +264,8 @@
 		<CombatHeader
 			{combat}
 			{controller}
-			onAdd={() => (addOpen = true)}
+			onAdd={openAdd}
+			addPending={formPending}
 			onStart={controller.start}
 			onAdvance={controller.advance}
 			canAdvance={canAdv}
@@ -219,7 +281,12 @@
 					title={m['setup.empty.title']()}
 					description={m['setup.empty.description']()}
 				>
-					<Button size="action" class="hidden lg:inline-flex" onclick={() => (addOpen = true)}>
+					<Button
+						size="action"
+						class="hidden lg:inline-flex"
+						aria-busy={formPending}
+						onclick={openAdd}
+					>
 						{m['setup.empty.cta']()}
 					</Button>
 				</EmptyState>
@@ -258,7 +325,8 @@
 				size="fab"
 				class="fixed right-4 bottom-safe shadow-lg lg:hidden max-lg:focus-visible:ring-0 max-lg:focus-visible:border-transparent"
 				aria-label={m['setup.addCombatant']()}
-				onclick={() => (addOpen = true)}
+				aria-busy={formPending}
+				onclick={openAdd}
 			>
 				<Add class="size-5" />
 			</Button>
@@ -276,19 +344,25 @@
 		{/if}
 	</div>
 
-	<NumpadSheet
-		combatant={numpadCombatant}
-		bind:open={numpadOpen}
-		onDamage={controller.damage}
-		onRestore={controller.restore}
-		onSetTempHp={controller.setTempHp}
-	/>
-	<CombatantForm
-		mode="add"
-		bind:open={addOpen}
-		onSubmit={submitAdd}
-		templates={store.libraryEntries}
-		onOpenLibrary={openLibrary}
-	/>
-	<CombatantForm mode="edit" combatant={editCombatant} bind:open={editOpen} onSubmit={submitEdit} />
+	{#if numpadModule}
+		{@const Numpad = numpadModule.default}
+		<Numpad
+			combatant={numpadCombatant}
+			bind:open={numpadOpen}
+			onDamage={controller.damage}
+			onRestore={controller.restore}
+			onSetTempHp={controller.setTempHp}
+		/>
+	{/if}
+	{#if formModule}
+		{@const Form = formModule.default}
+		<Form
+			mode="add"
+			bind:open={addOpen}
+			onSubmit={submitAdd}
+			templates={store.libraryEntries}
+			onOpenLibrary={openLibrary}
+		/>
+		<Form mode="edit" combatant={editCombatant} bind:open={editOpen} onSubmit={submitEdit} />
+	{/if}
 {/if}

@@ -689,4 +689,89 @@ stylesheet RTT; it is not recoverable by CSS scheduling, and the row is deleted 
 so nobody re-derives the skeleton a third time. Also note the common case was never in play: post
 install every boot is SW-warm at 32 ms first-paint / 84 ms FCP, unchanged by the full W-053 shape.
 Where the cold-launch time actually lives is the `nodes/6` static import named in the W-046 section
-above — a bundle row, filed as W-054, not a boot-shell row.
+above — a bundle row, not a boot-shell row. It shipped as W-054; see the next section.
+## Route-dialog deferral, part 2 (W-054) — measured
+
+Follow-on named directly by the W-046 section's "not in W-046" note: `/combats/[id]`
+(`nodes/6`) — the first-launch redirect target from `/` and from `/combats` — still statically
+imported the same bits-ui/vaul/floating chunks via `CombatHeader`→`ConfirmDialog` and
+`CombatantForm`→`ResponsiveModal`.
+
+**Reading the code turned up two more static importers of the same chunks that the row's own text
+did not name**, both of which would have kept the closure from moving at all if left alone:
+`NumpadSheet` (mounted unconditionally by `+page.svelte`, imports `ResponsiveModal` directly) and
+`CombatantRow`'s `ConditionPicker` (mounted per roster row — N simultaneous instances — also
+imports `ResponsiveModal`). Since Vite dedupes `ResponsiveModal.svelte` to one shared chunk, any one
+static importer left in `nodes/6`'s closure keeps the whole bits-ui-dialog + vaul-drawer chunk set
+in it regardless of what happens to `CombatantForm`. All four were deferred with the same mechanism
+(action-gated `import()`, `.catch` clearing the memo, `open` set only after `tick()`):
+
+| target | scope (module vs. instance) | reason |
+|---|---|---|
+| `CombatHeader`'s two `ConfirmDialog`s (Clear/Restart) | instance | `CombatHeader` is a page singleton — one instance mounted per combat |
+| `CombatantForm` (add + edit) | instance, in `+page.svelte` | same page singleton; both usages share one loader |
+| `NumpadSheet` | instance, in `+page.svelte` | same page singleton; not named in the row but a static `ResponsiveModal` importer |
+| `CombatantRow`'s `ConditionPicker` | **module**, in `CombatantRow.svelte` | the roster renders N simultaneous rows — an instance-scoped holder would fire N imports on the first tap |
+
+**Visible-control trap.** None of the four hit it. `ConfirmDialog`'s two triggers are
+`DropdownMenuItem`s, only reachable after the (separately eager, out-of-scope) overflow menu opens.
+`CombatantForm`'s add/edit triggers are the FAB, header button, empty-state CTA, and roster-row
+Edit — all clicks, none render the form. `NumpadSheet`'s trigger is the per-row HP tap — a click.
+`ConditionPicker`'s "+ Condition" chip only exists once a row is expanded (`open` state), itself
+gated behind the collapse chevron — two clicks deep, never present at first paint. `CombatHeader`'s
+`DropdownMenu` and `Popover` (round/escalation editors) stay eager as-is: their triggers *are*
+visible at first paint and are out of this row's scope (not named, not blocking).
+
+### Bytes — `/combats/[id]`'s route node (`nodes/6`) static import closure, gzip -9
+
+Both builds measured on the same machine, same session; "before" is a fresh build of `main` at
+`c7eb30b` in a scratch worktree, not a transcribed number.
+
+| metric | before | after | delta |
+|---|---:|---:|---:|
+| `nodes/6` static closure, JS gz | **193,705** | **162,134** | **−31,571 (−16.3 %)** |
+| files in that closure | 24 | 26 | +2 |
+
+Marker greps confirm the `vaul` / `data-vaul-drawer` chunk and the `alertdialog`-specific chunk are
+present in the overall build (other routes still need them) but **absent from `nodes/6`'s walked
+closure** — the closure that remains is `dropdown-menu` + shared bits-ui core + the floating layer,
+all correctly still eager because `CombatHeader`'s overflow menu and the round/escalation popovers
+are visible-at-first-paint controls out of this row's scope. The file count going *up* by 2 while
+the total drops is the expected shape: `CombatantFormBody`, `NumpadSheetBody` and `ConditionPicker`
+(and their `ResponsiveModal`/vaul/dialog dependencies) moved out of the route node's own bundle and
+into their own dynamic chunks, which is a net size win split across more, smaller files.
+
+### Rig — Fast 3G (1.6 Mbps / 750 Kbps / 150 ms RTT, CPU 4×), `scripts/capture-boot.mjs`
+
+Three runs per build, per scenario (before/after built and measured back-to-back on the same
+machine in the same session):
+
+| scenario | first-paint | FCP | LCP | CLS |
+|---|---:|---:|---:|---:|
+| Cold `/` — before | 672–680 | 1236–1272 | 1976–2020 | 0.036 |
+| Cold `/` — after | 672–688 | 1280–1304 | 1800–1932 | 0.036 |
+| F5 `/combats/<id>` — before | 32–36 | 104–128 | 152–172 | 0.000 |
+| F5 `/combats/<id>` — after | 36–52 | 84–124 | 128–188 | 0.000 |
+
+**What moved.** Cold `/` LCP improves — median ~1998 ms before to ~1883 ms after, roughly −115 ms —
+finally confirming the previous section's prediction: the redirect target's closure shrank, so the
+bytes deferred out of `/` in W-046 no longer come straight back in through `/combats/<id>`. It is a
+real but modest move, not the full ~55 KB gz round-trip, because `CombatHeader`'s overflow menu and
+popovers (out of scope) still pull the shared bits-ui core into the redirect target regardless.
+
+**What did not move, honestly.** FCP is flat to slightly worse in this run set (1236–1272 before vs.
+1280–1304 after) — within the rig's own run-to-run noise band seen throughout this report, not a
+regression signal, but not a clean win either; unlike W-046's Cold-`/`-FCP result, the two ranges
+here overlap. `F5 /combats/<id>` — the bar that must not regress — stays inside the before build's
+own spread on every column (first-paint 36–52 vs. 32–36, FCP 84–124 vs. 104–128, LCP 128–188 vs.
+152–172); nothing leaked additional bytes into that route.
+
+### Test
+
+`src/routes/combats/[id]/combat-detail-page.svelte.spec.ts` is the one test this row added, built on
+the same module-graph-probe pattern as `CombatsHome.svelte.spec.ts` (a `vi.mock` factory around
+`CombatantForm.svelte` that records the first import and re-exports `importActual`), for the same
+reason: a closed bits-ui dialog renders nothing, so DOM absence alone cannot distinguish "never
+imported" from "not open". Proved by breaking the deferral (restoring `CombatantForm`'s static
+import), watching the probe-not-called assertion fail, then restoring the lazy import and watching
+it pass again.

@@ -11,6 +11,7 @@
   combat; emits intent via the controller + the page-owned add form.
 -->
 <script lang="ts">
+	import { tick } from 'svelte';
 	import { Button } from '$lib/components/ui/button';
 	import {
 		DropdownMenu,
@@ -24,7 +25,6 @@
 	import { chromeIcon } from '$lib/icons';
 	import { escalationDie, showRoundAndEscalation } from '$lib/stores/domain/derive';
 	import type { CombatController } from './controller';
-	import ConfirmDialog from './ConfirmDialog.svelte';
 	import DesktopNav from './DesktopNav.svelte';
 	import EscalationEditor from './EscalationEditor.svelte';
 	import RoundEditor from './RoundEditor.svelte';
@@ -33,6 +33,7 @@
 		combat,
 		controller,
 		onAdd,
+		addPending = false,
 		onStart,
 		onAdvance,
 		canAdvance = false,
@@ -40,6 +41,9 @@
 		combat: Combat;
 		controller: CombatController;
 		onAdd: () => void;
+		/** True while the caller's `onAdd` is loading the deferred CombatantForm chunk (W-054) —
+		 *  surfaced as `aria-busy` on this header's own Add entry points. */
+		addPending?: boolean;
 		onStart: () => void;
 		onAdvance?: () => void;
 		canAdvance?: boolean;
@@ -75,9 +79,49 @@
 		escOpen = false;
 	}
 
-	// confirms
+	// confirms — ConfirmDialog is lazy (W-054): CombatHeader is a page singleton (one instance
+	// mounted per combat), so an instance-scoped holder is correct here (unlike CombatRow's
+	// module-level holder, needed only because a row list mounts N simultaneous instances).
+	// Clear and Restart share one loader/module since both route through the same component;
+	// `.catch` clears the in-flight promise so a later menu-select retries, and never sets
+	// `open` — the menu item stays usable.
 	let clearOpen = $state(false);
 	let restartOpen = $state(false);
+	let confirmModule = $state<typeof import('./ConfirmDialog.svelte')>();
+	let confirmPromise: Promise<boolean> | undefined;
+	let confirmPending = $state(false);
+
+	function loadConfirm(): Promise<boolean> {
+		if (confirmModule) return Promise.resolve(true);
+		if (confirmPromise) return confirmPromise;
+		confirmPending = true;
+		confirmPromise = import('./ConfirmDialog.svelte')
+			.then((mod) => {
+				confirmModule = mod;
+				confirmPending = false;
+				return true;
+			})
+			.catch(() => {
+				confirmPromise = undefined;
+				confirmPending = false;
+				return false;
+			});
+		return confirmPromise;
+	}
+
+	async function requestClear() {
+		if (await loadConfirm()) {
+			await tick();
+			clearOpen = true;
+		}
+	}
+
+	async function requestRestart() {
+		if (await loadConfirm()) {
+			await tick();
+			restartOpen = true;
+		}
+	}
 </script>
 
 <header class="flex h-13 shrink-0 items-center border-b border-border bg-card">
@@ -102,6 +146,7 @@
 				size="chrome"
 				class="hidden rounded-full bg-foreground/10 lg:inline-flex"
 				aria-label={m['setup.addCombatant']()}
+				aria-busy={addPending}
 				title={m['setup.addCombatant']()}
 				onclick={onAdd}
 			>
@@ -160,16 +205,16 @@
 					{m['combat.redo']()}
 				</DropdownMenuItem>
 				{#if isActive}
-					<DropdownMenuItem onSelect={onAdd}>
+					<DropdownMenuItem aria-busy={addPending} onSelect={onAdd}>
 						<Add class="size-4" />
 						{m['combat.menu.add']()}
 					</DropdownMenuItem>
-					<DropdownMenuItem onSelect={() => (restartOpen = true)}>
+					<DropdownMenuItem aria-busy={confirmPending} onSelect={requestRestart}>
 						<Restart class="size-4" />
 						{m['combat.menu.restart']()}
 					</DropdownMenuItem>
 				{/if}
-				<DropdownMenuItem onSelect={() => (clearOpen = true)}>
+				<DropdownMenuItem aria-busy={confirmPending} onSelect={requestClear}>
 					<Erase class="size-4" />
 					{m['combat.menu.clear']()}
 				</DropdownMenuItem>
@@ -231,23 +276,26 @@
 	</div>
 {/if}
 
-<ConfirmDialog
-	bind:open={clearOpen}
-	title={m['dialogs.clearCombat.title']()}
-	body={m['dialogs.clearCombat.body']()}
-	confirmLabel={m['dialogs.clearCombat.confirm']()}
-	onConfirm={() => {
-		controller.clear();
-		clearOpen = false;
-	}}
-/>
-<ConfirmDialog
-	bind:open={restartOpen}
-	title={m['dialogs.restart.title']()}
-	body={m['dialogs.restart.body']()}
-	confirmLabel={m['dialogs.restart.confirm']()}
-	onConfirm={() => {
-		controller.restart();
-		restartOpen = false;
-	}}
-/>
+{#if confirmModule}
+	{@const Confirm = confirmModule.default}
+	<Confirm
+		bind:open={clearOpen}
+		title={m['dialogs.clearCombat.title']()}
+		body={m['dialogs.clearCombat.body']()}
+		confirmLabel={m['dialogs.clearCombat.confirm']()}
+		onConfirm={() => {
+			controller.clear();
+			clearOpen = false;
+		}}
+	/>
+	<Confirm
+		bind:open={restartOpen}
+		title={m['dialogs.restart.title']()}
+		body={m['dialogs.restart.body']()}
+		confirmLabel={m['dialogs.restart.confirm']()}
+		onConfirm={() => {
+			controller.restart();
+			restartOpen = false;
+		}}
+	/>
+{/if}

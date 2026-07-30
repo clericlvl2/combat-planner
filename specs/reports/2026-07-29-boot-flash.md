@@ -60,6 +60,47 @@ turned out to be a noisier measurement of the same instant, not a different one.
 | F5 on `/combats` | 44 ms | 108 ms | 132 ms | 0.000 | 44 ms |
 | F5 on `/combats/<id>` | 44 ms | 100 ms | 140 ms | 0.000 | 44 ms |
 
+#### Re-measurement (W-051) — honest transport, unfixed bundle
+
+The table above ran `scripts/serve-build.mjs` with no `Content-Encoding` and no cache headers,
+so every scenario transferred the full ~509 KB raw shell instead of the ~140 KB brotli Vercel
+actually serves — Fast-3G's 1.6 Mbps cap turned that gap into real wall-clock time on the cold
+row. W-051 added brotli/gzip negotiation (matching Vercel's edge) and
+`Cache-Control: public, max-age=31536000, immutable` on `/_app/immutable/**` (matching
+SvelteKit's content-hashed build output) to `serve-build.mjs`, with no routing change. Same rig,
+same conditions, re-run twice for stability:
+
+| Scenario | first-paint | FCP | LCP | CLS | blank window |
+|---|---:|---:|---:|---:|---:|
+| Cold `/` (no SW, empty IndexedDB) | 676 ms | 1560 ms | 2012 ms | 0.036 | 676 ms |
+| F5 on `/` (SW warm) | 48 ms | 148 ms | 200 ms | 0.000 | 48 ms |
+| F5 on `/combats` | 36 ms | 96 ms | 120 ms | 0.000 | 36 ms |
+| F5 on `/combats/<id>` | 32 ms | 84 ms | 128 ms | 0.000 | 32 ms |
+
+Deltas against the Phase 6 table above (rig change only — no app code changed between the two):
+
+- **Cold `/`: first-paint 1744→676 ms, FCP 3616→1560 ms, LCP 4712→2012 ms.** All three roughly
+  halve to less-than-halve; the cold path is transfer-bound on Fast 3G, and the raw-bytes rig was
+  overstating it by the ~3.6× the report's headline already named. CLS is unchanged at 0.036 — it
+  is a layout property of the placeholder markup, not of transfer time, so it was never expected
+  to move.
+- **Warm F5 scenarios (`/`, `/combats`, `/combats/<id>`): unchanged within measurement noise**
+  (32–48 ms first-paint/blank-window, same as Phase 6's 40–44 ms). Expected: warm F5 is served
+  from Cache Storage by the service worker, never hits this HTTP server's compression or cache
+  headers at all.
+- **The cold-`/` LCP regression the Phase 6 delta notes attribute to Phase 3 (bits-ui/vaul
+  pulled into `/`'s node graph, W-046 still open) does not disappear under honest transport — it
+  is still present and by the same relative shape.** First-paint and FCP fell in near-lockstep
+  with LCP (all ~2.1-2.3× faster), so the gap between FCP and LCP that the regression note is
+  about — the "separate and later event" once the skeleton unblocks first paint — is structural,
+  not a transfer-size artifact: LCP is bytes-on-the-wire for `CombatsHome`'s bundle (which pulls
+  bits-ui/vaul) landing after the skeleton's first paint, and compression scales all three
+  milestones together rather than closing that gap. W-046 (route-level dialog deferral) remains
+  the next lever, not superseded by this measurement.
+- These are the current honest-transport numbers; the bundle itself is unchanged (W-046 is still
+  open), so the underlying byte-for-byte cost this table measures against will move again once
+  that lands.
+
 Note what the cold row is: an empty IndexedDB is **the first launch ever for that install**, and
 `App.firstLaunch` (`src/lib/stores/domain/app.ts:79`) gates on `settings.firstLaunchDone`, so it
 seeds a combat and returns an id exactly once and `null` on every boot after. The

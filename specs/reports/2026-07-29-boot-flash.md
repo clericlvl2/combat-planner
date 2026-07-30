@@ -62,6 +62,14 @@ turned out to be a noisier measurement of the same instant, not a different one.
 | F5 on `/combats` | 44 ms | 108 ms | 132 ms | 0.000 | 44 ms |
 | F5 on `/combats/<id>` | 44 ms | 100 ms | 140 ms | 0.000 | 44 ms |
 
+Note what the cold row is: an empty IndexedDB is **the first launch ever for that install**, and
+`App.firstLaunch` (`src/lib/stores/domain/app.ts:79`) gates on `settings.firstLaunchDone`, so it
+seeds a combat and returns an id exactly once and `null` on every boot after. The
+`/` → seeded-combat redirect Phase 3 moved out of `+page.ts` therefore happens once per install, not
+on every cold boot — a cold boot on an existing install goes straight to `CombatsHome` with no
+redirect and no intermediate chrome. Measurements on this row should not be generalised to
+steady-state cold opens.
+
 Deltas against the baseline above:
 
 - **Cold `/` first-paint/blank-window: 2104/2160 ms → 1744 ms (−17%/−19%).** Phase 3 unblocking
@@ -89,12 +97,62 @@ Deltas against the baseline above:
   the dimensions of the content it stands in for is therefore the actual CLS fix, not the optional
   polish item the baseline section originally filed it as.
 - **Warm F5 scenarios (`/`, `/combats`, `/combats/<id>`): first-paint/blank-window unchanged
-  within measurement noise (~40-52 ms before, ~40-44 ms after).** Expected, and consistent with
-  the report's own finding that warm F5 was already fast pre-fix (everything served from Cache
-  Storage) — the symptom Phase 2 fixes is *qualitative* (a hard blank-to-content cut versus chrome
-  painting immediately), not a timing regression these numbers were ever going to show. FCP moved
-  a few ms in both directions across runs, consistent with CDP-throttling jitter, not a real
-  change.
+  within measurement noise (~40-52 ms before, ~40-44 ms after).** Consistent with warm F5 already
+  being fast pre-fix (everything served from Cache Storage). FCP moved a few ms in both directions
+  across runs, consistent with CDP-throttling jitter, not a real change.
+
+### Correction — Phase 2's skeleton made warm F5 qualitatively *worse*
+
+The delta note above originally claimed the warm-F5 improvement was "qualitative, not a timing
+regression these numbers were ever going to show". The user reported after deploy that F5 still
+flashed, and re-measurement showed the qualitative change went the wrong way. Warm F5 with the
+service worker in control, production build, CPU 4×:
+
+| | first paint | content |
+|---|---:|---:|
+| with the skeleton painting immediately | 32 ms — skeleton chrome | 80 ms |
+| with the skeleton suppressed, nothing else changed | 44 ms — flat dark canvas | 96 ms |
+
+On a reload the browser holds the previous frame until the new document paints, so suppressing the
+skeleton yields **one** visual change. Painting it yields **two** 48 ms apart, the first of which is
+chrome that matches neither the previous page nor the destination. Two structural paints 48 ms apart
+is what "flashing on F5" is.
+
+Two further facts this exposed, both of which narrow what the skeleton can ever do:
+
+- **It cannot cover the first frame.** Every color in it is a `var()` token defined by the
+  render-blocking app stylesheet, so it has nothing to paint until that sheet lands. The dark canvas
+  on the genuinely first frame comes from the inline `color-scheme` declaration in the theme script,
+  which was the other half of the same commit. Verified in dev, where Vite injects CSS via JS: with
+  no stylesheet applied, `--bg` is undefined and the skeleton's computed background is
+  `rgba(0, 0, 0, 0)` — the raw canvas shows through, white under `cp-theme: light`.
+- **It never painted on cold boot at all, so it was deleted.** A delayed reveal (CSS
+  `animation-delay`, past warm-F5 FCP) was implemented first, on the assumption that cold open still
+  needed cover. Measurement killed that assumption. Sampling the skeleton's computed opacity every
+  animation frame, cold, empty profile, CPU 4×:
+
+| profile | first paint | skeleton removed | visible frames |
+|---|---:|---:|---:|
+| Fast 4G, no reveal delay | 356 ms | 351 ms | **0** |
+| Slow 3G, no reveal delay | 6480 ms | 6472 ms | **0** |
+| Fast 4G, 260 ms delay | 360 ms | 355 ms | **0** |
+| Slow 3G, 260 ms delay | 6480 ms | 6472 ms | **0** |
+
+  `onMount` removes the skeleton 5-8 ms *before* first paint on every profile, delay or not. The
+  reason is structural: the skeleton is styled entirely off `var()` tokens, so it cannot paint until
+  the render-blocking app stylesheet lands — and the bundle, fetched in parallel via `modulepreload`,
+  has finished executing by then. On a cold boot the gap between "stylesheet applied" and "bundle
+  ran" does not exist. It exists **only** on a warm F5, where both come from Cache Storage and the
+  JS parse is the slower half (~30 ms vs ~78 ms) — that is, the one window where painting a skeleton
+  is harmful. The mechanism was inverted: the only place it could appear was the only place it must
+  not.
+
+  So `#boot-skeleton`, its teardown in `+layout.svelte`, and the reveal delay are all gone. The
+  cold-boot blank window is entirely *pre-first-paint* time, which no in-shell markup can cover
+  because that markup needs the stylesheet too. The dark canvas there comes from the inline
+  `color-scheme` declaration, and only from it. Shortening the window itself means either shrinking
+  what blocks first paint (W-044, W-046) or making the app stylesheet non-blocking behind a
+  self-contained inline shell (W-053).
 
 The desktop "black lines at the top" symptom **could not be reproduced headless**, but the
 mechanism is now identified — see root cause 5. The original theory (`AppHeader.svelte:34` being

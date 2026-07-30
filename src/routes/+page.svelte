@@ -35,7 +35,12 @@
 	import CombatsHome from '$lib/components/app/CombatsHome.svelte';
 	import { store } from '$lib/stores';
 
-	let showHome = $state(false);
+	// Seeded from `store.ready`, not a bare `false`: this component remounts on every in-app
+	// navigation back to `/`, and once the store is already hydrated there is no decision left to
+	// wait for — `hydrate()` resolves `null` on the fast path, but only after a microtask, so a
+	// `false` start rendered the `…` placeholder for a frame on every such return. On the true
+	// first boot `ready` is still false here, which is the one case the placeholder is for.
+	let showHome = $state(store.ready);
 
 	onMount(() => {
 		let cancelled = false;

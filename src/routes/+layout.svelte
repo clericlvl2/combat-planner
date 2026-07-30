@@ -23,16 +23,14 @@
 	let Toaster = $state<typeof import('$lib/components/ui/sonner').Toaster>();
 
 	onMount(async () => {
-		// Boot skeleton teardown (src/app.html) — must be the *first* statement, before the
-		// `await` below. AppShell renders the real AppHeader unconditionally as soon as `mount()`
-		// completes; Svelte 5 queues `onMount` on a microtask that drains before the next paint,
-		// so removing the skeleton here is atomic with that paint. Placed after the `await` instead,
-		// both headers would sit in the DOM for the whole IndexedDB round-trip. Clearing the timer
-		// cancels app.html's bounded failure state, which only fires if this line never runs.
+		// Boot-shell teardown (src/app.html) — must be the *first* statement, before the `await`
+		// below, and specifically before anything that can throw or suspend: reaching this line is
+		// the app's only proof-of-life, and clearing the timer is what cancels the bounded failure
+		// screen. Left until after the `await`, a slow IndexedDB round-trip on a weak device could
+		// let the 15s timer fire over a perfectly healthy boot.
 		clearTimeout(
 			(window as unknown as { __cpBootTimer?: ReturnType<typeof setTimeout> }).__cpBootTimer,
 		);
-		document.getElementById('boot-skeleton')?.remove();
 		document.getElementById('boot-failed')?.remove();
 
 		// Fire-and-forget, independent of the hydrate await below — the sonner chunk has no

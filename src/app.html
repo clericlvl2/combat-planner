@@ -40,37 +40,11 @@
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>
 
-		<!-- Boot skeleton (warm-F5 fix). With `ssr: false` SvelteKit calls Svelte's `mount()`,
-		     which only appends to the target above — nothing here clears this markup, so
-		     src/routes/+layout.svelte's root `onMount` must remove #boot-skeleton (and
-		     #boot-failed) as its first statement, before `await store.hydrate()`. Styled off the
-		     same tokens the theme-boot script above already resolves via `data-theme`, so it is
-		     correct in both themes without duplicating any hex value into this shell. Placed after
-		     the mount target in DOM order so it paints on top of the real chrome for the one frame
-		     where both could otherwise coexist. -->
-		<div
-			id="boot-skeleton"
-			aria-hidden="true"
-			style="position: fixed; inset: 0; display: flex; flex-direction: column; background: var(--bg); color: var(--text);"
-		>
-			<div
-				style="flex: none; height: 52px; display: flex; align-items: center; gap: 12px; padding: 0 16px; border-bottom: 1px solid var(--border); background: var(--surface);"
-			>
-				<div style="width: 24px; height: 24px; border-radius: 4px; background: var(--surface-3);"></div>
-				<div style="width: 120px; height: 14px; border-radius: 4px; background: var(--surface-3);"></div>
-			</div>
-			<div style="flex: 1; padding: 16px;">
-				<div
-					style="max-width: 768px; height: 96px; margin: 0 auto; border-radius: 8px; background: var(--surface); border: 1px solid var(--border);"
-				></div>
-			</div>
-		</div>
-
 		<!-- Bounded failure state. If the client bundle never executes (e.g. a stale precache
-		     after a deploy, or a deep-link F5 whose modules 404 to this SPA fallback), the
-		     skeleton above would otherwise persist forever — a plausible but permanently dead app,
-		     worse than a blank page. This timer swaps it for a reload prompt; a normal boot cancels
-		     the timer and removes both elements from +layout.svelte's `onMount` well before it ever
+		     after a deploy, or a deep-link F5 whose modules 404 to this SPA fallback), the page
+		     would otherwise sit on an empty canvas forever — a plausible but permanently dead app,
+		     worse than an error. This timer swaps in a reload prompt; a normal boot cancels the
+		     timer and removes this element from +layout.svelte's `onMount` well before it ever
 		     fires. There is no framework JS by definition here, so the copy below is hardcoded
 		     English rather than routed through Paraglide (ADR-005) — a deliberate, narrow i18n
 		     exception.
@@ -111,8 +85,6 @@
 			// measured cold-boot FCP so a slow-but-healthy boot on a weaker device or network is
 			// never mistaken for a dead bundle.
 			window.__cpBootTimer = setTimeout(function () {
-				var skeleton = document.getElementById('boot-skeleton');
-				if (skeleton) skeleton.remove();
 				var failed = document.getElementById('boot-failed');
 				// Inline display, not `hidden` — see the #boot-failed comment above.
 				if (failed) failed.style.display = 'flex';

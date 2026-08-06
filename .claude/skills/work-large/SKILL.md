@@ -35,7 +35,9 @@ independent `guard-bee` pass, remediate, commit, clear the row. The unit runs in
    that brings phase total under budget.
 
    Genuinely indivisible oversized phase: flag it, then either feed runner a prepared research
-   summary, dispatch with stronger model/effort override, or run manually.
+   summary, dispatch with a stronger `model` override, or run manually. Effort cannot be
+   overridden per call — the Agent tool has no `effort` parameter, so `phase-runner`'s
+   frontmatter value always applies.
 
    Thresholds provisional — on phase-runner overflow, record it (memory note) and tune the anchor.
 3. **One explicit approval** — present the finished plan and stop. Wait for the user to say go.
